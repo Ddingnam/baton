@@ -35,3 +35,4 @@ application-*.properties
 footer.jsp
 KakaoAuthService.java
 MailSender.java
+.settings/org.eclipse.buildship.core.prefs
