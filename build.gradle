@@ -44,6 +44,16 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-websocket-test'
 	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:4.0.1'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	
+	// tomcat-embed
+	implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+
+    // JSTL
+	implementation 'jakarta.servlet:jakarta.servlet-api'
+	implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api'
+	implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl'
+	
+	implementation 'org.springframework.security:spring-security-taglibs'
 }
 
 tasks.named('test') {
