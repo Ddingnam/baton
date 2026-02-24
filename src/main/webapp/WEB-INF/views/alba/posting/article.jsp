@@ -4,43 +4,66 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${dto.title} - 바톤터치</title>
+<title>${dto.title} - BATON</title>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/main.css">
 <style>
-    :root { --main-color: #ff7e36; }
-    body { font-family: 'Pretendard', sans-serif; background-color: #f8f9fa; margin: 0; padding: 0; }
-    .mobile-container { max-width: 600px; margin: 0 auto; background: #fff; min-height: 100vh; padding-bottom: 90px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
-    .article-header { padding: 24px 20px; border-bottom: 1px solid #ebebeb; }
-    .title { font-size: 22px; font-weight: bold; color: #222; margin-bottom: 12px; }
-    .pay { font-size: 20px; font-weight: bold; color: var(--main-color); margin-bottom: 20px; }
-    .meta-info { display: flex; flex-wrap: wrap; gap: 10px; font-size: 14px; color: #555; }
-    .meta-info div { background: #f1f3f5; padding: 6px 12px; border-radius: 4px; }
-    .article-content { padding: 24px 20px; font-size: 16px; line-height: 1.6; color: #333; white-space: pre-wrap; min-height: 300px; }
+    .article-container { max-width: 800px; margin: 0 auto; background: #fff; border: 1px solid #ebebeb; border-radius: 16px; padding: 40px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
+    .article-header { border-bottom: 1px solid #ebebeb; padding-bottom: 24px; margin-bottom: 30px; }
+    .article-title { font-size: 28px; font-weight: 800; color: #191F28; margin: 0 0 16px 0; line-height: 1.4; }
     
-    /* 하단 고정 바 */
-    .bottom-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; background: #fff; padding: 12px 20px; box-sizing: border-box; border-top: 1px solid #ddd; display: flex; gap: 10px; z-index: 10; }
-    .apply-btn { flex: 1; padding: 16px; background-color: var(--main-color); color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; }
-    .back-btn { width: 60px; padding: 16px; background-color: #fff; color: #333; border: 1px solid #ddd; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; }
+    .pay-highlight { font-size: 24px; font-weight: 800; color: #ff7e36; display: flex; align-items: center; gap: 8px; margin-bottom: 24px; }
+    .pay-highlight .badge { background: #ff7e36; color: white; font-size: 14px; padding: 4px 8px; border-radius: 6px; }
+    
+    .info-grid { display: grid; grid-template-columns: 100px 1fr; gap: 12px 0; font-size: 16px; margin-bottom: 20px; }
+    .info-grid .label { color: #8B95A1; font-weight: 600; }
+    .info-grid .value { color: #333D4B; font-weight: 500; }
+    
+    .article-body { font-size: 16px; line-height: 1.8; color: #333D4B; white-space: pre-wrap; min-height: 200px; padding: 20px 0; border-bottom: 1px solid #ebebeb; margin-bottom: 30px; }
+    
+    .btn-group { display: flex; gap: 12px; justify-content: center; }
+    .btn { padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; text-decoration: none; text-align: center; transition: 0.2s; }
+    .btn-outline { background: #fff; color: #4E5968; border: 1px solid #D1D6DB; }
+    .btn-outline:hover { background: #F2F4F6; }
+    .btn-primary { background: #ff7e36; color: #fff; border: none; flex: 1; max-width: 300px; }
+    .btn-primary:hover { background: #e66a26; }
 </style>
 </head>
 <body>
-<div class="mobile-container">
-    <div class="article-header">
-        <div class="title">${dto.title}</div>
-        <div class="pay">시급 <fmt:formatNumber value="${dto.pay}" pattern="#,###"/>원</div>
-        <div class="meta-info">
-            <div>요일: ${dto.workDays}</div>
-            <div>시간: ${dto.workTime}</div>
-            <div>조회수: ${dto.hitCount}</div>
-        </div>
-    </div>
-    
-    <div class="article-content">${dto.content}</div>
 
-    <div class="bottom-bar">
-        <a href="${pageContext.request.contextPath}/alba/posting/list" class="back-btn">목록</a>
-        <a href="javascript:alert('지원하기 기능은 다음 단계에서 개발됩니다!');" class="apply-btn">지원하기</a>
+    <jsp:include page="/WEB-INF/views/layout/header.jsp" />
+
+    <div id="baton-layout-container">
+        <jsp:include page="/WEB-INF/views/layout/left.jsp" />
+
+        <main id="baton-main-content">
+            <div class="article-container">
+                <div class="article-header">
+                    <h1 class="article-title">${dto.title}</h1>
+                    <div class="pay-highlight">
+                        <span class="badge">시급</span> <fmt:formatNumber value="${dto.pay}" pattern="#,###"/>원
+                    </div>
+                    <div class="info-grid">
+                        <div class="label">근무요일</div>
+                        <div class="value">${dto.workDays}</div>
+                        <div class="label">근무시간</div>
+                        <div class="value">${dto.workTime}</div>
+                        <div class="label">조회수</div>
+                        <div class="value">${dto.hitCount}</div>
+                    </div>
+                </div>
+                
+                <div class="article-body">${dto.content}</div>
+
+                <div class="btn-group">
+                    <a href="${pageContext.request.contextPath}/alba/posting/list" class="btn btn-outline">목록으로</a>
+                    <button class="btn btn-primary" onclick="alert('곧 지원하기 기능이 연결됩니다!');">이 알바 지원하기</button>
+                </div>
+            </div>
+        </main>
     </div>
-</div>
+
+    <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
+
 </body>
 </html>
