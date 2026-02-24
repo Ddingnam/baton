@@ -33,7 +33,7 @@
                     <c:choose>
                         <c:when test="${empty sessionScope.member}">
                             <a href="${pageContext.request.contextPath}/member/login" class="login-btn">로그인</a>
-                            <a href="${pageContext.request.contextPath}/member/member" class="join-btn">시작하기</a>
+                            <a href="${pageContext.request.contextPath}/member/member" class="join-btn">회원가입</a>
                         </c:when>
                         <c:otherwise>
                             <span class="user-name"><strong>${sessionScope.member.userName}</strong>님</span>
