@@ -1,65 +1,9 @@
 ﻿@charset "UTF-8";
 
 #baton-left {
-	width: 240px;
-	padding: 40px 20px;
-	position: sticky;
-	top: 80px;
-	height: calc(100vh - 80px);
-	background: #ffffff;
-	border-right: 1px solid rgba(0, 0, 0, 0.05);
+    width: 220px; padding: 40px 20px 0 0; position: sticky; top: 72px; height: calc(100vh - 72px);
 }
-
-.menu-label {
-	color: #8B95A1;
-	font-size: 12px;
-	font-weight: 700;
-	margin-bottom: 15px;
-	padding-left: 12px;
-}
-
-#left-menu-list {
-	list-style: none;
-	padding: 0;
-	margin: 0;
-}
-
-#left-menu-list li {
-	margin-bottom: 4px;
-}
-
-#left-menu-list a {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	padding: 12px 14px;
-	border-radius: 12px;
-	font-weight: 600;
-	color: #4E5968;
-	text-decoration: none;
-	transition: 0.2s;
-}
-
-#left-menu-list a i {
-	font-size: 20px;
-	color: #8B95A1;
-	transition: 0.2s;
-}
-
-#left-menu-list a:hover {
-	background: #F2F4F6;
-	color: #191F28;
-}
-
-#left-menu-list a:hover i {
-	color: #191F28;
-}
-/* 현재 메뉴 활성화 시 고급스러운 블루(토스 블루 느낌) 포인트 */
-#left-menu-list li.active a {
-	background: #E8F3FF;
-	color: #3182F6;
-}
-
-#left-menu-list li.active a i {
-	color: #3182F6;
-}
+.sidebar-menu li { list-style: none; margin-bottom: 5px; }
+.sidebar-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: #555; font-weight: 600; text-decoration: none; transition: 0.2s; }
+.sidebar-menu a:hover { background: #F1F5F9; color: #111; }
+.sidebar-menu li.active a { background: #E0E7FF; color: #2563EB; }
