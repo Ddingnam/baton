@@ -1,6 +1,6 @@
 package com.sp.app.controller;
 
-public class TestController {
+class TestController {
 	// 김자바
 	// gradle refresh done.
 	// 테스트입니다.

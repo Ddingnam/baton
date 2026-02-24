@@ -1,9 +1,0 @@
-﻿@charset "UTF-8";
-
-#baton-left {
-    width: 220px; padding: 40px 20px 0 0; position: sticky; top: 72px; height: calc(100vh - 72px);
-}
-.sidebar-menu li { list-style: none; margin-bottom: 5px; }
-.sidebar-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: #555; font-weight: 600; text-decoration: none; transition: 0.2s; }
-.sidebar-menu a:hover { background: #F1F5F9; color: #111; }
-.sidebar-menu li.active a { background: #E0E7FF; color: #2563EB; }
