@@ -9,6 +9,6 @@ public class PaymentViewController {
     @GetMapping("/payment/test")
     public String showPaymentTestPage() {
    
-        return "paymentTest"; 
+        return "payment/paymentTest"; 
     }
 }
