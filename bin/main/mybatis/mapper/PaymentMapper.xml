@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sp.mapper.PaymentMapper">
+
+    <insert id="insertPayment" parameterType="com.sp.app.model.Payment">
+        <selectKey keyProperty="paymentIdx" resultType="int" order="BEFORE">
+            SELECT SEQPAYMENT.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO PAYMENT (
+            PAYMENTIDX, IMPUID, MERCHANTUID, CHARGEAMOUNT, 
+            PAYMETHOD, PAYSTATUS, USERIDX
+        ) VALUES (
+            #{paymentIdx}, #{impUid}, #{merchantUid}, #{chargeAmount}, 
+            #{payMethod}, #{payStatus}, #{userIdx}
+        )
+    </insert>
+
+    <insert id="insertPointHistory" parameterType="com.sp.app.model.PointHistory">
+        INSERT INTO POINTHISTORY (
+            HISTORYIDX, PAYMENTIDX, AMOUNT, HISTORYTYPE
+        ) VALUES (
+            SEQPOINTHISTORY.NEXTVAL, #{paymentIdx}, #{amount}, #{historyType}
+        )
+    </insert>
+
+</mapper>
