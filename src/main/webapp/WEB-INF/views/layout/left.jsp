@@ -24,6 +24,6 @@
         </div>
     </aside>
 
-    <script src="${pageContext.request.contextPath}/js/left.js"></script>
+    <script src="${pageContext.request.contextPath}/dist/js/left.js"></script>
 </body>
 </html>

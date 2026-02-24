@@ -51,5 +51,7 @@
             <span class="notification-dot"></span>
         </div>
     </div>
+    
+    <script src="${pageContext.request.contextPath}/dist/js/header.js"></script>
 </body>
 </html>

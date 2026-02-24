@@ -161,6 +161,6 @@
     </div>
 
     <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
-    <script src="${pageContext.request.contextPath}/js/main.js"></script>
+    <script src="${pageContext.request.contextPath}/dist/js/main.js"></script>
 </body>
 </html>
