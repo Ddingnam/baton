@@ -18,6 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 public class TradeController {
 	private final TradeService service;
 	
+	@GetMapping("list")
+	public String list() {
+		return "trade/list";
+	}
+	
 	@GetMapping("write")
 	public String writeForm() {
 		return "trade/write";
