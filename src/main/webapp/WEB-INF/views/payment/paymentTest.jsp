@@ -29,7 +29,7 @@
             var merchantUid = "ORD_" + new Date().getTime(); 
 
             IMP.request_pay({
-                pg: "html5_inicis",           // 테스트용 PG사 (KG이니시스)
+                pg: "kakaopay",           // 테스트용 PG사
                 pay_method: "card",           // 결제수단 (신용카드)
                 merchant_uid: merchantUid,    // 우리 시스템 고유 주문번호
                 name: "바톤터치 테스트 상품",      // 결제창에 보여질 상품명
