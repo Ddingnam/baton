@@ -1,4 +1,4 @@
-package com.sp.mapper;
+package com.sp.app.mapper;
 
 public interface TradeMapper {
 

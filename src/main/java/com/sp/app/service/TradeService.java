@@ -1,4 +1,4 @@
-package com.sp.service;
+package com.sp.app.service;
 
 public interface TradeService {
 
