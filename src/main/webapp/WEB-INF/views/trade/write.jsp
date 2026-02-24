@@ -161,6 +161,7 @@ function submitForm() {
     const f = document.tradeForm;
     
     // 이미지 유효성 체크
+    /*
     const files = document.getElementById('selectFile').files;
     if(files.length > 5) {
         alert("이미지는 최대 5장까지 가능합니다.");
@@ -170,8 +171,7 @@ function submitForm() {
         alert("이미지를 최소 1장 등록해주세요.");
         return;
     }
-
-    // 나중에 Vue나 Axios로 바꾸기 편하게 action 설정
+	*/
     f.action = "/trade/write"; 
     f.submit();
 }

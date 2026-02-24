@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sp.app.mapper.TradeMapper">
+	<insert id="insertTradePost" parameterType="com.sp.app.model.Trade">
+		INSERT INTO product(productIdx, title, content, price, userIdx, tradeType, 
+			tradePlace, regionIdx, productStatus, categoryIdx)
+		VALUES(seq_product.NEXTVAL, #{title}, #{content}, #{price}, 1, #{tradeType},
+			#{tradePlace}, 1, #{productStatus}, 1)
+	</insert>
+
+</mapper>
