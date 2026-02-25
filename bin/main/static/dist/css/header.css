@@ -139,13 +139,21 @@
 .login-btn:hover { color: #191F28 !important; }
 
 .join-btn, .join-btn:visited { 
-    padding: 12px 24px; background: #3182F6 !important; color: #fff !important; 
-    border-radius: 14px; font-weight: 700; text-decoration: none; transition: all 0.3s; 
+    padding: 12px 24px; 
+    background: var(--header-domain-color) !important;
+    color: #fff !important; 
+    border-radius: 14px; 
+    font-weight: 700; 
+    text-decoration: none; 
+    transition: all 0.3s ease; 
 }
+
 .join-btn:hover { 
-    background: #1B64DA !important; transform: translateY(-2px); 
-    box-shadow: 0 6px 15px rgba(49, 130, 246, 0.3); 
+    filter: brightness(90%);
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); 
 }
+
 
 /* =========================================================
    로그인 상태 유저

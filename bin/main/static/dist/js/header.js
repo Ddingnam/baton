@@ -20,6 +20,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	document.documentElement.style.setProperty('--header-domain-color', domainColor);
 	document.documentElement.style.setProperty('--header-domain-bg', domainBgColor);
+	    document.documentElement.style.setProperty('--page-theme-bg', pageBg);
+
+	    const joinBtn = document.querySelector('.join-btn');
+	    if(joinBtn) {
+	        joinBtn.style.backgroundColor = domainColor;
+	    }
+
+	    document.body.style.backgroundColor = pageBg;
 
 	const navLinks = document.querySelectorAll('.nav-menu .nav-link');
 	navLinks.forEach(link => {
