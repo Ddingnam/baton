@@ -57,3 +57,14 @@ function startCounterAnimation() {
         }
     }, frameTime);
 }
+
+function toggleWish(el, e) {
+            e.stopPropagation();
+            el.classList.toggle('active');
+            const icon = el.querySelector('i');
+            if (el.classList.contains('active')) {
+                icon.className = 'ri-heart-fill';
+            } else {
+                icon.className = 'ri-heart-line';
+            }
+        }
