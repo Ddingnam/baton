@@ -199,8 +199,8 @@ a { text-decoration: none; color: inherit; }
     display: flex; align-items: center; justify-content: center; gap: 6px;
     color: var(--text-sub);
 }
-.wish-btn-large:hover { border-color: #e53935; color: #e53935; background: #fff5f5; }
-.wish-btn-large.active { border-color: #e53935; color: #e53935; background: #fff5f5; }
+.wish-btn-large:hover { border-color: #F86D7D; color: #F86D7D; background: #FFF5F6; }
+.wish-btn-large.active { border-color: #F86D7D; color: #F86D7D; background: #FFF5F6; }
 .share-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
 
 .owner-actions { margin-top: 10px; display: flex; gap: 10px; }
