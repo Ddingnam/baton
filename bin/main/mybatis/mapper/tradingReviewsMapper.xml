@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sp.app.mapper.TradingReviewsMapper">
+
+	<select id="listReviewsByType" parameterType="String" resultType="com.sp.app.model.TradingReviews">
+        SELECT 
+            R.REVIEWIDX, R.SALEREVIEWTYPE, R.CONTENT, 
+            TO_CHAR(R.CREATEDDATE, 'YYYY-MM-DD HH24:MI') AS createdDate, 
+            R.SCORE, R.USERIDX, R.PRODUCTIDX,
+            U.NICKNAME AS writerNickname,  P.TITLE AS productTitle
+        FROM TRADINGREVIEWS R
+        JOIN USERS U ON R.USERIDX = U.USERIDX JOIN PRODUCT P ON R.PRODUCTIDX = P.PRODUCTIDX
+        WHERE R.SALEREVIEWTYPE = #{saleReviewType}
+        ORDER BY R.REVIEWIDX DESC
+    </select>
+
+    <insert id="insertReview" parameterType="com.sp.app.model.TradingReviews">
+        INSERT INTO TRADINGREVIEWS (
+            REVIEWIDX, SALEREVIEWTYPE, CONTENT, USERIDX, PRODUCTIDX, SCORE
+        ) VALUES (
+            SEQTRADINGREVIEWS.NEXTVAL, #{saleReviewType}, #{content}, #{userIdx}, #{productIdx}, #{score}
+        )
+    </insert>
+</mapper>
