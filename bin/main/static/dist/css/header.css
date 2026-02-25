@@ -97,9 +97,18 @@
 
 /* 각 도메인별 컬러 */
 .nav-menu li:nth-child(1) a:hover { color: #3182F6 !important; } 
-.nav-menu li:nth-child(2) a:hover { color: #7048E8 !important; } 
-.nav-menu li:nth-child(3) a:hover { color: #00B050 !important; } 
-.nav-menu li:nth-child(4) a:hover { color: #F86D7D !important; } 
+.nav-menu li:nth-child(2) a:hover { color: #00B98D !important; } 
+.nav-menu li:nth-child(3) a:hover { color: #F86D7D !important; }
+.nav-menu li:nth-child(4) a:hover { color: #002C5F !important; } 
+.nav-menu li:nth-child(5) a:hover { color: #8A63FF !important; } 
+
+.nav-menu li a.active {
+    color: var(--header-domain-color) !important;
+}
+.nav-menu li a.active::after {
+    width: 100%;
+    background: var(--header-domain-color);
+}
 
 .nav-menu li a::after {
     content: ''; 
@@ -116,14 +125,6 @@
 
 .nav-menu li a:hover::after { 
     width: 100%; 
-}
-
-.nav-menu li a.active {
-    color: var(--header-domain-color) !important;
-}
-.nav-menu li a.active::after {
-    width: 100%;
-    background: var(--header-domain-color);
 }
 
 /* =========================================================

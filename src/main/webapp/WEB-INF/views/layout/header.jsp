@@ -16,17 +16,23 @@
                 <span class="logo-text">BATON</span>
             </a>
         </div>
-        
-        <nav class="header-center">
-            <ul class="nav-menu">
-                <li><a href="${pageContext.request.contextPath}/trade/list" class="nav-link" data-domain="trade">중고거래</a></li>
-                <li><a href="${pageContext.request.contextPath}/club/list" class="nav-link" data-domain="club">동네모임</a></li>
-                <li><a href="${pageContext.request.contextPath}/alba/list" class="nav-link" data-domain="alba">알바·구인</a></li>
-                <li><a href="${pageContext.request.contextPath}/community/list" class="nav-link" data-domain="community">커뮤니티</a></li>
-            </ul>
-        </nav>
 
-        <div class="header-right">
+		<nav class="header-center">
+			<ul class="nav-menu">
+				<li><a href="${pageContext.request.contextPath}/"
+					class="nav-link" data-domain="home">홈</a></li>
+				<li><a href="${pageContext.request.contextPath}/trade/list"
+					class="nav-link" data-domain="trade">중고거래</a></li>
+				<li><a href="${pageContext.request.contextPath}/club/list"
+					class="nav-link" data-domain="club">동네모임</a></li>
+				<li><a href="${pageContext.request.contextPath}/alba/list"
+					class="nav-link" data-domain="alba">알바구인</a></li>
+				<li><a href="${pageContext.request.contextPath}/community/list"
+					class="nav-link" data-domain="community">커뮤니티</a></li>
+			</ul>
+		</nav>
+
+		<div class="header-right">
             <div class="auth-group">
                 <c:choose>
                     <c:when test="${empty sessionScope.member}">

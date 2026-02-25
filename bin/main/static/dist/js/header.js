@@ -1,46 +1,52 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const path = window.location.pathname;
-    
-    let domainColor = '#3182F6'; 
-    let domainBgColor = '#E8F3FF';
+	const path = window.location.pathname;
 
-    if (path.includes('/club/')) {
-        domainColor = '#7048E8'; // 동네모임 (보라)
-        domainBgColor = '#F3EFFF'; 
-    } else if (path.includes('/alba/')) {
-        domainColor = '#00B050'; // 알바구인 (초록)
-        domainBgColor = '#E6F7ED'; 
-    } else if (path.includes('/community/')) {
-        domainColor = '#F86D7D'; // 커뮤니티 (핑크)
-        domainBgColor = '#FEECEE'; 
-    }
+	let domainColor = '#3182F6';
+	let domainBgColor = '#E8F3FF';
 
-    document.documentElement.style.setProperty('--header-domain-color', domainColor);
-    document.documentElement.style.setProperty('--header-domain-bg', domainBgColor);
+	if (path.includes('/trade/')) {
+		domainColor = '#8A63FF';
+		domainBgColor = '#F4F0FF';
+	} else if (path.includes('/alba/')) {
+		domainColor = '#F86D7D';
+		domainBgColor = '#FFF0F1';
+	} else if (path.includes('/club/')) {
 
-    const navLinks = document.querySelectorAll('.nav-menu .nav-link');
-    navLinks.forEach(link => {
-        const domain = link.getAttribute('data-domain');
-        if (domain && path.includes('/' + domain + '/')) {
-            link.classList.add('active');
-        }
-    });
+		domainColor = '#002C5F';
+		domainBgColor = '#F0F4F8';
+	} else if (path.includes('/community/')) {
 
-    const sideLinks = document.querySelectorAll('.sidebar-menu .side-link');
-    
-    document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
-    
-    let isSideActive = false;
-    sideLinks.forEach(link => {
-        const domain = link.getAttribute('data-domain');
-        if (domain && domain !== 'home' && path.includes('/' + domain + '/')) {
-            link.parentElement.classList.add('active');
-            isSideActive = true;
-        }
-    });
-    
-    if (!isSideActive) {
-        const homeLink = document.querySelector('.sidebar-menu .side-link[data-domain="home"]');
-        if (homeLink) homeLink.parentElement.classList.add('active');
-    }
+		domainColor = '#00B98D';
+		domainBgColor = '#E6F8F3';
+	}
+
+	document.documentElement.style.setProperty('--header-domain-color', domainColor);
+	document.documentElement.style.setProperty('--header-domain-bg', domainBgColor);
+
+	const navLinks = document.querySelectorAll('.nav-menu .nav-link');
+	navLinks.forEach(link => {
+		const domain = link.getAttribute('data-domain');
+		if (domain === 'home' && (path === '/' || path.endsWith('/main') || path.endsWith('/index.jsp'))) {
+			link.classList.add('active');
+		} else if (domain && domain !== 'home' && path.includes('/' + domain + '/')) {
+			link.classList.add('active');
+		}
+	});
+
+	const sideLinks = document.querySelectorAll('.sidebar-menu .side-link');
+	document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+
+	let isSideActive = false;
+	sideLinks.forEach(link => {
+		const domain = link.getAttribute('data-domain');
+		if (domain && domain !== 'home' && path.includes('/' + domain + '/')) {
+			link.parentElement.classList.add('active');
+			isSideActive = true;
+		}
+	});
+
+	if (!isSideActive) {
+		const homeLink = document.querySelector('.sidebar-menu .side-link[data-domain="home"]');
+		if (homeLink) homeLink.parentElement.classList.add('active');
+	}
 });
