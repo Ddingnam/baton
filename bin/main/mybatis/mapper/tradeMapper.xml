@@ -8,5 +8,29 @@
 		VALUES(seq_product.NEXTVAL, #{title}, #{content}, #{price}, 1, #{tradeType},
 			#{tradePlace}, 1, #{productStatus}, 1)
 	</insert>
+	
+	<select id="findByIdx" parameterType="long" resultType="com.sp.app.model.Trade">
+		SELECT productIdx, title, content, price, userIdx, hitCount, likeCount, chatCount,
+			tradeType, tradeStatus, tradePlace, regionIdx, productStatus, pullCount, 
+			lastUpDate, createdDate, updatedDate, categoryIdx
+		FROM product
+		WHERE productIdx = #{productIdx}
+	</select>
+	
+	<select id="findImagesByIdx" parameterType="long" resultType="com.sp.app.model.TradeImg">
+		SELECT imgOrder, productIdx, imgUrl
+	    FROM productImages
+	    WHERE productIdx = #{productIdx}
+	    ORDER BY imgOrder ASC
+	</select>
+	
+	<select id="findTagsByIdx" parameterType="long" resultType="String">
+		SELECT t.tagName
+	    FROM productTag p
+	    JOIN tag t ON p.tagIdx = t.tagIdx
+	    WHERE p.productIdx = #{productIdx}
+	</select>
+	
+	
 
 </mapper>

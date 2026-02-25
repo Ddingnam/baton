@@ -32,7 +32,6 @@
     body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text-main); min-height: 100vh; }
     a { text-decoration: none; color: inherit; }
 
-    /* ── Header ── */
     .app-header {
         position: sticky; top: 0; z-index: 100;
         background: var(--surface); border-bottom: 1px solid var(--border);
@@ -52,7 +51,6 @@
     }
     .icon-btn:hover { background: var(--bg); }
 
-    /* ── Search Bar ── */
     .search-wrap {
         background: var(--surface); border-bottom: 1px solid var(--border);
         padding: 10px 20px;
@@ -78,7 +76,6 @@
     }
     .search-inner input::placeholder { color: var(--text-muted); }
 
-    /* ── Category Tabs ── */
     .cat-scroll {
         background: var(--surface); border-bottom: 1px solid var(--border);
         overflow-x: auto; -webkit-overflow-scrolling: touch;
@@ -97,10 +94,8 @@
     .cat-list li a:hover { color: var(--primary); }
     .cat-list li.active a { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
 
-    /* ── Main Layout ── */
     .main-wrap { max-width: 860px; margin: 0 auto; padding: 20px 20px 100px; }
 
-    /* ── Filter Bar ── */
     .filter-bar {
         display: flex; align-items: center; justify-content: space-between;
         margin-bottom: 16px;
@@ -114,14 +109,12 @@
         outline: none; cursor: pointer;
     }
 
-    /* ── Product Grid ── */
     .product-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 16px;
     }
 
-    /* ── Product Card ── */
     .product-card {
         background: var(--surface); border-radius: var(--radius);
         box-shadow: var(--shadow); overflow: hidden;
@@ -142,7 +135,6 @@
         font-size: 40px; color: var(--text-muted);
     }
 
-    /* Status badge */
     .status-badge {
         position: absolute; top: 8px; left: 8px;
         padding: 3px 8px; border-radius: 4px;
@@ -152,7 +144,6 @@
     .badge-used { background: #E3F2FD; color: #1565C0; }
     .badge-broken { background: #FFEBEE; color: #C62828; }
 
-    /* Wishlist btn */
     .wish-btn {
         position: absolute; bottom: 8px; right: 8px;
         width: 32px; height: 32px; border-radius: 50%;
@@ -164,7 +155,6 @@
     .wish-btn:hover { transform: scale(1.15); }
     .wish-btn.active { color: #e53935; }
 
-    /* Sold out overlay */
     .sold-overlay {
         position: absolute; inset: 0;
         background: rgba(0,0,0,0.45);
@@ -176,7 +166,6 @@
         padding: 6px 14px; border-radius: 6px; letter-spacing: .04em;
     }
 
-    /* Card body */
     .card-body { padding: 12px; flex: 1; display: flex; flex-direction: column; }
     .card-location {
         font-size: 11px; color: var(--text-muted); margin-bottom: 4px;
@@ -190,7 +179,6 @@
     .card-price { font-size: 16px; font-weight: 700; color: var(--text-main); margin-top: auto; }
     .card-price.free { color: var(--green); }
 
-    /* Card footer */
     .card-footer {
         display: flex; align-items: center; justify-content: space-between;
         margin-top: 8px;
@@ -199,7 +187,6 @@
     .card-stats { display: flex; gap: 8px; align-items: center; }
     .card-stats span { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 2px; }
 
-    /* ── Empty State ── */
     .empty-state {
         text-align: center; padding: 80px 20px; color: var(--text-muted);
         grid-column: 1/-1;
@@ -208,7 +195,6 @@
     .empty-state p { font-size: 15px; font-weight: 500; color: var(--text-sub); }
     .empty-state small { font-size: 13px; margin-top: 6px; display: block; }
 
-    /* ── Pagination ── */
     .pagination {
         display: flex; justify-content: center; align-items: center;
         gap: 6px; margin-top: 40px;
@@ -224,7 +210,6 @@
     .page-btn.active { background: var(--primary); border-color: var(--primary); color: white; font-weight: 700; }
     .page-btn:disabled { opacity: 0.4; cursor: default; }
 
-    /* ── FAB ── */
     .fab {
         position: fixed; bottom: 24px; right: 24px;
         width: 56px; height: 56px; border-radius: 50%;
@@ -241,7 +226,6 @@
     }
     .fab:active { transform: scale(0.97); }
 
-    /* ── Responsive ── */
     @media (max-width: 480px) {
         .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .card-body { padding: 10px; }
@@ -251,7 +235,6 @@
 </head>
 <body>
 
-<!-- Header -->
 <header class="app-header">
     <span class="logo">🛍 마켓</span>
     <div class="header-actions">
@@ -261,7 +244,6 @@
     </div>
 </header>
 
-<!-- Search -->
 <div class="search-wrap">
     <div class="search-inner">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -271,7 +253,6 @@
     </div>
 </div>
 
-<!-- Category Tabs -->
 <nav class="cat-scroll">
     <ul class="cat-list">
         <li class="${empty param.categoryIdx ? 'active' : ''}">
@@ -304,12 +285,10 @@
     </ul>
 </nav>
 
-<!-- Main Content -->
 <main class="main-wrap">
 
     <!-- Filter bar -->
     <div class="filter-bar">
-        <%-- 서버에서 totalCount를 model에 담아서 넘겨줘야 합니다 --%>
         <span class="result-count">
             <strong><c:out value="${not empty totalCount ? totalCount : '0'}"/></strong>개의 상품
         </span>
@@ -321,8 +300,6 @@
         </select>
     </div>
 
-    <!-- Product Grid -->
-    <%-- 서버에서 tradeList (List<TradeVO>) 를 model에 담아서 넘겨줘야 합니다 --%>
     <div class="product-grid" id="productGrid">
         <c:choose>
             <c:when test="${not empty tradeList}">
@@ -338,7 +315,6 @@
                                 </c:otherwise>
                             </c:choose>
 
-                            <%-- 물품 상태 뱃지 --%>
                             <c:choose>
                                 <c:when test="${item.productStatus == '새상품'}">
                                     <span class="status-badge badge-new">새상품</span>
@@ -351,13 +327,11 @@
                                 </c:otherwise>
                             </c:choose>
 
-                            <%-- 찜 버튼 --%>
                             <button type="button" class="wish-btn ${item.wishedByMe ? 'active' : ''}"
                                 onclick="toggleWish(event, ${item.tradeIdx})">
                                 ${item.wishedByMe ? '❤️' : '🤍'}
                             </button>
 
-                            <%-- 판매완료 오버레이 --%>
                             <c:if test="${item.tradeStatus == 'SOLD'}">
                                 <div class="sold-overlay"><span>판매완료</span></div>
                             </c:if>
@@ -384,7 +358,7 @@
                 </c:forEach>
             </c:when>
             <c:otherwise>
-                <%-- 빈 상태 (개발 중 미리보기용 더미는 JS로 렌더) --%>
+
                 <div class="empty-state" id="emptyState">
                     <div class="empty-icon">🛒</div>
                     <p>아직 등록된 상품이 없어요</p>
@@ -394,8 +368,6 @@
         </c:choose>
     </div>
 
-    <!-- Pagination -->
-    <%-- 서버에서 pageInfo (PageDTO 등) 를 넘겨줘야 합니다 --%>
     <c:if test="${not empty pageInfo && pageInfo.totalPage > 1}">
         <div class="pagination">
             <button class="page-btn" onclick="goPage(${pageInfo.currentPage - 1})"
@@ -414,23 +386,21 @@
 
 </main>
 
-<!-- FAB: 글쓰기 -->
 <button class="fab" onclick="location.href='/trade/write'" title="판매 글쓰기">+</button>
 
 <script>
-/* ── 검색 ── */
+
 document.getElementById('searchInput').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
         const keyword = this.value.trim();
         const url = new URL(location.href);
         if (keyword) url.searchParams.set('keyword', keyword);
         else url.searchParams.delete('keyword');
-        url.searchParams.delete('page'); // 검색 시 1페이지로
+        url.searchParams.delete('page');
         location.href = url.toString();
     }
 });
 
-/* ── 정렬 변경 ── */
 function changeSort(val) {
     const url = new URL(location.href);
     url.searchParams.set('sort', val);
@@ -438,15 +408,12 @@ function changeSort(val) {
     location.href = url.toString();
 }
 
-/* ── 페이지 이동 ── */
 function goPage(page) {
     const url = new URL(location.href);
     url.searchParams.set('page', page);
     location.href = url.toString();
 }
 
-/* ── 찜 토글 ── */
-// Vue 전환 시 axios.post + 반응형 상태로 교체 예정
 function toggleWish(e, tradeIdx) {
     e.preventDefault();
     e.stopPropagation();

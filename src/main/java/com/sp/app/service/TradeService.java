@@ -1,9 +1,17 @@
 package com.sp.app.service;
 
+import java.util.List;
+
 import com.sp.app.model.Trade;
+import com.sp.app.model.TradeImg;
 
 public interface TradeService {
 	public void insertTradePost(Trade dto) throws Exception;
 	public void upodateTradePost(Trade dto) throws Exception;
 	public void deleteTradePost(long productIdx) throws Exception;
+	
+	public Trade findByIdx(long productIdx);
+	public List<TradeImg> findImgsByIdx(long productIdx);
+	public List<String> findTagsByIdx(long productIdx);
+	
 }
