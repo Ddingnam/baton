@@ -51,9 +51,6 @@
 	</div>
 </main>
 
-<footer>
-	<jsp:include page="/WEB-INF/views/admin/layout/footer.jsp"/>
-</footer>
 
 <jsp:include page="/WEB-INF/views/admin/layout/footerResources.jsp"/>
 

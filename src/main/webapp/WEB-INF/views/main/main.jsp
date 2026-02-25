@@ -12,20 +12,24 @@
 </head>
 <body>
 
-    <div id="baton-intro">
-        <div class="relay-visual">
-            <div class="node active"></div>
-            <div class="baton-pass-bar"></div>
-            <div class="node"></div>
-            <div class="node"></div>
-        </div>
-        <div class="intro-content">
-            <h1 class="brand-name">BATON</h1>
-            <p class="brand-slogan">나의 필요가 당신의 일상으로, 가치를 이어주고 마음을 이어받는 따뜻한 바통 터치</p>
-        </div>
-    </div>
+	<div id="baton-intro">
+		<div class="intro-container">
+			<div class="relay-visual">
+				<div class="baton-pass-bar"></div>
+				<div class="node"></div>
+				<div class="node"></div>
+				<div class="node"></div>
+			</div>
 
-    <jsp:include page="/WEB-INF/views/layout/header.jsp" />
+			<div class="intro-content">
+				<h1 class="brand-name">BATON</h1>
+				<p class="brand-slogan">나의 필요가 당신의 일상으로. 가치를 이어주고 마음을 이어받는 따뜻한
+					바통 터치</p>
+			</div>
+		</div>
+	</div>
+
+	<jsp:include page="/WEB-INF/views/layout/header.jsp" />
 
     <div id="baton-layout-container">
         <jsp:include page="/WEB-INF/views/layout/left.jsp" />
