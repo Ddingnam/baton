@@ -11,18 +11,46 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
+<aside id="baton-left">
+    <div class="sidebar-toggle-trigger" onclick="handleSidebar()">
+        <i class="ri-arrow-left-s-line"></i>
+    </div>
+    
+    <div class="sidebar-menu">
+        <p class="menu-label">메뉴</p>
+        <ul>
+            <li class="active">
+                <a href="${pageContext.request.contextPath}/">
+                    <i class="ri-home-5-line"></i> 홈
+                </a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/trade/list">
+                    <i class="ri-shopping-bag-line"></i> 중고거래
+                </a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/club/list">
+                    <i class="ri-team-line"></i> 동네모임
+                </a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/alba/list">
+                    <i class="ri-briefcase-line"></i> 알바·구인
+                </a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/community/list">
+                    <i class="ri-discuss-line"></i> 커뮤니티
+                </a>
+            </li>
+        </ul>
+    </div>
+</aside>
 
-    <aside id="baton-left">
-        <div class="sidebar-menu">
-            <p class="menu-label">카테고리</p>
-            <ul id="left-menu-list">
-                <li class="active"><a href="/main"><i class="ri-home-smile-2-line"></i> 홈</a></li>
-                <li><a href="/market/list"><i class="ri-shopping-bag-3-line"></i> 중고거래</a></li>
-                <li><a href="/club/list"><i class="ri-group-line"></i> 동네모임</a></li>
-                <li><a href="/job/list"><i class="ri-briefcase-4-line"></i> 알바·구인</a></li>
-            </ul>
-        </div>
-    </aside>
+<div id="baton-sidebar-open" class="sidebar-show-btn" onclick="handleSidebar()">
+    <i class="ri-menu-unfold-line"></i>
+</div>
 
     <script src="${pageContext.request.contextPath}/dist/js/left.js"></script>
 </body>

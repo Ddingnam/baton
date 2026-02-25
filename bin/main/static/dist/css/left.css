@@ -1,73 +1,133 @@
 ﻿@charset "UTF-8";
 
+/* =========================================================
+   [사이드바 기본 구조]
+========================================================= */
 #baton-left {
-	width: 240px;
-	padding: 40px 24px 0 0;
-	position: sticky;
-	top: 72px;
-	height: calc(100vh - 72px);
-	border-right: 1px solid #E5E8EB;
-	margin-right: 40px;
-	box-sizing: border-box;
-	flex-shrink: 0;
+    width: 240px;
+    padding: 40px 24px 0 0;
+    position: sticky;
+    top: 80px;
+    height: calc(100vh - 80px);
+    border-right: 1px solid #F2F4F6;
+    margin-right: 40px;
+    flex-shrink: 0;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    background: var(--baton-bg);
+    overflow: visible; /* 토글 버튼 튀어나오게 하기 위해 필수 */
 }
 
-.sidebar-menu {
-	margin-bottom: 32px;
+/* =========================================================
+   [사이드바 숨김 상태] (JS로 제어됨)
+========================================================= */
+#baton-layout-container.sidebar-hidden #baton-left {
+    width: 0;
+    margin-right: 0;
+    padding: 40px 0 0 0;
+    opacity: 0;
+    transform: translateX(-20px);
+    pointer-events: none;
+    border-right: none;
 }
 
-.menu-label {
-	font-size: 13px;
-	font-weight: 700;
-	color: #8B95A1;
-	margin: 0 0 12px 8px;
-	letter-spacing: 0.5px;
+/* =========================================================
+   [접기 버튼 - 사이드바 우측 끝]
+========================================================= */
+.sidebar-toggle-trigger {
+    position: absolute;
+    right: -15px;
+    top: 30px;
+    width: 30px;
+    height: 30px;
+    background: #fff;
+    border: 1px solid #E5E8EB;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    z-index: 10;
+    transition: all 0.3s;
+    color: #8B95A1;
+}
+
+.sidebar-toggle-trigger:hover { 
+    background: #3182F6; 
+    color: #fff; 
+    border-color: #3182F6;
+}
+
+/* =========================================================
+   [펼치기 버튼 - 화면 왼쪽 고정] (사이드바 숨김 시에만 등장)
+========================================================= */
+.sidebar-show-btn {
+    position: fixed;
+    left: 20px;
+    top: 100px;
+    width: 44px;
+    height: 44px;
+    background: #fff;
+    border-radius: 14px;
+    display: none; /* js에서 토글 */
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    z-index: 1100;
+    color: #3182F6;
+    font-size: 24px;
+    transition: all 0.3s;
+}
+
+.sidebar-show-btn:hover {
+    transform: scale(1.1);
+    background: #F9FAFB;
+}
+
+/* =========================================================
+   [사이드바 메뉴 아이템 스타일] (보라색 방지 포함)
+========================================================= */
+.sidebar-menu .menu-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #8B95A1;
+    margin-left: 10px;
+    margin-bottom: 20px;
 }
 
 .sidebar-menu ul {
-	list-style: none;
-	padding: 0;
-	margin: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .sidebar-menu li {
-	margin-bottom: 4px;
+    margin-bottom: 5px;
 }
 
-.sidebar-menu a {
-	display: flex;
-	align-items: center;
-	gap: 14px;
-	padding: 14px 16px;
-	border-radius: 12px;
-	color: #4E5968;
-	font-weight: 600;
-	font-size: 16px;
-	text-decoration: none;
-	transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+.sidebar-menu li a, .sidebar-menu li a:link, .sidebar-menu li a:visited { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    padding: 15px 20px; 
+    border-radius: 15px; 
+    color: #4E5968 !important; 
+    font-weight: 600; 
+    text-decoration: none; 
+    transition: all 0.2s; 
 }
 
-.sidebar-menu a i {
-	font-size: 20px;
-	color: #8B95A1;
-	transition: color 0.2s;
-}
-
-.sidebar-menu a:hover {
-	background: #F2F4F6;
-	color: #191F28;
-	transform: translateX(4px);
-}
-
-.sidebar-menu a:hover i {
-	color: #191F28;
+.sidebar-menu li a:hover { 
+    background: #F2F4F6; 
+    color: #191F28 !important;
 }
 
 .sidebar-menu li.active a {
-	background: #E8F3FF;
-	color: #3182F6;
+    background: #E8F3FF;
+    color: #3182F6 !important;
 }
 
 .sidebar-menu li.active a i {
-	color: #3182F6;
+    color: #3182F6;
 }

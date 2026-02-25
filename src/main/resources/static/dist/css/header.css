@@ -1,70 +1,205 @@
 ﻿@charset "UTF-8";
 
-/* [수정] 투명도 없는 불투명 흰색 헤더 */
+:root {
+    --header-domain-color: #3182F6; 
+}
+
+/* =========================================================
+   [불투명 헤더 기본 설정]
+========================================================= */
 #baton-header {
-    position: fixed; top: 0; left: 0; right: 0; height: 76px;
-    background: #FFFFFF; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    height: 76px;
+    background: #FFFFFF;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08); 
     z-index: 1000;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.02);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
 }
 
 .header-container {
-    max-width: 1320px; margin: 0 auto; height: 100%;
-    display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
+    max-width: 1320px; 
+    margin: 0 auto; 
+    height: 100%;
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 0 24px;
 }
 
-/* 로고 섹션 */
-.baton-logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-.logo-symbol { display: flex; align-items: center; gap: 5px; }
-.symbol-dot { width: 7px; height: 7px; background: #E5E8EB; border-radius: 50%; }
-.symbol-bar { width: 26px; height: 7px; background: #3182F6; border-radius: 12px; transform: rotate(-15deg); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.baton-logo-link:hover .symbol-bar { transform: rotate(0deg); background: #191F28; width: 30px; }
-.logo-text { font-size: 24px; font-weight: 900; color: #191F28; letter-spacing: 1.2px; }
-
-/* [수정] 메뉴별 도메인 컬러 포인트 */
-.nav-menu { display: flex; list-style: none; gap: 40px; margin: 0; padding: 0; }
-.nav-menu li a { 
-    font-size: 17px; font-weight: 600; color: #4E5968; text-decoration: none; 
-    position: relative; padding: 12px 0; transition: color 0.3s ease; 
+/* =========================================================
+   [로고 디자인]
+========================================================= */
+.baton-logo-link, .baton-logo-link:visited, .baton-logo-link:hover { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    text-decoration: none; 
+    color: #191F28 !important; 
 }
 
-/* 호버 시 도메인별 포인트 컬러 */
-.nav-menu li:nth-child(1) a:hover { color: #3182F6; } /* 중고거래: 블루 */
-.nav-menu li:nth-child(2) a:hover { color: #7048E8; } /* 동네모임: 퍼플 */
-.nav-menu li:nth-child(3) a:hover { color: #00B050; } /* 알바: 그린 */
-.nav-menu li:nth-child(4) a:hover { color: #F86D7D; } /* 커뮤니티: 핑크 */
-
-.nav-menu li a::after {
-    content: ''; position: absolute; bottom: 0; left: 50%; width: 0; height: 3px;
-    background: currentColor; transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
-    transform: translateX(-50%); border-radius: 10px;
+.logo-symbol { 
+    display: flex; 
+    align-items: center; 
+    gap: 5px; 
 }
-.nav-menu li a:hover::after { width: 100%; }
 
-/* 우측 인증 그룹 */
-.auth-group { display: flex; align-items: center; gap: 20px; }
-.login-btn { font-size: 16px; font-weight: 600; color: #4E5968; text-decoration: none; transition: 0.2s; }
-.login-btn:hover { color: #191F28; }
-.join-btn { 
-    padding: 12px 24px; background: #3182F6; color: #fff; border-radius: 14px; 
-    font-weight: 700; text-decoration: none; transition: all 0.3s; 
+.symbol-dot { 
+    width: 7px; 
+    height: 7px; 
+    background: #E5E8EB; 
+    border-radius: 50%; 
 }
-.join-btn:hover { background: #1B64DA; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(49, 130, 246, 0.3); }
 
-/* 🤖 챗봇 플로팅 버튼 */
-#baton-chatbot-trigger { 
-    position: fixed; bottom: 35px; right: 35px; z-index: 2000; cursor: pointer; 
+.symbol-bar { 
+    width: 26px; 
+    height: 7px; 
+    background: var(--header-domain-color); 
+    border-radius: 12px; 
+    transform: rotate(-15deg); 
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
 }
-#baton-chatbot-trigger:hover { transform: scale(1.15) translateY(-8px); }
-.chatbot-icon-wrapper { 
-    width: 64px; height: 64px; background: #191F28; border-radius: 24px; 
-    display: flex; align-items: center; justify-content: center; 
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); position: relative; 
+
+.baton-logo-link:hover .symbol-bar { 
+    transform: rotate(0deg); 
+    background: #191F28; 
+    width: 32px; 
 }
-.chatbot-icon-wrapper i { font-size: 32px; color: #fff; }
-.notification-dot { 
-    position: absolute; top: 14px; right: 14px; width: 10px; height: 10px; 
-    background: #3182F6; border-radius: 50%; border: 2.5px solid #191F28; 
+
+.logo-text { 
+    font-size: 24px; 
+    font-weight: 900; 
+    letter-spacing: 1.2px; 
+}
+
+/* =========================================================
+   [메뉴 네비게이션] 
+========================================================= */
+.nav-menu { 
+    display: flex; 
+    list-style: none; 
+    gap: 40px; 
+    margin: 0; 
+    padding: 0; 
+}
+
+.nav-menu li a, .nav-menu li a:link, .nav-menu li a:visited { 
+    font-size: 17px; 
+    font-weight: 600; 
+    color: #4E5968 !important; 
+    text-decoration: none; 
+    position: relative; 
+    padding: 12px 0; 
+    transition: color 0.3s ease; 
+}
+
+/* 각 도메인별 고유 컬러 호버 효과 */
+.nav-menu li:nth-child(1) a:hover { color: #3182F6 !important; } 
+.nav-menu li:nth-child(2) a:hover { color: #7048E8 !important; } 
+.nav-menu li:nth-child(3) a:hover { color: #00B050 !important; } 
+.nav-menu li:nth-child(4) a:hover { color: #F86D7D !important; } 
+
+.nav-menu li a::after {
+    content: ''; 
+    position: absolute; 
+    bottom: 0; 
+    left: 50%; 
+    width: 0; 
+    height: 3px;
+    background: currentColor; 
+    transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
+    transform: translateX(-50%);
+    border-radius: 10px;
+}
+
+.nav-menu li a:hover::after { 
+    width: 100%; 
+}
+
+.nav-menu li a.active {
+    color: var(--header-domain-color) !important;
+}
+.nav-menu li a.active::after {
+    width: 100%;
+    background: var(--header-domain-color);
+}
+
+/* =========================================================
+   [우측 로그인/버튼 그룹 및 챗봇]
+========================================================= */
+.auth-group {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+}
+
+.login-btn, .login-btn:visited {
+	font-size: 16px;
+	font-weight: 600;
+	color: #4E5968 !important;
+	text-decoration: none;
+	transition: 0.2s;
+}
+
+.login-btn:hover {
+	color: #191F28 !important;
+}
+
+.join-btn, .join-btn:visited {
+	padding: 12px 24px;
+	background: #3182F6 !important;
+	color: #fff !important;
+	border-radius: 14px;
+	font-weight: 700;
+	text-decoration: none;
+	transition: all 0.3s;
+}
+
+.join-btn:hover {
+	background: #1B64DA !important;
+	transform: translateY(-2px);
+	box-shadow: 0 6px 15px rgba(49, 130, 246, 0.3);
+}
+
+#baton-chatbot-trigger {
+	position: fixed;
+	bottom: 35px;
+	right: 35px;
+	z-index: 2000;
+	cursor: pointer;
+	transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#baton-chatbot-trigger:hover {
+	transform: scale(1.15) translateY(-8px);
+}
+
+.chatbot-icon-wrapper {
+	width: 64px;
+	height: 64px;
+	background: #191F28;
+	border-radius: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+	position: relative;
+}
+
+.chatbot-icon-wrapper i {
+	font-size: 32px;
+	color: #fff;
+}
+
+.notification-dot {
+	position: absolute;
+	top: 14px;
+	right: 14px;
+	width: 10px;
+	height: 10px;
+	background: #3182F6;
+	border-radius: 50%;
+	border: 2.5px solid #191F28;
 }

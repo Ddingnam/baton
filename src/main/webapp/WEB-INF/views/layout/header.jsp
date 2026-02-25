@@ -1,57 +1,52 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<!DOCTYPE html>
-<html>
-<head>
+
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/header.css">
-</head>
-<body>
-    <header id="baton-header">
-        <div class="header-container">
-            <div class="header-left">
-                <a href="${pageContext.request.contextPath}/" class="baton-logo-link">
-                    <div class="logo-symbol">
-                        <div class="symbol-dot"></div>
-                        <div class="symbol-bar"></div>
-                        <div class="symbol-dot"></div>
-                    </div>
-                    <span class="logo-text">BATON</span>
-                </a>
-            </div>
-            
-            <nav class="header-center">
-                <ul class="nav-menu">
-                    <li><a href="${pageContext.request.contextPath}/trade/list">중고거래</a></li>
-                    <li><a href="${pageContext.request.contextPath}/club/list">동네모임</a></li>
-                    <li><a href="${pageContext.request.contextPath}/alba/list">알바·구인</a></li>
-                    <li><a href="${pageContext.request.contextPath}/community/list">커뮤니티</a></li>
-                </ul>
-            </nav>
 
-            <div class="header-right">
-                <div class="auth-group">
-                    <c:choose>
-                        <c:when test="${empty sessionScope.member}">
-                            <a href="${pageContext.request.contextPath}/member/login" class="login-btn">로그인</a>
-                            <a href="${pageContext.request.contextPath}/member/member" class="join-btn">회원가입</a>
-                        </c:when>
-                        <c:otherwise>
-                            <span class="user-name"><strong>${sessionScope.member.userName}</strong>님</span>
-                            <a href="${pageContext.request.contextPath}/member/logout" class="logout-link">로그아웃</a>
-                        </c:otherwise>
-                    </c:choose>
+<header id="baton-header">
+    <div class="header-container">
+        <div class="header-left">
+            <a href="${pageContext.request.contextPath}/" class="baton-logo-link">
+                <div class="logo-symbol">
+                    <div class="symbol-dot"></div>
+                    <div class="symbol-bar"></div> 
+                    <div class="symbol-dot"></div>
                 </div>
-            </div>
+                <span class="logo-text">BATON</span>
+            </a>
         </div>
-    </header>
+        
+        <nav class="header-center">
+            <ul class="nav-menu">
+                <li><a href="${pageContext.request.contextPath}/trade/list" class="nav-link" data-domain="trade">중고거래</a></li>
+                <li><a href="${pageContext.request.contextPath}/club/list" class="nav-link" data-domain="club">동네모임</a></li>
+                <li><a href="${pageContext.request.contextPath}/alba/list" class="nav-link" data-domain="alba">알바·구인</a></li>
+                <li><a href="${pageContext.request.contextPath}/community/list" class="nav-link" data-domain="community">커뮤니티</a></li>
+            </ul>
+        </nav>
 
-    <div id="baton-chatbot-trigger">
-        <div class="chatbot-icon-wrapper">
-            <i class="ri-chat-smile-3-fill"></i>
-            <span class="notification-dot"></span>
+        <div class="header-right">
+            <div class="auth-group">
+                <c:choose>
+                    <c:when test="${empty sessionScope.member}">
+                        <a href="${pageContext.request.contextPath}/member/login" class="login-btn">로그인</a>
+                        <a href="${pageContext.request.contextPath}/member/member" class="join-btn">시작하기</a>
+                    </c:when>
+                    <c:otherwise>
+                        <span class="user-name"><strong>${sessionScope.member.userName}</strong>님</span>
+                        <a href="${pageContext.request.contextPath}/member/logout" class="login-btn" style="margin-left: 10px;">로그아웃</a>
+                    </c:otherwise>
+                </c:choose>
+            </div>
         </div>
     </div>
-    
-    <script src="${pageContext.request.contextPath}/dist/js/header.js"></script>
-</body>
-</html>
+</header>
+
+<div id="baton-chatbot-trigger">
+    <div class="chatbot-icon-wrapper">
+        <i class="ri-chat-smile-3-fill"></i>
+        <span class="notification-dot"></span>
+    </div>
+</div>
+
+<script src="${pageContext.request.contextPath}/dist/js/header.js"></script>
