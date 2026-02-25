@@ -10,5 +10,7 @@ public class PointHistory {
     private int amount;          
     private String historyType; 
     private Integer refId;      
-    private String createdAt;     
+    private String createdAt; 
+    private int userIdx;
+    private int totalPoint;
 }

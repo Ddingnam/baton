@@ -17,7 +17,7 @@ public class PaymentController {
 
     @PostMapping("/verify/{impUid}")
     public ResponseEntity<String> verifyPayment(
-            @PathVariable String impUid,
+            @PathVariable("impUid") String impUid,
             @RequestBody Map<String, Object> paymentData) {
         
         try {

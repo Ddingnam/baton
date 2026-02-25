@@ -19,7 +19,7 @@ public class PaymentService {
     @Transactional 
     public void processPointCharge(String impUid, String merchantUid, int chargeAmount, int userIdx, String payMethod) {
    
-        double feeRate = 0.02; // 2%
+        double feeRate = 0.02; 
         int fee = (int) Math.round(chargeAmount * feeRate); 
         int accumulatedPoint = chargeAmount - fee; 
 
@@ -32,11 +32,15 @@ public class PaymentService {
         payment.setPayStatus("PAID");
 
         paymentMapper.insertPayment(payment);
+        
+        int newTotalPoint = 0 + accumulatedPoint;
 
         PointHistory pointHistory = new PointHistory();
         pointHistory.setPaymentIdx(payment.getPaymentIdx()); 
         pointHistory.setAmount(accumulatedPoint);           
         pointHistory.setHistoryType("CHARGE");
+        pointHistory.setUserIdx(userIdx);
+        pointHistory.setTotalPoint(newTotalPoint);
 
         paymentMapper.insertPointHistory(pointHistory);
      
