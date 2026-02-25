@@ -1,73 +1,56 @@
 @charset "UTF-8";
 
-#baton-layout-container.mypage-mode {
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 40px;
-    max-width: 1200px;
-    margin: 40px auto;
-}
-
 .mypage-sidebar {
-    background: #fff;
-    border: 1px solid #E5E8EB;
-    border-radius: 24px;
-    padding: 24px;
-    height: fit-content;
+    width: 250px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 120px;
 }
 
-.user-profile-section {
-    padding-bottom: 24px;
-    border-bottom: 1px solid #F2F4F6;
-    margin-bottom: 24px;
+/* 심플 프로필 영역 */
+.sidebar-profile {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
+    padding: 12px 12px 32px 12px;
 }
 
-.user-avatar {
-    width: 50px; height: 50px;
-    background: #F2F4F6;
+.sidebar-profile .profile-avatar {
+    width: 52px; height: 52px;
+    background: #E8F3FF;
+    color: #3182F6;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; color: #ADB5BD;
+    font-size: 24px;
 }
 
-.user-name { font-weight: 700; font-size: 18px; display: block; }
-.user-grade { font-size: 13px; color: #3182F6; font-weight: 600; }
+.sidebar-profile .profile-info { display: flex; flex-direction: column; gap: 4px; }
+.sidebar-profile .name { font-size: 20px; font-weight: 800; color: #191F28; }
+.sidebar-profile .manner { font-size: 13px; font-weight: 600; color: #8B95A1; }
 
-.mypage-nav h4 {
-    font-size: 13px; color: #8B95A1;
-    margin: 24px 0 12px 10px;
-    font-weight: 600;
+/* 네비게이션 영역 */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
 }
 
-.mypage-nav a {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 16px;
-    border-radius: 12px;
-    color: #4E5968;
-    font-weight: 600;
-    transition: 0.2s;
-    text-decoration: none;
-}+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-.mypage-nav a:hover { background: #F9FAFB; }
-.mypage-nav a.active {
-    background: #F2F4F6;
-    color: #191F28;
+.nav-group h4 {
+    font-size: 13px; font-weight: 600; color: #8B95A1;
+    margin: 0 0 8px 12px;
 }
 
-.mypage-main-card {
-    background: #fff;
-    border: 1px solid #E5E8EB;
-    border-radius: 24px;
-    padding: 32px;
+.nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 12px; border-radius: 12px;
+    color: #4E5968; font-size: 16px; font-weight: 600;
+    text-decoration: none; transition: 0.2s;
 }
 
-.section-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 24px;
-}
+.nav-item i { font-size: 22px; color: #B0B8C1; transition: 0.2s; }
 
-.section-header h2 { font-size: 22px; font-weight: 800; }
+.nav-item:hover { background: rgba(0,0,0,0.03); color: #191F28; }
+.nav-item:hover i { color: #4E5968; }
+
+.nav-item.active { background: #FFFFFF; color: #1B64DA; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.nav-item.active i { color: #3182F6; }

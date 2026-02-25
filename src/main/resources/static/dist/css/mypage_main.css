@@ -1,0 +1,108 @@
+@charset "UTF-8";
+
+body {
+    background-color: #F9FAFB; /* 토스, 당근이 쓰는 가장 편안한 배경색 */
+}
+
+#baton-layout-container.mypage-mode {
+    display: flex; gap: 40px;
+    max-width: 1140px;
+    margin: 0 auto;
+    padding-top: 110px; /* 헤더 여백 */
+    padding-bottom: 80px;
+    padding-left: 20px; padding-right: 20px;
+    box-sizing: border-box; align-items: flex-start;
+}
+
+.mypage-main-content {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 24px;
+}
+
+.mypage-title { margin-bottom: 4px; }
+.mypage-title h2 { font-size: 24px; font-weight: 800; color: #191F28; margin: 0; }
+
+/* 공통 카드 스타일 (가장 깔끔한 그림자와 둥글기) */
+.mp-card {
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03); /* 아주 연한 그림자 */
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+/* 1. 프로필 & 포인트 */
+.profile-point-card {
+    display: flex; align-items: center; justify-content: space-between;
+}
+
+.profile-area { display: flex; align-items: center; gap: 20px; flex: 1; }
+.profile-area .avatar {
+    width: 72px; height: 72px; background: #F2F4F6;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 32px; color: #ADB5BD;
+}
+.profile-area .greeting { font-size: 15px; color: #6B7684; font-weight: 600; display: block; margin-bottom: 4px; }
+.profile-area h3 { font-size: 22px; font-weight: 800; color: #191F28; margin: 0 0 8px 0; }
+.manner-temp { font-size: 14px; color: #4E5968; background: #F2F4F6; padding: 6px 12px; border-radius: 8px; display: inline-block; font-weight: 600; }
+.manner-temp strong { color: #3182F6; font-weight: 800; }
+
+.divider { width: 1px; height: 80px; background: #F2F4F6; margin: 0 40px; }
+
+.point-area { flex: 1; text-align: right; }
+.point-label { font-size: 14px; font-weight: 600; color: #6B7684; display: block; margin-bottom: 8px; }
+.point-val { margin-bottom: 16px; }
+.point-val strong { font-size: 32px; font-weight: 800; color: #191F28; }
+.point-val span { font-size: 18px; font-weight: 700; color: #3182F6; margin-left: 2px; }
+
+.btn-charge {
+    background: #E8F3FF; color: #3182F6; border: none;
+    padding: 10px 20px; border-radius: 10px; font-weight: 700; font-size: 14px;
+    cursor: pointer; transition: 0.2s;
+}
+.btn-charge:hover { background: #3182F6; color: #fff; }
+
+/* 2. 도메인 통계 그리드 */
+.mp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.mp-stat-card {
+    background: #FFFFFF; border-radius: 20px; padding: 24px;
+    display: flex; flex-direction: column; gap: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);
+    transition: transform 0.2s; cursor: pointer;
+}
+.mp-stat-card:hover { transform: translateY(-4px); }
+.icon-wrap { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.stat-text { display: flex; flex-direction: column; gap: 4px; }
+.stat-text .label { font-size: 14px; color: #6B7684; font-weight: 600; }
+.stat-text .val { font-size: 15px; color: #4E5968; }
+.stat-text .val strong { font-size: 20px; font-weight: 800; color: #191F28; margin-right: 2px; }
+
+/* 3. 배너 (편안한 색감) */
+.mp-banner {
+    background: #F0F5FF; border-radius: 20px; padding: 32px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; transition: 0.2s;
+}
+.mp-banner:hover { background: #E6EFFF; }
+.banner-text .badge { background: #3182F6; color: #fff; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 12px; }
+.banner-text h4 { font-size: 20px; font-weight: 800; color: #191F28; margin: 0; line-height: 1.4; }
+.banner-img i { font-size: 64px; color: #B3D3FF; }
+
+/* 4. 리스트 */
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.card-header h3 { font-size: 20px; font-weight: 800; color: #191F28; margin: 0; }
+.link-more { font-size: 14px; font-weight: 600; color: #8B95A1; text-decoration: none; display: flex; align-items: center; }
+.link-more:hover { color: #4E5968; }
+
+.mp-list { display: flex; flex-direction: column; }
+.list-item { display: flex; gap: 20px; padding: 20px 0; border-bottom: 1px solid #F2F4F6; cursor: pointer; transition: 0.2s; }
+.list-item:hover { background: #F9FAFB; border-radius: 12px; padding: 20px; margin: 0 -20px; }
+.list-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+.item-thumb { width: 88px; height: 88px; background: #F2F4F6; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #D1D6DB; flex-shrink: 0; }
+.item-info { display: flex; flex-direction: column; justify-content: center; }
+.status { font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px; width: fit-content; margin-bottom: 8px; }
+.st-done { background: #F2F4F6; color: #8B95A1; }
+.st-ing { background: #E6F8F3; color: #00B98D; }
+.item-info h4 { font-size: 17px; font-weight: 600; color: #191F28; margin: 0 0 6px 0; }
+.price { font-size: 18px; font-weight: 800; color: #191F28; }
