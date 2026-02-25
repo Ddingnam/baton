@@ -40,19 +40,18 @@ public class JobPostingController {
         model.addAttribute("dataCount", dataCount);
         model.addAttribute("page", current_page);
         
-        return "alba/posting/list"; 
+        return "alba/list"; 
     }
 
     @GetMapping("write")
     public String writeForm() {
-        return "alba/posting/write";
+        return "alba/write";
     }
 
     @PostMapping("write")
     public String writeSubmit(JobPosting dto) throws Exception {
-        // 실제로는 로그인한 유저 세션 정보를 가져와 맵핑해야 합니다.
         dto.setUserIdx(1L); 
-        dto.setRegionIdx(100L); // 예시 동네 인덱스
+        dto.setRegionIdx(100L); 
         
         postingService.insertPosting(dto);
         return "redirect:/alba/posting/list";
@@ -67,6 +66,7 @@ public class JobPostingController {
         }
         
         model.addAttribute("dto", dto);
-        return "alba/posting/article";
+        
+        return "alba/article";
     }
 }
