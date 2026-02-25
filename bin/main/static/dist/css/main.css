@@ -31,8 +31,9 @@ a, a:link, a:visited, a:hover, a:active {
     text-decoration: none;
     color: inherit;
 }
+
 /* =========================================================
-   [로딩창 애니메이션] - 바통 릴레이 육상 트랙 & 4컬러 스와이프
+   [로딩창 애니메이션] - 진짜 이어달리기 육상 트랙 (스타디움형) 🏃‍♂️💨
 ========================================================= */
 #baton-intro { 
     position: fixed; 
@@ -46,74 +47,74 @@ a, a:link, a:visited, a:hover, a:active {
     transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s; 
 }
 
-/* 🏟️ 리얼 육상 트랙 디자인 */
+/* 🏟️ 캡슐 모양(스타디움) 육상 트랙 */
 .relay-visual { 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; /* 체크포인트 간격 벌리기 */
-    width: 320px;  /* 달리는 느낌을 주기 위해 트랙 길이를 대폭 늘림 */
-    height: 70px; 
-    background: #F4F5F7; /* 연하고 부드러운 트랙 바닥색 */
-    padding: 0 40px; 
-    border-radius: 100px; 
-    border: 1px solid #E5E8EB;
-    box-shadow: inset 0 6px 15px rgba(0, 0, 0, 0.04); /* 트랙 안쪽으로 파인 입체감 */
+    width: 240px; 
+    height: 100px; 
+    background: #FCECE9; /* 육상 트랙(우레탄)의 부드러운 코랄/브릭 색상 */
+    border-radius: 50px; /* 완벽한 반원 형태의 양끝 */
     position: relative; 
-    overflow: hidden;
+    box-shadow: inset 0 4px 15px rgba(200, 100, 100, 0.15); /* 파인 듯한 입체감 */
+    padding: 0;
+    border: 4px solid #F6DDD8; /* 트랙 외곽선 */
 }
 
-/* 🏁 트랙의 점선 레인 (위아래 2줄) */
+/* 🏁 트랙 중앙의 점선 주행선 (하얀색) */
 .relay-visual::before {
     content: '';
     position: absolute;
-    top: 22px; bottom: 22px; left: 20px; right: 20px;
-    border-top: 2px dashed #D1D6DB;
-    border-bottom: 2px dashed #D1D6DB;
+    top: 10px; left: 10px; right: 10px; bottom: 10px;
+    border-radius: 40px;
+    border: 2px dashed #FFFFFF;
     z-index: 1;
 }
 
-/* 🚩 바통 터치 구역 (기존의 점을 트랙 출발선 모양으로 변경) */
+/* 🚩 바통 터치 구역 (하얀색 출발선) */
 .node { 
-    width: 6px; 
-    height: 36px; 
-    background: #E5E8EB; 
-    border-radius: 4px; 
-    position: relative; 
-    z-index: 2; 
+    position: absolute;
+    width: 4px; 
+    height: 16px; 
+    background: #FFFFFF; 
+    border-radius: 2px; 
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-/* 활성화된 출발선 */
-.node.active { 
-    background: #B0B8C1; 
+/* 기존 3개의 node와 가상 요소 1개를 이용해 트랙의 4방향 체크포인트 생성 (수학적 정렬) */
+.node:nth-child(1) { top: 2px; left: 118px; }          /* 북쪽 라인 */
+.node:nth-child(3) { top: 42px; left: 228px; }         /* 동쪽 라인 */
+.node:nth-child(4) { bottom: 2px; left: 118px; }       /* 남쪽 라인 */
+
+.relay-visual::after {
+    content: '';
+    position: absolute;
+    width: 4px; height: 16px;
+    background: #FFFFFF;
+    border-radius: 2px;
+    top: 42px; left: 8px;                              /* 서쪽 라인 */
+    z-index: 2;
 }
 
-/* 🔥 달리는 바통 (색상과 그림자 효과 추가) */
+/* 🔥 둥근 곡선을 따라 완벽하게 도는 바통과 혜성 꼬리(잔상) 효과 */
 .baton-pass-bar { 
-    width: 50px; 
-    height: 12px; 
-    border-radius: 10px; 
     position: absolute; 
-    top: 50%;
-    margin-top: -6px; /* 완벽한 수직 중앙 정렬 */
-    z-index: 3; 
-    /* 달릴 때 가속/감속이 느껴지는 애니메이션 곡선 적용 */
-    animation: trackRelayRace 2.4s infinite cubic-bezier(0.25, 0.1, 0.25, 1); 
+    top: 0; left: 0;
+    width: 24px; 
+    height: 8px; 
+    border-radius: 4px; 
+    z-index: 5;
+    /* CSS 모션 패스: 스타디움 트랙의 둥근 곡선과 100% 일치하는 이동 경로 */
+    offset-path: path('M 50 10 L 190 10 A 40 40 0 0 1 190 90 L 50 90 A 40 40 0 0 1 50 10 Z');
+    animation: trackRace 2.8s linear infinite; 
 }
 
-/* 🌈 파랑 -> 보라 -> 초록 -> 분홍 (분홍색 노출 시간 대폭 증가!) */
-@keyframes trackRelayRace {
-    0%   { left: 0%;   background: #3182F6; box-shadow: 0 4px 12px rgba(49, 130, 246, 0.4); opacity: 0; }
-    10%  { left: 10%;  background: #3182F6; box-shadow: 0 4px 12px rgba(49, 130, 246, 0.4); opacity: 1; }
-    
-    35%  { left: 40%;  background: #7048E8; box-shadow: 0 4px 12px rgba(112, 72, 232, 0.4); opacity: 1; }
-    
-    60%  { left: 70%;  background: #00B050; box-shadow: 0 4px 12px rgba(0, 176, 80, 0.4); opacity: 1; }
-    
-    /* 분홍색이 80%부터 95%까지 길게, 완벽하게 선명하게 유지됩니다 */
-    80%  { left: 85%;  background: #F86D7D; box-shadow: 0 4px 12px rgba(248, 109, 125, 0.4); opacity: 1; }
-    95%  { left: 95%;  background: #F86D7D; box-shadow: 0 4px 12px rgba(248, 109, 125, 0.4); opacity: 1; }
-    
-    100% { left: 100%; background: #F86D7D; box-shadow: 0 4px 12px rgba(248, 109, 125, 0.4); opacity: 0; }
+/* 🌈 파랑 -> 보라 -> 초록 -> 분홍으로 자연스럽게 이어지는 색상과 잔상(꼬리) */
+@keyframes trackRace {
+    0%   { offset-distance: 0%;   background: #3182F6; box-shadow: -10px 0 12px rgba(49, 130, 246, 0.7), -20px 0 20px rgba(49, 130, 246, 0.4); }
+    25%  { offset-distance: 25%;  background: #7048E8; box-shadow: -10px 0 12px rgba(112, 72, 232, 0.7), -20px 0 20px rgba(112, 72, 232, 0.4); }
+    50%  { offset-distance: 50%;  background: #00B050; box-shadow: -10px 0 12px rgba(0, 176, 80, 0.7), -20px 0 20px rgba(0, 176, 80, 0.4); }
+    75%  { offset-distance: 75%;  background: #F86D7D; box-shadow: -10px 0 12px rgba(248, 109, 125, 0.7), -20px 0 20px rgba(248, 109, 125, 0.4); }
+    100% { offset-distance: 100%; background: #3182F6; box-shadow: -10px 0 12px rgba(49, 130, 246, 0.7), -20px 0 20px rgba(49, 130, 246, 0.4); }
 }
 
 .intro-content { 
@@ -136,6 +137,7 @@ a, a:link, a:visited, a:hover, a:active {
     font-weight: 600; 
     letter-spacing: 2px; 
 }
+
 /* =========================================================
    전체 레이아웃 및 사이드바 숨김 제어
 ========================================================= */

@@ -21,7 +21,7 @@
         </div>
         <div class="intro-content">
             <h1 class="brand-name">BATON</h1>
-            <p class="brand-slogan">당신의 일상이 따뜻한 연결이 되는 순간</p>
+            <p class="brand-slogan">나의 필요가 당신의 일상으로, 가치를 이어주고 마음을 이어받는 따뜻한 바통 터치</p>
         </div>
     </div>
 
