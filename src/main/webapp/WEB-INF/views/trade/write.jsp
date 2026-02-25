@@ -123,7 +123,7 @@
 						
 						<div class="field" id="locationField" style="margin-top: 20px;">
 						    <label>거래 희망 장소</label>
-						    <input type="text" name="location" id="locationInput" placeholder="예) 강남역 1번 출구 앞">
+						    <input type="text" name="tradePlace" id="locationInput" placeholder="예) 강남역 1번 출구 앞">
 						</div>
                     </div>
 

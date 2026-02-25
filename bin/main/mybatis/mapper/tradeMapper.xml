@@ -5,8 +5,8 @@
 	<insert id="insertTradePost" parameterType="com.sp.app.model.Trade">
 		INSERT INTO product(productIdx, title, content, price, userIdx, tradeType, 
 			tradePlace, regionIdx, productStatus, categoryIdx)
-		VALUES(seq_product.NEXTVAL, #{title}, #{content}, #{price}, 1, #{tradeType},
-			#{tradePlace}, 1, #{productStatus}, 1)
+		VALUES(seq_product.NEXTVAL, #{title, jdbcType=VARCHAR}, #{content, jdbcType=VARCHAR}, #{price}, 1, #{tradeType, jdbcType=VARCHAR},
+			#{tradePlace, jdbcType=VARCHAR}, 1, #{productStatus, jdbcType=VARCHAR}, 1)
 	</insert>
 	
 	<select id="findByIdx" parameterType="long" resultType="com.sp.app.model.Trade">
