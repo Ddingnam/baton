@@ -37,7 +37,7 @@
                 <c:choose>
                     <c:when test="${empty sessionScope.member}">
                         <a href="${pageContext.request.contextPath}/member/login" class="login-btn">로그인</a>
-                        <a href="${pageContext.request.contextPath}/member/member" class="join-btn">시작하기</a>
+                        <a href="${pageContext.request.contextPath}/member/townAuth" class="join-btn">시작하기</a>
                     </c:when>
                     <c:otherwise>
                         <div class="user-action-group">

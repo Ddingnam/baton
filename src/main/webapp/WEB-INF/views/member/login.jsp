@@ -13,7 +13,7 @@
 <style type="text/css">
     .main-content {
         background-color: #f8f9fa;
-        min-height: 80vh; /* 헤더 제외하고 화면을 꽉 채우기 위해 */
+        min-height: 80vh;
         display: flex;
         align-items: center;
     }
@@ -69,11 +69,9 @@
 </style>
 </head>
 <body>
-<!--
 <header>
     <jsp:include page="/WEB-INF/views/layout/header.jsp"/>
 </header>
--->
 
 <main class="main-content">
     <div class="container">

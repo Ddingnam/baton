@@ -25,7 +25,7 @@ public class SpringSecurityConfig {
 		HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
 		requestCache.setMatchingRequestParameterName(null);
 
-		String[] excludeUri = { "/", "/index.jsp", "/member/login", "/member/account", "/member/logout",
+		String[] excludeUri = { "/", "/index.jsp", "/member/login", "/member/account", "/member/logout", "/member/join", "/member/townAuth",
 				"/member/userIdCheck", "/member/complete", "/member/pwdFind", "/member/expired", "/dist/**",
 				"/guest/main", "/guest/list", "/uploads/photo/**", "/favicon.ico", "/WEB-INF/views/**", "/static/**",
 				"/oauth/kakao/callback", "/js/**" };
@@ -38,7 +38,7 @@ public class SpringSecurityConfig {
 			.requestMatchers(excludeUri).permitAll()
 			.requestMatchers("/admin/**").hasAnyRole("ADMIN", "EMP")
 			.requestMatchers("/**").hasAnyRole("USER", "INSTRUCTOR", "EMP", "ADMIN")
-			.requestMatchers("/error").permitAll() // 에러 페이지는 검사하지 말고 그냥 보여줘라!
+			.requestMatchers("/error").permitAll()
 			.anyRequest().authenticated()
 		)
 		.formLogin(login -> login
