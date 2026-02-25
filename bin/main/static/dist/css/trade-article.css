@@ -1,9 +1,9 @@
 @charset "UTF-8";
 
 :root {
-    --primary: #FF6F0F;
-    --primary-dark: #e55e00;
-    --primary-light: #FFF3EC;
+    --primary: #00B98D;
+    --primary-dark: #008D6A;
+    --primary-light: #F2FAF8;
     --surface: #ffffff;
     --bg: #F7F8FA;
     --border: #E8EAED;
@@ -187,7 +187,7 @@ a { text-decoration: none; color: inherit; }
     cursor: pointer; transition: all .2s; margin-bottom: 10px; font-family: inherit;
     display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.chat-btn:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 16px rgba(255,111,15,0.25); }
+.chat-btn:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0, 185, 141, 0.15); }
 .chat-btn:disabled { background: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; }
 
 .secondary-actions { display: flex; gap: 10px; }
