@@ -1,22 +1,28 @@
 document.addEventListener("DOMContentLoaded", () => {
-	
-	const summaryCards = document.querySelectorAll('.summary-card');
-	
-	summaryCards.forEach(card => {
-		card.addEventListener('mouseenter', () => {
-			card.style.transform = 'translateY(-4px)';
-		});
-		card.addEventListener('mouseleave', () => {
-			card.style.transform = 'translateY(0)';
-		});
-	});
+	const root = document.getElementById('mp-theme-root');
+	const tabs = document.querySelectorAll('.tab-item');
+	const sections = document.querySelectorAll('.mp-section');
 
-	const tradeItems = document.querySelectorAll('.trade-item');
-	
-	tradeItems.forEach(item => {
-		item.addEventListener('click', () => {
-			window.location.href = '/mypage/trade/buy';
+	root.style.setProperty('--mp-theme', '#3182F6');
+	root.style.setProperty('--mp-theme-bg', '#E8F3FF');
+
+	tabs.forEach(tab => {
+		tab.addEventListener('click', () => {
+			tabs.forEach(t => t.classList.remove('active'));
+			tab.classList.add('active');
+
+			const color = tab.getAttribute('data-color');
+			const bg = tab.getAttribute('data-bg');
+			root.style.setProperty('--mp-theme', color);
+			root.style.setProperty('--mp-theme-bg', bg);
+
+			const targetId = tab.getAttribute('data-target');
+			sections.forEach(sec => {
+				sec.classList.remove('active');
+				if (sec.id === targetId) {
+					sec.classList.add('active');
+				}
+			});
 		});
 	});
-	
 });

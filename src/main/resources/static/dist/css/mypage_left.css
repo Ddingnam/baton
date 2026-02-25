@@ -1,56 +1,28 @@
 @charset "UTF-8";
 
-.mypage-sidebar {
-    width: 250px;
-    flex-shrink: 0;
-    position: sticky;
-    top: 120px;
+.mp-sidebar {
+    width: 220px; flex-shrink: 0;
+    position: sticky; top: 110px;
 }
 
-/* 심플 프로필 영역 */
-.sidebar-profile {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 12px 12px 32px 12px;
+.sb-header { margin-bottom: 24px; padding-left: 12px; }
+.sb-header h2 { font-size: 18px; font-weight: 800; color: #191F28; margin: 0; letter-spacing: 0.5px; }
+
+.sb-nav { display: flex; flex-direction: column; gap: 24px; }
+.sb-group { display: flex; flex-direction: column; gap: 4px; }
+
+.sb-label {
+    font-size: 12px; font-weight: 700; color: #8B95A1;
+    margin-bottom: 8px; padding-left: 12px;
 }
 
-.sidebar-profile .profile-avatar {
-    width: 52px; height: 52px;
-    background: #E8F3FF;
-    color: #3182F6;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px;
-}
-
-.sidebar-profile .profile-info { display: flex; flex-direction: column; gap: 4px; }
-.sidebar-profile .name { font-size: 20px; font-weight: 800; color: #191F28; }
-.sidebar-profile .manner { font-size: 13px; font-weight: 600; color: #8B95A1; }
-
-/* 네비게이션 영역 */
-.sidebar-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-}
-
-.nav-group h4 {
-    font-size: 13px; font-weight: 600; color: #8B95A1;
-    margin: 0 0 8px 12px;
-}
-
-.nav-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 14px 12px; border-radius: 12px;
-    color: #4E5968; font-size: 16px; font-weight: 600;
+.sb-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px;
+    color: #4E5968; font-size: 14px; font-weight: 600;
     text-decoration: none; transition: 0.2s;
 }
 
-.nav-item i { font-size: 22px; color: #B0B8C1; transition: 0.2s; }
-
-.nav-item:hover { background: rgba(0,0,0,0.03); color: #191F28; }
-.nav-item:hover i { color: #4E5968; }
-
-.nav-item.active { background: #FFFFFF; color: #1B64DA; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-.nav-item.active i { color: #3182F6; }
+.sb-link i { font-size: 18px; color: #B0B8C1; transition: 0.2s; }
+.sb-link:hover { background: #F2F4F6; color: #191F28; }
+.sb-link:hover i { color: #4E5968; }
