@@ -5,7 +5,7 @@
 }
 
 /* =========================================================
-   [불투명 헤더 기본 설정]
+   불투명 헤더 기본 설정
 ========================================================= */
 #baton-header {
     position: fixed; 
@@ -30,7 +30,7 @@
 }
 
 /* =========================================================
-   [로고 디자인]
+   로고 디자인
 ========================================================= */
 .baton-logo-link, .baton-logo-link:visited, .baton-logo-link:hover { 
     display: flex; 
@@ -75,7 +75,7 @@
 }
 
 /* =========================================================
-   [메뉴 네비게이션] 
+   메뉴 네비게이션
 ========================================================= */
 .nav-menu { 
     display: flex; 
@@ -95,7 +95,7 @@
     transition: color 0.3s ease; 
 }
 
-/* 각 도메인별 고유 컬러 호버 효과 */
+/* 각 도메인별 컬러 */
 .nav-menu li:nth-child(1) a:hover { color: #3182F6 !important; } 
 .nav-menu li:nth-child(2) a:hover { color: #7048E8 !important; } 
 .nav-menu li:nth-child(3) a:hover { color: #00B050 !important; } 
@@ -127,40 +127,118 @@
 }
 
 /* =========================================================
-   [우측 로그인/버튼 그룹 및 챗봇]
+  비로그인 상태 유저
 ========================================================= */
-.auth-group {
-	display: flex;
-	align-items: center;
-	gap: 20px;
+.auth-group { display: flex; align-items: center; gap: 20px; }
+
+.login-btn, .login-btn:visited { 
+    font-size: 16px; font-weight: 600; color: #4E5968 !important; 
+    text-decoration: none; transition: 0.2s; 
+}
+.login-btn:hover { color: #191F28 !important; }
+
+.join-btn, .join-btn:visited { 
+    padding: 12px 24px; background: #3182F6 !important; color: #fff !important; 
+    border-radius: 14px; font-weight: 700; text-decoration: none; transition: all 0.3s; 
+}
+.join-btn:hover { 
+    background: #1B64DA !important; transform: translateY(-2px); 
+    box-shadow: 0 6px 15px rgba(49, 130, 246, 0.3); 
 }
 
-.login-btn, .login-btn:visited {
-	font-size: 16px;
-	font-weight: 600;
-	color: #4E5968 !important;
-	text-decoration: none;
-	transition: 0.2s;
+/* =========================================================
+   로그인 상태 유저
+========================================================= */
+.user-action-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
-.login-btn:hover {
-	color: #191F28 !important;
+.action-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: #4E5968 !important;
+    font-size: 24px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
 }
 
-.join-btn, .join-btn:visited {
-	padding: 12px 24px;
-	background: #3182F6 !important;
-	color: #fff !important;
-	border-radius: 14px;
-	font-weight: 700;
-	text-decoration: none;
-	transition: all 0.3s;
+.action-icon:hover {
+    background: #F2F4F6;
+    color: var(--header-domain-color) !important;
+    transform: translateY(-2px);
 }
 
-.join-btn:hover {
-	background: #1B64DA !important;
-	transform: translateY(-2px);
-	box-shadow: 0 6px 15px rgba(49, 130, 246, 0.3);
+.badge-dot {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 6px;
+    height: 6px;
+    background: #FF4D4F;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px #fff;
+}
+
+.action-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 16px 6px 6px;
+    background: #F9FAFB;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid #E5E8EB;
+}
+
+.action-profile:hover {
+    border-color: var(--header-domain-color); 
+    background: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.profile-thumb {
+    width: 32px;
+    height: 32px;
+    background: #E5E8EB;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8B95A1;
+    font-size: 18px;
+}
+
+.action-profile:hover .profile-thumb {
+    background: var(--header-domain-color);
+    color: #FFFFFF;
+}
+
+.user-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #191F28 !important;
+}
+
+.logout-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #8B95A1 !important;
+    text-decoration: none;
+    margin-left: 8px;
+    transition: 0.2s;
+}
+
+.logout-text:hover {
+    color: #191F28 !important;
+    text-decoration: underline;
 }
 
 #baton-chatbot-trigger {

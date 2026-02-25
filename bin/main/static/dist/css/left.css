@@ -1,7 +1,7 @@
 ﻿@charset "UTF-8";
 
 /* =========================================================
-   [사이드바 기본 구조]
+   사이드바 기본 구조
 ========================================================= */
 #baton-left {
     width: 240px;
@@ -14,11 +14,11 @@
     flex-shrink: 0;
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     background: var(--baton-bg);
-    overflow: visible; /* 토글 버튼 튀어나오게 하기 위해 필수 */
+    overflow: visible;
 }
 
 /* =========================================================
-   [사이드바 숨김 상태] (JS로 제어됨)
+   사이드바 숨김 상태
 ========================================================= */
 #baton-layout-container.sidebar-hidden #baton-left {
     width: 0;
@@ -31,7 +31,7 @@
 }
 
 /* =========================================================
-   [접기 버튼 - 사이드바 우측 끝]
+   접기 버튼 - 사이드바 우측 끝
 ========================================================= */
 .sidebar-toggle-trigger {
     position: absolute;
@@ -53,13 +53,13 @@
 }
 
 .sidebar-toggle-trigger:hover { 
-    background: #3182F6; 
+    background: var(--header-domain-color, #3182F6); 
     color: #fff; 
-    border-color: #3182F6;
+    border-color: var(--header-domain-color, #3182F6);
 }
 
 /* =========================================================
-   [펼치기 버튼 - 화면 왼쪽 고정] (사이드바 숨김 시에만 등장)
+   펼치기 버튼 - 화면 왼쪽 고정
 ========================================================= */
 .sidebar-show-btn {
     position: fixed;
@@ -69,13 +69,13 @@
     height: 44px;
     background: #fff;
     border-radius: 14px;
-    display: none; /* js에서 토글 */
+    display: none;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     z-index: 1100;
-    color: #3182F6;
+    color: var(--header-domain-color, #3182F6);
     font-size: 24px;
     transition: all 0.3s;
 }
@@ -86,7 +86,7 @@
 }
 
 /* =========================================================
-   [사이드바 메뉴 아이템 스타일] (보라색 방지 포함)
+   사이드바 메뉴
 ========================================================= */
 .sidebar-menu .menu-label {
     font-size: 13px;
@@ -124,10 +124,10 @@
 }
 
 .sidebar-menu li.active a {
-    background: #E8F3FF;
-    color: #3182F6 !important;
+    background: var(--header-domain-bg, #E8F3FF) !important;
+    color: var(--header-domain-color, #3182F6) !important;
 }
 
 .sidebar-menu li.active a i {
-    color: #3182F6;
+    color: var(--header-domain-color, #3182F6) !important;
 }

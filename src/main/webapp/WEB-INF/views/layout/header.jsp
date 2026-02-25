@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/header.css">
 
@@ -7,11 +8,11 @@
     <div class="header-container">
         <div class="header-left">
             <a href="${pageContext.request.contextPath}/" class="baton-logo-link">
-                <div class="logo-symbol">
-                    <div class="symbol-dot"></div>
-                    <div class="symbol-bar"></div> 
-                    <div class="symbol-dot"></div>
-                </div>
+                <span class="logo-symbol">
+                    <span class="symbol-dot"></span>
+                    <span class="symbol-bar"></span> 
+                    <span class="symbol-dot"></span>
+                </span>
                 <span class="logo-text">BATON</span>
             </a>
         </div>
@@ -33,8 +34,22 @@
                         <a href="${pageContext.request.contextPath}/member/member" class="join-btn">시작하기</a>
                     </c:when>
                     <c:otherwise>
-                        <span class="user-name"><strong>${sessionScope.member.userName}</strong>님</span>
-                        <a href="${pageContext.request.contextPath}/member/logout" class="login-btn" style="margin-left: 10px;">로그아웃</a>
+                        <div class="user-action-group">
+                            <a href="${pageContext.request.contextPath}/wish/list" class="action-icon" title="찜 목록">
+                                <i class="ri-heart-3-line"></i>
+                            </a>
+                            <a href="${pageContext.request.contextPath}/chat/list" class="action-icon" title="채팅 및 알림">
+                                <i class="ri-chat-1-line"></i>
+                                <span class="badge-dot"></span>
+                            </a>
+                            <a href="${pageContext.request.contextPath}/mypage" class="action-profile" title="마이페이지">
+                                <div class="profile-thumb">
+                                    <i class="ri-user-smile-fill"></i>
+                                </div>
+                                <span class="user-name">${sessionScope.member.userName}님</span>
+                            </a>
+                            <a href="${pageContext.request.contextPath}/member/logout" class="logout-text">로그아웃</a>
+                        </div>
                     </c:otherwise>
                 </c:choose>
             </div>
