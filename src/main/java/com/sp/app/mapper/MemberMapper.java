@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.sp.app.domain.dto.MemberDto;
+import com.sp.app.domain.dto.UserDto;
 
 @Mapper
 public interface MemberMapper {
@@ -19,7 +20,7 @@ public interface MemberMapper {
 	public void insertSnsMember(MemberDto dto) throws SQLException;
 	public void insertMemberStatus(MemberDto dto) throws SQLException;
 	
-	public void updateMemberEnabled(Map<String, Object> map) throws SQLException;
+	public void updateUserEnabled(Map<String, Object> map) throws SQLException;
 	public void updateMemberPassword(MemberDto dto) throws SQLException;
 	
 	public void updateMember1(MemberDto dto) throws SQLException;
@@ -29,8 +30,8 @@ public interface MemberMapper {
 	public void updateLastLogin(Long member_id) throws SQLException;
 	public void updateLastLoginId(String login_id) throws SQLException;
 	
-	public MemberDto findById(Long member_id);
-	public MemberDto findByLoginId(String login_id);
+	public UserDto findById(Long member_id);
+	public UserDto findByLoginId(String login_id);
 	public Long getMemberId(String login_id);
 	
 	public int checkFailureCount(String login_id);

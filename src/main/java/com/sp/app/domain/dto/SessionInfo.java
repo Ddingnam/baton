@@ -13,9 +13,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class SessionInfo {
-	private long member_id;
-	private String login_id;
-	private String password;
+	private long userIdx;
+	private String userId;
+	private String pwd;
 	private String name;
 	private String email;
 	private int userLevel;

@@ -67,12 +67,12 @@ public class CustomUserDetails implements UserDetails{
 
 	@Override
 	public @Nullable String getPassword() {
-		return member.getPassword();
+		return member.getPwd();
 	}
 
 	@Override
 	public String getUsername() {
-		return member.getLogin_id();
+		return member.getUserId();
 	}
 	
 	@Override

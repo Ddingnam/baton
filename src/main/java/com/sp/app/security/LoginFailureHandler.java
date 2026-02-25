@@ -11,7 +11,7 @@ import org.springframework.security.authentication.InternalAuthenticationService
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
-import com.sp.app.domain.dto.MemberDto;
+import com.sp.app.domain.dto.UserDto;
 import com.sp.app.service.MemberService;
 
 import jakarta.servlet.ServletException;
@@ -42,17 +42,19 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 				}
 				
 				if(cnt >= 4) {
-					MemberDto dto = memberService.findById(login_id);
+					UserDto dto = memberService.findById(login_id);
 					
 					Map<String, Object> map = new HashMap<>();
-					map.put("enabled", 0);
-					map.put("member_id", dto.getMember_id());
-					memberService.updateMemberEnabled(map);
+					map.put("status", 0);
+					map.put("userIdx", dto.getUserIdx());
+					memberService.updateUserEnabled(map);
 					
+					/*
 					dto.setRegister_id(dto.getMember_id());
 					dto.setStatus_code(1);
 					dto.setMemo("패스워드 5회이상 실패");
 					memberService.insertMemberStatus(dto);
+					*/
 				}
 				
 				msg = "패스워드 불일치";

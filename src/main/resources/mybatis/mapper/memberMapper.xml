@@ -68,15 +68,15 @@
 		VALUES (memberStatus_seq.NEXTVAL, #{member_id}, #{status_code}, #{memo}, #{register_id}, SYSDATE)
 	</insert>
 
-    <update id="updateMemberEnabled" parameterType="map">
-		UPDATE member1 SET enabled = #{enabled}
+    <update id="updateUserEnabled" parameterType="map">
+		UPDATE users SET status = #{status}
 		<where>
 			<choose>
 				<when test="login_id != null">
-					login_id = #{login_id}
+					userId = #{login_id}
 				</when>
 				<otherwise>
-					member_id = #{member_id}
+					userIdx = #{userIdx}
 				</otherwise>
 			</choose>
 		</where>
@@ -122,28 +122,26 @@
 	</update>
 
 	<!-- 회원 정보 -->
-	<select id="findById" parameterType="Long" resultType="com.sp.app.domain.dto.MemberDto">
-		SELECT m1.member_id, m1.login_id, password, sns_provider, sns_id, email,
-			enabled, created_at, update_at, last_login,
-			name, TO_CHAR(birth, 'YYYY-MM-DD') birth, email, tel, 
-			profile_photo, zip, addr1, addr2, receive_email,
-			authority
-		FROM member1 m1
-		LEFT OUTER JOIN member2 m2 ON m1.member_id = m2.member_id
-		LEFT OUTER JOIN memberAuthority m3 ON m1.login_id = m3.login_id
-		WHERE m1.member_id = #{member_id}
+	<select id="findById" parameterType="Long" resultType="com.sp.app.domain.dto.UserDto">
+		SELECT m1.userIdx, m1.userId, pwd, name, nickname, email, tel, addr,
+			status, createdDate, updatedDate, lastLoginDate,
+			TO_CHAR(birth, 'YYYY-MM-DD') birth, 
+			profile_photo, score, userLevel, pwdFailCount,
+			m2.authority
+		FROM users m1
+		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
+		WHERE m1.userIdx = #{member_id}
 	</select>
 
-	<select id="findByLoginId" parameterType="String" resultType="com.sp.app.domain.dto.MemberDto">
-		SELECT m1.member_id, m1.login_id, password, sns_provider, sns_id, email,
-			enabled, created_at, update_at, last_login,
-			name, TO_CHAR(birth, 'YYYY-MM-DD') birth, email, tel, 
-			profile_photo, zip, addr1, addr2, receive_email,
-			authority
-		FROM member1 m1
-		LEFT OUTER JOIN member2 m2 ON m1.member_id = m2.member_id
-		LEFT OUTER JOIN memberAuthority m3 ON m1.login_id = m3.login_id
-		WHERE m1.login_id = #{login_id}
+	<select id="findByLoginId" parameterType="String" resultType="com.sp.app.domain.dto.UserDto">
+		SELECT m1.userIdx, m1.userId, pwd, name, nickname, email, tel, addr,
+			status, createdDate, updatedDate, lastLoginDate,
+			TO_CHAR(birth, 'YYYY-MM-DD') birth, 
+			profile_photo, score, userLevel, pwdFailCount,
+			m2.authority
+		FROM users m1
+		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
+		WHERE m1.userId = #{login_id}
 	</select>
 
 	<select id="getMemberId" parameterType="String" resultType="Long">
@@ -154,21 +152,21 @@
 
 	<!-- 패스워드 실패 횟수 -->
 	<select id="checkFailureCount" parameterType="String" resultType="Integer">
-		SELECT NVL(failure_cnt, 0) failure_cnt
-		FROM member1
-		WHERE login_id = #{login_id}
+		SELECT NVL(pwdFailCount, 0) pwdFailCount
+		FROM users
+		WHERE userId = #{login_id}
 	</select>
 	
 	<!-- 패스워드 실패 횟수 초기화 -->
 	<update id="updateFailureCountReset" parameterType="String">
-		UPDATE member1 SET failure_cnt = 0
-		WHERE login_id = #{login_id}
+		UPDATE users SET pwdFailCount = 0
+		WHERE userId = #{login_id}
 	</update>
 	
 	<!-- 패스워드 실패 횟수 증가 -->
 	<update id="updateFailureCount" parameterType="String">
-		UPDATE member1 SET failure_cnt = failure_cnt + 1
-		WHERE login_id = #{login_id}
+		UPDATE users SET pwdFailCount = pwdFailCount + 1
+		WHERE userId = #{login_id}
 	</update>
 	
 	<!-- 회원 정보 삭제 -->
@@ -216,8 +214,8 @@
 
 	<select id="findByAuthority" parameterType="String" resultType="String">
 		SELECT authority
-		FROM memberAuthority
-		WHERE login_id = #{login_id}
+		FROM userAuthority
+		WHERE userId = #{login_id}
 	</select>
 	
 	<insert id="insertRefreshToken" parameterType="com.sp.app.domain.dto.MemberDto">

@@ -10,38 +10,30 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class UserDto {
-	private Long member_id;
-	private String login_id;
-	private String password;
-	private String sns_provider;
-	private String sns_id;
-	// private int userLevel;
-	private int enabled;
-	private String created_at;
-	private String update_at;
-	private String last_login;
-	private int failure_cnt;
-
-	private String name;
-	private String birth;
-	private String email;
-	private int receive_email;
-	private String tel;
-	private String profile_photo;
-	private String zip;
-	private String addr1;
-	private String addr2;
-	private String ipAddr;
+	private long userIdx;
 	
-	private MultipartFile selectFile;
+	private String userId;
+	private String oauthId;
+	private String pwd;
+	
+	private String name;
+	private String nickname;
+	private String email;
+	private String tel;
+	private String addr;
+	private String birth;
+	private String profile_photo;
+	
+	private double score;
+	private int userLevel;
+	private int pwdFailCount;
+	private int status;
+	
+	private String createdDate;
+	private String updatedDate;
+	private String lastLoginDate;
+	
+	private MultipartFile selectFile;		
 	
 	private String authority;
-	private String oldAuthority;
-	
-	private String rt_value;
-	
-	private long num;
-	private int status_code;
-	private String memo;
-	private long register_id;		
 }

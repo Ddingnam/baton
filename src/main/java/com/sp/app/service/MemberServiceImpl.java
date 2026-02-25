@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.springframework.mail.MailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sp.app.domain.dto.MemberDto;
+import com.sp.app.domain.dto.UserDto;
 import com.sp.app.mapper.MemberMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -54,9 +54,14 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public void updateMemberEnabled(Map<String, Object> map) throws Exception {
-		// TODO Auto-generated method stub
-		
+	public void updateUserEnabled(Map<String, Object> map) throws Exception {
+		try {
+			mapper.updateUserEnabled(map);
+		} catch (Exception e) {
+			log.info("updateUserEnabled : ", e);
+			
+			throw e;
+		}
 	}
 
 	@Override
@@ -78,8 +83,8 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public MemberDto findById(Long member_id) {
-		MemberDto dto = null;
+	public UserDto findById(Long member_id) {
+		UserDto dto = null;
 
 		try {
 			dto = Objects.requireNonNull(mapper.findById(member_id));
@@ -93,8 +98,8 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public MemberDto findById(String login_id) {
-		MemberDto dto = null;
+	public UserDto findById(String login_id) {
+		UserDto dto = null;
 
 		try {
 			dto = Objects.requireNonNull(mapper.findByLoginId(login_id));
@@ -127,14 +132,24 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public void updateFailureCountReset(String login_id) throws Exception {
-		// TODO Auto-generated method stub
-		
+		try {
+			mapper.updateFailureCountReset(login_id);
+		} catch (Exception e) {
+			log.info("updateFailureCountReset : ", e);
+			
+			throw e;
+		}
 	}
 
 	@Override
 	public void updateFailureCount(String login_id) throws Exception {
-		// TODO Auto-generated method stub
-		
+		try {
+			mapper.updateFailureCount(login_id);
+		} catch (Exception e) {
+			log.info("updateFailureCount : ", e);
+			
+			throw e;
+		}
 	}
 
 	@Override

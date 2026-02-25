@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <title>BATON | Footer</title>
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/footer.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/footer.css">
 </head>
 <body>
 
@@ -20,6 +20,6 @@
         </div>
     </footer>
 
-    <script src="${pageContext.request.contextPath}/js/footer.js"></script>
+    <script src="${pageContext.request.contextPath}/dist/js/footer.js"></script>
 </body>
 </html>
