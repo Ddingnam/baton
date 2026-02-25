@@ -5,19 +5,17 @@ document.addEventListener("DOMContentLoaded", () => {
 	let domainBgColor = '#E8F3FF';
 
 	if (path.includes('/trade/')) {
-		domainColor = '#8A63FF';
-		domainBgColor = '#F4F0FF';
-	} else if (path.includes('/alba/')) {
+		domainColor = '#00B98D';
+		domainBgColor = '#E6F8F3';
+	} else if (path.includes('/club/')) {
 		domainColor = '#F86D7D';
 		domainBgColor = '#FFF0F1';
-	} else if (path.includes('/club/')) {
-
+	} else if (path.includes('/alba/')) {
 		domainColor = '#002C5F';
 		domainBgColor = '#F0F4F8';
 	} else if (path.includes('/community/')) {
-
-		domainColor = '#00B98D';
-		domainBgColor = '#E6F8F3';
+		domainColor = '#8A63FF';
+		domainBgColor = '#F4F0FF';
 	}
 
 	document.documentElement.style.setProperty('--header-domain-color', domainColor);
