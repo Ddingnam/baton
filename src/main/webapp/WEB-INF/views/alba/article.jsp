@@ -232,11 +232,55 @@
   }
 
   @media (max-width: 600px) {
-    .article-top, .article-body, .article-footer, .article-meta { padding-left: 20px; padding-right: 20px; }
+    .article-top, .article-body, .article-footer, .article-meta, .map-wrap { padding-left: 20px; padding-right: 20px; }
     .article-title { font-size: 20px; }
     .pay-amount { font-size: 22px; }
     .info-grid { grid-template-columns: 1fr; }
   }
+  .map-section {
+    border-top: 1px solid var(--border);
+  }
+  .map-wrap {
+    padding: 28px 36px;
+  }
+  .map-frame {
+    width: 100%; height: 220px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .map-placeholder {
+    text-align: center; color: var(--muted);
+  }
+  .map-placeholder .map-icon { font-size: 36px; margin-bottom: 8px; }
+  .map-placeholder p { font-size: 13px; font-weight: 600; }
+  .map-address {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 12px;
+    font-size: 13px; color: var(--sub); font-weight: 500;
+  }
+  /* ── 공유/찜 토스트 ── */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #1a1a2e; color: white;
+    padding: 11px 22px; border-radius: 30px;
+    font-size: 13px; font-weight: 600;
+    opacity: 0; transition: all .3s; z-index: 999; pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  /* ── 마감 D-day ── */
+  .deadline-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 11px; border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    margin-left: 8px;
+  }
+  .deadline-badge.urgent { background: #fff0f0; color: #e53935; border: 1px solid #ffd0d0; }
+  .deadline-badge.normal { background: var(--blue-light); color: var(--blue); border: 1px solid var(--blue-mid); }
 </style>
 </head>
 <body>
@@ -255,7 +299,10 @@
 
         <!-- 헤더 -->
         <div class="article-top">
-          <div class="article-category">📋 알바 공고</div>
+          <div class="article-category">
+            📋 알바 공고
+            <span class="deadline-badge" id="deadlineBadge"></span>
+          </div>
           <h1 class="article-title">${dto.title}</h1>
 
           <div class="pay-box">
@@ -290,6 +337,22 @@
           <div class="body-text">${dto.content}</div>
         </div>
 
+        <!-- 지도 -->
+        <div class="map-section">
+          <div class="map-wrap">
+            <div class="body-title">근무 위치</div>
+            <div class="map-frame" id="mapFrame">
+              <div class="map-placeholder">
+                <div class="map-icon">📍</div>
+                <p>${dto.location}</p>
+              </div>
+            </div>
+            <div class="map-address">
+              📍 <span>${dto.location}</span>
+            </div>
+          </div>
+        </div>
+
         <!-- 메타 -->
         <div class="article-meta">
           <div class="meta-item">👁 조회 ${dto.hitCount}회</div>
@@ -299,7 +362,8 @@
         <div class="article-footer">
           <a href="${pageContext.request.contextPath}/alba/posting/list" class="btn btn-outline">← 목록</a>
           <button class="btn btn-heart" id="heartBtn" onclick="toggleHeart(this)" title="찜하기">♡</button>
-          <button class="btn btn-primary" onclick="alert('곧 지원하기 기능이 연결됩니다!');">
+          <button class="btn btn-outline" style="width:50px;height:50px;padding:0;flex-shrink:0;font-size:18px;" onclick="sharePost()" title="공유">↗</button>
+          <button class="btn btn-primary" onclick="applyJob()">
             ✉️ 이 알바 지원하기
           </button>
         </div>
@@ -309,6 +373,7 @@
   </main>
 </div>
 <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
+<div class="toast" id="toast"></div>
 <script>
 function toggleHeart(btn) {
   btn.classList.toggle('liked');
@@ -316,8 +381,74 @@ function toggleHeart(btn) {
   if (btn.classList.contains('liked')) {
     btn.style.transform = 'scale(1.3)';
     setTimeout(() => btn.style.transform = '', 200);
+    showToast('💛 찜 목록에 추가했어요!');
+  } else {
+    showToast('찜 목록에서 제거했어요');
   }
 }
+
+function sharePost() {
+  const url = location.href;
+  if (navigator.share) {
+    navigator.share({ title: document.title, url });
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => showToast('🔗 링크가 복사됐어요!'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = url; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('🔗 링크가 복사됐어요!');
+  }
+}
+
+function applyJob() {
+  showToast('✅ 지원하기 기능이 곧 연결됩니다!');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* 마감일 D-day 계산 (dto.deadline이 있으면 사용) */
+(function() {
+  const deadlineStr = '${dto.deadline}'; // 예: "2026-03-10"
+  const badge = document.getElementById('deadlineBadge');
+  if (!deadlineStr || deadlineStr === 'null' || deadlineStr.trim() === '') return;
+  try {
+    const deadline = new Date(deadlineStr);
+    const now = new Date();
+    const diffMs = deadline - now;
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) {
+      badge.textContent = '마감';
+      badge.className = 'deadline-badge urgent';
+    } else if (diffDays === 0) {
+      badge.textContent = 'D-Day';
+      badge.className = 'deadline-badge urgent';
+    } else if (diffDays <= 3) {
+      badge.textContent = `D-${diffDays} 마감임박!`;
+      badge.className = 'deadline-badge urgent';
+    } else {
+      badge.textContent = `D-${diffDays}`;
+      badge.className = 'deadline-badge normal';
+    }
+  } catch(e) {}
+})();
+
+/* 지도 iframe (카카오 지도 embed) */
+(function() {
+  const loc = encodeURIComponent('${dto.location}');
+  if (!loc || loc === 'null') return;
+  const frame = document.getElementById('mapFrame');
+  frame.innerHTML = `<iframe
+    src="https://map.kakao.com/link/map/${loc}/37.5665,126.9780"
+    width="100%" height="220"
+    style="border:0;border-radius:12px;"
+    loading="lazy">
+  </iframe>`;
+})();
 </script>
 </body>
 </html>

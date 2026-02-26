@@ -286,6 +286,7 @@
     .submit-bar { padding: 12px 16px; }
   }
 </style>
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/layout/header.jsp" />
@@ -466,7 +467,30 @@
           </div>
           <div class="form-group">
             <label for="location">근무 지역 <span class="required">*</span></label>
-            <input type="text" id="location" name="location" placeholder="예) 서울 중구 신당동" required>
+            <div class="input-with-suffix" style="gap:8px;">
+              <input type="text" id="location" name="location" placeholder="주소 검색 버튼을 눌러 검색하세요" required readonly style="background:var(--bg);cursor:pointer;" onclick="searchAddress()">
+              <button type="button" onclick="searchAddress()" style="
+                flex-shrink:0; padding:12px 16px; border-radius:var(--r-sm);
+                background:var(--blue); color:white; border:none;
+                font-family:inherit; font-size:13px; font-weight:700; cursor:pointer;
+                white-space:nowrap; transition:background .15s;
+              " onmouseover="this.style.background='var(--blue-hover)'" onmouseout="this.style.background='var(--blue)'">
+                📍 검색
+              </button>
+            </div>
+            <input type="text" id="locationDetail" name="locationDetail" placeholder="상세 주소 입력 (예: 3층 302호)" style="margin-top:8px;">
+            <input type="hidden" id="locationLat" name="locationLat">
+            <input type="hidden" id="locationLng" name="locationLng">
+          </div>
+          <div class="form-group">
+            <label for="deadline">모집 마감일 <span class="optional">(선택)</span></label>
+            <div class="input-with-suffix" style="align-items:stretch">
+              <input type="date" id="deadline" name="deadline"
+                style="padding-right:14px"
+                min="${today}"
+                oninput="updateDeadlineInfo()">
+            </div>
+            <div id="deadlineInfo" class="info-box" style="display:none;margin-top:8px;"></div>
           </div>
           <div class="form-group">
             <label for="contact">연락처 <span class="required">*</span></label>
@@ -511,12 +535,64 @@
 </div>
 <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 <script>
-function selectPayType(btn) {
-  document.querySelectorAll('#payTypeGroup .pay-type-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('payTypeHidden').value = btn.dataset.val;
-  updatePreview();
+/* ─ 주소 검색 ─ */
+function searchAddress() {
+  new daum.Postcode({
+    oncomplete: function(data) {
+      const addr = data.roadAddress || data.jibunAddress;
+      document.getElementById('location').value = addr;
+      document.getElementById('locationDetail').focus();
+      updateProgress();
+    }
+  }).open();
 }
+
+/* ─ 마감일 D-day ─ */
+function updateDeadlineInfo() {
+  const val = document.getElementById('deadline').value;
+  const box = document.getElementById('deadlineInfo');
+  if (!val) { box.style.display = 'none'; return; }
+  const diff = Math.ceil((new Date(val) - new Date()) / 86400000);
+  if (diff < 0) {
+    box.innerHTML = '⚠️ 이미 지난 날짜입니다. 다시 선택해주세요.';
+    box.style.background = '#fff0f0'; box.style.borderColor = '#ffd0d0'; box.style.color = '#e53935';
+  } else if (diff === 0) {
+    box.innerHTML = '📅 <strong>오늘 마감</strong>입니다.';
+    box.style.background = ''; box.style.borderColor = ''; box.style.color = '';
+  } else {
+	box.innerHTML = `📅 <strong>D-\${diff}</strong> — \${val.replaceAll('-', '.')} 마감`;
+    box.style.background = ''; box.style.borderColor = ''; box.style.color = '';
+  }
+  box.style.display = 'block';
+}
+
+/* ─ 최저임금 경고 ─ */
+const MIN_WAGE = 10030;
+document.getElementById('pay').addEventListener('input', function() {
+  const payType = document.getElementById('payTypeHidden').value;
+  const val = parseInt(this.value, 10);
+  let warnEl = document.getElementById('payWarn');
+  if (!warnEl) {
+    warnEl = document.createElement('div');
+    warnEl.id = 'payWarn';
+    warnEl.style.cssText = 'margin-top:8px;padding:9px 12px;border-radius:8px;font-size:12px;font-weight:600;display:none;';
+    this.closest('.input-with-suffix').insertAdjacentElement('afterend', warnEl);
+  }
+  if (payType === '시급' && val > 0 && val < MIN_WAGE) {
+    warnEl.innerHTML = `⚠️ 입력하신 시급이 최저임금(${MIN_WAGE.toLocaleString()}원)보다 낮아요!`;
+    warnEl.style.background = '#fff0f0'; warnEl.style.color = '#e53935'; warnEl.style.border = '1px solid #ffd0d0';
+    warnEl.style.display = 'block';
+  } else {
+    warnEl.style.display = 'none';
+  }
+  updatePreview();
+});
+function selectPayType(btn) {
+	  document.querySelectorAll('#payTypeGroup .pay-type-btn').forEach(b => b.classList.remove('active'));
+	  btn.classList.add('active');
+	  document.getElementById('payTypeHidden').value = btn.dataset.val;
+	  updatePreview();
+	}
 function selectWorkType(btn) {
   btn.closest('.form-group').querySelectorAll('.pay-type-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -658,11 +734,20 @@ function submitForm() {
   const loc     = document.getElementById('location').value.trim();
   const contact = document.getElementById('contact').value.trim();
   const days    = document.getElementById('workDaysHidden').value;
+  const payType = document.getElementById('payTypeHidden').value;
+  const deadline = document.getElementById('deadline').value;
   if (!title)   { alert('공고 제목을 입력해주세요.'); document.getElementById('title').focus(); return; }
   if (!pay)     { alert('급여를 입력해주세요.'); document.getElementById('pay').focus(); return; }
+  if (payType === '시급' && parseInt(pay,10) < 10030) {
+    if (!confirm('최저임금(10,030원)보다 낮은 시급입니다. 그래도 등록하시겠어요?')) return;
+  }
   if (!days)    { alert('근무 요일을 선택해주세요.'); return; }
-  if (!loc)     { alert('근무 지역을 입력해주세요.'); document.getElementById('location').focus(); return; }
+  if (!loc)     { alert('근무 지역을 검색해주세요.'); return; }
   if (!contact) { alert('연락처를 입력해주세요.'); document.getElementById('contact').focus(); return; }
+  if (deadline) {
+    const diff = Math.ceil((new Date(deadline) - new Date()) / 86400000);
+    if (diff < 0) { alert('마감일이 이미 지났어요. 다시 선택해주세요.'); document.getElementById('deadline').focus(); return; }
+  }
   const btn = document.getElementById('submitBtn');
   btn.disabled = true; btn.textContent = '등록 중...';
   document.getElementById('writeForm').submit();
