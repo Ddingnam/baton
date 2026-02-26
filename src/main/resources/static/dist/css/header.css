@@ -298,7 +298,7 @@ html {
 	height: 64px !important;
 	background: #191F28 !important;
 	border-radius: 24px !important;
-	display: flex !important;
+	display: inline-flex !important;
 	align-items: center !important;
 	justify-content: center !important;
 	box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2) !important;
@@ -310,12 +310,16 @@ html {
 }
 
 .notification-dot {
-	position: absolute !important;
-	top: 14px !important;
-	right: 14px !important;
-	width: 10px !important;
-	height: 10px !important;
-	background: #3182F6 !important;
-	border-radius: 50% !important;
-	border: 2.5px solid #191F28 !important;
+    position: absolute !important;
+    top: 14px !important; 
+    right: 14px !important;
+    width: 10px !important; 
+    height: 10px !important;
+    min-width: 10px !important;
+    min-height: 10px !important;
+    background-color: #3182F6 !important; 
+    border-radius: 50% !important;
+    border: 1.5px solid #191F28 !important; 
+    display: block !important;
+    z-index: 10 !important;
 }

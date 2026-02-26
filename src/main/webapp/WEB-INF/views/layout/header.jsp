@@ -63,11 +63,13 @@
     </div>
 </header>
 
-<div id="baton-chatbot-trigger">
+
+<c:if test="${!hideChatbot}"><div id="baton-chatbot-trigger">
     <div class="chatbot-icon-wrapper">
         <i class="ri-chat-smile-3-fill"></i>
         <span class="notification-dot"></span>
     </div>
-</div>
+</div></c:if>
+
 
 <script src="${pageContext.request.contextPath}/dist/js/header.js"></script>

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ include file="/WEB-INF/views/layout/headerResources.jsp" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -465,7 +466,7 @@ body { background: var(--baton-bg); font-family: 'Pretendard', sans-serif; color
       </div>
     </div>
 
-    <a href="${pageContext.request.contextPath}/baton/write" class="fab">
+    <a href="${pageContext.request.contextPath}/alba/write" class="fab">
       <i class="ri-pencil-line"></i> 공고 쓰기
     </a>
 
