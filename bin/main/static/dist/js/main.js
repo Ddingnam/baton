@@ -1,94 +1,104 @@
-document.addEventListener("DOMContentLoaded", () => {
-    
+function closeIntroNow() {
     const intro = document.getElementById('baton-intro');
     if (intro) {
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                intro.style.opacity = '0';
-                setTimeout(() => intro.style.visibility = 'hidden', 800);
-            }, 1500); 
+        intro.style.opacity = '0';
+        setTimeout(() => {
+            intro.style.display = 'none';
+        }, 800);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const intro = document.getElementById('baton-intro');
+    const introToggle = document.getElementById('intro-toggle');
+    
+    const introSetting = localStorage.getItem('introSetting') || 'on';
+
+    if (introToggle) {
+        introToggle.checked = (introSetting === 'on');
+        introToggle.addEventListener('change', (e) => {
+            const status = e.target.checked ? 'on' : 'off';
+            localStorage.setItem('introSetting', status);
         });
     }
 
-    const observerOptions = { threshold: 0.1 };
-    const revealObserver = new IntersectionObserver((entries) => {
+    if (introSetting === 'on' && intro) {
+        intro.style.display = 'flex';
+        intro.style.opacity = '1';
+        window.addEventListener('load', () => {
+            setTimeout(closeIntroNow, 2000);
+        });
+    } else if (intro) {
+        intro.style.display = 'none';
+    }
+
+    const counters = document.querySelectorAll('.counter-number');
+    counters.forEach(c => {
+        c.dataset.count = c.innerText.replace(/,/g, '');
+        c.innerText = '0';
+    });
+
+    const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.style.opacity = "1";
                 entry.target.style.transform = "translateY(0)";
                 
-                if (entry.target.id === 'stats-section') {
-                    startCounterAnimation();
-                }
-                
-                revealObserver.unobserve(entry.target);
+                const nums = entry.target.querySelectorAll('.counter-number');
+                nums.forEach(num => {
+                    if (!num.classList.contains('done')) {
+                        num.classList.add('done');
+                        const target = parseInt(num.dataset.count);
+                        if (isNaN(target)) return;
+
+                        let currentFrame = 0;
+                        const duration = 2000;
+                        const frameRate = 1000 / 60;
+                        const totalFrames = Math.round(duration / frameRate);
+                        const easeOutQuart = t => 1 - (--t) * t * t * t;
+
+                        const timer = setInterval(() => {
+                            currentFrame++;
+                            const progress = easeOutQuart(currentFrame / totalFrames);
+                            const currentCount = Math.round(target * progress);
+                            num.innerText = currentCount.toLocaleString();
+
+                            if (currentFrame === totalFrames) {
+                                num.innerText = target.toLocaleString();
+                                clearInterval(timer);
+                            }
+                        }, frameRate);
+                    }
+                });
+                observer.unobserve(entry.target);
             }
         });
-    }, observerOptions);
+    }, { threshold: 0.1 });
 
     document.querySelectorAll('.reveal').forEach(el => {
         el.style.opacity = "0";
         el.style.transform = "translateY(40px)";
-        el.style.transition = "all 0.8s cubic-bezier(0.22, 1, 0.36, 1)";
-        revealObserver.observe(el);
+        el.style.transition = "all 1.2s cubic-bezier(0.16, 1, 0.3, 1)";
+        observer.observe(el);
     });
 });
 
-// ==========================================
-// 3. 통계 카운터 애니메이션 함수
-// ==========================================
-function startCounterAnimation() {
-    const counterEl = document.getElementById('counter');
-    if (!counterEl) return;
-    
-    let start = 0;
-    const end = 1584200;
-    const duration = 2000;
-    
-    const timer = setInterval(() => {
-        start += Math.floor(end / 40);
-        if (start >= end) {
-            counterEl.innerText = end.toLocaleString();
-            clearInterval(timer);
-        } else {
-            counterEl.innerText = start.toLocaleString();
-        }
-    }, 50);
-}
-
-// ==========================================
-// 4. 찜하기(하트) 토글 기능
-// ==========================================
 function toggleWish(el, e) {
     if (!el || !e) return;
     e.stopPropagation();
-    
     el.classList.toggle('active');
     const icon = el.querySelector('i');
-    
-    if (el.classList.contains('active')) {
-        icon.className = 'ri-heart-fill';
-    } else {
-        icon.className = 'ri-heart-line';
+    if (icon) {
+        icon.className = el.classList.contains('active') ? 'ri-heart-fill' : 'ri-heart-line';
     }
 }
 
-// ==========================================
-// 5. 사이드바 숨김/보임 토글 기능
-// ==========================================
 function handleSidebar() {
     const container = document.getElementById('baton-layout-container');
     const openBtn = document.getElementById('baton-sidebar-open');
-    
     if (!container) return;
-
     container.classList.toggle('sidebar-hidden');
-    
     if (openBtn) {
-        if (container.classList.contains('sidebar-hidden')) {
-            openBtn.style.display = 'flex';
-        } else {
-            openBtn.style.display = 'none';
-        }
+        openBtn.style.display = container.classList.contains('sidebar-hidden') ? 'flex' : 'none';
     }
 }
