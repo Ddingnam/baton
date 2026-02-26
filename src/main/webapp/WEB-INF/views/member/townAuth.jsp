@@ -191,7 +191,7 @@ body {
     </div>
 </main>
 
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=8869bae56ce4b6e8c3104ca7c1b9454a&libraries=services"></script>
+<jsp:include page="/WEB-INF/views/api/api.jsp"/>
 
 <script>
 function startAuth() {
