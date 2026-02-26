@@ -1,6 +1,3 @@
-/**
- * 사이드바 토글 핸들러
- */
 function handleSidebar() {
     const container = document.getElementById('baton-layout-container');
     const openBtn = document.getElementById('baton-sidebar-open');

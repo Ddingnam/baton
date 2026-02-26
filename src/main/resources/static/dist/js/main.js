@@ -1,11 +1,3 @@
-/**
- * BATON 프로젝트 통합 스크립트
- * 1. 인트로 로딩 제어 (LocalSettings 반영)
- * 2. 카운트 애니메이션 (Ease-out 효과)
- * 3. 스크롤 Reveal 효과
- */
-
-// 인트로를 즉시 닫는 함수
 function closeIntroNow() {
     const intro = document.getElementById('baton-intro');
     if (intro) {
@@ -40,7 +32,11 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (intro) {
         intro.style.display = 'none';
     }
-
+	const counters = document.querySelectorAll('.counter-number');
+	counters.forEach(c => {
+	    c.dataset.count = c.innerText.replace(/,/g, '');
+	    c.innerText = '0';
+	});
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -99,8 +95,13 @@ function toggleWish(el, e) {
     }
 }
 
+
 function handleSidebar() {
     const container = document.getElementById('baton-layout-container');
+    const openBtn = document.getElementById('baton-sidebar-open');
     if (!container) return;
     container.classList.toggle('sidebar-hidden');
+    if (openBtn) {
+        openBtn.style.display = container.classList.contains('sidebar-hidden') ? 'flex' : 'none';
+    }
 }
