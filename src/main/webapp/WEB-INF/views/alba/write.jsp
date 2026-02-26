@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ include file="/WEB-INF/views/layout/headerResources.jsp" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -278,17 +279,19 @@
     from { opacity:0; transform: translateY(8px); }
     to   { opacity:1; transform: translateY(0); }
   }
-
+  
   @media (max-width: 600px) {
     .input-row { grid-template-columns: 1fr; }
     .write-page { padding: 18px 14px 100px; }
     .form-card { padding: 20px 18px; }
     .submit-bar { padding: 12px 16px; }
   }
+  
 </style>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
+<c:set var="hideChatbot" value="true" scope="request" />
 <jsp:include page="/WEB-INF/views/layout/header.jsp" />
 <div id="baton-layout-container">
   <main id="baton-main-content">

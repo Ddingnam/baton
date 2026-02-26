@@ -1,6 +1,7 @@
 package com.sp.app.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,13 @@ public class TradeServiceImpl implements TradeService {
 
 	@Override
 	public void deleteTradePost(long productIdx) throws Exception {
-		// TODO Auto-generated method stub
+		try {
+			mapper.deleteTradePostTag(productIdx);
+			mapper.deleteTragePostImg(productIdx);
+			mapper.deleteTradePost(productIdx);
+		} catch (Exception e) {
+			log.info("deleteTradePost : ", e);
+		}
 		
 	}
 
@@ -70,6 +77,28 @@ public class TradeServiceImpl implements TradeService {
 			log.info("findTagsByIdx", e);
 		}
 		return list;
+	}
+
+	@Override
+	public List<Trade> tradeList(Map<String, Object> map) {
+		List<Trade> list = null;
+	    try {
+	        list = mapper.tradeList(map);
+	    } catch (Exception e) {
+	        log.info("tradeList : ", e);
+	    }
+	    return list;
+	}
+
+	@Override
+	public int dataCount(Map<String, Object> map) {
+		int result = 0;
+	    try {
+	        result = mapper.dataCount(map);
+	    } catch (Exception e) {
+	        log.info("dataCount error", e);
+	    }
+	    return result;
 	}
 	
 }

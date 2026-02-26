@@ -15,7 +15,7 @@ import java.util.Map;
 @Controller
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/alba/posting/*")
+@RequestMapping("/alba/*")
 public class JobPostingController {
 
     private final JobPostingService postingService;
