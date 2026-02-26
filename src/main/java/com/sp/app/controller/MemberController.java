@@ -1,12 +1,15 @@
 package com.sp.app.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,8 +23,15 @@ public class MemberController {
 	private final MemberService service;
 	
 	@RequestMapping(value = "login", method = {RequestMethod.GET, RequestMethod.POST})
-	public String loginForm(@RequestParam(name = "error", required = false) String error, 
+	public String loginForm(@RequestParam(name = "error", required = false) String error,
+			@AuthenticationPrincipal CustomUserDetails userDetails,
+			RedirectAttributes rattr,
 			Model model) {
+		
+		if(userDetails != null) {
+			rattr.addFlashAttribute("msg", "이미 로그인된 상태입니다.");
+			return "redirect:/";
+		}
 		
 		if(error != null) {
 			model.addAttribute("message", "아이디 또는 패스워드가 일치하지 않습니다.");

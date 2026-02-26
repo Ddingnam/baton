@@ -13,6 +13,23 @@
     line-height: 1.5 !important;
 }
 
+/* 아이콘 복구 설정 */
+#baton-header .ri-heart-3-line, 
+#baton-header .ri-chat-1-line, 
+#baton-header .ri-user-smile-fill, 
+#baton-header .ri-settings-3-line,
+#baton-header [class^="ri-"], 
+#baton-header [class*=" ri-"] {
+    font-family: 'remixicon' !important; /* 아이콘 전용 폰트로 재지정 */
+    display: inline-block !important;
+    font-style: normal !important;
+    font-weight: normal !important;
+    font-variant: normal !important;
+    text-transform: none !important;
+    line-height: 1 !important;
+    -webkit-font-smoothing: antialiased;
+}
+
 #baton-header ul, 
 #baton-header li {
     margin: 0 !important;
@@ -342,4 +359,71 @@ html {
     padding: 0 !important;
     margin: 0 !important;
     box-sizing: content-box !important;
+}
+
+/* Toast */
+.baton-toast-container {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.baton-toast-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 32px;
+    background: rgba(25, 31, 40, 0.95);
+    backdrop-filter: blur(10px);
+    color: #FFFFFF;
+    border-radius: 100px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 320px;
+    justify-content: center;
+    animation: batonFadeInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.toast-icon {
+    font-size: 20px;
+    color: #3182F6;
+}
+
+.toast-text {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+.baton-toast-item.hide {
+    animation: batonFadeOutDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes batonFadeInDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-40px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes batonFadeOutDown {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
 }

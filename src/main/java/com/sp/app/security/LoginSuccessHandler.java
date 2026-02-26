@@ -13,6 +13,9 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
+import org.springframework.web.servlet.FlashMap;
+import org.springframework.web.servlet.FlashMapManager;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 import com.sp.app.domain.dto.UserDto;
 import com.sp.app.service.MemberService;
@@ -60,22 +63,20 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler{
 	        HttpServletResponse response,
 	        Authentication authentication) throws IOException, ServletException {
 
+		request.getSession().setAttribute("msg", authentication.getName() + "님, 환영합니다!");
+	    
 	    SavedRequest savedRequest = requestCache.getRequest(request, response);
 
 	    if (savedRequest != null) {
 	        String targetUrl = savedRequest.getRedirectUrl();
-	        
 	        redirectStrategy.sendRedirect(request, response, targetUrl);
-
 	    } else {
-
 	        if (defaultUrl == null || defaultUrl.isEmpty()) {
 	            redirectStrategy.sendRedirect(request, response, "/");
 	        } else {
 	            redirectStrategy.sendRedirect(request, response, defaultUrl);
 	        }
 	    }
-	    
 	}
 
 	public void setDefaultUrl(String defaultUrl) {

@@ -67,4 +67,33 @@ document.addEventListener("DOMContentLoaded", () => {
         const homeLink = document.querySelector('.sidebar-menu .side-link[data-domain="home"]');
         if (homeLink) homeLink.parentElement.classList.add('active');
     }
+	
+	const displayMsg = window.SERVER_MSG || window.SERVER_MESSAGE;
+    if (displayMsg && displayMsg.trim() !== "") {
+        showBatonToast(displayMsg);
+    }
 });
+
+function showBatonToast(text) {
+    const container = document.getElementById('baton-toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = 'baton-toast-item';
+    toast.innerHTML = `
+        <i class="ri-information-line toast-icon"></i>
+        <span class="toast-text">${text}</span>
+    `;
+    
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('hide');
+        
+        setTimeout(() => {
+            if (toast && toast.parentNode) {
+                toast.remove();
+            }
+        }, 700); 
+    }, 2000);
+}

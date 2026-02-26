@@ -33,6 +33,16 @@ public class SpringSecurityConfig {
 		http.cors(Customizer.withDefaults())
 			.csrf(AbstractHttpConfigurer::disable)
 			.requestCache(request -> request.requestCache(requestCache));
+		
+		http.headers(headers -> headers
+		    .frameOptions(frame -> frame.sameOrigin())
+		    .contentSecurityPolicy(csp -> csp
+		        .policyDirectives("default-src 'self'; " +
+		                         "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net https://unpkg.com; " +
+		                         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; " +
+		                         "img-src 'self' data: *; " + "script-src 'self' 'unsafe-inline' 'unsafe-eval';")
+		    )
+		);
 
 		http.authorizeHttpRequests(authorize -> authorize
 			.requestMatchers(excludeUri).permitAll()
