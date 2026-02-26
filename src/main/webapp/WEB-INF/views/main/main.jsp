@@ -151,7 +151,7 @@
                             <div class="meta">참여 4/10명 · 여의도 공원</div>
                         </div>
                     </div>
-                    <div class="horizontal-action-card">
+                    <div class="horizontal-action-card" style="cursor: pointer;" onclick="location.href='${pageContext.request.contextPath}/alba/list'">
                         <div class="action-icon-box job-bg">💼</div>
                         <div class="action-info-box">
                             <span class="tag blue-text" style="color:#00B050;">동네알바</span>
