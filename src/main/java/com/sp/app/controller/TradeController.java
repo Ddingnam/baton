@@ -3,6 +3,7 @@ package com.sp.app.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,7 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
+import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.model.Trade;
 import com.sp.app.model.TradeImg;
 import com.sp.app.service.TradeService;
@@ -84,7 +87,10 @@ public class TradeController {
 	}
 	
 	@GetMapping("write")
-	public String writeForm() {
+	public String writeForm(Model model) {
+		
+		model.addAttribute("mode", "write");
+		
 		return "trade/write";
 	}
 	
@@ -95,11 +101,23 @@ public class TradeController {
 		} catch (Exception e) {
 			log.info("writeSubmit : ", e);
 		}
-		return "trade/list";
+		return "redirect:/trade/list";
 	}
 	
 	@GetMapping("update")
-	public String updateForm() {
+	public String updateForm(@RequestParam("productIdx") long productIdx, 
+			@RequestParam(name = "page") String page, Model model) {
+		try {
+			Trade dto = Objects.requireNonNull(service.findByIdx(productIdx));
+			
+			model.addAttribute("trade", dto);
+			model.addAttribute("mode", "update");
+			model.addAttribute("page", page);
+					
+			
+		} catch (Exception e) {
+			log.info("updateForm : ", e);
+		}
 		return "trade/write";
 	}
 	

@@ -227,7 +227,6 @@
     </main>
 </div>
 
-<!-- 모바일 FAB -->
 <button class="tl-fab"
     onclick="location.href='${pageContext.request.contextPath}/trade/write'">
     ✏️ 판매하기

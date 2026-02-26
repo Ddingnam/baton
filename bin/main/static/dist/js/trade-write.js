@@ -4,14 +4,17 @@ const toggleImage = (function() {
     const imgCount = document.getElementById('imgCount');
 
     function init() {
-        document.getElementById('selectFile').addEventListener('change', function() {
+        const fileInput = document.getElementById('selectFile');
+        if(!fileInput) return;
+
+        fileInput.addEventListener('change', function() {
             const newFiles = Array.from(this.files);
             const remaining = 5 - uploadedFiles.length;
             newFiles.slice(0, remaining).forEach(file => {
                 if (!file.type.startsWith('image/')) return;
                 const reader = new FileReader();
                 reader.onload = e => {
-                    uploadedFiles.push({ file: file, url: e.target.result });
+                    uploadedFiles.push({ file: file, url: e.target.result, isExisting: false });
                     render();
                 };
                 reader.readAsDataURL(file);
@@ -20,44 +23,53 @@ const toggleImage = (function() {
         });
     }
 
+    function addExisting(url, fileIdx) {
+        uploadedFiles.push({ url: url, fileIdx: fileIdx, isExisting: true });
+        render();
+    }
+
     function remove(idx) {
+        const target = uploadedFiles[idx];
+        if(target.isExisting) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'deleteFiles';
+            input.value = target.fileIdx;
+            document.getElementById('tradeForm').appendChild(input);
+        }
         uploadedFiles.splice(idx, 1);
         render();
     }
 
     function render() {
+        if(!previewList) return;
         previewList.innerHTML = '';
-        for(let i=0; i<uploadedFiles.length; i++) {
-            const item = uploadedFiles[i];
+        uploadedFiles.forEach((item, i) => {
             const div = document.createElement('div');
             div.className = 'preview-item';
-            
-            let html = '<img src="' + item.url + '">';
+            let html = `<img src="${item.url}">`;
             if (i === 0) html += '<div class="thumb-badge">대표</div>';
-            html += '<button type="button" class="remove-img-btn" onclick="toggleImage.remove(' + i + ')">✕</button>';
-            
+            html += `<button type="button" class="remove-img-btn" onclick="toggleImage.remove(${i})">✕</button>`;
             div.innerHTML = html;
             previewList.appendChild(div);
-        }
+        });
         imgCount.textContent = uploadedFiles.length + '/5';
     }
-    return { init, remove };
+
+    return { init, remove, addExisting };
 })();
 
 const toggleTag = (function() {
-    const tags = [];
+    let tags = [];
     const tagInput = document.getElementById('tagInput');
     const tagWrap = document.getElementById('tagWrap');
 
     function init() {
+        if(!tagInput) return;
         tagInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                let val = this.value.trim().replace(/^#/, '');
-                if (val && tags.length < 5 && !tags.includes(val)) {
-                    tags.push(val);
-                    render();
-                }
+                add(this.value);
                 this.value = '';
             }
             if (e.key === 'Backspace' && !this.value && tags.length) {
@@ -67,54 +79,83 @@ const toggleTag = (function() {
         });
     }
 
+    function add(val) {
+        val = val.trim().replace(/^#/, '');
+        if (val && tags.length < 5 && !tags.includes(val)) {
+            tags.push(val);
+            render();
+        }
+    }
+
     function remove(idx) {
         tags.splice(idx, 1);
         render();
     }
 
     function render() {
+        if(!tagWrap) return;
         tagWrap.querySelectorAll('.tag-chip').forEach(el => el.remove());
-        for(let i=0; i<tags.length; i++) {
+        tags.forEach((tag, i) => {
             const span = document.createElement('span');
             span.className = 'tag-chip';
-            span.innerHTML = '#' + tags[i] + '<button type="button" onclick="toggleTag.remove(' + i + ')" style="border:none;background:none;color:inherit;cursor:pointer">×</button>';
+            span.innerHTML = `#${tag}<button type="button" onclick="toggleTag.remove(${i})" style="border:none;background:none;color:inherit;cursor:pointer">×</button>`;
             tagWrap.insertBefore(span, tagInput);
-        }
+        });
         document.getElementById('finalTags').value = tags.join(',');
     }
-    return { init, remove };
+
+    return { init, remove, add };
 })();
 
 const TradeLogic = (function() {
-    const locationField = document.getElementById('locationField');
-    const locationInput = document.getElementById('locationInput');
-
     function toggleLocation(show) {
+        const locationField = document.getElementById('locationField');
+        const locationInput = document.getElementById('locationInput');
+        if(!locationField) return;
+
         if (show) {
             locationField.style.display = 'block';
         } else {
             locationField.style.display = 'none';
-            locationInput.value = ''; // 택배 선택 시 입력했던 장소 초기화
+            if(locationInput) locationInput.value = '';
         }
     }
-
     return { toggleLocation };
 })();
 
 window.onload = function() {
-    ImageModule.init();
-    TagModule.init();
-    TradeLogic.toggleLocation(true); 
+    toggleImage.init();
+    toggleTag.init();
     
-    document.getElementById('contentInput').oninput = function() {
-        document.getElementById('contentCount').textContent = this.value.length + '/2000';
-    };
+    const contentInput = document.getElementById('contentInput');
+    if(contentInput) {
+        document.getElementById('contentCount').textContent = contentInput.value.length + '/2000';
+        contentInput.oninput = function() {
+            document.getElementById('contentCount').textContent = this.value.length + '/2000';
+        };
+    }
+
+    if (window.serverData && window.serverData.mode === 'update') {
+        const data = window.serverData;
+        
+        if(data.files) {
+            data.files.forEach(f => toggleImage.addExisting(f.url, f.fileIdx));
+        }
+        if(data.tags) {
+            data.tags.split(',').forEach(t => toggleTag.add(t));
+        }
+        TradeLogic.toggleLocation(data.tradeType !== '택배');
+    } else {
+        TradeLogic.toggleLocation(true); 
+    }
 };
 
 function submitForm() {
     const f = document.tradeForm;
     if (!f.title.value.trim()) return alert('제목을 입력하세요.');
     if (!f.price.value) return alert('가격을 입력하세요.');
-    f.action = '/trade/write';
+    
+    const mode = f.mode ? f.mode.value : 'write';
+    f.action = (mode === 'update') ? '/trade/update' : '/trade/write';
     f.submit();
 }

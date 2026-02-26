@@ -18,37 +18,19 @@
 
 <jsp:include page="/WEB-INF/views/layout/header.jsp" />
 
-<header class="app-header">
-    <div class="header-content">
-        <button class="back-btn" onclick="history.back()">
-			<i class="ri-arrow-left-s-line" style="font-size: 24px;"></i>
+<div class="page-wrap">
+	<div class="header-content">
+        <button type="button" class="back-btn" onclick="history.back()">
+            <i class="ri-arrow-left-s-line" style="font-size: 24px;"></i>
         </button>
-        <h1>중고거래</h1>
-        <div class="header-actions">
-            <c:if test="${not empty sessionScope.member}">
-                <button class="icon-btn" id="wishIconBtn"
-                    title="${false ? '찜 취소' : '찜하기'}"
-                    onclick="WishModule.toggle()">
-                    ${false ? '❤️' : '🤍'}
-                </button>
-            </c:if>
-            <button class="icon-btn" title="공유하기" onclick="ShareModule.share()">🔗</button>
+        <div class="title-set">
+            <h1>우리 동네 물건 보기</h1>
+            <p>우리 동네 따뜻한 거래 정보를 확인해보세요.</p>
         </div>
     </div>
-</header>
 
-<div id="articleData"
-    data-trade-idx="${trade.productIdx}"
-    data-wished="${false}"
-    data-wish-count="${trade.likeCount}"
-    style="display:none">
-</div>
-
-<div class="page-wrap">
     <div class="article-layout">
-    
         <div class="main-side">
-
             <div class="card gallery-card">
                 <div class="main-image-wrap">
                     <c:choose>
@@ -301,7 +283,7 @@
                 <%-- <c:if test="${sessionScope.member.userIdx == trade.userIdx}"> --%>
                     <div class="owner-actions">
                         <button class="edit-btn"
-                            onclick="location.href='${pageContext.request.contextPath}/trade/edit?tradeIdx=${trade.productIdx}'">
+                            onclick="location.href='${pageContext.request.contextPath}/trade/update?productIdx=${trade.productIdx}&page=${page}'">
                             ✏️ 수정
                         </button>
                         <button class="delete-btn"
@@ -325,6 +307,13 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div id="articleData"
+    data-trade-idx="${trade.productIdx}"
+    data-wished="${false}"
+    data-wish-count="${trade.likeCount}"
+    style="display:none">
+</div>
 
 <script src="${pageContext.request.contextPath}/dist/js/trade-article.js"></script>
 </body>
