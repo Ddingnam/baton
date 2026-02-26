@@ -10,10 +10,11 @@
 	</insert>
 	
 	<select id="findByIdx" parameterType="long" resultType="com.sp.app.model.Trade">
-		SELECT productIdx, title, content, price, userIdx, hitCount, likeCount, chatCount,
-			tradeType, tradeStatus, tradePlace, regionIdx, productStatus, pullCount, 
-			lastUpDate, createdDate, updatedDate, categoryIdx
-		FROM product
+		SELECT productIdx, title, content, price, p.userIdx, hitCount, likeCount, chatCount,
+			tradeType, tradeStatus, tradePlace, p.regionIdx, productStatus, pullCount, 
+			lastUpDate, p.createdDate, p.updatedDate, categoryIdx, u.nickName
+		FROM product p
+		JOIN users u ON p.userIdx = u.userIdx
 		WHERE productIdx = #{productIdx}
 	</select>
 	
@@ -31,6 +32,48 @@
 	    WHERE p.productIdx = #{productIdx}
 	</select>
 	
+	<select id="tradeList" parameterType="map" resultType="com.sp.app.model.Trade">
+	    SELECT * FROM (
+	        SELECT ROWNUM rnum, tb.* FROM (
+	            SELECT 
+	                p.productIdx, p.title, p.price, p.userIdx, p.hitCount, p.likeCount, p.chatCount,
+	                p.tradeType, p.tradeStatus, p.productStatus, p.createdDate,
+	                (SELECT imgUrl FROM productImages WHERE productIdx = p.productIdx AND imgOrder = 1) as thumbUrl
+	            FROM product p
+	            <where>
+	                <if test="keyword != null and keyword != ''">
+	                    AND (p.title LIKE '%' || #{keyword} || '%' OR p.content LIKE '%' || #{keyword} || '%')
+	                </if>
+	                <if test="categoryIdx != null and categoryIdx != ''">
+	                    AND p.categoryIdx = #{categoryIdx}
+	                </if>
+	            </where>
+	            ORDER BY p.productIdx DESC
+	        ) tb WHERE ROWNUM &lt;= #{end}
+	    ) WHERE rnum &gt;= #{start}
+	</select>
 	
-
+	<select id="dataCount" parameterType="map" resultType="int">
+	    SELECT COUNT(*) FROM product
+	    <where>
+	        <if test="keyword != null and keyword != ''">
+	            AND (title LIKE '%' || #{keyword} || '%' OR content LIKE '%' || #{keyword} || '%')
+	        </if>
+	        <if test="categoryIdx != null and categoryIdx != ''">
+	            AND categoryIdx = #{categoryIdx}
+	        </if>
+	    </where>
+	</select>
+	
+	<delete id="deleteTradePost" parameterType="long">
+		DELETE FROM product WHERE productIdx = #{productIdx}
+	</delete>
+	
+	<delete id="deleteTradePostTag" parameterType="long">
+		DELETE FROM productTag WHERE productIdx = #{productIdx}
+	</delete>
+	
+	<delete id="deleteTragePostImg" parameterType="long">
+		DELETE FROM productImages WHERE productIdx = #{productIdx}
+	</delete>
 </mapper>

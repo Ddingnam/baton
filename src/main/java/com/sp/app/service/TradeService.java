@@ -1,6 +1,7 @@
 package com.sp.app.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.sp.app.model.Trade;
 import com.sp.app.model.TradeImg;
@@ -13,5 +14,8 @@ public interface TradeService {
 	public Trade findByIdx(long productIdx);
 	public List<TradeImg> findImgsByIdx(long productIdx);
 	public List<String> findTagsByIdx(long productIdx);
+	
+	public List<Trade> tradeList(Map<String, Object> map);
+	public int dataCount(Map<String, Object> map);
 	
 }

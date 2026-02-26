@@ -191,9 +191,9 @@ const Toast = (function () {
     return { show };
 })();
 
-function confirmDelete(tradeIdx) {
+function confirmDelete(productIdx) {
     if (confirm('정말 삭제하시겠습니까?\n삭제된 게시글은 복구할 수 없습니다.')) {
-        location.href = '/trade/delete?tradeIdx=' + tradeIdx;
+        location.href = '/trade/delete?productIdx=' + productIdx;
     }
 }
 

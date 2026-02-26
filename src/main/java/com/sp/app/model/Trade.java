@@ -10,6 +10,7 @@ import lombok.Setter;
 public class Trade {
 	private long productIdx;
 	private long userIdx;
+	private String nickName;
 	
 	private String title;
 	private String content;
@@ -28,8 +29,8 @@ public class Trade {
 	private long regionIdx;	
 
 	private String lastUpDate;
-	private String createDate;
-	private String updateDate;
+	private String createdDate;
+	private String updatedDate;
 	
 	// 게시물 카테고리
 	private long categoryIdx;
@@ -42,5 +43,6 @@ public class Trade {
 	// 게시물 이미지
 	private long imgOrder;
 	private String imgUrl;
+	private boolean likeByMe;
 	
 }

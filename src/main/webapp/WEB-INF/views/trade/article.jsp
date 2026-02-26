@@ -2,6 +2,7 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ include file="/WEB-INF/views/layout/headerResources.jsp" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -129,7 +130,7 @@
                     <span>👁 조회 ${trade.hitCount}</span>
                     <span>❤️ 찜 <span id="statWish">${trade.likeCount}</span></span>
                     <span>💬 채팅 ${trade.chatCount}</span>
-                    <span>${trade.createDate}</span>
+                    <span>${trade.createdDate}</span>
                 </div>
             </div>
 
@@ -205,7 +206,7 @@
 
                     <div class="info-item">
                         <p class="info-label">등록일</p>
-                        <p class="info-value">${trade.createDate}</p>
+                        <p class="info-value">${trade.createdDate}</p>
                     </div>
 
                     <div class="info-item">
@@ -227,7 +228,7 @@
                         👤
                     </div>
                     <div class="seller-info">
-                        <p class="seller-name">${sellerName}</p>
+                        <p class="seller-name">${trade.nickName}</p>
                         <p class="seller-region">
                             📍 <c:choose>
                                 <c:when test="${not empty regionName}">${regionName}</c:when>
@@ -297,7 +298,7 @@
                     <button class="share-btn" onclick="ShareModule.share()">🔗 공유</button>
                 </div>
 
-                <c:if test="${sessionScope.member.userIdx == trade.userIdx}">
+                <%-- <c:if test="${sessionScope.member.userIdx == trade.userIdx}"> --%>
                     <div class="owner-actions">
                         <button class="edit-btn"
                             onclick="location.href='${pageContext.request.contextPath}/trade/edit?tradeIdx=${trade.productIdx}'">
@@ -308,7 +309,7 @@
                             🗑 삭제
                         </button>
                     </div>
-                </c:if>
+                <%-- </c:if> --%>
             </div>
 
         </div>
