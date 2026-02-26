@@ -45,7 +45,7 @@
 					<li class="tab-item" data-target="sec-trade" data-color="#00B98D" data-bg="#E6F8F3">중고거래</li>
 					<li class="tab-item" data-target="sec-club" data-color="#F86D7D" data-bg="#FFF0F1">동네모임</li>
 					<li class="tab-item" data-target="sec-alba" data-color="#002C5F" data-bg="#F0F4F8">알바구인</li>
-					<li class="tab-item" data-target="sec-comm" data-color="#8A63FF" data-bg="#F4F0FF">커뮤니티</li>
+					<li class="tab-item" data-target="sec-community" data-color="#8A63FF" data-bg="#F4F0FF">커뮤니티</li>
 				</ul>
 			</div>
 
@@ -154,7 +154,7 @@
 					</div>
 				</section>
 
-				<section id="sec-comm" class="mp-section">
+				<section id="sec-community" class="mp-section">
 					<div class="list-card">
 						<div class="lc-header">
 							<h3>작성한 동네 이야기</h3>
@@ -177,36 +177,6 @@
 	</div>
 
 	<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
-	
-	<script>
-		document.addEventListener("DOMContentLoaded", () => {
-			const root = document.getElementById('mp-theme-root');
-			const tabs = document.querySelectorAll('.tab-item');
-			const sections = document.querySelectorAll('.mp-section');
-
-			root.style.setProperty('--mp-theme', '#3182F6');
-			root.style.setProperty('--mp-theme-bg', '#E8F3FF');
-
-			tabs.forEach(tab => {
-				tab.addEventListener('click', () => {
-					tabs.forEach(t => t.classList.remove('active'));
-					tab.classList.add('active');
-
-					const color = tab.getAttribute('data-color');
-					const bg = tab.getAttribute('data-bg');
-					root.style.setProperty('--mp-theme', color);
-					root.style.setProperty('--mp-theme-bg', bg);
-
-					const targetId = tab.getAttribute('data-target');
-					sections.forEach(sec => {
-						sec.classList.remove('active');
-						if(sec.id === targetId) {
-							sec.classList.add('active');
-						}
-					});
-				});
-			});
-		});
-	</script>
+	<script src="${pageContext.request.contextPath}/dist/js/mypage_main.js"></script>
 </body>
 </html>
