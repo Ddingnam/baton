@@ -1,10 +1,18 @@
+/**
+ * BATON 프로젝트 통합 스크립트
+ * 1. 인트로 로딩 제어 (LocalSettings 반영)
+ * 2. 카운트 애니메이션 (Ease-out 효과)
+ * 3. 스크롤 Reveal 효과
+ */
+
+// 인트로를 즉시 닫는 함수
 function closeIntroNow() {
     const intro = document.getElementById('baton-intro');
     if (intro) {
         intro.style.opacity = '0';
         setTimeout(() => {
             intro.style.display = 'none';
-        }, 800);
+        }, 800); // 페이드아웃 대기 시간
     }
 }
 
@@ -19,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
         introToggle.addEventListener('change', (e) => {
             const status = e.target.checked ? 'on' : 'off';
             localStorage.setItem('introSetting', status);
+            // alert('인트로 설정이 ' + (e.target.checked ? '켜졌습니다.' : '꺼졌습니다.'));
         });
     }
 
@@ -32,35 +41,33 @@ document.addEventListener("DOMContentLoaded", () => {
         intro.style.display = 'none';
     }
 
-    const counters = document.querySelectorAll('.counter-number');
-    counters.forEach(c => {
-        c.dataset.count = c.innerText.replace(/,/g, '');
-        c.innerText = '0';
-    });
-
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.style.opacity = "1";
                 entry.target.style.transform = "translateY(0)";
                 
-                const nums = entry.target.querySelectorAll('.counter-number');
+                const nums = entry.target.querySelectorAll('.counter-number, #counter');
                 nums.forEach(num => {
                     if (!num.classList.contains('done')) {
                         num.classList.add('done');
-                        const target = parseInt(num.dataset.count);
-                        if (isNaN(target)) return;
+                        
+                        const targetStr = num.innerText.replace(/,/g, '');
+                        const target = parseInt(targetStr) || 1584200;
 
                         let currentFrame = 0;
                         const duration = 2000;
                         const frameRate = 1000 / 60;
                         const totalFrames = Math.round(duration / frameRate);
+                        
+                        // 촤라라락- 부드러운 감속 효과 함수
                         const easeOutQuart = t => 1 - (--t) * t * t * t;
 
                         const timer = setInterval(() => {
                             currentFrame++;
                             const progress = easeOutQuart(currentFrame / totalFrames);
                             const currentCount = Math.round(target * progress);
+                            
                             num.innerText = currentCount.toLocaleString();
 
                             if (currentFrame === totalFrames) {
@@ -70,7 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         }, frameRate);
                     }
                 });
-                observer.unobserve(entry.target);
             }
         });
     }, { threshold: 0.1 });
@@ -95,10 +101,6 @@ function toggleWish(el, e) {
 
 function handleSidebar() {
     const container = document.getElementById('baton-layout-container');
-    const openBtn = document.getElementById('baton-sidebar-open');
     if (!container) return;
     container.classList.toggle('sidebar-hidden');
-    if (openBtn) {
-        openBtn.style.display = container.classList.contains('sidebar-hidden') ? 'flex' : 'none';
-    }
 }
