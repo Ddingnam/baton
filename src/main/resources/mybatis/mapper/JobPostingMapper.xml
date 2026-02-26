@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sp.app.mapper.JobPostingMapper">
+
+    <insert id="insertPosting" parameterType="com.sp.app.model.JobPosting">
+        INSERT INTO job_posting (
+            user_idx, region_idx, title, employer, category, description,
+            pay_type, pay, work_period, work_days, start_time, end_time, time_negotiable,
+            start_date, end_date, location, location_detail, location_lat, location_lng,
+            deadline, contact, benefits, created_date, recruit_status
+        ) VALUES (
+            #{userIdx}, #{regionIdx}, #{title}, #{employer}, #{category}, #{description},
+            #{payType}, #{pay}, #{workPeriod}, #{workDays}, #{startTime}, #{endTime}, #{timeNegotiable, jdbcType=VARCHAR},
+            #{startDate, jdbcType=VARCHAR}, #{endDate, jdbcType=VARCHAR}, #{location}, #{locationDetail, jdbcType=VARCHAR}, #{locationLat, jdbcType=VARCHAR}, #{locationLng, jdbcType=VARCHAR},
+            #{deadline, jdbcType=VARCHAR}, #{contact}, #{benefits, jdbcType=VARCHAR}, SYSDATE, 'RECRUITING'
+        )
+    </insert>
+
+    <select id="listPosting" parameterType="map" resultType="com.sp.app.model.JobPosting">
+        SELECT posting_idx AS postingIdx, user_idx AS userIdx, title, employer, 
+               pay_type AS payType, pay, work_days AS workDays,
+               start_time AS startTime, end_time AS endTime,
+               created_date AS createdDate, recruit_status AS recruitStatus
+        FROM job_posting
+        ORDER BY posting_idx DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
+    <select id="dataCount" parameterType="map" resultType="Integer">
+        SELECT COUNT(*) 
+        FROM job_posting
+    </select>
+
+    <select id="findById" parameterType="Long" resultType="com.sp.app.model.JobPosting">
+        SELECT posting_idx AS postingIdx, user_idx AS userIdx, region_idx AS regionIdx,
+               title, employer, category, description,
+               pay_type AS payType, pay, work_period AS workPeriod, work_days AS workDays,
+               start_time AS startTime, end_time AS endTime, time_negotiable AS timeNegotiable,
+               start_date AS startDate, end_date AS endDate,
+               location, location_detail AS locationDetail, deadline, contact, benefits,
+               hit_count AS hitCount, created_date AS createdDate, recruit_status AS recruitStatus
+        FROM job_posting
+        WHERE posting_idx = #{postingIdx}
+    </select>
+
+</mapper>
