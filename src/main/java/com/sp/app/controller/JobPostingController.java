@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,12 +39,12 @@ public class JobPostingController {
         model.addAttribute("dataCount", dataCount);
         model.addAttribute("page", current_page);
         
-        return "alba/posting/list"; 
+        return "alba/list";
     }
 
     @GetMapping("write")
     public String writeForm() {
-        return "alba/posting/write";
+        return "alba/write";
     }
 
     @PostMapping("write")
@@ -74,6 +73,6 @@ public class JobPostingController {
         
         model.addAttribute("dto", dto);
         
-        return "alba/posting/article";
+        return "alba/article";
     }
 }
