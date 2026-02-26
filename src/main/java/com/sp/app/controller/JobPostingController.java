@@ -15,12 +15,12 @@ import java.util.Map;
 @Controller
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/alba/*")
+@RequestMapping("/alba") // 클래스 기본 경로를 /alba 로 설정
 public class JobPostingController {
 
     private final JobPostingService postingService;
 
-    @GetMapping("list")
+    @GetMapping("list") // 실제 경로: /alba/list
     public String list(
             @RequestParam(value = "page", defaultValue = "1") int current_page,
             Model model) {
@@ -39,30 +39,32 @@ public class JobPostingController {
         model.addAttribute("dataCount", dataCount);
         model.addAttribute("page", current_page);
         
-        return "alba/list";
+        return "alba/list"; // 뷰 파일 (WEB-INF/views/alba/list.jsp)
     }
 
-    @GetMapping("write")
+    @GetMapping("write") // 실제 경로: /alba/write
     public String writeForm() {
         return "alba/write";
     }
 
-    @PostMapping("write")
+    @PostMapping("write") // 실제 경로: /alba/write
     public String writeSubmit(JobPosting dto) throws Exception {
         dto.setUserIdx(1L); 
         dto.setRegionIdx(100L); 
         
         postingService.insertPosting(dto);
         
-        return "redirect:/alba/posting/list";
+        // 작성 완료 후 이동할 경로 (posting 제거)
+        return "redirect:/alba/list"; 
     }
 
-    @GetMapping("article")
+    @GetMapping("article") // 실제 경로: /alba/article?postingIdx=8
     public String article(@RequestParam long postingIdx, Model model) {
         JobPosting dto = postingService.findById(postingIdx);
         
         if(dto == null) {
-            return "redirect:/alba/posting/list";
+            // 없는 글일 경우 이동할 경로 (posting 제거)
+            return "redirect:/alba/list";
         }
         
         if (dto.getStartTime() != null && dto.getEndTime() != null) {
