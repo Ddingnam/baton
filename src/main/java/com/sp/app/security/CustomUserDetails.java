@@ -98,5 +98,9 @@ public class CustomUserDetails implements UserDetails{
 	public SessionInfo getMember() {
 		return member;
 	}
+	
+	public long getUserIdx() {
+        return member.getUserIdx();
+    }
 
 }

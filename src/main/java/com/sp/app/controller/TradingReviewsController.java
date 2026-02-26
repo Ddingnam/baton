@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sp.app.mapper.TradingReviewsMapper;
 import com.sp.app.model.TradingReviews;
+import com.sp.app.security.CustomUserDetails;
 
 @Controller
 @RequestMapping("/review")
@@ -33,14 +34,15 @@ public class TradingReviewsController {
             @RequestParam(value = "type", defaultValue = "ALL") String type, 
             Model model) {
         
-        int userIdx = 0;
+        long userIdx = 0;
       
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
-            // ★ TODO: CustomUserDetails 등에서 실제 userIdx 꺼내오는 로직으로 변경하세요.
-            userIdx = 1; // 임시 고정
+        if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {          
+            CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+            userIdx = userDetails.getUserIdx();
+            model.addAttribute("sessionUserIdx", userIdx);
         }
-        
+
         Map<String, Object> map = new HashMap<>();
         map.put("type", type);
         map.put("userIdx", userIdx);
@@ -50,7 +52,6 @@ public class TradingReviewsController {
  
         long currentTime = System.currentTimeMillis();
         for(TradingReviews dto : list) {
-        
             if (dto.getRawCreatedDate() != null) {
                 dto.setTimeAgo(calculateTimeAgo(dto.getRawCreatedDate().getTime(), currentTime));
             }
@@ -71,7 +72,7 @@ public class TradingReviewsController {
     }
 
     private String calculateTimeAgo(long regTime, long currentTime) {
-        long diffTime = (currentTime - regTime) / 1000; // 초 단위
+        long diffTime = (currentTime - regTime) / 1000;
         if (diffTime < 60) return "방금 전";
         else if ((diffTime /= 60) < 60) return diffTime + "분 전";
         else if ((diffTime /= 60) < 24) return diffTime + "시간 전";
@@ -87,9 +88,8 @@ public class TradingReviewsController {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
-               
-            	// ★ TODO: 실제 로그인한 회원의 userIdx로 변경
-                dto.setUserIdx(1); 
+                CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+                dto.setUserIdx((int)userDetails.getUserIdx()); 
             } else {
                 response.put("status", "error");
                 response.put("message", "로그인이 필요한 서비스입니다.");
@@ -97,6 +97,51 @@ public class TradingReviewsController {
             }
             
             reviewMapper.insertReview(dto);
+            response.put("status", "success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("status", "error");
+            response.put("message", "데이터 저장 중 오류가 발생했습니다.");
+        }
+        return response;
+    }
+    
+    @PostMapping("/delete")
+    @ResponseBody
+    public Map<String, Object> deleteReview(@RequestParam("reviewIdx") int reviewIdx) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+            long userIdx = userDetails.getUserIdx();
+
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("reviewIdx", reviewIdx);
+            paramMap.put("userIdx", userIdx);
+
+            reviewMapper.deleteReview(paramMap); 
+            response.put("status", "success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("status", "error");
+        }
+        return response;
+    }
+
+    @PostMapping("/hide")
+    @ResponseBody
+    public Map<String, Object> hideReview(@RequestParam("reviewIdx") int reviewIdx) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+            long userIdx = userDetails.getUserIdx();
+
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("reviewIdx", reviewIdx);
+            paramMap.put("userIdx", userIdx);
+
+            reviewMapper.hideReview(paramMap); 
             response.put("status", "success");
         } catch (Exception e) {
             e.printStackTrace();

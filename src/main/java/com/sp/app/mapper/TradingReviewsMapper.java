@@ -10,4 +10,6 @@ public interface TradingReviewsMapper {
     public List<TradingReviews> listReviews(Map<String, Object> map);
     public int getReviewCount();
     public void insertReview(TradingReviews dto);
+    public void deleteReview(Map<String, Object> map);
+    public void hideReview(Map<String, Object> map);
 }
