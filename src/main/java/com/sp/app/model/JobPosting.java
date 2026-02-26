@@ -3,6 +3,8 @@ package com.sp.app.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
 
 @Getter
 @Setter
@@ -13,24 +15,42 @@ public class JobPosting {
     private long regionIdx;     
     
     private String title;         
-    private String content;       
+    private String employer;
+    private String category;
+    private String description;
+    
+    private String payType;
     private int pay;          
-    private String workDays;     
-    private String workTime;     
+    private String workPeriod;
+    private String workDays;
+    private String startTime;
+    private String endTime;
+    private String timeNegotiable;
+    private String workTime;
+    private String startDate;
+    private String endDate;
+    
+    private String location;
+    private String locationDetail;
+    private String locationLat;
+    private String locationLng;
+    private String deadline;
+    private String contact;
+    private String benefits;
+    
+    private List<MultipartFile> images; 
     
     private int hitCount;       
     private int likeCount;      
     private int chatCount;     
     private int applyCount;  
     private int pullCount;   
-    
     private String recruitStatus;
     private String isDisplay;   
-    
     private String createdDate;  
     private String updatedDate;  
-    private String deadlineDate;
-    
     private int responseRate; 
     private String responseTime;
+    
+    private String thumbUrl;
 }

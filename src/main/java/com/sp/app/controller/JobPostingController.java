@@ -2,12 +2,12 @@ package com.sp.app.controller;
 
 import com.sp.app.model.JobPosting;
 import com.sp.app.service.JobPostingService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,12 +40,12 @@ public class JobPostingController {
         model.addAttribute("dataCount", dataCount);
         model.addAttribute("page", current_page);
         
-        return "alba/list"; 
+        return "alba/posting/list"; 
     }
 
     @GetMapping("write")
     public String writeForm() {
-        return "alba/write";
+        return "alba/posting/write";
     }
 
     @PostMapping("write")
@@ -54,6 +54,7 @@ public class JobPostingController {
         dto.setRegionIdx(100L); 
         
         postingService.insertPosting(dto);
+        
         return "redirect:/alba/posting/list";
     }
 
@@ -65,8 +66,14 @@ public class JobPostingController {
             return "redirect:/alba/posting/list";
         }
         
+        if (dto.getStartTime() != null && dto.getEndTime() != null) {
+            dto.setWorkTime(dto.getStartTime() + " ~ " + dto.getEndTime());
+        } else if ("Y".equals(dto.getTimeNegotiable())) {
+            dto.setWorkTime("시간협의 가능");
+        }
+        
         model.addAttribute("dto", dto);
         
-        return "alba/article";
+        return "alba/posting/article";
     }
 }
