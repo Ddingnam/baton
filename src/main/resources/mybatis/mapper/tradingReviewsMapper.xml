@@ -2,23 +2,47 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.TradingReviewsMapper">
 
-	<select id="listReviewsByType" parameterType="String" resultType="com.sp.app.model.TradingReviews">
+    <select id="listReviews" parameterType="map" resultType="com.sp.app.model.TradingReviews">
         SELECT 
-            R.REVIEWIDX, R.SALEREVIEWTYPE, R.CONTENT, 
-            TO_CHAR(R.CREATEDDATE, 'YYYY-MM-DD HH24:MI') AS createdDate, 
+            R.REVIEWIDX, R.SALEREVIEWTYPE, R.CONTENT, R.REVIEWTAGS,
+            TO_CHAR(R.CREATEDDATE, 'YYYY-MM-DD HH24:MI') AS createdDate,
+            R.CREATEDDATE AS rawCreatedDate, 
             R.SCORE, R.USERIDX, R.PRODUCTIDX,
-            U.NICKNAME AS writerNickname,  P.TITLE AS productTitle
+            U.NICKNAME AS writerNickname,
+            U.PROFILE_PHOTO AS profilePhoto,
+            U.ADDR AS writerAddr,
+            P.TITLE AS productTitle
         FROM TRADINGREVIEWS R
-        JOIN USERS U ON R.USERIDX = U.USERIDX JOIN PRODUCT P ON R.PRODUCTIDX = P.PRODUCTIDX
-        WHERE R.SALEREVIEWTYPE = #{saleReviewType}
+        LEFT JOIN USERS U ON R.USERIDX = U.USERIDX LEFT JOIN PRODUCT P ON R.PRODUCTIDX = P.PRODUCTIDX <where>
+            <choose>
+                <when test="type == 'BUYER'">
+                    R.SALEREVIEWTYPE = 'BUYER'
+                </when>
+                <when test="type == 'SELLER'">
+                    R.SALEREVIEWTYPE = 'SELLER'
+                </when>
+                <when test="type == 'ME'">
+                    R.USERIDX = #{userIdx}
+                </when>
+            </choose>
+        </where>
         ORDER BY R.REVIEWIDX DESC
+    </select>
+
+    <select id="getReviewCount" resultType="int">
+        SELECT COUNT(*) FROM TRADINGREVIEWS
     </select>
 
     <insert id="insertReview" parameterType="com.sp.app.model.TradingReviews">
         INSERT INTO TRADINGREVIEWS (
-            REVIEWIDX, SALEREVIEWTYPE, CONTENT, USERIDX, PRODUCTIDX, SCORE
+            REVIEWIDX, SALEREVIEWTYPE, CONTENT, USERIDX, PRODUCTIDX, SCORE, REVIEWTAGS
         ) VALUES (
-            SEQTRADINGREVIEWS.NEXTVAL, #{saleReviewType}, #{content}, #{userIdx}, #{productIdx}, #{score}
-        )
+            SEQTRADINGREVIEWS.NEXTVAL, 
+            #{saleReviewType}, 
+            #{content, jdbcType=VARCHAR},  #{userIdx}, 
+            #{productIdx}, 
+            #{score}, 
+            #{reviewTags, jdbcType=VARCHAR} )
     </insert>
+
 </mapper>
