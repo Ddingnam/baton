@@ -8,7 +8,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>중고거래 | BATON</title>
-<%@ include file="/WEB-INF/views/layout/headerResources.jsp" %>
+<jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/trade-list.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
@@ -17,191 +17,144 @@
 
 <jsp:include page="/WEB-INF/views/layout/header.jsp" />
 
-<div class="tl-page-wrap">
+<main class="trade-main-container">
+    <section class="trade-hero-section">
+        <div class="container hero-inner">
+            <div class="hero-text-box">
+                <span class="sub-title">BATON TRADE</span>
+                <h1 class="main-title">이웃과 함께하는 <span class="highlight">중고거래</span></h1>
+                <p class="desc">어떤 물건을 찾고 있나요? 동네에서 따뜻한 거래를 시작해보세요.</p>
+            </div>
+            <div class="hero-search-box">
+                <input type="text" id="tlSearchInput" placeholder="관심있는 상품과 태그를 검색해보세요" value="${param.keyword}" onkeypress="if(event.keyCode==13) tlApplyFilter();">
+                <button class="search-btn" onclick="tlApplyFilter()">검색</button>
+            </div>
+        </div>
+    </section>
 
-    <aside class="tl-sidebar">
-        <button class="tl-mobile-filter-btn" onclick="tlMobileFilter()">
-            ⚙️ 필터
-        </button>
-        
-        <div class="tl-sidebar-section">
-            <div class="tl-sidebar-card" id="tlCard1">
-                <div class="tl-sidebar-head">필터</div>
-                <div class="tl-status-filter">
-                    <div class="tl-status-toggle">
-                        <span>거래 가능만 보기</span>
-                        <label class="tl-toggle-switch">
-                            <input type="checkbox" id="tlAvailableOnly"
-                                ${param.available == 'true' ? 'checked' : ''}
-                                onchange="tlApplyFilter()">
-                            <span class="tl-toggle-track"></span>
-                        </label>
-                    </div>
+    <div class="content-wrapper">
+        <div class="trade-toolbar">
+            <div class="toolbar-top">
+                <div class="filter-group tl-filter-list">
+                    <button class="filter-btn ${empty param.categoryIdx ? 'active' : ''}" onclick="tlSetCategory(''); return false;">전체</button>
+                    <button class="filter-btn ${param.categoryIdx == '1' ? 'active' : ''}" onclick="tlSetCategory('1'); return false;">전자기기</button>
+                    <button class="filter-btn ${param.categoryIdx == '2' ? 'active' : ''}" onclick="tlSetCategory('2'); return false;">남성의류</button>
+                    <button class="filter-btn ${param.categoryIdx == '3' ? 'active' : ''}" onclick="tlSetCategory('3'); return false;">여성의류</button>
+                    <button class="filter-btn ${param.categoryIdx == '4' ? 'active' : ''}" onclick="tlSetCategory('4'); return false;">뷰티</button>
+                    <button class="filter-btn ${param.categoryIdx == '5' ? 'active' : ''}" onclick="tlSetCategory('5'); return false;">스타굿즈</button>
+                    <button class="filter-btn ${param.categoryIdx == '6' ? 'active' : ''}" onclick="tlSetCategory('6'); return false;">가구/인테리어</button>
+                    <button class="filter-btn ${param.categoryIdx == '7' ? 'active' : ''}" onclick="tlSetCategory('7'); return false;">도서</button>
+                    <button class="filter-btn ${param.categoryIdx == '8' ? 'active' : ''}" onclick="tlSetCategory('8'); return false;">게임</button>
+                    <button class="filter-btn ${param.categoryIdx == '9' ? 'active' : ''}" onclick="tlSetCategory('9'); return false;">기타</button>
                 </div>
-            </div>
-        </div>
-
-        <div class="tl-sidebar-section">
-            <div class="tl-sidebar-card" id="tlCard2">
-                <div class="tl-sidebar-head">카테고리</div>
-                <ul class="tl-filter-list">
-                    <li class="${empty param.categoryIdx ? 'active' : ''}">
-                        <a href="#" onclick="tlSetCategory(''); return false;">
-                            <span class="tl-fi-dot"></span> 전체
-                        </a>
-                    </li>
-                    <li class="${param.categoryIdx == '1' ? 'active' : ''}">
-                        <a href="#" onclick="tlSetCategory('1'); return false;">
-                            <span class="tl-fi-dot"></span> 📱 전자기기
-                        </a>
-                    </li>
-                    <li class="${param.categoryIdx == '2' ? 'active' : ''}">
-                        <a href="#" onclick="tlSetCategory('2'); return false;">
-                            <span class="tl-fi-dot"></span> 👗 의류
-                        </a>
-                    </li>
-                    <li class="${param.categoryIdx == '3' ? 'active' : ''}">
-                        <a href="#" onclick="tlSetCategory('3'); return false;">
-                            <span class="tl-fi-dot"></span> 💄 뷰티
-                        </a>
-                    </li>
-                    <li class="${param.categoryIdx == '4' ? 'active' : ''}">
-                        <a href="#" onclick="tlSetCategory('4'); return false;">
-                            <span class="tl-fi-dot"></span> ⭐ 스타굿즈
-                        </a>
-                    </li>
-                    <li class="${param.categoryIdx == '5' ? 'active' : ''}">
-                        <a href="#" onclick="tlSetCategory('5'); return false;">
-                            <span class="tl-fi-dot"></span> 🏠 가구/인테리어
-                        </a>
-                    </li>
-                    <li class="${param.categoryIdx == '6' ? 'active' : ''}">
-                        <a href="#" onclick="tlSetCategory('6'); return false;">
-                            <span class="tl-fi-dot"></span> 📚 도서
-                        </a>
-                    </li>
-                    <li class="${param.categoryIdx == '7' ? 'active' : ''}">
-                        <a href="#" onclick="tlSetCategory('7'); return false;">
-                            <span class="tl-fi-dot"></span> 🎮 게임
-                        </a>
-                    </li>
-                    <li class="${param.categoryIdx == '8' ? 'active' : ''}">
-                        <a href="#" onclick="tlSetCategory('8'); return false;">
-                            <span class="tl-fi-dot"></span> 기타
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="tl-sidebar-section">
-            <div class="tl-sidebar-card" id="tlCard3">
-                <div class="tl-sidebar-head">가격대</div>
-                <div class="tl-price-range">
-                    <div class="tl-price-row">
-                        <input type="number" class="tl-price-input" id="tlPriceMin"
-                            placeholder="최소" value="${param.priceMin}" min="0">
-                        <span class="tl-price-sep">~</span>
-                        <input type="number" class="tl-price-input" id="tlPriceMax"
-                            placeholder="최대" value="${param.priceMax}" min="0">
-                    </div>
-                    <button class="tl-price-apply" onclick="tlApplyFilter()">가격 적용</button>
-                </div>
-            </div>
-        </div>
-
-        <button class="tl-reset-btn" onclick="tlResetFilters()">✕ 필터 초기화</button>
-
-    </aside>
-
-    <main class="tl-content">
-		
-		<div class="tl-content-header-filters">
-            <div class="tl-search-field">
-                <i class="ri-search-line tl-search-icon"></i>
-                <input type="text" id="tlSearchInput" placeholder="어떤 물건을 찾고 있나요?" value="${param.keyword}">
-            </div>
-            
-            <div class="tl-header-actions">                
-                <button class="tl-write-btn" onclick="location.href='${pageContext.request.contextPath}/trade/write'">
-                    + 판매하기
+                <button class="btn-create-trade" onclick="location.href='${pageContext.request.contextPath}/trade/write'">
+                    <i class="ri-add-line"></i> 판매하기
                 </button>
             </div>
-        </div>
-		
-        <div class="tl-title-row">
-            <h1 class="tl-page-title">
-                중고거래
-                <small><c:out value="${not empty totalCount ? totalCount : '0'}"/>개의 상품</small>
-            </h1>
-            <select class="tl-sort-select" onchange="tlChangeSort(this.value)">
-                <option value="latest"     ${param.sort == 'latest'     || empty param.sort ? 'selected' : ''}>최신순</option>
-                <option value="price_asc"  ${param.sort == 'price_asc'  ? 'selected' : ''}>낮은 가격순</option>
-                <option value="price_desc" ${param.sort == 'price_desc' ? 'selected' : ''}>높은 가격순</option>
-                <option value="popular"    ${param.sort == 'popular'    ? 'selected' : ''}>인기순</option>
-            </select>
+
+            <div class="toolbar-bottom">
+                <div class="price-select-group">
+                    <input type="number" class="tl-price-input" id="tlPriceMin" placeholder="최소 금액" value="${param.priceMin}" min="0">
+                    <span class="tl-price-sep">~</span>
+                    <input type="number" class="tl-price-input" id="tlPriceMax" placeholder="최대 금액" value="${param.priceMax}" min="0">
+                    <button class="tl-price-apply" onclick="tlApplyFilter()">적용</button>
+                    <button class="tl-reset-btn" onclick="tlResetFilters()"><i class="ri-refresh-line"></i> 초기화</button>
+                </div>
+
+                <div class="action-group">
+                    <label class="toggle-switch-wrap">
+                        <input type="checkbox" class="green-switch" id="tlAvailableOnly" ${param.available == 'true' ? 'checked' : ''} onchange="tlApplyFilter()">
+                        <span class="toggle-label">거래 가능만 보기</span>
+                    </label>
+                    <span class="divider">|</span>
+                    <select class="detail-select sort-select" onchange="tlChangeSort(this.value)">
+                        <option value="latest" ${param.sort == 'latest' || empty param.sort ? 'selected' : ''}>최신순</option>
+                        <option value="price_asc" ${param.sort == 'price_asc' ? 'selected' : ''}>낮은 가격순</option>
+                        <option value="price_desc" ${param.sort == 'price_desc' ? 'selected' : ''}>높은 가격순</option>
+                        <option value="popular" ${param.sort == 'popular' ? 'selected' : ''}>인기순</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <div class="tl-active-filters" id="tlActiveFilters"></div>
 
-        <div class="tl-product-grid">
+        <div class="trade-grid tl-product-grid">
             <c:choose>
                 <c:when test="${not empty tradeList}">
                     <c:forEach var="item" items="${tradeList}">
-                        <a href="${pageContext.request.contextPath}/trade/article?productIdx=${item.productIdx}"
-                            class="tl-product-card">
-                            <div class="tl-card-img">
+                        <div class="trade-card tl-product-card" onclick="location.href='${pageContext.request.contextPath}/trade/article?productIdx=${item.productIdx}'">
+                            <div class="card-image-box tl-card-img ${empty item.imgUrl ? 'no-image' : ''}">
                                 <c:choose>
                                     <c:when test="${not empty item.imgUrl}">
                                         <img src="${item.imgUrl}" alt="${item.title}" loading="lazy">
                                     </c:when>
                                     <c:otherwise>
-                                        <div class="tl-no-img">📷</div>
+                                        <i class="ri-camera-off-line placeholder-icon"></i>
                                     </c:otherwise>
                                 </c:choose>
-                                <c:choose>
-                                    <c:when test="${item.productStatus == '새상품'}">
-                                        <span class="tl-status-badge tl-badge-new">새상품</span>
-                                    </c:when>
-                                    <c:when test="${item.productStatus == '고장/파손'}">
-                                        <span class="tl-status-badge tl-badge-broken">파손</span>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="tl-status-badge tl-badge-used">${item.productStatus}</span>
-                                    </c:otherwise>
-                                </c:choose>
-                                <button type="button"
-                                    class="tl-wish-btn ${not empty item.likeByMe ? 'active' : ''}"
-                                    onclick="tlToggleWish(event, ${item.productIdx})">
-                                    ${item.likeByMe ? '❤️' : '🤍'}
+                                
+                                <div class="badge-group">
+                                    <c:choose>
+                                        <c:when test="${item.productStatus == '새상품'}">
+                                            <span class="badge badge-new">새상품</span>
+                                        </c:when>
+                                        <c:when test="${item.productStatus == '고장/파손'}">
+                                            <span class="badge badge-broken">파손</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="badge badge-used">${item.productStatus}</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <c:choose>
+                                        <c:when test="${item.tradeStatus == 'SOLD'}">
+                                            <span class="badge badge-sold">판매완료</span>
+                                        </c:when>
+                                        <c:when test="${item.tradeStatus == 'RESERVED'}">
+                                            <span class="badge badge-reserved">예약중</span>
+                                        </c:when>
+                                    </c:choose>
+                                </div>
+
+                                <button type="button" class="wish-btn tl-wish-btn ${item.likeByMe ? 'active' : ''}" onclick="tlToggleWish(event, ${item.productIdx})">
+                                    ${item.likeByMe ? '<i class="ri-heart-3-fill"></i>' : '<i class="ri-heart-3-line"></i>'}
                                 </button>
-                                <c:if test="${item.tradeStatus == 'SOLD'}">
-                                    <div class="tl-sold-overlay"><span>판매완료</span></div>
-                                </c:if>
                             </div>
-                            <div class="tl-card-body">
-                                <p class="tl-card-location">📍 ${not empty item.tradePlace ? item.tradePlace : '장소 미정'}</p>
-                                <p class="tl-card-title">${item.title}</p>
-                                <p class="tl-card-price ${item.price == 0 ? 'free' : ''}">
+
+                            <div class="card-info tl-card-body">
+                                <h3 class="card-title tl-card-title">${item.title}</h3>
+                                
+                                <div class="card-price tl-card-price ${item.price == 0 ? 'free' : ''}">
                                     <c:choose>
                                         <c:when test="${item.price == 0}">나눔</c:when>
                                         <c:otherwise><fmt:formatNumber value="${item.price}" pattern="#,###"/>원</c:otherwise>
                                     </c:choose>
-                                </p>
-                                <div class="tl-card-footer">
-                                    <span class="tl-card-time">${item.createdDate}</span>
-                                    <div class="tl-card-stats">
-                                        <span>🤍 ${item.likeCount}</span>
-                                        <span>💬 ${item.chatCount}</span>
+                                </div>
+
+                                <div class="card-details">
+                                    <div class="detail-item"><i class="ri-price-tag-3-line"></i> 카테고리</div>
+                                    <div class="detail-item"><i class="ri-map-pin-2-line"></i> ${not empty item.tradePlace ? item.tradePlace : '장소 미정'}</div>
+                                    <div class="detail-item"><i class="ri-time-line"></i> ${item.createdDate}</div>
+                                </div>
+
+                                <div class="card-footer">
+                                    <div class="host-info">
+                                        <div class="host-avatar"><i class="ri-user-smile-line"></i></div>
+                                        <span class="host-name">동네이웃</span>
+                                    </div>
+                                    <div class="interaction-info tl-card-stats">
+                                        <span><i class="ri-eye-line"></i> 0</span>
+                                        <span><i class="ri-chat-3-line"></i> ${item.chatCount}</span>
+                                        <span><i class="ri-heart-3-fill wish-icon"></i> ${item.likeCount}</span>
                                     </div>
                                 </div>
                             </div>
-                        </a>
+                        </div>
                     </c:forEach>
                 </c:when>
                 <c:otherwise>
                     <div class="tl-empty-state">
-                        <div class="tl-empty-icon">🛒</div>
+                        <i class="ri-shopping-basket-line empty-icon"></i>
                         <p>아직 등록된 상품이 없어요</p>
                         <small>첫 번째 판매자가 되어보세요!</small>
                     </div>
@@ -210,26 +163,21 @@
         </div>
 
         <c:if test="${not empty pageInfo && pageInfo.totalPage > 1}">
-            <div class="tl-pagination">
-                <button class="tl-page-btn"
-                    onclick="tlGoPage(${pageInfo.currentPage - 1})"
-                    ${pageInfo.currentPage <= 1 ? 'disabled' : ''}>&#8249;</button>
+            <div class="pagination-container tl-pagination">
+                <button class="tl-page-btn" onclick="tlGoPage(${pageInfo.currentPage - 1})" ${pageInfo.currentPage <= 1 ? 'disabled' : ''}>&#8249;</button>
                 <c:forEach begin="${pageInfo.startPage}" end="${pageInfo.endPage}" var="p">
-                    <button class="tl-page-btn ${pageInfo.currentPage == p ? 'active' : ''}"
-                        onclick="tlGoPage(${p})">${p}</button>
+                    <button class="tl-page-btn ${pageInfo.currentPage == p ? 'active' : ''}" onclick="tlGoPage(${p})">${p}</button>
                 </c:forEach>
-                <button class="tl-page-btn"
-                    onclick="tlGoPage(${pageInfo.currentPage + 1})"
-                    ${pageInfo.currentPage >= pageInfo.totalPage ? 'disabled' : ''}>&#8250;</button>
+                <button class="tl-page-btn" onclick="tlGoPage(${pageInfo.currentPage + 1})" ${pageInfo.currentPage >= pageInfo.totalPage ? 'disabled' : ''}>&#8250;</button>
             </div>
         </c:if>
+    </div>
+</main>
 
-    </main>
-</div>
+<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 
-<button class="tl-fab"
-    onclick="location.href='${pageContext.request.contextPath}/trade/write'">
-    ✏️ 판매하기
+<button class="tl-fab" onclick="location.href='${pageContext.request.contextPath}/trade/write'">
+    <i class="ri-pencil-line"></i>
 </button>
 
 <script src="${pageContext.request.contextPath}/dist/js/trade-list.js"></script>

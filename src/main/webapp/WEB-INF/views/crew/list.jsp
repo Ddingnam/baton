@@ -29,13 +29,19 @@
             <div class="toolbar-top">
                 <div class="filter-group">
                     <button class="filter-btn active">전체</button>
-                    <button class="filter-btn">🏃 운동</button>
-                    <button class="filter-btn">☕ 맛집/카페</button>
-                    <button class="filter-btn">📚 스터디</button>
-                    <button class="filter-btn">🐱 반려동물</button>
+                    <button class="filter-btn">스터디</button>
+                    <button class="filter-btn">독서</button>
+                    <button class="filter-btn">운동</button>
+                    <button class="filter-btn">여행</button>
+                    <button class="filter-btn">취미/게임</button>
+                    <button class="filter-btn">문화/예술</button>
+                    <button class="filter-btn">맛집/카페</button>
+                    <button class="filter-btn">가족/육아</button>
+                    <button class="filter-btn">반려동물</button>
+                    <button class="filter-btn">기타</button>
                 </div>
                 <button class="btn-create-crew" onclick="location.href='${pageContext.request.contextPath}/crew/write'">
-                    <i class="ri-add-line"></i> 모임 개설
+                    <i class="ri-add-line"></i>모임 개설
                 </button>
             </div>
             
