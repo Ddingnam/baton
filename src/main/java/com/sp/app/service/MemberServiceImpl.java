@@ -6,7 +6,9 @@ import java.util.Objects;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.sp.app.common.StorageService;
 import com.sp.app.domain.dto.MemberDto;
 import com.sp.app.domain.dto.UserDto;
 import com.sp.app.mapper.MemberMapper;
@@ -19,9 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MemberServiceImpl implements MemberService {
 	private final MemberMapper mapper;
-	// private final StorageService storageService;
-	// private final MailSender mailSender;
+	private final StorageService storageService;
 	private final PasswordEncoder bcryptEncoder;
+	
+	// private final MailSender mailSender;
 
 	@Override
 	public MemberDto loginSnsMember(Map<String, Object> map) {
@@ -29,10 +32,31 @@ public class MemberServiceImpl implements MemberService {
 		return null;
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public void insertMember(MemberDto dto, String uploadPath) throws Exception {
-		// TODO Auto-generated method stub
-		
+	public void insertUser(UserDto dto, String uploadPath) throws Exception {
+		try {
+			if (dto.getSelectFile() != null && !dto.getSelectFile().isEmpty()) {
+	            String saveFilename = storageService.uploadFileToServer(dto.getSelectFile(), uploadPath);
+	            dto.setProfile_photo(saveFilename);
+	        }		
+			
+			String encPassword = bcryptEncoder.encode(dto.getPwd());
+			dto.setPwd(encPassword);
+						
+			Long seq = mapper.userSeq();
+			dto.setUserIdx(seq);
+			
+			mapper.insertUser(dto);
+			mapper.insertRegion(dto);
+			
+			dto.setAuthority("USER");
+			mapper.insertAuthority(dto);
+			
+		} catch (Exception e) {
+			log.info("insertUser : ", e);
+			throw e;
+		}
 	}
 
 	@Override
@@ -211,6 +235,16 @@ public class MemberServiceImpl implements MemberService {
 	public boolean isPasswordCheck(String login_id, String password) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public boolean isUserIdDuplicated(String userId) {
+		return mapper.isUserIdDuplicated(userId) > 0;
+	}
+
+	@Override
+	public boolean isNicknameDuplicated(String nickname) {
+		return mapper.isNicknameDuplicated(nickname) > 0;
 	}
 
 }

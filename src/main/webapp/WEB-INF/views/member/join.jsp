@@ -386,7 +386,7 @@ body {
 		<jsp:include page="/WEB-INF/views/layout/header.jsp" />
 	</header>
 
-	<main class="page-wrapper">
+	<main class="page-wrapper" id="registerForm" data-context-path="${pageContext.request.contextPath}">
 
 		<div id="step-auth" class="auth-box">
 			<div class="icon-circle">
@@ -438,9 +438,13 @@ body {
 			<form name="registerForm"
 				action="${pageContext.request.contextPath}/member/register"
 				method="post">
-				<input type="hidden" name="${_csrf.parameterName}"
-					value="${_csrf.token}" /> <input type="hidden" name="userAddr"
-					id="userAddr" value="">
+				<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+				
+				<input type="hidden" name="fullAddress" id="fullAddress">
+				<input type="hidden" name="coreAddress" id="coreAddress">
+				<input type="hidden" name="regionCode" id="regionCode">
+				<input type="hidden" name="lat" id="lat">
+				<input type="hidden" name="lng" id="lng">
 
 				<div class="form-group">
 					<label class="form-label">아이디</label>
@@ -463,13 +467,18 @@ body {
 				</div>
 
 				<div class="divider"></div>
+				
+				<div class="form-group">
+				    <label class="form-label">이름</label>
+				    <input type="text" name="name" class="form-control" placeholder="실명 입력">
+				</div>
 
 				<div class="form-group">
 					<label class="form-label">닉네임</label>
 					<div class="input-with-btn">
 						<input type="text" name="nickname" class="form-control"
 							placeholder="닉네임 입력">
-						<button type="button" class="btn-action" onclick="checkNick()">중복
+						<button type="button" class="btn-action" onclick="checkNickname()">중복
 							확인</button>
 					</div>
 				</div>
@@ -512,327 +521,11 @@ body {
 		</div>
 
 	</main>
+	
+	<jsp:include page="/WEB-INF/views/layout/footer.jsp"/>
 
 	<jsp:include page="/WEB-INF/views/api/api.jsp" />
 	
 	<script src="${pageContext.request.contextPath}/dist/js/util-async.js"></script>
-
-	<script>
-	
-document.querySelectorAll('.form-control').forEach(input => {
-    input.addEventListener('input', () => {
-        showStatusMsg(input, null);
-    });
-});
-
-document.getElementById("email").addEventListener('input', function() {
-    const authRow = document.getElementById("emailAuthRow");
-    if(authRow.classList.contains("open")) {
-        authRow.classList.remove("open");
-        document.getElementById("authCode").value = "";
-        clearInterval(timerInterval);
-        
-        const sendBtn = document.getElementById("btnSendAuth");
-        sendBtn.innerText = "인증번호 전송";
-        sendBtn.disabled = false;
-    }
-});
-	
-/* ==============================================
-   동네 인증 관련 로직
-============================================== */
-function startAuth() {
-    const btnText = document.getElementById('btnText');
-    const loader = document.getElementById('loader');
-    const townNameDisplay = document.getElementById('townName');
-    const locationResult = document.getElementById('locationResult');
-    const btnRetry = document.getElementById('btnRetry');
-    const btnMain = document.getElementById('btnMain');
-    const mapContainer = document.getElementById('map');
-
-    btnText.innerText = "위치 확인 중...";
-    loader.style.display = "inline-block";
-    btnMain.disabled = true;
-
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-
-            const geocoder = new kakao.maps.services.Geocoder();
-            geocoder.coord2RegionCode(lng, lat, function(result, status) {
-                if (status === kakao.maps.services.Status.OK) {
-                    const region = result.find(r => r.region_type === 'B');
-                    const fullAddress = region.address_name;
-
-                    loader.style.display = "none";
-                    locationResult.style.display = "flex"; 
-                    townNameDisplay.innerText = fullAddress;
-                    btnText.innerText = "가입 계속하기"; 
-                    btnMain.disabled = false;
-                    btnRetry.style.display = "block"; 
-
-                    // 맵 랜더링
-                    setTimeout(() => {
-                        const mapOption = { center: new kakao.maps.LatLng(lat, lng), level: 3 };
-                        const map = new kakao.maps.Map(mapContainer, mapOption);
-                        const marker = new kakao.maps.Marker({ position: new kakao.maps.LatLng(lat, lng) });
-                        marker.setMap(map);
-                        map.relayout();
-                        map.setCenter(new kakao.maps.LatLng(lat, lng));
-                    }, 100);
-
-                    // 버튼 클릭 시 화면 전환 로직으로 변경 (쿼리스트링 URL 이동 X)
-                    btnMain.onclick = function() {
-                        showJoinForm(fullAddress);
-                    };
-                }
-            });
-        }, function(error) {
-            loader.style.display = "none";
-            btnMain.disabled = false;
-            btnText.innerText = "인증 실패";
-            btnRetry.style.display = "block";
-            alert("위치 정보를 가져오지 못했습니다. 기기의 위치 설정을 확인해주세요.");
-        }, { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 });
-    } else {
-        alert("브라우저가 위치 정보를 지원하지 않습니다.");
-    }
-}
-
-function showJoinForm(address) {
-    document.getElementById('displayTown').innerText = address;
-    document.getElementById('userAddr').value = address;
-    
-    document.getElementById('step-auth').style.display = 'none';
-    document.getElementById('step-join').style.display = 'block';
-    
-    window.scrollTo(0, 0);
-}
-
-function backToAuth() {
-    document.getElementById('step-join').style.display = 'none';
-    document.getElementById('step-auth').style.display = 'block';
-    window.scrollTo(0, 0);
-}
-
-
-/* ==============================================
-   회원가입 폼 관련 로직
-============================================== */
-let timerInterval;
-let isEmailVerified = false;
-
-async function sendEmailAuth() {
-    const emailField = document.getElementById("email");
-    const email = emailField.value.trim();
-    
-    if(!email) { 
-        showBatonToast("이메일을 입력해주세요."); 
-        emailField.focus();
-        return; 
-    }
-
-    const btnSendAuth = document.getElementById("btnSendAuth");
-
-    try {
-        btnSendAuth.innerText = "전송 중...";
-        btnSendAuth.disabled = true;
-
-        const url = "${pageContext.request.contextPath}/member/sendAuthEmail";
-        
-        const params = new URLSearchParams();
-        params.append('email', email);
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: params
-        });
-
-        if (!response.ok) throw new Error('Network response was not ok');
-
-        const data = await response.json();
-
-        if (data.state === "true") {
-            showBatonToast("인증번호가 발송되었습니다.");
-            
-            btnSendAuth.innerText = "재전송";
-            btnSendAuth.disabled = false;
-            
-            document.getElementById("emailAuthRow").classList.add("open");
-            startTimer(180);
-            
-            showStatusMsg(emailField, null);
-        } else {
-            showBatonToast(data.message || "발송에 실패했습니다.");
-            btnSendAuth.innerText = "인증번호 전송";
-            btnSendAuth.disabled = false;
-        }
-
-    } catch (error) {
-        console.error("Mail Auth Error:", error);
-        showBatonToast("인증 메일 전송 중 오류가 발생했습니다.");
-        btnSendAuth.innerText = "인증번호 전송";
-        btnSendAuth.disabled = false;
-    }
-}
-
-function startTimer(duration) {
-    clearInterval(timerInterval);
-    let timer = duration;
-    const timerDisplay = document.getElementById("timer");
-
-    timerInterval = setInterval(() => {
-        let minutes = Math.floor(timer / 60);
-        let seconds = timer % 60;
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
-
-        timerDisplay.innerText = minutes + ":" + seconds;
-
-        if (--timer < 0) {
-            clearInterval(timerInterval);
-            timerDisplay.innerText = "시간 만료";
-            timerDisplay.style.color = "#8B95A1";
-        }
-    }, 1000);
-}
-
-async function verifyCode() {
-    const userCodeField = document.getElementById("authCode");
-    const emailField = document.getElementById("email");
-    const userCode = userCodeField.value.trim();
-    const email = emailField.value.trim();
-    
-    if(!userCode) {
-    	showStatusMsg(userCodeField, "인증번호를 입력해주세요.");
-        userCodeField.focus();
-        return;
-    }
-
-    const verifyBtn = event ? event.target : document.querySelector("button[onclick='verifyCode()']");
-    const originalText = verifyBtn.innerText;
-
-    try {
-        verifyBtn.disabled = true;
-        verifyBtn.innerText = "확인 중...";
-
-        const url = "${pageContext.request.contextPath}/member/chkAuthCode";
-        const params = new URLSearchParams();
-        params.append('userCode', userCode);
-        params.append('email', email);
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: params
-        });
-
-        if (!response.ok) throw new Error('인증 서버 응답 오류');
-
-        const data = await response.json();
-
-        if (data.state === "success") {
-            isEmailVerified = true;
-            
-            document.getElementById("emailAuthRow").classList.remove("open");
-            clearInterval(timerInterval);
-            
-            const sendBtn = document.getElementById("btnSendAuth");
-            sendBtn.innerHTML = '인증 완료';
-            sendBtn.classList.add("verified");
-            sendBtn.disabled = true;
-            
-            emailField.readOnly = true;
-            userCodeField.readOnly = true;
-            
-            showStatusMsg(emailField, null);
-        } else {
-            if (data.state === "invalidCode") {
-                showStatusMsg(userCodeField, "인증번호가 일치하지 않습니다.");
-                userCodeField.value = "";
-                userCodeField.focus();
-            } else {
-                let errorMsg = "";
-                switch(data.state) {
-                    case "timeout": errorMsg = "인증 시간이 만료되었습니다. 다시 시도해주세요."; break;
-                    case "expired": errorMsg = "인증 세션이 만료되었습니다. 다시 번호를 요청하세요."; break;
-                    case "invalidEmail": errorMsg = "인증 요청 시 이메일과 현재 이메일이 다릅니다."; break;
-                    default: errorMsg = "서버 오류가 발생했습니다.";
-                }
-                showStatusMsg(emailField, errorMsg);
-                resetAuthUI();
-            }
-        }
-
-    } catch (error) {
-    	console.error("Verification Error:", error);
-        showStatusMsg(emailField, "통신 중 오류가 발생했습니다.");
-        resetAuthUI();
-    } finally {
-        verifyBtn.disabled = false;
-        verifyBtn.innerText = originalText;
-    }
-}
-
-function resetAuthUI() {
-    document.getElementById("emailAuthRow").classList.remove("open");
-    document.getElementById("authCode").value = "";
-    clearInterval(timerInterval);
-    
-    const sendBtn = document.getElementById("btnSendAuth");
-    sendBtn.innerText = "인증번호 재전송";
-    sendBtn.disabled = false;
-}
-
-function checkId() { alert("사용 가능한 아이디입니다."); }
-function checkNick() { alert("사용 가능한 닉네임입니다."); }
-
-function sendRegister() {
-    const f = document.registerForm;
-    if(!isEmailVerified) { alert("이메일 인증을 완료해주세요."); return; }
-    
-    // 여기에 추가적인 빈값 검증(Validation) 로직을 넣으시면 됩니다.
-    
-    f.submit();
-}
-
-function showStatusMsg(element, message, isError = true) {
-    const container = element.parentElement.classList.contains('input-with-btn') 
-                      ? element.parentElement.parentElement 
-                      : element.parentElement;
-                      
-    let msgBox = container.querySelector('.status-msg');
-    
-    if (!msgBox) {
-        msgBox = document.createElement('span');
-        msgBox.className = 'status-msg';
-        
-        const timer = container.querySelector('.timer-container');
-        if (timer) {
-            timer.parentNode.insertBefore(msgBox, timer);
-        } else {
-            container.appendChild(msgBox);
-        }
-    }
-
-    if (!message) {
-        msgBox.innerText = "";
-        msgBox.className = 'status-msg';
-        element.classList.remove('input-error');
-        return;
-    }
-
-    msgBox.innerText = message;
-    msgBox.className = isError ? 'status-msg error-msg' : 'status-msg success-msg';
-    
-    if (isError) {
-        element.classList.add('input-error');
-    } else {
-        element.classList.remove('input-error');
-    }
-}
-</script>
-
+	<script src="${pageContext.request.contextPath}/dist/js/join.js"></script>
 </body>

@@ -11,10 +11,51 @@
 		WHERE sns_provider = #{sns_provider} AND sns_id = #{sns_id}
 	</select>
 	
-	<select id="memberSeq" resultType="Long">
-		SELECT member_seq.NEXTVAL
+	<select id="userSeq" resultType="Long">
+		SELECT user_seq.NEXTVAL
 		FROM dual
 	</select>
+	
+	<insert id="insertUser" parameterType="com.sp.app.domain.dto.UserDto">
+	    INSERT INTO users (
+	        userIdx, 
+	        userId, 
+	        oauthId, 
+	        pwd, 
+	        name, 
+	        nickname, 
+	        email, 
+	        tel, 
+	        birth, 
+	        profile_photo, 
+	        score, 
+	        userLevel, 
+	        createdDate, 
+	        updatedDate, 
+	        lastLoginDate, 
+	        pwdFailCount, 
+	        status
+	    ) VALUES (
+	        #{userIdx}, 
+	        #{userId}, 
+	        #{oauthId, jdbcType=VARCHAR}, 
+	        #{pwd}, 
+	        #{name}, 
+	        #{nickname}, 
+	        #{email}, 
+	        #{tel}, 
+	        #{birth}, 
+	        #{profile_photo, jdbcType=VARCHAR}, 
+	        0, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 1)
+	</insert>
+	
+	<insert id="insertRegion" parameterType="com.sp.app.domain.dto.UserDto">
+	    INSERT INTO region (
+	        regionIdx, userIdx, regionCode, fullAddress, coreAddress, lat, lng
+	    ) VALUES (
+	        region_seq.NEXTVAL, #{userIdx}, #{regionCode}, #{fullAddress}, #{coreAddress}, #{lat}, #{lng}
+	    )
+	</insert>
 	
     <insert id="insertMember1" parameterType="com.sp.app.domain.dto.MemberDto">
 		INSERT INTO member1(member_id, login_id, password, sns_provider, sns_id,  
@@ -123,7 +164,7 @@
 
 	<!-- 회원 정보 -->
 	<select id="findById" parameterType="Long" resultType="com.sp.app.domain.dto.UserDto">
-		SELECT m1.userIdx, m1.userId, pwd, name, nickname, email, tel, addr,
+		SELECT m1.userIdx, m1.userId, pwd, name, nickname, email, tel,
 			status, createdDate, updatedDate, lastLoginDate,
 			TO_CHAR(birth, 'YYYY-MM-DD') birth, 
 			profile_photo, score, userLevel, pwdFailCount,
@@ -134,7 +175,7 @@
 	</select>
 
 	<select id="findByLoginId" parameterType="String" resultType="com.sp.app.domain.dto.UserDto">
-		SELECT m1.userIdx, m1.userId, pwd, name, nickname, email, tel, addr,
+		SELECT m1.userIdx, m1.userId, pwd, name, nickname, email, tel,
 			status, createdDate, updatedDate, lastLoginDate,
 			TO_CHAR(birth, 'YYYY-MM-DD') birth, 
 			profile_photo, score, userLevel, pwdFailCount,
@@ -202,14 +243,14 @@
     </select>
 
 	<!-- 어쏘러티(권한) 테이블 --> 
-	<insert id="insertAuthority" parameterType="com.sp.app.domain.dto.MemberDto">
-		INSERT INTO memberAuthority(login_id, authority)
-		VALUES (#{login_id}, #{authority})
+	<insert id="insertAuthority" parameterType="com.sp.app.domain.dto.UserDto">
+		INSERT INTO userAuthority(userId, authority)
+		VALUES (#{userId}, #{authority})
 	</insert>
 
 	<delete id="deleteAuthority" parameterType="map">
-		DELETE FROM memberAuthority
-		WHERE login_id = #{login_id}
+		DELETE FROM userAuthority
+		WHERE userId = #{userId}
 	</delete>
 
 	<select id="findByAuthority" parameterType="String" resultType="String">
@@ -237,6 +278,18 @@
 		SELECT login_id, rt_value
 		FROM refreshToken
 		WHERE login_id = #{login_id}
+	</select>
+
+	<select id="isUserIdDuplicated" resultType="int">
+		SELECT COUNT(userId)
+		FROM users
+		WHERE userId = #{userId}
+	</select>
+
+	<select id="isNicknameDuplicated" resultType="int">
+		SELECT COUNT(nickname)
+		FROM users
+		WHERE nickname = #{nickname}
 	</select>
 	
 </mapper>

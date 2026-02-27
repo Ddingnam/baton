@@ -20,7 +20,6 @@ public class UserDto {
 	private String nickname;
 	private String email;
 	private String tel;
-	private String addr;
 	private String birth;
 	private String profile_photo;
 	
@@ -36,4 +35,10 @@ public class UserDto {
 	private MultipartFile selectFile;		
 	
 	private String authority;
+	
+	private String regionCode;
+    private String fullAddress;
+    private String coreAddress;
+    private Double lat;
+    private Double lng;
 }

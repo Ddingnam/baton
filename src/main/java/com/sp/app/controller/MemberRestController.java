@@ -3,16 +3,19 @@ package com.sp.app.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.sp.app.common.MyUtil;
+import com.sp.app.domain.dto.UserDto;
 import com.sp.app.mail.Mail;
 import com.sp.app.mail.MailSender;
 import com.sp.app.service.MemberService;
@@ -29,18 +32,40 @@ public class MemberRestController {
 	private final MemberService service;
 	private final MailSender mailSender;
 	
-	@GetMapping("chkId")
-    public Map<String, Object> checkId(@RequestParam String userId) {
-        // boolean available = service.isIdAvailable(userId);
-        // return Map.of("available", available);
-		return null;
-    }
+	@Value("${file.upload-root}/trade")
+    private String uploadPath;
+	
+	@GetMapping("checkDuplicated")
+    public ResponseEntity<?> checkDuplicated(
+    		@RequestParam("type") String type,
+    		@RequestParam("input") String input) {
+		Map<String, Object> model = new HashMap<>();
 
-    @GetMapping("chkNickname")
-    public Map<String, Object> checkNick(@RequestParam String nickname) {
-        // boolean available = service.isNickAvailable(nickname);
-        // return Map.of("available", available);
-    	return null;
+		if (type == null || input == null || input.trim().isEmpty()) {
+			model.put("state", "null");
+			return ResponseEntity.ok(model);
+		}
+		
+        try {
+        	boolean isDuplicated = false;
+        	
+        	if("userId".equals(type)) {
+        		isDuplicated = service.isUserIdDuplicated(input);
+        	} else if ("nickname".equals(type)){
+        		isDuplicated = service.isNicknameDuplicated(input);
+        	} else {
+        		model.put("state", "invalidType");
+                return ResponseEntity.ok(model);
+        	}
+	        
+        	model.put("state", isDuplicated ? "duplicated" : "available");
+            return ResponseEntity.ok(model);
+        	
+        } catch (Exception e) {
+        	log.info("checkDuplicated(" + type + ") error: ", e);
+            model.put("state", "serverError");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
+        }
     }
     
     @PostMapping("sendAuthEmail")
@@ -181,6 +206,27 @@ public class MemberRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
         }
     }
+    
+    @PostMapping("register")
+    public ResponseEntity<?> register(UserDto dto, HttpSession session) {
+    	Map<String, Object> model = new HashMap<>();
+    	
+		try {
+			service.insertUser(dto, uploadPath);
+			
+			session.setAttribute("completeUserId", dto.getUserId());
+			session.setAttribute("completeNickname", dto.getNickname());
+			
+			model.put("state", "success");
+        	return ResponseEntity.ok(model);
+		} catch (Exception e) {
+			log.info("Register error: ", e);
+            model.put("state", "serverError");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
+		}
+    }
+    
+    
 	
 
 }

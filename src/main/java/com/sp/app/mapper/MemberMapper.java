@@ -13,9 +13,10 @@ import com.sp.app.domain.dto.UserDto;
 public interface MemberMapper {
 	public MemberDto loginSnsMember(Map<String, Object> map);
 
-	public Long memberSeq();	
-	public void insertMember1(MemberDto dto) throws SQLException;
-	public void insertMember2(MemberDto dto) throws SQLException;
+	public Long userSeq();	
+	public void insertUser(UserDto dto) throws SQLException;
+	public void insertRegion(UserDto dto) throws SQLException;
+	
 	public void insertMember12(MemberDto dto) throws SQLException;
 	public void insertSnsMember(MemberDto dto) throws SQLException;
 	public void insertMemberStatus(MemberDto dto) throws SQLException;
@@ -43,12 +44,15 @@ public interface MemberMapper {
 	
 	public List<MemberDto> listFindMember(Map<String, Object> map);
 	
-	public void insertAuthority(MemberDto dto) throws SQLException;
+	public void insertAuthority(UserDto dto) throws SQLException;
 	public void deleteAuthority(Map<String, Object> map) throws SQLException;
 	public String findByAuthority(String login_id);
 	
 	public void insertRefreshToken(MemberDto dto) throws SQLException;
 	public void updateRefreshToken(MemberDto dto) throws SQLException;
 	public void deleteRefreshToken(String login_id) throws SQLException;
-	public MemberDto findByToken(String login_id);	
+	public MemberDto findByToken(String login_id);
+	
+	public int isUserIdDuplicated(String userId);
+	public int isNicknameDuplicated(String nickname);
 }

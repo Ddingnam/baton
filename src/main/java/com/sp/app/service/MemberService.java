@@ -9,7 +9,7 @@ import com.sp.app.domain.dto.UserDto;
 public interface MemberService {
 	public MemberDto loginSnsMember(Map<String, Object> map);
 	
-	public void insertMember(MemberDto dto, String uploadPath) throws Exception;
+	public void insertUser(UserDto dto, String uploadPath) throws Exception;
 	public void insertSnsMember(MemberDto dto) throws Exception;
 	public void insertMemberStatus(MemberDto dto) throws Exception;
 	
@@ -42,4 +42,7 @@ public interface MemberService {
 	public MemberDto findByToken(String login_id);
 	
 	public boolean isPasswordCheck(String login_id, String password);		
+	
+	public boolean isUserIdDuplicated(String userId);
+	public boolean isNicknameDuplicated(String nickname);
 }

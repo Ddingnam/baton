@@ -13,6 +13,10 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
+	
+<header class="fixed-top shadow-sm bg-white">
+	<jsp:include page="/WEB-INF/views/layout/header.jsp" />
+</header>
 
 <main class="baton-harmony-canvas">
     <a href="${pageContext.request.contextPath}/" class="btn-exit-portal" title="나가기">
@@ -85,6 +89,8 @@
         </footer>
     </div>
 </main>
+
+<jsp:include page="/WEB-INF/views/layout/footer.jsp"/>
 
 <script type="text/javascript">
 function sendLogin() {
