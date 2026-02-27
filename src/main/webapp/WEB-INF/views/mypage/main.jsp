@@ -46,15 +46,7 @@
 					        <span class="theme-text">P</span>
 					    </strong>
 					</div>
-					<button class="theme-btn" onclick="requestBatonPay(
-					    '${pageContext.request.contextPath}', 
-					    '${sessionScope.member.email}', 
-					    '${sessionScope.member.name}', 
-					    '${sessionScope.member.tel}', 
-					    '${sessionScope.member.userIdx}'
-					)">
-					    충전하기
-					</button>
+					<button class="theme-btn" onclick="openChargeModal()">충전하기</button>
 				</div>
 			</div>
 
@@ -468,9 +460,9 @@
 	</div>
 
 	<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
-	<script src="${pageContext.request.contextPath}/dist/js/mypage_main.js"></script>
-	
+	<jsp:include page="/WEB-INF/views/payment/chargeModal.jsp" />
 	<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+	<script src="${pageContext.request.contextPath}/dist/js/mypage_main.js"></script>
 	<script src="${pageContext.request.contextPath}/dist/js/payment.js"></script>
 	
 	<script>

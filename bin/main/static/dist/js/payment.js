@@ -1,33 +1,75 @@
 var IMP = window.IMP;
 IMP.init("imp25654160"); 
 
-/**
- * 포트원 결제 공통 함수
- * @param contextPath 서버 경로
- * @param email 유저 이메일
- * @param name 유저 이름
- * @param tel 유저 전화번호
- * @param userIdx 유저 PK
- */
-function requestBatonPay(contextPath, email, name, tel, userIdx) {
-    let amount = 0;
+function showCustomAlert(title, msg, type, callback) {
+    $('#chargeStep1, #chargeStep2').hide();
+    $('#chargeStepAlert').show();
+    $('#chargeModalOverlay').css('display', 'flex').hide().fadeIn(200);
 
-    let amountInput = document.getElementById('chargeAmount');
-    
-    if (amountInput && amountInput.value) {
-        amount = parseInt(amountInput.value);
+    $('#alertTitle').text(title);
+    $('#alertMessage').text(msg);
+
+    if (type === 'success') {
+        $('#alertIconBox').html('<i class="ri-checkbox-circle-fill" style="color: #00B98D;"></i>');
+    } else if (type === 'error') {
+        $('#alertIconBox').html('<i class="ri-error-warning-fill" style="color: #F86D7D;"></i>');
     } else {
-      
-        let amountStr = prompt("충전할 금액을 입력하세요 (예: 10000)", "10000");
-        if (!amountStr) return; 
-        amount = parseInt(amountStr);
+        $('#alertIconBox').html('<i class="ri-information-fill" style="color: #3182F6;"></i>');
     }
 
-    if (!amount || amount < 100) {
-        alert("최소 결제 금액은 100원입니다.");
-        if(amountInput) amountInput.focus();
+    $('#alertConfirmBtn').off('click').on('click', function() {
+        closeChargeModal();
+        if (typeof callback === 'function') callback();
+    });
+}
+
+function openChargeModal() {
+    let input = $('#customChargeInput');
+    if(!input.val()) input.val(''); 
+    $('#chargeStep1').show();
+    $('#chargeStepAlert, #chargeStep2').hide();
+    $('#chargeModalOverlay').css('display', 'flex').hide().fadeIn(200);
+}
+
+function closeChargeModal() {
+    $('#chargeModalOverlay').fadeOut(200);
+}
+
+function changeAmount(step) {
+    let input = $('#customChargeInput');
+    let current = parseInt(input.val()) || 0;
+    let newVal = current + step;
+    if (newVal < 1000 && step < 0) newVal = 0; 
+    input.val(newVal);
+}
+
+function openConfirmStep() {
+    let amt = parseInt($('#customChargeInput').val());
+  
+    if (!amt || amt < 1000) {
+        showCustomAlert('금액 입력 오류', '최소 결제 금액은 1,000원입니다.', 'warning', function() {
+            openChargeModal(); 
+        });
         return;
     }
+    
+    let savedPoint = Math.floor(amt * 0.98); 
+    $('#confirmAmountText').text(amt.toLocaleString());
+    $('#saveAmountText').text(savedPoint.toLocaleString());
+
+    $('#chargeStep1').hide();
+    $('#chargeStep2').fadeIn(200);
+}
+
+
+function executeBatonPayment() {
+    let amount = parseInt($('#customChargeInput').val());
+    closeChargeModal(); 
+
+    let contextPath = $('#ctxPath').val();
+    let email = $('#userEmail').val() || "test@test.com";
+    let name = $('#userName').val() || "테스터";
+    let tel = $('#userTel').val() || "010-0000-0000";
 
     var merchantUid = "ORD_" + new Date().getTime();
 
@@ -37,57 +79,48 @@ function requestBatonPay(contextPath, email, name, tel, userIdx) {
         merchantUid: merchantUid,
         name: "바톤터치 포인트 충전",
         amount: amount,
-        buyerEmail: email || "test@test.com", 
-        buyerName: name || "테스터", 
-        buyerTel: tel || "010-0000-0000" 
-		}, function (rsp) { 
-	        if (rsp.success) {
-	            const headerMeta = document.querySelector("meta[name='_csrf_header']");
-	            const tokenMeta = document.querySelector("meta[name='_csrf']");
-	            
-	            const header = headerMeta ? headerMeta.content : '';
-	            const token = tokenMeta ? tokenMeta.content : '';
+        buyerEmail: email, 
+        buyerName: name, 
+        buyerTel: tel 
+    }, function (rsp) { 
+        if (rsp.success) {
+            const headerMeta = document.querySelector("meta[name='_csrf_header']");
+            const tokenMeta = document.querySelector("meta[name='_csrf']");
+            const header = headerMeta ? headerMeta.content : '';
+            const token = tokenMeta ? tokenMeta.content : '';
 
-	            $.ajax({
-	                url: contextPath + "/api/payment/verify/" + rsp.imp_uid,
-	                type: "POST",
-	                contentType: "application/json",
-	                beforeSend: function(xhr) {
-	                    if(header && token) xhr.setRequestHeader(header, token);
-	                },
-	                data: JSON.stringify({
+            $.ajax({
+                url: contextPath + "/api/payment/verify/" + rsp.imp_uid,
+                type: "POST",
+                contentType: "application/json",
+                beforeSend: function(xhr) {
+                    if(header && token) xhr.setRequestHeader(header, token);
+                },
+                data: JSON.stringify({
                     merchantUid: rsp.merchant_uid,
                     chargeAmount: rsp.paid_amount,
                     payMethod: rsp.pay_method,
-                    userIdx: parseInt(userIdx || 0)
+                    userIdx: 0 
                 })
-				}).done(function (data) {
-	                let savedPoint = Math.floor(rsp.paid_amount * 0.98); 
-	                alert("결제가 완료되었습니다!\n수수료 2%를 제외한 " + savedPoint + "P가 적립되었습니다.");
-	    
-	                let pointElement = $('.pb-point strong');
-	                
-	                if (pointElement.length > 0) {
-	         
-	                    let currentPointStr = pointElement.text().replace(/[^0-9]/g, '');
-	                    let currentPoint = parseInt(currentPointStr) || 0;
-	              
-	                    let finalPoint = currentPoint + savedPoint;
-	           
-	                    pointElement.html(finalPoint.toLocaleString() + '<span class="theme-text">P</span>');
-	                } else {
-	          
-	                    if (window.location.pathname.includes('/payment')) {
-	                        window.location.href = contextPath + "/mypage";
-	                    }
-	                }
-	                
-	            }).fail(function(xhr) {
-	                alert("결제는 진행되었으나 시스템 오류로 적립에 실패했습니다.");
-	            });
-			
+            }).done(function (data) {
+                let savedPoint = Math.floor(rsp.paid_amount * 0.98); 
+                
+                showCustomAlert('결제 완료', '결제가 성공적으로 완료되었습니다!\n수수료 2%를 제외한 ' + savedPoint.toLocaleString() + 'P가 적립되었습니다.', 'success', function() {
+                    let pointElement = $('.pb-point strong');
+                    if (pointElement.length > 0) {
+                        let currentPoint = parseInt(pointElement.text().replace(/[^0-9]/g, '')) || 0;
+                        pointElement.html((currentPoint + savedPoint).toLocaleString() + '<span class="theme-text">P</span>');
+                    } else {
+                        if (window.location.pathname.includes('/payment')) window.location.href = contextPath + "/mypage";
+                    }
+                });
+                
+            }).fail(function(xhr) {
+                showCustomAlert('적립 실패', '결제는 진행되었으나 시스템 오류로 적립에 실패했습니다.\n고객센터에 문의해 주세요.', 'error');
+            });
+            
         } else {
-            alert("결제에 실패하였습니다. 에러: " + rsp.error_msg);
+            showCustomAlert('결제 취소/실패', '결제가 정상적으로 진행되지 않았습니다.\n(' + rsp.error_msg + ')', 'warning');
         }
     });
 }
