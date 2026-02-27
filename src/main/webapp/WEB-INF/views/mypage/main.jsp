@@ -6,6 +6,8 @@
 <head>
 <meta charset="UTF-8">
 <title>BATON | 마이페이지</title>
+<meta name="_csrf" content="${_csrf.token}"/>
+<meta name="_csrf_header" content="${_csrf.headerName}"/>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -39,9 +41,20 @@
 				<div class="pb-right">
 					<div class="pb-point">
 						<span>보유 바통 포인트</span>
-						<strong>12,500<span class="theme-text">P</span></strong>
+						<strong>
+					        <fmt:formatNumber value="${empty userPoint ? 0 : userPoint}" pattern="#,###"/>
+					        <span class="theme-text">P</span>
+					    </strong>
 					</div>
-					<button class="theme-btn">충전하기</button>
+					<button class="theme-btn" onclick="requestBatonPay(
+					    '${pageContext.request.contextPath}', 
+					    '${sessionScope.member.email}', 
+					    '${sessionScope.member.name}', 
+					    '${sessionScope.member.tel}', 
+					    '${sessionScope.member.userIdx}'
+					)">
+					    충전하기
+					</button>
 				</div>
 			</div>
 
@@ -456,6 +469,10 @@
 
 	<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 	<script src="${pageContext.request.contextPath}/dist/js/mypage_main.js"></script>
+	
+	<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+	<script src="${pageContext.request.contextPath}/dist/js/payment.js"></script>
+	
 	<script>
 	document.querySelectorAll('.inner-tab').forEach(tab => {
 		tab.addEventListener('click', function() {

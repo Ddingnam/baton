@@ -1,5 +1,7 @@
 package com.sp.app.service;
 
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,10 +32,10 @@ public class PaymentService {
         payment.setPayMethod(payMethod);
         payment.setUserIdx(userIdx);
         payment.setPayStatus("PAID");
-
         paymentMapper.insertPayment(payment);
         
-        int newTotalPoint = 0 + accumulatedPoint;
+        int currentPoint = paymentMapper.getCurrentPoint(userIdx);
+        int newTotalPoint = currentPoint + accumulatedPoint;
 
         PointHistory pointHistory = new PointHistory();
         pointHistory.setPaymentIdx(payment.getPaymentIdx()); 
@@ -41,8 +43,11 @@ public class PaymentService {
         pointHistory.setHistoryType("CHARGE");
         pointHistory.setUserIdx(userIdx);
         pointHistory.setTotalPoint(newTotalPoint);
-
         paymentMapper.insertPointHistory(pointHistory);
      
+        Map<String, Object> paramMap = new java.util.HashMap<>();
+        paramMap.put("userIdx", userIdx);
+        paramMap.put("point", accumulatedPoint); 
+        paymentMapper.updateUserPoint(paramMap);
     }
 }
