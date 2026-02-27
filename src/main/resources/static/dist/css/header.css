@@ -4,7 +4,6 @@
     --header-domain-color: #3182F6; 
 }
 
-/* 헤더 기본 설정 */
 #baton-header, 
 #baton-header * {
     box-sizing: border-box !important;
@@ -13,14 +12,13 @@
     line-height: 1.5 !important;
 }
 
-/* 아이콘 복구 설정 */
 #baton-header .ri-heart-3-line, 
 #baton-header .ri-chat-1-line, 
 #baton-header .ri-user-smile-fill, 
 #baton-header .ri-settings-3-line,
 #baton-header [class^="ri-"], 
 #baton-header [class*=" ri-"] {
-    font-family: 'remixicon' !important; /* 아이콘 전용 폰트로 재지정 */
+    font-family: 'remixicon' !important;
     display: inline-block !important;
     font-style: normal !important;
     font-weight: normal !important;
@@ -90,7 +88,6 @@ html {
     scrollbar-gutter: stable;
 }
 
-/* 로고 디자인 */
 .baton-logo-link { 
     display: flex !important; 
     align-items: center !important; 
@@ -137,10 +134,8 @@ html {
     letter-spacing: 1.2px !important; 
     white-space: nowrap !important;
     color: #191F28 !important;
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif !important;
 }
 
-/* 메뉴 네비게이션 */
 .nav-menu { 
     display: flex !important; 
     gap: 40px !important; 
@@ -180,7 +175,6 @@ html {
 
 .nav-menu li a:hover::after { width: 100% !important; }
 
-/* 비로그인 상태 유저 */
 .auth-group { 
     display: flex !important; 
     align-items: center !important; 
@@ -210,12 +204,11 @@ html {
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1) !important; 
 }
 
-/* 로그인 상태 유저 */
 .user-action-group {
     display: flex !important;
     align-items: center !important;
+    position: relative !important;
     gap: 16px !important;
-    flex-shrink: 0 !important;
 }
 
 .action-icon {
@@ -230,34 +223,35 @@ html {
     transition: all 0.2s ease !important;
     position: relative !important;
 }
+
+.action-icon.admin-icon {
+    order: 2 !important;
+}
+
 .action-icon:hover {
     background: #F2F4F6 !important;
     color: var(--header-domain-color) !important;
     transform: translateY(-2px) !important;
 }
 
-.badge-dot {
-    position: absolute !important;
-    top: 10px !important;
-    right: 10px !important;
-    width: 6px !important;
-    height: 6px !important;
-    background: #FF4D4F !important;
-    border-radius: 50% !important;
-    box-shadow: 0 0 0 2px #fff !important;
+.profile-dropdown-wrapper {
+    position: relative !important;
+    order: 1 !important;
 }
 
 .action-profile {
     display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
-    padding: 6px 16px 6px 6px !important;
+    gap: 8px !important;
+    padding: 6px 12px 6px 6px !important;
     background: #F9FAFB !important;
     border-radius: 100px !important;
     border: 1px solid #E5E8EB !important;
     transition: all 0.3s ease !important;
+    cursor: pointer !important;
+    outline: none !important;
 }
-.action-profile:hover {
+.action-profile:hover, .action-profile.active {
     border-color: var(--header-domain-color) !important; 
     background: #FFFFFF !important;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
@@ -273,8 +267,9 @@ html {
     justify-content: center !important;
     color: #8B95A1 !important;
     font-size: 18px !important;
+    transition: all 0.3s !important;
 }
-.action-profile:hover .profile-thumb {
+.action-profile:hover .profile-thumb, .action-profile.active .profile-thumb {
     background: var(--header-domain-color) !important;
     color: #FFFFFF !important;
 }
@@ -285,19 +280,121 @@ html {
     color: #191F28 !important;
 }
 
-.logout-text {
-    font-size: 14px !important;
-    font-weight: 600 !important;
+.dropdown-arrow {
+    font-size: 18px !important;
     color: #8B95A1 !important;
-    margin-left: 8px !important;
-    transition: 0.2s !important;
+    transition: transform 0.3s ease !important;
 }
-.logout-text:hover {
-    color: #191F28 !important;
-    text-decoration: underline !important;
+.action-profile.active .dropdown-arrow {
+    transform: rotate(180deg) !important;
 }
 
-/* 챗봇 */
+.profile-dropdown-menu {
+    position: absolute !important;
+    top: calc(100% + 12px) !important;
+    right: 0 !important;
+    width: 240px !important;
+    background: #FFFFFF !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
+    border: 1px solid #EAECEF !important;
+    padding: 8px 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transform: translateY(-10px) !important;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+    z-index: 10000 !important;
+}
+
+.profile-dropdown-menu.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+}
+
+.dropdown-header {
+    padding: 16px 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+.dh-thumb {
+    width: 40px !important;
+    height: 40px !important;
+    background: var(--header-domain-color) !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 20px !important;
+}
+
+.dh-info {
+    display: flex !important;
+    flex-direction: column !important;
+}
+.dh-info strong {
+    font-size: 15px !important;
+    color: #191F28 !important;
+    font-weight: 700 !important;
+}
+.dh-info span {
+    font-size: 13px !important;
+    color: #8B95A1 !important;
+}
+
+.dropdown-divider {
+    height: 1px !important;
+    background: #EAECEF !important;
+    margin: 8px 0 !important;
+}
+
+.dropdown-item {
+    display: flex !important;
+    align-items: center !important;
+    padding: 12px 20px !important;
+    color: #4E5968 !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    transition: background 0.2s, color 0.2s !important;
+    position: relative !important;
+}
+.dropdown-item i {
+    font-size: 18px !important;
+    margin-right: 12px !important;
+    color: #8B95A1 !important;
+    transition: color 0.2s !important;
+}
+.dropdown-item:hover {
+    background: #F9FAFB !important;
+    color: var(--header-domain-color) !important;
+    font-weight: 600 !important;
+}
+.dropdown-item:hover i {
+    color: var(--header-domain-color) !important;
+}
+
+.dropdown-item.text-danger {
+    color: #FF4D4F !important;
+}
+.dropdown-item.text-danger i {
+    color: #FF4D4F !important;
+}
+.dropdown-item.text-danger:hover {
+    background: #FFF1F0 !important;
+}
+
+.badge-dot-inline {
+    width: 6px !important;
+    height: 6px !important;
+    background: #FF4D4F !important;
+    border-radius: 50% !important;
+    margin-left: 6px !important;
+    display: inline-block !important;
+}
+
 #baton-chatbot-trigger {
     position: fixed !important;
     bottom: 35px !important;
@@ -361,7 +458,6 @@ html {
     box-sizing: content-box !important;
 }
 
-/* Toast */
 .baton-toast-container {
     position: fixed;
     top: 100px;
@@ -407,23 +503,11 @@ html {
 }
 
 @keyframes batonFadeInDown {
-    0% {
-        opacity: 0;
-        transform: translateY(-40px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    0% { opacity: 0; transform: translateY(-40px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes batonFadeOutDown {
-    0% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(20px); }
 }
