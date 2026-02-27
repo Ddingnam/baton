@@ -2,11 +2,35 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.TradeMapper">
+
 	<insert id="insertTradePost" parameterType="com.sp.app.model.Trade">
+		<selectKey keyProperty="productIdx" resultType="long" order="BEFORE">
+	        SELECT seq_product.NEXTVAL FROM DUAL
+	    </selectKey>
 		INSERT INTO product(productIdx, title, content, price, userIdx, tradeType, 
 			tradePlace, regionIdx, productStatus, categoryIdx)
-		VALUES(seq_product.NEXTVAL, #{title, jdbcType=VARCHAR}, #{content, jdbcType=VARCHAR}, #{price}, 1, #{tradeType, jdbcType=VARCHAR},
+		VALUES(#{productIdx}, #{title, jdbcType=VARCHAR}, #{content, jdbcType=VARCHAR}, #{price}, #{userIdx}, #{tradeType, jdbcType=VARCHAR},
 			#{tradePlace, jdbcType=VARCHAR}, 1, #{productStatus, jdbcType=VARCHAR}, 1)
+	</insert>
+	
+	<insert id="insertTradePostImg" parameterType="com.sp.app.model.TradeImg">
+        INSERT INTO productImages (
+            productIdx, imgOrder, originalName, saveName, imgUrl
+        ) VALUES (
+            #{productIdx}, #{imgOrder}, #{originalName}, #{saveName}, #{imgUrl}
+        )
+    </insert>
+    
+    <insert id="insertTradePostTag" parameterType="map">
+    	INSERT INTO productTag (productIdx, tagIdx)
+    	VALUES (#{productIdx}, #{tagIdx})
+    </insert>
+    
+	<insert id="insertTradeTag" parameterType="com.sp.app.model.Trade">
+	    <selectKey keyProperty="tagIdx" resultType="long" order="BEFORE">
+	        SELECT seq_tag.NEXTVAL FROM DUAL
+	    </selectKey>
+	    INSERT INTO tag (tagIdx, tagName) VALUES (#{tagIdx}, #{tagName})
 	</insert>
 	
 	<select id="findByIdx" parameterType="long" resultType="com.sp.app.model.Trade">
@@ -19,10 +43,10 @@
 	</select>
 	
 	<select id="findImagesByIdx" parameterType="long" resultType="com.sp.app.model.TradeImg">
-		SELECT imgOrder, productIdx, imgUrl
-	    FROM productImages
-	    WHERE productIdx = #{productIdx}
-	    ORDER BY imgOrder ASC
+		SELECT productIdx, imgOrder, originalName, saveName, imgUrl
+        FROM productImages
+        WHERE productIdx = #{productIdx}
+        ORDER BY imgOrder ASC
 	</select>
 	
 	<select id="findTagsByIdx" parameterType="long" resultType="String">
@@ -32,13 +56,17 @@
 	    WHERE p.productIdx = #{productIdx}
 	</select>
 	
+	<select id="findTagIdxByName" parameterType="String" resultType="Long">
+	    SELECT tagIdx FROM tag WHERE tagName = #{tagName}
+	</select>
+	
 	<select id="tradeList" parameterType="map" resultType="com.sp.app.model.Trade">
 	    SELECT * FROM (
 	        SELECT ROWNUM rnum, tb.* FROM (
 	            SELECT 
 	                p.productIdx, p.title, p.price, p.userIdx, p.hitCount, p.likeCount, p.chatCount,
 	                p.tradeType, p.tradeStatus, p.productStatus, p.createdDate,
-	                (SELECT imgUrl FROM productImages WHERE productIdx = p.productIdx AND imgOrder = 1) as thumbUrl
+	                (SELECT imgUrl FROM productImages WHERE productIdx = p.productIdx AND imgOrder = 1) as imgUrl
 	            FROM product p
 	            <where>
 	                <if test="keyword != null and keyword != ''">
@@ -65,6 +93,29 @@
 	    </where>
 	</select>
 	
+	<update id="updateTradePost">
+		UPDATE product SET title = #{title}, content = #{content}, price = #{price}, 
+			tradeType = #{tradeType}, tradePlace = #{tradePlace}, productStatus = #{productStatus},
+			categoryIdx = #{categoryIdx}, updateDate = SYSDATE
+		WHERE productIdx = #{productIdx}
+	</update>
+	
+	<update id="updateTradePostTag">
+		UPDATE product SET tagIdx = #{tagIdx} WHERE productIdx = #{productIdx}
+	</update>
+	
+	<select id="findSaveName" parameterType="map" resultType="String">
+        SELECT saveName 
+        FROM productImages 
+        WHERE productIdx = #{productIdx} AND imgOrder = #{imgOrder}
+    </select>
+
+    <select id="getLastOrder" parameterType="long" resultType="int">
+        SELECT NVL(MAX(imgOrder), 0) 
+        FROM productImages 
+        WHERE productIdx = #{productIdx}
+    </select>
+
 	<delete id="deleteTradePost" parameterType="long">
 		DELETE FROM product WHERE productIdx = #{productIdx}
 	</delete>
@@ -73,7 +124,12 @@
 		DELETE FROM productTag WHERE productIdx = #{productIdx}
 	</delete>
 	
-	<delete id="deleteTragePostImg" parameterType="long">
+	<delete id="deleteTradePostImg" parameterType="map">
+        DELETE FROM productImages
+        WHERE productIdx = #{productIdx} AND imgOrder = #{imgOrder}
+    </delete>
+	
+	<delete id="deleteTradePostImgAll" parameterType="long">
 		DELETE FROM productImages WHERE productIdx = #{productIdx}
 	</delete>
 </mapper>

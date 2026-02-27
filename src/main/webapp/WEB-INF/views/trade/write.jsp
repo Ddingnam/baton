@@ -2,7 +2,6 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%@ include file="/WEB-INF/views/layout/headerResources.jsp" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -16,6 +15,7 @@
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/layout/header.jsp" />
+<jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 
 <div class="page-wrap">
 	<div class="header-content">
@@ -50,7 +50,7 @@
                                 </c:if>
                             </div>
                         </div>
-                        <input type="file" name="selectFile" id="selectFile" accept="image/*" multiple style="display:none">
+                        <input type="file" name="newFiles" id="selectFile" accept="image/*" multiple style="display:none">
                     </div>
                     
                     <p class="card-title">상품 정보</p>
@@ -147,8 +147,13 @@
             </div>
             
         </div>
+        <c:if test="${mode == 'update'}">
+		    <input type="hidden" name="productIdx" value="${trade.productIdx}">
+		</c:if>
+		<input type="hidden" name="mode" value="${mode}">
     </form>
 </div>
 <script src="${pageContext.request.contextPath}/dist/js/trade-write.js"></script>
+<script> const contextPath = '${pageContext.request.contextPath}'; </script>
 </body>
 </html>

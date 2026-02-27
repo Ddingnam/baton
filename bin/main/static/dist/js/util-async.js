@@ -64,7 +64,12 @@ async function fetchRequest(url, method='GET', params=null, contentType='form', 
 		}
 		
 		switch (responseType) {
-		case 'json': return await resp.json();
+		case 'json': {
+			// return await resp.json();
+			// body 없이 200 OK만 반환되는 경우
+			const text = await resp.text();
+			return text ? JSON.parse(text) : null;
+		}
 		case 'text': return await resp.text();
 		case 'blob': return await resp.blob();
 		default: throw new Error('지원하지 않는 responseType: ' + responseType);

@@ -23,8 +23,8 @@ const toggleImage = (function() {
         });
     }
 
-    function addExisting(url, fileIdx) {
-        uploadedFiles.push({ url: url, fileIdx: fileIdx, isExisting: true });
+    function addExisting(url, imgOrder) {
+        uploadedFiles.push({ url: url, imgOrder: imgOrder, isExisting: true });
         render();
     }
 
@@ -33,8 +33,8 @@ const toggleImage = (function() {
         if(target.isExisting) {
             const input = document.createElement('input');
             input.type = 'hidden';
-            input.name = 'deleteFiles';
-            input.value = target.fileIdx;
+            input.name = 'deleteImgOrders';
+            input.value = target.imgOrder;
             document.getElementById('tradeForm').appendChild(input);
         }
         uploadedFiles.splice(idx, 1);
@@ -44,6 +44,9 @@ const toggleImage = (function() {
     function render() {
         if(!previewList) return;
         previewList.innerHTML = '';
+		
+		const dataTransfer = new DataTransfer();
+		
         uploadedFiles.forEach((item, i) => {
             const div = document.createElement('div');
             div.className = 'preview-item';
@@ -52,7 +55,14 @@ const toggleImage = (function() {
             html += `<button type="button" class="remove-img-btn" onclick="toggleImage.remove(${i})">✕</button>`;
             div.innerHTML = html;
             previewList.appendChild(div);
+			
+			if(!item.isExisting && item.file) {
+				dataTransfer.items.add(item.file);
+			}
         });
+		
+		document.getElementById('selectFile').files = dataTransfer.files;
+		
         imgCount.textContent = uploadedFiles.length + '/5';
     }
 
@@ -127,27 +137,26 @@ window.onload = function() {
     toggleImage.init();
     toggleTag.init();
     
-    const contentInput = document.getElementById('contentInput');
-    if(contentInput) {
-        document.getElementById('contentCount').textContent = contentInput.value.length + '/2000';
-        contentInput.oninput = function() {
-            document.getElementById('contentCount').textContent = this.value.length + '/2000';
-        };
-    }
+	const urlParams = new URLSearchParams(window.location.search);
+	    const productIdx = urlParams.get('productIdx');
+	    const isUpdate = window.location.pathname.includes('update');
 
-    if (window.serverData && window.serverData.mode === 'update') {
-        const data = window.serverData;
-        
-        if(data.files) {
-            data.files.forEach(f => toggleImage.addExisting(f.url, f.fileIdx));
-        }
-        if(data.tags) {
-            data.tags.split(',').forEach(t => toggleTag.add(t));
-        }
-        TradeLogic.toggleLocation(data.tradeType !== '택배');
-    } else {
-        TradeLogic.toggleLocation(true); 
-    }
+	    if (isUpdate && productIdx) {
+	        fetch(`${contextPath}/trade/updateData?productIdx=${productIdx}`)
+	            .then(response => response.json())
+	            .then(data => {
+	                if(data.imageList) {
+	                    data.imageList.forEach(img => {
+	                        toggleImage.addExisting(img.imgUrl, img.imgOrder);
+	                    });
+	                }
+	                if(data.tagList) {
+	                    data.tagList.forEach(tagName => toggleTag.add(tagName));
+	                }
+	                TradeLogic.toggleLocation(data.trade.tradeType !== '택배');
+	            })
+	            .catch(error => console.error('데이터 로드 실패:', error));
+	    }
 };
 
 function submitForm() {
