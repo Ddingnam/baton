@@ -7,9 +7,9 @@ import com.sp.app.model.Trade;
 import com.sp.app.model.TradeImg;
 
 public interface TradeService {
-	public void insertTradePost(Trade dto) throws Exception;
-	public void upodateTradePost(Trade dto) throws Exception;
-	public void deleteTradePost(long productIdx) throws Exception;
+	public void insertTradePost(Trade dto, String uploadPath) throws Exception;
+	public void updateTradePost(Trade dto, String uploadPath) throws Exception;
+	public void deleteTradePost(long productIdx, String uploadPath) throws Exception;
 	
 	public Trade findByIdx(long productIdx);
 	public List<TradeImg> findImgsByIdx(long productIdx);

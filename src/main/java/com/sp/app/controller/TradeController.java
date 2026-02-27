@@ -5,17 +5,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.sp.app.domain.dto.SessionInfo;
+import com.sp.app.common.MyUtil;
+import com.sp.app.common.StorageService;
 import com.sp.app.model.Trade;
 import com.sp.app.model.TradeImg;
+import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.TradeService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +31,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/trade/*")
 public class TradeController {
 	private final TradeService service;
+	private final StorageService storageService;
+	private final MyUtil myUtil;
+	
+	@Value("${file.upload-root}/trade")
+    private String uploadPath;
 	
 	@GetMapping("list")
 	public String list(@RequestParam(value = "page", defaultValue = "1") int current_page,
@@ -95,9 +104,13 @@ public class TradeController {
 	}
 	
 	@PostMapping("write")
-	public String writeSubmit(Trade dto) throws Exception{
+	public String writeSubmit(Trade dto, 
+			@AuthenticationPrincipal CustomUserDetails userDetails) throws Exception{
 		try {
-			service.insertTradePost(dto);
+			if (userDetails != null) {
+	            dto.setUserIdx(userDetails.getUserIdx());
+	        }
+			service.insertTradePost(dto, uploadPath);
 		} catch (Exception e) {
 			log.info("writeSubmit : ", e);
 		}
@@ -122,14 +135,39 @@ public class TradeController {
 	}
 	
 	@PostMapping("update")
-	public String updateSubmit() {
-		return "trade/article";
+	public String updateSubmit(Trade dto, @RequestParam("page") String page, Model model) {
+		try {
+			service.updateTradePost(dto, uploadPath);
+			
+			return "redirect:/trade/article?productIdx=" + dto.getProductIdx();
+			
+		} catch (Exception e) {
+			log.info("updateSubmit : ", e);
+		}
+		
+		return "redirect:/trade/list";
+	}
+	
+	@GetMapping("updateData")
+	@ResponseBody
+	public Map<String, Object> getUpdateData(@RequestParam("productIdx") long productIdx) {
+	    Map<String, Object> data = new HashMap<>();
+	    
+	    Trade dto = service.findByIdx(productIdx);
+	    List<TradeImg> imageList = service.findImgsByIdx(productIdx);
+	    List<String> tagList = service.findTagsByIdx(productIdx);
+	    
+	    data.put("trade", dto);
+	    data.put("imageList", imageList);
+	    data.put("tagList", tagList);
+	    
+	    return data;
 	}
 	
 	@GetMapping("delete")
 	public String delete(@RequestParam("productIdx") long productIdx) {
 		try {
-			service.deleteTradePost(productIdx);
+			service.deleteTradePost(productIdx, uploadPath);
 		} catch (Exception e) {
 			log.info("delete : ", e);
 		}

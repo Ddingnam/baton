@@ -1,5 +1,9 @@
 package com.sp.app.model;
 
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,17 +36,18 @@ public class Trade {
 	private String createdDate;
 	private String updatedDate;
 	
-	// 게시물 카테고리
 	private long categoryIdx;
 	private String categoryName;
 	
-	// 게시물 태그
 	private long tagIdx;
 	private String tagName;
+	private String tags;
 	
-	// 게시물 이미지
-	private long imgOrder;
 	private String imgUrl;
+	private List<Integer> deleteImgOrders;
+	private List<MultipartFile> newFiles;
+	private List<TradeImg> imageList;
+	
 	private boolean likeByMe;
 	
 }
