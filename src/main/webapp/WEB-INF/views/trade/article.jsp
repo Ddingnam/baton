@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ include file="/WEB-INF/views/layout/headerResources.jsp" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -34,15 +35,18 @@
             <div class="card gallery-card">
                 <div class="main-image-wrap">
                     <c:choose>
-                        <c:when test="${not empty trade.imgUrl}">
-                            <img id="mainImage" src="${trade.imgUrl}" alt="${trade.title}">
-                        </c:when>
-                        <c:otherwise>
-                            <img id="mainImage" src="" alt="이미지 없음">
-                        </c:otherwise>
+                        <c:when test="${not empty imageList}">
+				            <img id="mainImage" src="${pageContext.request.contextPath}${imageList[0].imgUrl}" alt="${trade.title}">
+				        </c:when>
+				        <c:when test="${not empty trade.imgUrl}">
+				             <img id="mainImage" src="${pageContext.request.contextPath}${trade.imgUrl}" alt="${trade.title}">
+				        </c:when>
+				        <c:otherwise>
+				            <img id="mainImage" src="${pageContext.request.contextPath}/dist/images/noimage.png" alt="이미지 없음">
+				        </c:otherwise>
                     </c:choose>
 
-                    <c:if test="${trade.tradeStatus == 'SOLD' || trade.tradeStatus == 'RESERVED'}">
+                    <c:if test="${trade.tradeStatus == '판매완료' || trade.tradeStatus == '예약중'}">
                         <div class="status-overlay">
                             <span class="status-overlay-badge">
                                 <c:choose>
@@ -56,9 +60,9 @@
 
                 <c:if test="${not empty imageList && imageList.size() > 1}">
                     <div class="thumb-strip">
-                        <c:forEach var="img" items="${imageList}" varStatus="st">
+                        <c:forEach var="item" items="${imageList}" varStatus="st">
                             <div class="thumb-item ${st.index == 0 ? 'active' : ''}">
-                                <img src="${img.imgUrl}" alt="이미지 ${st.index + 1}">
+                                <img src="${pageContext.request.contextPath}${item.imgUrl}" alt="이미지 ${st.index + 1}">
                             </div>
                         </c:forEach>
                     </div>
@@ -279,8 +283,9 @@
                     </c:choose>
                     <button class="share-btn" onclick="ShareModule.share()">🔗 공유</button>
                 </div>
-
-                <%-- <c:if test="${sessionScope.member.userIdx == trade.userIdx}"> --%>
+				<sec:authentication property="principal.member.userIdx" var="loggedInUserId" />
+				
+                <c:if test="${loggedInUserId == trade.userIdx}">
                     <div class="owner-actions">
                         <button class="edit-btn"
                             onclick="location.href='${pageContext.request.contextPath}/trade/update?productIdx=${trade.productIdx}&page=${page}'">
@@ -291,7 +296,7 @@
                             🗑 삭제
                         </button>
                     </div>
-                <%-- </c:if> --%>
+                </c:if>
             </div>
 
         </div>

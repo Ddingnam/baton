@@ -9,7 +9,10 @@ const Gallery = (function () {
 
         thumbItems.forEach(function (el, i) {
             const img = el.querySelector('img');
-            if (img) images.push(img.src);
+            if (img) {
+				images.push(img.src);
+				console.log("로드된 이미지 주소:", img.src);
+			}
             el.addEventListener('click', function () { selectThumb(i); });
         });
         if (images.length === 0) {
