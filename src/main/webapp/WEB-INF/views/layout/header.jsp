@@ -14,7 +14,7 @@
                     <span class="symbol-bar"></span> 
                     <span class="symbol-dot"></span>
 			    </span> 
-                <span class="logo-text">BATON</span>
+                <span class="logo-text">Baton</span>
 			</a>
 		</div>
 

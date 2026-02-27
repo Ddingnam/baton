@@ -131,7 +131,7 @@ html {
     font-style: normal !important;
     font-stretch: normal !important;
     -webkit-font-smoothing: antialiased !important;
-    letter-spacing: 1.2px !important; 
+    letter-spacing: 0.5px !important; 
     white-space: nowrap !important;
     color: #191F28 !important;
 }
@@ -501,6 +501,9 @@ html {
 .baton-toast-item.hide {
     animation: batonFadeOutDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
+
+.btn-baton-login:focus { background: var(--baton-primary); outline: none; transform: translateY(-4px); }
+.social-orb:focus, .footer-links a:focus { border-color: var(--baton-primary); color: var(--baton-primary); outline: none; }
 
 @keyframes batonFadeInDown {
     0% { opacity: 0; transform: translateY(-40px); }
