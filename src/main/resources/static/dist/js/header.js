@@ -11,11 +11,11 @@ document.addEventListener("DOMContentLoaded", () => {
         domainBgColor = '#E6F8F3';
         pageBg = '#F7FCFA';
         currentDomain = 'trade';
-    } else if (path.includes('/club/')) {
+    } else if (path.includes('/crew/')) {
         domainColor = '#F86D7D';
         domainBgColor = '#FFF0F1';
         pageBg = '#FFFBFB';
-        currentDomain = 'club';
+        currentDomain = 'crew';
     } else if (path.includes('/alba/')) {
         domainColor = '#002C5F';
         domainBgColor = '#F0F4F8';
