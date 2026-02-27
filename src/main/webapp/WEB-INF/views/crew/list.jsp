@@ -35,7 +35,7 @@
                     <button class="filter-btn">🐱 반려동물</button>
                 </div>
                 <button class="btn-create-crew" onclick="location.href='${pageContext.request.contextPath}/crew/write'">
-                    <i class="ri-add-line"></i> 크루 개설
+                    <i class="ri-add-line"></i> 모임 개설
                 </button>
             </div>
             
