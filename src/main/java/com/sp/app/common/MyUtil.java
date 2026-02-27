@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -240,4 +241,16 @@ public class MyUtil {
 						email.trim());
 		return b;
 	}
+	
+	/**
+	 * 인증번호 난수 생성
+	 * 
+	 * @return 6자리 난수 문자열
+	 */
+	public static String generateAuthCode() {
+        Random random = new Random();
+        int num = random.nextInt(1000000);
+        
+        return String.format("%06d", num);
+    }
 }

@@ -48,13 +48,14 @@ public class MemberController {
 	}
 	
 	@GetMapping("join")
-    public String joinForm(@RequestParam(value = "town", required = false) String town, Model model) {
-        
-        if (town == null || town.trim().isEmpty()) {
-            return "redirect:/member/townAuth"; 
-        }
-
-        model.addAttribute("town", town);
+    public String joinForm(
+    		@AuthenticationPrincipal CustomUserDetails userDetails,
+    		RedirectAttributes rattr, Model model) {
+		
+		if(userDetails != null) {
+			rattr.addFlashAttribute("msg", "이미 로그인된 상태입니다.");
+			return "redirect:/";
+		}
 
         return "member/join";
     }
