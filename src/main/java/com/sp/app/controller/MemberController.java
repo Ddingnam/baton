@@ -70,6 +70,32 @@ public class MemberController {
         return "member/join";
     }
 	
+	@GetMapping("findId")
+	public String findIdForm(
+			@AuthenticationPrincipal CustomUserDetails userDetails,
+			RedirectAttributes rattr) {
+		
+		if(userDetails != null) {
+			rattr.addFlashAttribute("msg", "이미 로그인된 상태입니다.");
+			return "redirect:/";
+		}
+		
+		return "member/findId";
+	}
+	
+	@GetMapping("findPwd")
+	public String findPwdForm(
+			@AuthenticationPrincipal CustomUserDetails userDetails,
+			RedirectAttributes rattr) {
+		
+		if(userDetails != null) {
+			rattr.addFlashAttribute("msg", "이미 로그인된 상태입니다.");
+			return "redirect:/";
+		}
+		
+		return "member/findPwd";
+	}
+	
 	@GetMapping("complete")
     public String complete(HttpSession session, Model model) {
 		

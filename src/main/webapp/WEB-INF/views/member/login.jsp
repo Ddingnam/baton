@@ -19,10 +19,6 @@
 </header>
 
 <main class="baton-harmony-canvas">
-    <a href="${pageContext.request.contextPath}/" class="btn-exit-portal" title="나가기">
-        <i class="ri-close-line"></i>
-    </a>
-
     <div class="login-auth-frame">
         <header class="auth-header">
             <div class="baton-accent-dot"></div>
@@ -80,15 +76,20 @@
             </div>
         </c:if>
 
-        <footer class="auth-footer item-6">
-            <div class="footer-links">
-                <a href="${pageContext.request.contextPath}/member/join">회원가입</a>
-                <span class="bar"></span>
-                <a href="${pageContext.request.contextPath}/member/pwdFind">비밀번호 찾기</a>
-            </div>
-        </footer>
-    </div>
-</main>
+				<footer class="auth-footer item-6">
+		            <div class="join-prompt">
+		                <span class="prompt-text">아직 회원이 아니신가요?</span>
+		                <a href="${pageContext.request.contextPath}/member/join" class="btn-link-join">회원가입</a>
+		            </div>
+
+		            <div class="footer-links find-links">
+		                <a href="${pageContext.request.contextPath}/member/findId">아이디 찾기</a>
+		                <span class="bar"></span>
+		                <a href="${pageContext.request.contextPath}/member/findPwd">비밀번호 찾기</a>
+		            </div>
+		        </footer>
+		    </div>
+		</main>
 
 <jsp:include page="/WEB-INF/views/layout/footer.jsp"/>
 
