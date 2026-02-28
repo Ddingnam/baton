@@ -216,6 +216,110 @@ input[type="checkbox"]:checked + .checkbox-box::after { content: '✓'; position
     75% { transform: translateX(-5px); }
 }
 
+.result-box {
+    padding: 30px 20px;
+    background: #F9FAFB;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.result-label {
+    font-size: 14px;
+    color: var(--text-gray);
+    margin-bottom: 12px;
+}
+
+.result-id-display {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-dark);
+    letter-spacing: -0.5px;
+}
+
+.item-reveal {
+    animation: toastReveal 0.5s var(--harmony-ease) forwards;
+}
+
+.input-with-btn {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.btn-action {
+    min-width: 100px;
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid #E5E8EB;
+    background: #fff;
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--baton-blue, #3182F6);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-action:hover { background-color: #F2F4F6; }
+.btn-action:disabled { color: #8B95A1; cursor: not-allowed; }
+
+#emailAuthRow {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.4s ease;
+}
+
+#emailAuthRow.open {
+    max-height: 150px;
+    opacity: 1;
+    margin-top: 20px;
+}
+
+.auth-timer {
+    font-size: 13px;
+    color: #F04452;
+    font-weight: 600;
+    margin-top: 5px;
+    display: block;
+}
+
+.status-msg {
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+}
+.error-msg { color: #F04452; }
+.success-msg { color: #3182F6; }
+
+@keyframes successBounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.btn-action.verified {
+    background-color: #00D082 !important;
+    color: #ffffff !important;
+    border-color: #00D082 !important;
+    animation: successBounce 0.4s ease-out;
+    cursor: default;
+}
+
+.auth-row-animate {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin-top 0.3s ease;
+}
+
+.auth-row-animate.open {
+    max-height: 150px;
+    opacity: 1;
+    margin-top: 20px;
+}
+
 .footer-links { display: flex; align-items: center; justify-content: center; gap: 14px; }
 .footer-links a { font-size: 14px; color: var(--text-muted); text-decoration: none; font-weight: 600; transition: 0.2s; }
 .footer-links a:hover { color: var(--text-dark); }

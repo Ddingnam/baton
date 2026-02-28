@@ -70,9 +70,9 @@
             </div>
         </form>
         
-        <c:if test="${not empty message}">
+        <c:if test="${not empty loginErrMsg}">
             <div class="auth-error-toast">
-                <i class="ri-error-warning-fill"></i> ${message}
+                ${loginErrMsg}
             </div>
         </c:if>
 

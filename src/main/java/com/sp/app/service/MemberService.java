@@ -1,5 +1,6 @@
 package com.sp.app.service;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -45,4 +46,8 @@ public interface MemberService {
 	
 	public boolean isUserIdDuplicated(String userId);
 	public boolean isNicknameDuplicated(String nickname);
+	
+	public String findUserId(Map<String, Object> map);
+	public long findByUserIdAndEmail(Map<String, Object> map);
+	public void updateUserPwd(Map<String, Object> map) throws SQLException;
 }

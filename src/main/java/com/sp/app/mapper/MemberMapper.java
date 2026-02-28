@@ -55,4 +55,9 @@ public interface MemberMapper {
 	
 	public int isUserIdDuplicated(String userId);
 	public int isNicknameDuplicated(String nickname);
+	
+	public String findUserId(Map<String, Object> map);
+	public long findByUserIdAndEmail(Map<String, Object> map);
+	public void updateUserPwd(Map<String, Object> map) throws SQLException;
+	
 }

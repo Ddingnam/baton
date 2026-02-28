@@ -285,11 +285,28 @@
 		FROM users
 		WHERE userId = #{userId}
 	</select>
-
+	
 	<select id="isNicknameDuplicated" resultType="int">
 		SELECT COUNT(nickname)
 		FROM users
 		WHERE nickname = #{nickname}
 	</select>
+
+	<select id="findUserId" parameterType="map" resultType="String">
+		SELECT userId
+		FROM users
+		WHERE name = #{name} AND email = #{email}
+	</select>
+	
+	<select id="findByUserIdAndEmail" parameterType="map" resultType="Long">
+		SELECT userIdx
+		FROM users
+		WHERE userId = #{userId} AND email = #{email}
+	</select>
+	
+	<update id="updateUserPwd" parameterType="map">
+		UPDATE users SET pwd = #{pwd} 
+		WHERE useridx = #{userIdx}
+	</update>
 	
 </mapper>

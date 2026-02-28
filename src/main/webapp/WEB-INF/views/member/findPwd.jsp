@@ -21,38 +21,54 @@
         <header class="auth-header">
             <div class="baton-accent-dot"></div>
             <h1 class="auth-title">Find Password</h1>
-            <p class="auth-subtitle">가입 정보(아이디, 이메일)를 <br>정확히 입력해 주세요.</p>
+            <p class="auth-subtitle">등록한 아이디와 이메일을 <br>정확히 입력해 주세요.</p>
         </header>
 
-        <form name="idFindForm" action="${pageContext.request.contextPath}/member/idFind" method="post" class="auth-form-body">
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-            
-            <div class="input-sequence item-1">
-                <label class="input-label">아이디</label>
-                <div class="input-glow-wrap">
-                    <input type="text" name="userId" placeholder="아이디를 입력해주세요" autofocus>
-                </div>
-            </div>
-			
-            <div class="input-sequence item-3">
-                <label class="input-label">이메일</label>
-                <div class="input-glow-wrap">
-                    <input type="email" name="email" placeholder="example@baton.com">
-                </div>
-            </div>
+		<form name="findPwdForm" class="auth-form-body">
+		    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+		    
+		    <div class="input-sequence item-1">
+		        <label class="input-label">아이디</label>
+		        <div class="input-glow-wrap">
+		            <input type="text" id="userId" name="userId" placeholder="아이디를 입력해주세요" autofocus>
+		        </div>
+		    </div>
+		    
+		    <div class="input-sequence item-2">
+		        <label class="input-label">이메일</label>
+		        <div class="input-glow-wrap">
+		            <input type="email" id="email" name="email" placeholder="example@baton.com">
+		        </div>
+		    </div>
 
-            <div class="auth-action item-4" style="margin-top: 40px;">
-                <button type="button" class="btn-baton-login" onclick="sendIdFind();">
-                    <span>확인하기</span>
-                </button>
-                <div class="auth-back-helper item-5">
-                    <span class="btn-link-back" onclick="location.href='${pageContext.request.contextPath}/member/login';">
-                        돌아가기
-                    </span>
-                </div>
-            </div>
-        </form>
-        
+		    <div id="emailAuthRow" class="auth-row-animate">
+		        <div class="input-sequence" style="margin-top: 20px; margin-bottom: 0px;">
+		            <label class="input-label">인증번호</label>
+		            <div class="input-with-btn">
+		                <div class="input-glow-wrap" style="flex: 1;">
+		                    <input type="text" id="authCode" placeholder="인증번호 6자리">
+		                </div>
+		                <button type="button" id="btnVerify" class="btn-action" onclick="verifyCodeForPwd()">확인</button>
+		            </div>
+		            <div class="timer-container" style="text-align: center; margin-top: 8px;">
+		                <span class="auth-timer" id="timer">03:00</span>
+		            </div>
+		        </div>
+		    </div>
+
+		    <div class="auth-action item-4" style="margin-top: 40px;">
+		        <button type="button" id="btnMain" class="btn-baton-login" onclick="handleMainAction()">
+		            <span id="btnMainText">인증번호 전송</span>
+		        </button>
+		        
+		        <div class="auth-back-helper item-5">
+		            <span class="btn-link-back" onclick="location.href='${pageContext.request.contextPath}/member/login';">
+		                돌아가기
+		            </span>
+		        </div>
+		    </div>
+		</form>
+
 		<div id="auth-error-msg" class="auth-error-toast" style="display: none;">
 		    <span id="error-message-text"></span>
 		</div>

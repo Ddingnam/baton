@@ -169,7 +169,5 @@ body::before {
     <jsp:include page="/WEB-INF/views/layout/footer.jsp"/>
 </footer>
 
-<jsp:include page="/WEB-INF/views/layout/footerResources.jsp"/>
-
 </body>
 </html>

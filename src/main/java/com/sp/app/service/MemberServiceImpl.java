@@ -1,5 +1,6 @@
 package com.sp.app.service;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -245,6 +246,42 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public boolean isNicknameDuplicated(String nickname) {
 		return mapper.isNicknameDuplicated(nickname) > 0;
+	}
+
+	@Override
+	public String findUserId(Map<String, Object> map) {
+		String userId = null;
+		try {
+			userId = mapper.findUserId(map);
+		} catch (Exception e) {
+			log.info("findUserId", e);
+		}
+		return userId;
+	}
+	
+	@Override
+	public long findByUserIdAndEmail(Map<String, Object> map) {
+		long userIdx = 0;
+		try {
+			userIdx = mapper.findByUserIdAndEmail(map);
+		} catch (Exception e) {
+			log.info("findByUserIdAndEmail", e);
+		}
+		return userIdx;
+	}
+
+	@Override
+	public void updateUserPwd(Map<String, Object> map) throws SQLException {
+		try {
+			String pwd = (String) map.get("pwd");
+			String encPassword = bcryptEncoder.encode(pwd);
+			map.put("pwd", encPassword);
+			
+			mapper.updateUserPwd(map);
+		} catch (Exception e) {
+			log.info("updateUserPwd : ", e);
+			throw e;
+		}
 	}
 
 }

@@ -1,20 +1,18 @@
 package com.sp.app.controller;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.sp.app.common.RequestUtils;
-import com.sp.app.domain.dto.UserDto;
+import com.sp.app.domain.dto.GuestSessionInfo;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.MemberService;
 
@@ -26,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping(value = "/member/*")
+@SessionAttributes("guestInfo")
 public class MemberController {
 	private final MemberService service;
 	
@@ -36,6 +35,7 @@ public class MemberController {
 	public String loginForm(@RequestParam(name = "error", required = false) String error,
 			@AuthenticationPrincipal CustomUserDetails userDetails,
 			RedirectAttributes rattr,
+			HttpSession session,
 			Model model) {
 		
 		if(userDetails != null) {
@@ -44,9 +44,15 @@ public class MemberController {
 		}
 		
 		if(error != null) {
-			model.addAttribute("message", "아이디 또는 패스워드가 일치하지 않습니다.");
+			model.addAttribute("loginErrMsg", "아이디 또는 패스워드가 일치하지 않습니다.");
 		}
 		
+		GuestSessionInfo guestInfo = (GuestSessionInfo) session.getAttribute("guestInfo");
+	    if (guestInfo != null) {
+	        guestInfo.clearAll(); 
+	        model.addAttribute("guestInfo", guestInfo);
+	    }
+	    
 		return "member/login";
 	}
 	
@@ -96,11 +102,40 @@ public class MemberController {
 		return "member/findPwd";
 	}
 	
-	@GetMapping("complete")
-    public String complete(HttpSession session, Model model) {
+	@GetMapping("updatePwd")
+	public String updatePwdForm(
+			@AuthenticationPrincipal CustomUserDetails userDetails,
+			RedirectAttributes rattr,
+			HttpSession session) {
 		
-		String nickname = (String) session.getAttribute("completeNickname");
-		String userId = (String) session.getAttribute("completeUserId");
+		if(userDetails != null) {
+			rattr.addFlashAttribute("msg", "이미 로그인된 상태입니다.");
+			return "redirect:/";
+		}
+		
+		GuestSessionInfo guestInfo = (GuestSessionInfo) session.getAttribute("guestInfo");
+	    
+	    if (guestInfo == null || guestInfo.getFindUserIdx() == null|| !guestInfo.isVerified()) {
+	        rattr.addFlashAttribute("msg", "인증 정보가 만료되었거나 비정상적인 접근입니다.");
+	        return "redirect:/";
+	    }
+	    
+		return "member/updatePwd";
+	}
+	
+	@GetMapping("complete")
+    public String complete(
+    		HttpSession session,
+    		SessionStatus status,
+    		Model model) {
+		
+		GuestSessionInfo guestInfo = (GuestSessionInfo) session.getAttribute("guestInfo");
+		if (guestInfo == null) {
+	        return "redirect:/";
+	    }
+		
+		String nickname = guestInfo.getCompleteNickname();
+		String userId = guestInfo.getCompleteUserId();
 	    if (nickname == null || userId == null) {
 	        return "redirect:/";
 	    }
@@ -108,8 +143,7 @@ public class MemberController {
 	    model.addAttribute("nickname", nickname);
 	    model.addAttribute("userId", userId);
 	    
-	    session.removeAttribute("completeNickname");
-	    session.removeAttribute("completeUserId");
+	    status.setComplete();
 
         return "member/complete";
     }
