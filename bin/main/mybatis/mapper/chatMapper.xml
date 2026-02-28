@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sp.app.mapper.ChatMapper">
+    
+    <insert id="insertMessage" parameterType="com.sp.app.model.ChatMessage">
+        INSERT INTO chatMessage (msgIdx, roomIdx, userIdx, content, msgType, sendDate)
+        VALUES (chatMsgSeq.NEXTVAL, #{roomIdx}, #{userIdx}, #{content}, #{msgType}, SYSTIMESTAMP)
+    </insert>
+
+    <select id="listChatMessage" parameterType="Long" resultType="com.sp.app.model.ChatMessage">
+        SELECT 
+            m.msgIdx, m.roomIdx, m.userIdx, m.content, m.msgType,
+            TO_CHAR(m.sendDate, 'YYYY-MM-DD HH24:MI') AS sendDate,
+            u.nickname, u.profile_photo AS profilePhoto
+        FROM chatMessage m
+        JOIN users u ON m.userIdx = u.userIdx
+        WHERE m.roomIdx = #{roomIdx}
+        ORDER BY m.msgIdx ASC
+    </select>
+
+    <update id="updateLastReadDate" parameterType="map">
+        UPDATE chatMember 
+        SET lastReadDate = SYSTIMESTAMP
+        WHERE roomIdx = #{roomIdx} AND userIdx = #{userIdx}
+    </update>
+
+</mapper>
