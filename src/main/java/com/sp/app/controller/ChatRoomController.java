@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sp.app.model.ChatMessage;
+import com.sp.app.model.ChatRoom;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.ChatService;
 
@@ -53,5 +54,20 @@ public class ChatRoomController {
         model.addAttribute("counterpartName", counterpartNickname);
 
         return "chat/room";
+    }
+    
+    @GetMapping("/tradeList")
+    public String tradeChatList(@RequestParam("tradeIdx") Long tradeIdx,
+                                @AuthenticationPrincipal CustomUserDetails userDetails,
+                                Model model) {
+        if (userDetails == null) return "redirect:/member/login";
+        
+        Long myUserIdx = userDetails.getUserIdx();
+        List<ChatRoom> list = chatService.listTradeChatRoom(tradeIdx, myUserIdx);
+        
+        model.addAttribute("list", list);
+        model.addAttribute("tradeIdx", tradeIdx);
+        
+        return "chat/tradeList"; 
     }
 }

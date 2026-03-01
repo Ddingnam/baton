@@ -6,7 +6,6 @@
 <head>
 <meta charset="UTF-8">
 <title>바톤 채팅방</title>
-<jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
@@ -43,7 +42,6 @@
 </style>
 </head>
 <body>
-    <jsp:include page="/WEB-INF/views/layout/header.jsp" />
 
     <div class="chat-wrapper">
         <div class="chat-container">
@@ -76,7 +74,9 @@
                             <div style="display: flex; align-items: flex-end;">
                                 <c:if test="${chat.userIdx == userIdx}">
                                     <div class="msg-info">
-                                        <span class="unread-count">1</span>
+                                        <span class="unread-count">
+											<c:if test="${chat.unreadCount > 0}">${chat.unreadCount}</c:if>
+										</span>
                                         <span class="msg-time">${msgTime}</span>
                                     </div>
                                 </c:if>

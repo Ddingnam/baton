@@ -2,6 +2,8 @@ package com.sp.app.service;
 
 import com.sp.app.mapper.ChatMapper;
 import com.sp.app.model.ChatMessage;
+import com.sp.app.model.ChatRoom;
+
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -64,5 +66,13 @@ public class ChatServiceImpl implements ChatService {
         map.put("roomIdx", roomIdx);
         map.put("myUserIdx", myUserIdx);
         return mapper.getCounterpartNickname(map);
+    }
+    
+    @Override
+    public List<ChatRoom> listTradeChatRoom(Long tradeIdx, Long myUserIdx) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("tradeIdx", tradeIdx);
+        map.put("myUserIdx", myUserIdx);
+        return mapper.listTradeChatRoom(map);
     }
 }

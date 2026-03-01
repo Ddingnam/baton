@@ -1,6 +1,8 @@
 package com.sp.app.service;
 
 import com.sp.app.model.ChatMessage;
+import com.sp.app.model.ChatRoom;
+
 import java.util.List;
 
 public interface ChatService {
@@ -9,4 +11,5 @@ public interface ChatService {
     void updateLastReadDate(Long roomIdx, Long userIdx);
     Long createOrGetRoom(Long tradeIdx, Long sellerIdx, Long buyerIdx);
     String getCounterpartNickname(Long roomIdx, Long myUserIdx);
+    List<ChatRoom> listTradeChatRoom(Long tradeIdx, Long myUserIdx);
 }

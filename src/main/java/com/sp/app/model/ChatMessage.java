@@ -12,4 +12,5 @@ public class ChatMessage {
     private String sendDate;
     private String nickname;
     private String profilePhoto;
+    private Integer unreadCount;
 }

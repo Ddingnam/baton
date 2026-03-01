@@ -273,14 +273,17 @@
 			        
 			        <c:choose>
 			            <c:when test="${loggedInUserId == trade.userIdx}">
-			                <button class="chat-btn" disabled>내 게시물입니다</button>
+			                <button class="chat-btn"
+			                    onclick="window.open('${pageContext.request.contextPath}/chat/tradeList?tradeIdx=${trade.productIdx}', 'chatList', 'width=450, height=700, left=200, top=100, scrollbars=yes, resizable=yes')">
+			                    💬 채팅 내역 확인하기
+			                </button>
 			            </c:when>
 			            <c:when test="${trade.tradeStatus == 'SOLD'}">
 			                <button class="chat-btn" disabled>판매 완료된 상품입니다</button>
 			            </c:when>
 			            <c:otherwise>
 			                <button class="chat-btn"
-			                    onclick="location.href='${pageContext.request.contextPath}/chat/room?tradeIdx=${trade.productIdx}&toUserIdx=${trade.userIdx}'">
+			                    onclick="window.open('${pageContext.request.contextPath}/chat/room?tradeIdx=${trade.productIdx}&toUserIdx=${trade.userIdx}', 'chatRoom', 'width=450, height=700, left=200, top=100, scrollbars=yes, resizable=yes')">
 			                    💬 채팅으로 거래하기
 			                </button>
 			            </c:otherwise>

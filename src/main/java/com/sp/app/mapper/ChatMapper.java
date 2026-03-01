@@ -1,6 +1,8 @@
 package com.sp.app.mapper;
 
 import com.sp.app.model.ChatMessage;
+import com.sp.app.model.ChatRoom;
+
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 import java.util.Map;
@@ -14,5 +16,5 @@ public interface ChatMapper {
     void insertChatRoom(Map<String, Object> map);
     void insertChatMember(Map<String, Object> map);
     String getCounterpartNickname(Map<String, Object> map);
-    
+    List<ChatRoom> listTradeChatRoom(Map<String, Object> map);
 }
