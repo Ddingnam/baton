@@ -23,5 +23,32 @@
         SET lastReadDate = SYSTIMESTAMP
         WHERE roomIdx = #{roomIdx} AND userIdx = #{userIdx}
     </update>
+    
+    <select id="findChatRoom" parameterType="map" resultType="Long">
+	    SELECT c.roomIdx 
+	    FROM chatRoom c
+	    JOIN chatMember m1 ON c.roomIdx = m1.roomIdx AND m1.userIdx = #{buyerIdx}
+	    JOIN chatMember m2 ON c.roomIdx = m2.roomIdx AND m2.userIdx = #{sellerIdx}
+	    WHERE c.tradeIdx = #{tradeIdx}
+	</select>
+
+	<insert id="insertChatRoom" parameterType="map">
+	    <selectKey keyProperty="roomIdx" resultType="Long" order="BEFORE">
+	        SELECT chatRoomSeq.NEXTVAL FROM dual
+	    </selectKey>
+	    INSERT INTO chatRoom(roomIdx, roomType, tradeIdx, roomName)
+	    VALUES (#{roomIdx}, 1, #{tradeIdx}, '거래채팅')
+	</insert>
+	
+	<insert id="insertChatMember" parameterType="map">
+	    INSERT INTO chatMember(roomIdx, userIdx) VALUES (#{roomIdx}, #{userIdx})
+	</insert>
+	
+	<select id="getCounterpartNickname" parameterType="map" resultType="String">
+	    SELECT u.nickname
+	    FROM chatMember m
+	    JOIN users u ON m.userIdx = u.USERIDX
+	    WHERE m.roomIdx = #{roomIdx} AND m.userIdx != #{myUserIdx}
+	</select>
 
 </mapper>

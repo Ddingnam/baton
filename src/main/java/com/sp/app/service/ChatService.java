@@ -7,4 +7,6 @@ public interface ChatService {
     void insertMessage(ChatMessage message);
     List<ChatMessage> listChatMessage(Long roomIdx);
     void updateLastReadDate(Long roomIdx, Long userIdx);
+    Long createOrGetRoom(Long tradeIdx, Long sellerIdx, Long buyerIdx);
+    String getCounterpartNickname(Long roomIdx, Long myUserIdx);
 }

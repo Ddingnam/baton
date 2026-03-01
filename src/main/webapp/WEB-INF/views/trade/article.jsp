@@ -230,74 +230,84 @@
             </div>
 
             <div class="card action-card">
-                <div class="stats-row">
-                    <div class="stat-item">
-                        <p class="stat-value">${trade.hitCount}</p>
-                        <p class="stat-label">조회</p>
-                    </div>
-                    <div class="stat-item">
-                        <p class="stat-value" id="statWishSide">${trade.likeCount}</p>
-                        <p class="stat-label">찜</p>
-                    </div>
-                    <div class="stat-item">
-                        <p class="stat-value">${trade.chatCount}</p>
-                        <p class="stat-label">채팅</p>
-                    </div>
-                </div>
-
-                <c:choose>
-                    <c:when test="${sessionScope.member.userIdx == trade.userIdx}">
-                        <button class="chat-btn" disabled>내 게시물입니다</button>
-                    </c:when>
-                    <c:when test="${trade.tradeStatus == 'SOLD'}">
-                        <button class="chat-btn" disabled>판매 완료된 상품입니다</button>
-                    </c:when>
-                    <c:when test="${empty sessionScope.member}">
-                        <button class="chat-btn"
-                            onclick="location.href='${pageContext.request.contextPath}/member/login'">
-                            💬 로그인하고 채팅하기
-                        </button>
-                    </c:when>
-                    <c:otherwise>
-                        <button class="chat-btn"
-                            onclick="location.href='${pageContext.request.contextPath}/chat/room?tradeIdx=${trade.productIdx}&toUserIdx=${trade.userIdx}'">
-                            💬 채팅으로 거래하기
-                        </button>
-                    </c:otherwise>
-                </c:choose>
-
-                <div class="secondary-actions">
-                    <c:choose>
-                        <c:when test="${not empty sessionScope.member}">
-                            <button class="wish-btn-large ${false ? 'active' : ''}"
-                                id="wishBtnLarge" onclick="WishModule.toggle()">
-                                ${false ? '❤️' : '🤍'} 찜 ${trade.likeCount}
-                            </button>
-                        </c:when>
-                        <c:otherwise>
-                            <button class="wish-btn-large"
-                                onclick="location.href='${pageContext.request.contextPath}/member/login'">
-                                🤍 찜하기
-                            </button>
-                        </c:otherwise>
-                    </c:choose>
-                    <button class="share-btn" onclick="ShareModule.share()">🔗 공유</button>
-                </div>
-				<sec:authentication property="principal.member.userIdx" var="loggedInUserId" />
-				
-                <c:if test="${loggedInUserId == trade.userIdx}">
-                    <div class="owner-actions">
-                        <button class="edit-btn"
-                            onclick="location.href='${pageContext.request.contextPath}/trade/update?productIdx=${trade.productIdx}&page=${page}'">
-                            ✏️ 수정
-                        </button>
-                        <button class="delete-btn"
-                            onclick="confirmDelete(${trade.productIdx})">
-                            🗑 삭제
-                        </button>
-                    </div>
-                </c:if>
-            </div>
+			    <div class="stats-row">
+			        <div class="stat-item">
+			            <p class="stat-value">${trade.hitCount}</p>
+			            <p class="stat-label">조회</p>
+			        </div>
+			        <div class="stat-item">
+			            <p class="stat-value" id="statWishSide">${trade.likeCount}</p>
+			            <p class="stat-label">찜</p>
+			        </div>
+			        <div class="stat-item">
+			            <p class="stat-value">${trade.chatCount}</p>
+			            <p class="stat-label">채팅</p>
+			        </div>
+			    </div>
+			
+			    <sec:authorize access="isAnonymous()">
+			        <c:choose>
+			            <c:when test="${trade.tradeStatus == 'SOLD'}">
+			                <button class="chat-btn" disabled>판매 완료된 상품입니다</button>
+			            </c:when>
+			            <c:otherwise>
+			                <button class="chat-btn"
+			                    onclick="location.href='${pageContext.request.contextPath}/member/login'">
+			                    💬 로그인하고 채팅하기
+			                </button>
+			            </c:otherwise>
+			        </c:choose>
+			
+			        <div class="secondary-actions">
+			            <button class="wish-btn-large"
+			                onclick="location.href='${pageContext.request.contextPath}/member/login'">
+			                🤍 찜하기
+			            </button>
+			            <button class="share-btn" onclick="ShareModule.share()">🔗 공유</button>
+			        </div>
+			    </sec:authorize>
+			
+			
+			    <sec:authorize access="isAuthenticated()">
+			        <sec:authentication property="principal.member.userIdx" var="loggedInUserId" />
+			        
+			        <c:choose>
+			            <c:when test="${loggedInUserId == trade.userIdx}">
+			                <button class="chat-btn" disabled>내 게시물입니다</button>
+			            </c:when>
+			            <c:when test="${trade.tradeStatus == 'SOLD'}">
+			                <button class="chat-btn" disabled>판매 완료된 상품입니다</button>
+			            </c:when>
+			            <c:otherwise>
+			                <button class="chat-btn"
+			                    onclick="location.href='${pageContext.request.contextPath}/chat/room?tradeIdx=${trade.productIdx}&toUserIdx=${trade.userIdx}'">
+			                    💬 채팅으로 거래하기
+			                </button>
+			            </c:otherwise>
+			        </c:choose>
+			
+			        <div class="secondary-actions">
+			            <button class="wish-btn-large ${false ? 'active' : ''}"
+			                id="wishBtnLarge" onclick="WishModule.toggle()">
+			                ${false ? '❤️' : '🤍'} 찜 ${trade.likeCount}
+			            </button>
+			            <button class="share-btn" onclick="ShareModule.share()">🔗 공유</button>
+			        </div>
+			
+			        <c:if test="${loggedInUserId == trade.userIdx}">
+			            <div class="owner-actions">
+			                <button class="edit-btn"
+			                    onclick="location.href='${pageContext.request.contextPath}/trade/update?productIdx=${trade.productIdx}&page=${page}'">
+			                    ✏️ 수정
+			                </button>
+			                <button class="delete-btn"
+			                    onclick="confirmDelete(${trade.productIdx})">
+			                    🗑 삭제
+			                </button>
+			            </div>
+			        </c:if>
+			    </sec:authorize>
+			</div>
 
         </div>
     </div>

@@ -34,4 +34,35 @@ public class ChatServiceImpl implements ChatService {
         map.put("userIdx", userIdx);
         mapper.updateLastReadDate(map);
     }
+    
+    @Override
+    public Long createOrGetRoom(Long tradeIdx, Long sellerIdx, Long buyerIdx) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("tradeIdx", tradeIdx);
+        map.put("sellerIdx", sellerIdx);
+        map.put("buyerIdx", buyerIdx);
+
+        Long roomIdx = mapper.findChatRoom(map);
+        if(roomIdx == null) {
+       
+            mapper.insertChatRoom(map);
+            roomIdx = (Long) map.get("roomIdx");
+
+            map.put("roomIdx", roomIdx);
+            map.put("userIdx", sellerIdx);
+            mapper.insertChatMember(map);
+            
+            map.put("userIdx", buyerIdx);
+            mapper.insertChatMember(map);
+        }
+        return roomIdx;
+    }
+
+    @Override
+    public String getCounterpartNickname(Long roomIdx, Long myUserIdx) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("roomIdx", roomIdx);
+        map.put("myUserIdx", myUserIdx);
+        return mapper.getCounterpartNickname(map);
+    }
 }
