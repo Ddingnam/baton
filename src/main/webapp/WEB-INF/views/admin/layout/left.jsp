@@ -1,85 +1,88 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
-<nav class="vertical-nav nav-expand-lg">
-	<div class="mobile-menu-closed">
-		<i class="menu-closed-icon bi bi-x"></i>
-	</div>
-	
-	<ul class="nav-menu">
-		<li>
-			<a class="menu-link" href="<c:url value='/admin' />" title="홈">
-				<i class="menu-icon bi bi-h-square"></i>
-				<span class="menu-label">홈</span>
-			</a>
-		</li>
-		<li>
-			<a class="menu-link" href="<c:url value='/admin' />" title="회원관리">
-				<i class="menu-icon bi bi-person-square"></i>
-				<span class="menu-label">회원관리</span>
-			</a>
-		</li>
-		<li class="has-sub-menu" aria-expanded="false">
-			<label class="menu-link" title="강좌관리">
-				<i class="menu-icon bi bi-book-half"></i>
-				<span class="menu-label">강좌관리</span>
-			</label>
-			<ul>
-				<li><a class="sub-menu-link" href="#">카테고리</a></li>
-				<li><a class="sub-menu-link" href="#">강좌</a></li>
-				<li><a class="sub-menu-link" href="#">강사</a></li>
-			</ul>
-		</li>
-		<li class="has-sub-menu" aria-expanded="false">
-			<label class="menu-link" title="고객센터">
-				<i class="menu-icon bi bi-question-square"></i>
-				<span class="menu-label">고객센터</span>
-			</label>
-			<ul>
-				<li><a class="sub-menu-link" href="<c:url value='/admin' />">자주하는 질문</a></li>
-				<li><a class="sub-menu-link" href="<c:url value='/admin' />">공지사항</a></li>
-				<li><a class="sub-menu-link" href="<c:url value='/admin' />">1:1문의</a></li>
-				<li><a class="sub-menu-link" href="<c:url value='/admin' />">이벤트</a></li>
-				<li><a class="sub-menu-link" href="<c:url value='/admin' />">신고</a></li>
-			</ul>
-		</li>
-		<li>
-			<a class="menu-link" href="<c:url value='/admin' />" title="블로그">
-				<i class="menu-icon bi bi-chat-square-text"></i>
-				<span class="menu-label">블로그</span>
-			</a>
-		</li>
-		<li class="has-sub-menu" aria-expanded="false">
-			<label class="menu-link" title="서비스">
-				<i class="menu-icon bi bi-wallet"></i>
-				<span class="menu-label">서비스</span>
-			</label>
-			<ul>
-				<li><a class="sub-menu-link" href="#">맛집정보관리</a></li>
-				<li><a class="sub-menu-link" href="#">레시피관리</a></li>
-				<li><a class="sub-menu-link" href="#">관광정보관리</a></li>
-			</ul>
-		</li>
-		<li>
-			<a href="#" class="menu-link" title="GroupWare">
-				<i class="menu-icon bi bi-c-square"></i>
-				<span class="menu-label">GroupWare</span>
-			</a>
-		</li>
-		<li>
-			<a href="<c:url value='/' />" class="menu-link" title="Logout">
-				<i class="menu-icon bi bi-unlock"></i>
-				<span class="menu-label">Logout</span>
-			</a>
-		</li>
-	</ul>
-	
-	<div class="nav-menu-footer" aria-expanded="true">
-		<div class="collapsed-menu">
-			<i class="collapse-menu-icon bi bi-arrow-bar-left"></i>
-			<span class="menu-label">Collapsed Menu</span>
-		</div>
-	</div>
-</nav>
+<aside class="admin-sidebar">
+    <div class="sidebar-logo">
+        <a href="${pageContext.request.contextPath}/admin" class="logo-link" onclick="location.reload(); return false;">
+            <div class="logo-point"></div>
+            <span>BATON ADMIN</span>
+        </a>
+    </div>
+
+    <nav class="nav-wrap">
+        <div class="nav-category">Main</div>
+        <div class="nav-item">
+            <a href="${pageContext.request.contextPath}/admin" class="nav-link">
+                <div class="nav-left"><i class="ri-dashboard-3-fill nav-icon"></i> <span class="nav-text">대시보드</span></div>
+            </a>
+        </div>
+
+        <div class="nav-category">Service</div>
+        
+        <div class="nav-item has-sub">
+            <a href="#" class="nav-link">
+                <div class="nav-left"><i class="ri-user-smile-fill nav-icon"></i> <span class="nav-text">회원 관리</span></div>
+                <i class="ri-arrow-down-s-line nav-arrow"></i>
+            </a>
+            <ul class="sub-nav">
+                <li><a href="${pageContext.request.contextPath}/admin/member/list" class="sub-link">전체 회원</a></li>
+                <li><a href="${pageContext.request.contextPath}/admin/member/dormant" class="sub-link">휴면/탈퇴</a></li>
+                <li><a href="${pageContext.request.contextPath}/admin/member/sanction" class="sub-link">제재 내역</a></li>
+            </ul>
+        </div>
+
+        <div class="nav-item has-sub">
+            <a href="#" class="nav-link">
+                <div class="nav-left"><i class="ri-shopping-bag-3-fill nav-icon"></i> <span class="nav-text">중고거래</span></div>
+                <i class="ri-arrow-down-s-line nav-arrow"></i>
+            </a>
+            <ul class="sub-nav">
+                <li><a href="${pageContext.request.contextPath}/admin/trade/list" class="sub-link">매물 목록</a></li>
+                <li><a href="${pageContext.request.contextPath}/admin/trade/report" class="sub-link">신고 접수</a></li>
+                <li><a href="${pageContext.request.contextPath}/admin/trade/category" class="sub-link">카테고리</a></li>
+            </ul>
+        </div>
+
+        <div class="nav-item has-sub">
+            <a href="#" class="nav-link">
+                <div class="nav-left"><i class="ri-briefcase-4-fill nav-icon"></i> <span class="nav-text">알바천국</span></div>
+                <i class="ri-arrow-down-s-line nav-arrow"></i>
+            </a>
+            <ul class="sub-nav">
+                <li><a href="${pageContext.request.contextPath}/admin/alba/list" class="sub-link">공고 목록</a></li>
+                <li><a href="${pageContext.request.contextPath}/admin/alba/report" class="sub-link">신고 내역</a></li>
+            </ul>
+        </div>
+
+        <div class="nav-item">
+            <a href="${pageContext.request.contextPath}/admin/crew/list" class="nav-link">
+                <div class="nav-left"><i class="ri-group-2-fill nav-icon"></i> <span class="nav-text">동네모임</span></div>
+            </a>
+        </div>
+
+        <div class="nav-category">Support</div>
+        <div class="nav-item has-sub">
+            <a href="#" class="nav-link">
+                <div class="nav-left"><i class="ri-customer-service-2-fill nav-icon"></i> <span class="nav-text">고객센터</span></div>
+                <i class="ri-arrow-down-s-line nav-arrow"></i>
+            </a>
+            <ul class="sub-nav">
+                <li><a href="${pageContext.request.contextPath}/admin/cs/notice/list" class="sub-link">공지사항</a></li>
+                <li><a href="${pageContext.request.contextPath}/admin/cs/inquiry/list" class="sub-link">1:1 문의</a></li>
+                <li><a href="${pageContext.request.contextPath}/admin/cs/faq/list" class="sub-link">FAQ</a></li>
+            </ul>
+        </div>
+        
+        <div class="nav-item">
+            <a href="${pageContext.request.contextPath}/admin/stats/sales" class="nav-link">
+                <div class="nav-left"><i class="ri-pie-chart-2-fill nav-icon"></i> <span class="nav-text">통계</span></div>
+            </a>
+        </div>
+    </nav>
+
+    <div class="sidebar-footer">
+        <a href="${pageContext.request.contextPath}/member/logout" class="btn-logout">
+            <i class="ri-logout-box-r-line"></i> <span class="nav-text">로그아웃</span>
+        </a>
+    </div>
+</aside>
