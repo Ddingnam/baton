@@ -1,10 +1,3 @@
-/**
- * trade-list.js
- * 순수 Vanilla JS (jQuery 없음)
- * Vue로 전환 시 각 함수를 methods로, 상태값을 data()로 이동하면 됩니다.
- */
-
-/* ── 유틸 ──────────────────────────────────────────── */
 function tlGetParams() {
     return new URL(location.href).searchParams;
 }
@@ -14,7 +7,6 @@ function tlNavigate(params) {
     location.href = '/trade/list?' + params.toString();
 }
 
-/* ── 검색 ──────────────────────────────────────────── */
 document.getElementById('tlSearchInput').addEventListener('keydown', function (e) {
     if (e.key !== 'Enter') return;
     const p = tlGetParams();
@@ -24,7 +16,6 @@ document.getElementById('tlSearchInput').addEventListener('keydown', function (e
     tlNavigate(p);
 });
 
-/* ── 카테고리 ──────────────────────────────────────── */
 function tlSetCategory(idx) {
     const p = tlGetParams();
     if (idx) p.set('categoryIdx', idx);
@@ -32,14 +23,12 @@ function tlSetCategory(idx) {
     tlNavigate(p);
 }
 
-/* ── 정렬 ──────────────────────────────────────────── */
 function tlChangeSort(val) {
     const p = tlGetParams();
     p.set('sort', val);
     tlNavigate(p);
 }
 
-/* ── 가격 + 거래가능 필터 적용 ─────────────────────── */
 function tlApplyFilter() {
     const p = tlGetParams();
     const min = document.getElementById('tlPriceMin').value.trim();
@@ -51,19 +40,16 @@ function tlApplyFilter() {
     tlNavigate(p);
 }
 
-/* ── 필터 전체 초기화 ──────────────────────────────── */
 function tlResetFilters() {
     location.href = '/trade/list';
 }
 
-/* ── 페이지네이션 ──────────────────────────────────── */
 function tlGoPage(page) {
     const p = tlGetParams();
     p.set('page', page);
     location.href = '/trade/list?' + p.toString();
 }
 
-/* ── 찜하기 ────────────────────────────────────────── */
 function tlToggleWish(e, tradeIdx) {
     e.preventDefault();
     e.stopPropagation();
@@ -77,14 +63,12 @@ function tlToggleWish(e, tradeIdx) {
         .catch(function () { alert('로그인이 필요합니다.'); });
 }
 
-/* ── 모바일 사이드바 토글 ──────────────────────────── */
 function tlMobileFilter() {
     ['tlCard1', 'tlCard2', 'tlCard3'].forEach(function (id) {
         document.getElementById(id).classList.toggle('is-open');
     });
 }
 
-/* ── 활성 필터 칩 렌더링 ───────────────────────────── */
 (function tlRenderChips() {
     const p = tlGetParams();
     const container = document.getElementById('tlActiveFilters');

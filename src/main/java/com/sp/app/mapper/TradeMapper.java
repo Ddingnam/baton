@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.sp.app.model.Trade;
 import com.sp.app.model.TradeImg;
@@ -18,12 +19,12 @@ public interface TradeMapper {
 	
 	public void updateTradePost(Trade dto) throws SQLException;
 	public void updateTradePostTag(long productIdx) throws SQLException;
-	public String findSaveName(long productIdx, int order);
+	public String findSaveName(@Param("productIdx") long productIdx, @Param("imgOrder") int order);
 	public int getLastOrder(long productIdx);
 	
 	public void deleteTradePost(long productIdx) throws SQLException;
 	public void deleteTradePostTag(long productIdx) throws SQLException;
-	public void deleteTradePostImg(long productIdx, int order) throws SQLException;
+	public void deleteTradePostImg(@Param("productIdx") long productIdx, @Param("imgOrder") int order) throws SQLException;
 	public void deleteTradePostImgAll(long productIdx) throws SQLException;
 	
 	public Trade findByIdx(long productIdx);

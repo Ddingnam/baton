@@ -78,8 +78,12 @@
                             <label>판매 가격</label>
                             <div class="price-wrap">
                                 <span class="won-sign">₩</span>
-                                <input type="number" name="price" id="priceInput" placeholder="0" value="${trade.price}">
+                                <input type="text" name="price" id="priceInput" placeholder="0" value="${trade.price}">
                             </div>
+                            <div class="free-check-wrapper">
+						        <input type="checkbox" id="freeCheck">
+						        <label for="freeCheck">무료나눔</label>
+						    </div>
                         </div>
 
                         <div class="field">
@@ -124,14 +128,22 @@
 						    <div class="trade-type-group">
 						    	<c:set var="tType" value="${empty trade.tradeType ? '직거래' : trade.tradeType}"/>
 						    	
-						        <input type="radio" name="tradeType" id="t1" value="직거래" ${tType == '직거래' ? 'checked' : ''} onchange="TradeLogic.toggleLocation(true)">
+						        <input type="radio" name="tradeType" id="t1" value="직거래" ${tType == '직거래' ? 'checked' : ''} onchange="TradeLogic.toggleOptions('직거래')">
 						        <label for="t1">직거래</label>
 						        
-						        <input type="radio" name="tradeType" id="t2" value="택배" ${tType == '택배' ? 'checked' : ''} onchange="TradeLogic.toggleLocation(false)">
+						        <input type="radio" name="tradeType" id="t2" value="택배" ${tType == '택배' ? 'checked' : ''} onchange="TradeLogic.toggleOptions('택배')">
 						        <label for="t2">택배</label>
 						        
-						        <input type="radio" name="tradeType" id="t3" value="둘다가능" ${tType == '둘다가능' ? 'checked' : ''} onchange="TradeLogic.toggleLocation(true)">
+						        <input type="radio" name="tradeType" id="t3" value="둘다가능" ${tType == '둘다가능' ? 'checked' : ''} onchange="TradeLogic.toggleOptions('둘다가능')">
 						        <label for="t3">둘 다 가능</label>
+						    </div>
+						</div>
+						
+						<div class="field" id="shippingFeeField" style="margin-top: 20px; display: none;">
+						    <label>배송비</label>
+						    <div class="price-wrap">
+						        <span class="won-sign">₩</span>
+						        <input type="text" name="shippingFee" id="shippingFeeInput" placeholder="0" value="${trade.shippingFee}">
 						    </div>
 						</div>
 						

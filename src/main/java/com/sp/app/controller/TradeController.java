@@ -119,27 +119,36 @@ public class TradeController {
 	
 	@GetMapping("update")
 	public String updateForm(@RequestParam("productIdx") long productIdx, 
-			@RequestParam(name = "page") String page, Model model) {
+			@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 		try {
 			Trade dto = Objects.requireNonNull(service.findByIdx(productIdx));
 			
+			if(dto == null || userDetails == null || dto.getUserIdx() != userDetails.getUserIdx()) {
+				return "redirect:/trade/list";
+			}
+			
 			model.addAttribute("trade", dto);
 			model.addAttribute("mode", "update");
-			model.addAttribute("page", page);
-					
+			
+			return "trade/write";
 			
 		} catch (Exception e) {
 			log.info("updateForm : ", e);
+			return "redirect:/trade/list";
 		}
-		return "trade/write";
 	}
 	
 	@PostMapping("update")
-	public String updateSubmit(Trade dto, @RequestParam("page") String page, Model model) {
+	public String updateSubmit(Trade dto, 
+			@AuthenticationPrincipal CustomUserDetails userDetails) {
 		try {
-			service.updateTradePost(dto, uploadPath);
+			Trade originDto = service.findByIdx(dto.getProductIdx());
 			
-			return "redirect:/trade/article?productIdx=" + dto.getProductIdx();
+			if (originDto != null && userDetails != null && originDto.getUserIdx() == userDetails.getUserIdx()) {
+	            service.updateTradePost(dto, uploadPath);
+
+	            return "redirect:/trade/article?productIdx=" + dto.getProductIdx();
+	        }
 			
 		} catch (Exception e) {
 			log.info("updateSubmit : ", e);

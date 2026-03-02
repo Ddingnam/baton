@@ -7,7 +7,7 @@
 		<selectKey keyProperty="productIdx" resultType="long" order="BEFORE">
 	        SELECT seq_product.NEXTVAL FROM DUAL
 	    </selectKey>
-		INSERT INTO product(productIdx, title, content, price, userIdx, tradeType, 
+		INSERT INTO product(productIdx, title, content, price, shippingFee, userIdx, tradeType, 
 			tradePlace, regionIdx, productStatus, categoryIdx)
 		VALUES(#{productIdx}, #{title, jdbcType=VARCHAR}, #{content, jdbcType=VARCHAR}, #{price}, #{userIdx}, #{tradeType, jdbcType=VARCHAR},
 			#{tradePlace, jdbcType=VARCHAR}, 1, #{productStatus, jdbcType=VARCHAR}, 1)
@@ -34,7 +34,7 @@
 	</insert>
 	
 	<select id="findByIdx" parameterType="long" resultType="com.sp.app.model.Trade">
-		SELECT productIdx, title, content, price, p.userIdx, hitCount, likeCount, chatCount,
+		SELECT productIdx, title, content, price, shippingFee, p.userIdx, hitCount, likeCount, chatCount,
 			tradeType, tradeStatus, tradePlace, p.regionIdx, productStatus, pullCount, 
 			lastUpDate, p.createdDate, p.updatedDate, categoryIdx, u.nickName
 		FROM product p
@@ -64,7 +64,7 @@
 	    SELECT * FROM (
 	        SELECT ROWNUM rnum, tb.* FROM (
 	            SELECT 
-	                p.productIdx, p.title, p.price, p.userIdx, p.hitCount, p.likeCount, p.chatCount,
+	                p.productIdx, p.title, p.price, p.shippingFee, p.userIdx, p.hitCount, p.likeCount, p.chatCount,
 	                p.tradeType, p.tradeStatus, p.productStatus, p.createdDate,
 	                (SELECT imgUrl FROM productImages WHERE productIdx = p.productIdx AND imgOrder = 1) as imgUrl
 	            FROM product p
@@ -94,9 +94,9 @@
 	</select>
 	
 	<update id="updateTradePost">
-		UPDATE product SET title = #{title}, content = #{content}, price = #{price}, 
+		UPDATE product SET title = #{title}, content = #{content}, price = #{price}, shippingFee = #{shippingFee},
 			tradeType = #{tradeType}, tradePlace = #{tradePlace}, productStatus = #{productStatus},
-			categoryIdx = #{categoryIdx}, updateDate = SYSDATE
+			categoryIdx = #{categoryIdx}, updatedDate = SYSDATE
 		WHERE productIdx = #{productIdx}
 	</update>
 	

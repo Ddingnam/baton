@@ -203,6 +203,22 @@ background: var(--primary-light); }
 .chat-btn:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0, 185, 141, 0.15); }
 .chat-btn:disabled { background: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; }
 
+.pay-btn {
+    width: 100%; padding: 18px; background: var(--primary); color: white;
+    border: none; border-radius: var(--radius); font-size: 17px; font-weight: 700;
+    cursor: pointer; transition: all .2s; margin-bottom: 10px; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+
+.pay-btn:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0, 185, 141, 0.15); }
+
+.pay-btn i {
+    margin-right: 6px;
+    font-size: 18px;
+}
+
+.pay-btn:disabled { background: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; }
+
 .secondary-actions { display: flex; gap: 10px; }
 .wish-btn-large, .share-btn {
     flex: 1; padding: 13px; border-radius: var(--radius-sm);

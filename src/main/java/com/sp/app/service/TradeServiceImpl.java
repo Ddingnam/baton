@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.sp.app.common.StorageService;
@@ -23,6 +24,7 @@ public class TradeServiceImpl implements TradeService {
 	private final StorageService storageService;
 
 	@Override
+	@Transactional
 	public void insertTradePost(Trade dto, String uploadPath) throws Exception {
 		try {
 			mapper.insertTradePost(dto);
@@ -77,38 +79,40 @@ public class TradeServiceImpl implements TradeService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void updateTradePost(Trade dto, String uploadPath) throws Exception {
 		try {
 			
 			if (dto.getDeleteImgOrders() != null) {
-                for (Integer order : dto.getDeleteImgOrders()) {
-                    String saveName = mapper.findSaveName(dto.getProductIdx(), order);
-                    storageService.deleteFile(uploadPath, saveName);
-                    
-                    mapper.deleteTradePostImg(dto.getProductIdx(), order);
-                }
-            }
+	            for (Integer order : dto.getDeleteImgOrders()) {
+	                String saveName = mapper.findSaveName(dto.getProductIdx(), order);
+	                if (saveName != null) {
+	                    storageService.deleteFile(uploadPath, saveName);
+	                    mapper.deleteTradePostImg(dto.getProductIdx(), order);
+	                }
+	            }
+	        }
 
-            if (dto.getNewFiles() != null && !dto.getNewFiles().isEmpty()) {
-            	
-                int lastOrder = mapper.getLastOrder(dto.getProductIdx());
-                
-                for (MultipartFile mf : dto.getNewFiles()) {
-                    if (mf.isEmpty()) continue;
-                    if (++lastOrder > 5) break;
+			if (dto.getNewFiles() != null && !dto.getNewFiles().isEmpty()) {
+	            Integer lastOrder = mapper.getLastOrder(dto.getProductIdx());
+	            int currentOrder = (lastOrder == null) ? 0 : lastOrder;
+	            
+	            for (MultipartFile mf : dto.getNewFiles()) {
+	                if (mf.isEmpty()) continue;
+	                if (++currentOrder > 5) break;
 
-                    String saveFilename = storageService.uploadFileToServer(mf, uploadPath);
-                    
-                    TradeImg imgDto = new TradeImg();
-                    imgDto.setProductIdx(dto.getProductIdx());
-                    imgDto.setImgOrder(lastOrder);
-                    imgDto.setOriginalName(mf.getOriginalFilename());
-                    imgDto.setSaveName(saveFilename);
-                    imgDto.setImgUrl("/uploads/trade/" + saveFilename);
+	                String saveFilename = storageService.uploadFileToServer(mf, uploadPath);
+	                
+	                TradeImg imgDto = new TradeImg();
+	                imgDto.setProductIdx(dto.getProductIdx());
+	                imgDto.setImgOrder(currentOrder);
+	                imgDto.setOriginalName(mf.getOriginalFilename());
+	                imgDto.setSaveName(saveFilename);
+	                imgDto.setImgUrl("/uploads/trade/" + saveFilename);
 
-                    mapper.insertTradePostImg(imgDto);
-                }
-            }
+	                mapper.insertTradePostImg(imgDto);
+	            }
+	        }
             
             mapper.deleteTradePostTag(dto.getProductIdx());
 
@@ -118,23 +122,34 @@ public class TradeServiceImpl implements TradeService {
                     String tagName = name.trim();
                     if (tagName.isEmpty()) continue;
 
-                    Long tagIdx = mapper.findTagIdxByName(tagName);
+                    Long existingTagIdx = mapper.findTagIdxByName(tagName);
+                    long currentTagIdx;
 
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("productIdx", dto.getProductIdx());
-                    map.put("tagIdx", tagIdx);
-                    mapper.insertTradePostTag(map);
+                    if (existingTagIdx == null) {
+                        dto.setTagName(tagName); 
+                        mapper.insertTradeTag(dto); 
+                        currentTagIdx = dto.getTagIdx(); 
+                    } else {
+                        currentTagIdx = existingTagIdx;
+                    }
+
+                    Map<String, Object> tagMap = new HashMap<>();
+                    tagMap.put("productIdx", dto.getProductIdx());
+                    tagMap.put("tagIdx", currentTagIdx);
+                    mapper.insertTradePostTag(tagMap);
                 }
             }
 			
 			mapper.updateTradePost(dto);
 		} catch (Exception e) {
 			log.info("updateTradePost", e);
+			throw e;
 		}
 		
 	}
 
 	@Override
+	@Transactional
 	public void deleteTradePost(long productIdx, String uploadPath) throws Exception {
 		try {
 			
@@ -151,6 +166,7 @@ public class TradeServiceImpl implements TradeService {
 			mapper.deleteTradePost(productIdx);
 		} catch (Exception e) {
 			log.info("deleteTradePost : ", e);
+			throw e;
 		}
 		
 	}
@@ -162,6 +178,7 @@ public class TradeServiceImpl implements TradeService {
 			dto = mapper.findByIdx(productIdx);
 		} catch (Exception e) {
 			log.info("findByIdx : ", e);
+			throw e;
 		}
 		return dto;
 	}
@@ -172,7 +189,7 @@ public class TradeServiceImpl implements TradeService {
 			return mapper.findImagesByIdx(productIdx);
 		} catch (Exception e) {
 			log.info("findImgsByIdx", e);
-			return null;
+			throw e;
 		}
 	}
 
@@ -182,7 +199,7 @@ public class TradeServiceImpl implements TradeService {
 			return mapper.findTagsByIdx(productIdx);
 		} catch (Exception e) {
 			log.info("findTagsByIdx", e);
-			return null;
+			throw e;
 		}
 	}
 
@@ -193,6 +210,7 @@ public class TradeServiceImpl implements TradeService {
 	        list = mapper.tradeList(map);
 	    } catch (Exception e) {
 	        log.info("tradeList : ", e);
+	        throw e;
 	    }
 	    return list;
 	}
@@ -204,6 +222,7 @@ public class TradeServiceImpl implements TradeService {
 	        result = mapper.dataCount(map);
 	    } catch (Exception e) {
 	        log.info("dataCount error", e);
+	        throw e;
 	    }
 	    return result;
 	}

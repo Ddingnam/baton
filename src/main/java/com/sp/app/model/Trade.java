@@ -19,6 +19,7 @@ public class Trade {
 	private String title;
 	private String content;
 	private int price;
+	private int shippingFee;
 
 	private int hitCount;
 	private int likeCount;

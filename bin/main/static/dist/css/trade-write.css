@@ -107,6 +107,48 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
 
 textarea { resize: vertical; min-height: 400px; }
 
+.free-check-wrapper {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    width: fit-content;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.free-check-wrapper:hover {
+    border-color: var(--primary-light);
+    background: var(--primary-light);
+}
+
+.free-check-wrapper input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.free-check-wrapper label {
+    margin-bottom: 0;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-sub);
+    user-select: none;
+}
+
+input[readonly] {
+    background-color: #F2F4F6 !important;
+    color: var(--text-muted) !important;
+    cursor: not-allowed;
+    border-color: var(--border) !important;
+    box-shadow: none !important;
+}
+
 .price-wrap { position: relative; }
 
 .price-wrap .won-sign { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-weight: 600; color: var(--text-sub); }

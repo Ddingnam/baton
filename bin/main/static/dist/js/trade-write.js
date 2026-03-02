@@ -118,24 +118,80 @@ const toggleTag = (function() {
 })();
 
 const TradeLogic = (function() {
-    function toggleLocation(show) {
+    function toggleOptions(type) {
         const locationField = document.getElementById('locationField');
+		const shippingFeeField = document.getElementById('shippingFeeField');
         const locationInput = document.getElementById('locationInput');
-        if(!locationField) return;
+		const shippingFeeInput = document.getElementById('shippingFeeInput');
+		
+		if (type === '직거래' || type === '둘다가능') {
+			locationField.style.display = 'block';
+		} else {
+			locationField.style.display = 'none';
+			if(locationInput) locationInput.value = '';
+		}
 
-        if (show) {
-            locationField.style.display = 'block';
-        } else {
-            locationField.style.display = 'none';
-            if(locationInput) locationInput.value = '';
+		if (type === '택배' || type === '둘다가능') {
+			shippingFeeField.style.display = 'block';
+		} else {
+			shippingFeeField.style.display = 'none';
+			if(shippingFeeInput) shippingFeeInput.value = '0';
+		}
+	}
+	return { toggleOptions };
+})();
+
+const PriceFormatter = (function() {
+    function format(value) {
+		value = String(value).replace(/[^0-9]/g, '');
+		return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function unformat(value) {
+        return value.replace(/[^\d]+/g, '');
+    }
+
+    function init() {
+        const priceInput = document.getElementById('priceInput');
+        const shippingFeeInput = document.getElementById('shippingFeeInput');
+        const freeCheck = document.getElementById('freeCheck');
+
+        [priceInput, shippingFeeInput].forEach(input => {
+            if(!input) return;
+            input.addEventListener('input', function() {
+                if(this.readOnly) return;
+                this.value = format(this.value);
+            });
+            if(input.value) input.value = format(input.value);
+        });
+
+		if (freeCheck && priceInput) {
+			freeCheck.addEventListener('change', function() {
+				if (this.checked) {
+					priceInput.value = "0";
+					priceInput.readOnly = true;
+				} else {
+					priceInput.value = "";
+					priceInput.readOnly = false;
+					priceInput.focus();
+				}
+			});
+
+			const currentVal = unformat(priceInput.value);
+			if (currentVal === "0" && priceInput.value !== "") {
+				freeCheck.checked = true;
+				priceInput.readOnly = true;
+			}
         }
     }
-    return { toggleLocation };
+
+    return { init, unformat };
 })();
 
 window.onload = function() {
     toggleImage.init();
     toggleTag.init();
+	PriceFormatter.init();
     
 	const urlParams = new URLSearchParams(window.location.search);
 	    const productIdx = urlParams.get('productIdx');
@@ -153,16 +209,34 @@ window.onload = function() {
 	                if(data.tagList) {
 	                    data.tagList.forEach(tagName => toggleTag.add(tagName));
 	                }
-	                TradeLogic.toggleLocation(data.trade.tradeType !== '택배');
+					if (data.trade && data.trade.tradeType) {
+						TradeLogic.toggleOptions(data.trade.tradeType);
+					}
 	            })
 	            .catch(error => console.error('데이터 로드 실패:', error));
-	    }
+	    } else {
+			TradeLogic.toggleOptions('직거래');
+		}
 };
 
 function submitForm() {
     const f = document.tradeForm;
+	const priceInput = document.getElementById('priceInput');
+	const freeCheck = document.getElementById('freeCheck');
+	const rawPrice = PriceFormatter.unformat(priceInput.value);
+	
     if (!f.title.value.trim()) return alert('제목을 입력하세요.');
-    if (!f.price.value) return alert('가격을 입력하세요.');
+	
+	if (!freeCheck.checked && (!rawPrice || rawPrice === '0')) {
+		return alert('판매 가격을 입력하거나 무료나눔을 선택해주세요.');
+	}
+
+	priceInput.value = rawPrice || '0';
+	    
+	const shippingFeeInput = document.getElementById('shippingFeeInput');
+	if(shippingFeeInput) {
+		shippingFeeInput.value = PriceFormatter.unformat(shippingFeeInput.value) || '0';
+	}
     
     const mode = f.mode ? f.mode.value : 'write';
     f.action = (mode === 'update') ? '/trade/update' : '/trade/write';

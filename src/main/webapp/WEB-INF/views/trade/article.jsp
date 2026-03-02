@@ -50,8 +50,8 @@
                         <div class="status-overlay">
                             <span class="status-overlay-badge">
                                 <c:choose>
-                                    <c:when test="${trade.tradeStatus == 'SOLD'}">판매완료</c:when>
-                                    <c:when test="${trade.tradeStatus == 'RESERVED'}">예약 중</c:when>
+                                    <c:when test="${trade.tradeStatus == '판매완료'}">판매완료</c:when>
+                                    <c:when test="${trade.tradeStatus == '예약중'}">예약 중</c:when>
                                 </c:choose>
                             </span>
                         </div>
@@ -146,9 +146,9 @@
                         <p class="info-label">판매 상태</p>
                         <p class="info-value">
                             <c:choose>
-                                <c:when test="${trade.tradeStatus == 'SALE'}">판매 중</c:when>
-                                <c:when test="${trade.tradeStatus == 'RESERVED'}">예약 중</c:when>
-                                <c:when test="${trade.tradeStatus == 'SOLD'}">판매 완료</c:when>
+                                <c:when test="${trade.tradeStatus == '판매중'}">판매 중</c:when>
+                                <c:when test="${trade.tradeStatus == '예약중'}">예약 중</c:when>
+                                <c:when test="${trade.tradeStatus == '판매완료'}">판매 완료</c:when>
                                 <c:otherwise>${trade.tradeStatus}</c:otherwise>
                             </c:choose>
                         </p>
@@ -164,22 +164,19 @@
                     <c:if test="${trade.tradeType == '택배' || trade.tradeType == '둘다가능'}">
                         <div class="info-item full-width">
                             <p class="info-label">택배비</p>
-                            <%--
+
                             <c:choose>
-                            	 
                                 <c:when test="${not empty trade.shippingFee && trade.shippingFee > 0}">
                                     <p class="info-value">
                                         <fmt:formatNumber value="${trade.shippingFee}" pattern="#,###"/>원
-                                        (착불 / 선불 결제 시 선택)
                                     </p>
                                 </c:when>
                                  
                                 <c:otherwise>
                                     <p class="info-value">추후 협의</p>
                                 </c:otherwise>
-                                
-                            </c:choose>
-                           	--%>
+							</c:choose> 
+                            
                         </div>
                         <div class="info-item full-width" style="padding: 0; background: none;">
                             <div class="shipping-notice">
@@ -247,7 +244,7 @@
 			
 			    <sec:authorize access="isAnonymous()">
 			        <c:choose>
-			            <c:when test="${trade.tradeStatus == 'SOLD'}">
+			            <c:when test="${trade.tradeStatus == '판매완료'}">
 			                <button class="chat-btn" disabled>판매 완료된 상품입니다</button>
 			            </c:when>
 			            <c:otherwise>
@@ -278,7 +275,7 @@
 			                    💬 채팅 내역 확인하기
 			                </button>
 			            </c:when>
-			            <c:when test="${trade.tradeStatus == 'SOLD'}">
+			            <c:when test="${trade.tradeStatus == '판매완료'}">
 			                <button class="chat-btn" disabled>판매 완료된 상품입니다</button>
 			            </c:when>
 			            <c:otherwise>
@@ -286,6 +283,12 @@
 			                    onclick="window.open('${pageContext.request.contextPath}/chat/room?tradeIdx=${trade.productIdx}&toUserIdx=${trade.userIdx}', 'chatRoom', 'width=450, height=700, left=200, top=100, scrollbars=yes, resizable=yes')">
 			                    💬 채팅으로 거래하기
 			                </button>
+			                <c:if test="${trade.price > 0}">
+				                <button class="pay-btn"
+	                            	onclick="location.href='${pageContext.request.contextPath}/'">
+	                            	<i class="ri-wallet-3-line"></i> 안전 결제하기
+	                        	</button>
+	                        </c:if>
 			            </c:otherwise>
 			        </c:choose>
 			
