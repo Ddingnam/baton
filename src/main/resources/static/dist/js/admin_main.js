@@ -1,60 +1,110 @@
-$(function() {
-    /* 1. Sidebar Accordion (Maknaez Logic) */
-    $(document).on('click', '.nav-item.has-sub > .nav-link', function(e) {
-        e.preventDefault();
-        
-        // 접혀있으면 펼치기
-        if ($('body').hasClass('sb-fold')) {
-            $('body').removeClass('sb-fold');
-        }
-
-        const $item = $(this).parent('.nav-item');
-        const $sub = $item.find('.sub-nav');
-
-        // 다른 메뉴 닫기
-        $('.nav-item.has-sub').not($item).removeClass('open').find('.sub-nav').slideUp(200);
-
-        // 토글
-        $item.toggleClass('open');
-        $sub.stop(true, true).slideToggle(200);
-    });
-
-    /* 2. Sidebar Toggle */
-    $('#toggleSidebar').on('click', function() {
-        $('body').toggleClass('sb-fold');
-    });
-
-    /* 3. Profile Modal */
-    $('#btnProfile').on('click', function(e) {
-        e.stopPropagation();
-        $('#modalProfile').toggleClass('show');
-    });
-
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('.header-right').length) {
-            $('#modalProfile').removeClass('show');
-        }
-    });
-
-    /* 4. Active State */
-    const path = window.location.pathname;
+document.addEventListener("DOMContentLoaded", () => {
     
-    // Submenu Active
-    $('.sub-link').each(function() {
-        const href = $(this).attr('href');
-        if (href && path.indexOf(href) !== -1) {
-            $(this).addClass('current');
-            $(this).closest('.sub-nav').show();
-            $(this).closest('.nav-item').addClass('open');
-            $(this).closest('.nav-item').find('.nav-link').addClass('active');
-        }
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if(toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+            
+            setTimeout(() => {
+                if(window.mainChart) window.mainChart.resize();
+            }, 450);
+        });
+    }
+
+    const navHeaders = document.querySelectorAll('.nav-item.has-sub > .nav-link');
+
+    navHeaders.forEach(header => {
+        header.addEventListener('click', function(e) {
+            e.preventDefault(); 
+            
+            const parentItem = this.parentElement;
+            const isOpen = parentItem.classList.contains('open');
+
+            document.querySelectorAll('.nav-item.has-sub').forEach(item => {
+                if (item !== parentItem) {
+                    item.classList.remove('open');
+                }
+            });
+
+            parentItem.classList.toggle('open');
+        });
     });
 
-    // Main Menu Active
-    $('.nav-item:not(.has-sub) .nav-link').each(function() {
-        const href = $(this).attr('href');
-        if (href && path === href) {
-            $(this).addClass('active');
+    const profileTrigger = document.getElementById('profileTrigger');
+    const profileModal = document.getElementById('profileModal');
+    
+    if(profileTrigger && profileModal) {
+        profileTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileModal.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!profileTrigger.contains(e.target) && !profileModal.contains(e.target)) {
+                profileModal.classList.remove('active');
+            }
+        });
+    }
+
+    renderCalendar();
+    if(document.getElementById('bigChart')) {
+        initChart();
+    }
+});
+
+function renderCalendar() {
+    const grid = document.getElementById('calGrid');
+    if(!grid) return;
+    const now = new Date();
+    const monthEl = document.getElementById('calMonth');
+    if(monthEl) monthEl.innerText = now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+    const startDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
+    const today = now.getDate();
+    let html = '';
+    ['S','M','T','W','T','F','S'].forEach(d => html += `<div class="cd-h" style="text-align:center; font-weight:700; color:#A3AED0; font-size:12px;">${d}</div>`);
+    for(let i=0; i<startDay; i++) html += `<div></div>`;
+    for(let i=1; i<=daysInMonth; i++) {
+        const cls = i === today ? 'today' : '';
+        html += `<div class="cd-d ${cls}">${i}</div>`;
+    }
+    grid.innerHTML = html;
+}
+
+function initChart() {
+    const ctx = document.getElementById('bigChart').getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 500);
+    gradient.addColorStop(0, 'rgba(67, 24, 255, 0.4)');
+    gradient.addColorStop(1, 'rgba(67, 24, 255, 0)');
+
+    window.mainChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Revenue',
+                data: [2100, 3200, 2800, 4500, 3900, 5800, 6500],
+                borderColor: '#4318FF',
+                borderWidth: 4,
+                backgroundColor: gradient,
+                fill: true,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#4318FF',
+                pointRadius: 6,
+                pointHoverRadius: 10,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { family: 'Pretendard' } } },
+                y: { grid: { color: '#E0E5F2', borderDash: [5, 5] }, border: { display: false } }
+            }
         }
     });
-});
+}
