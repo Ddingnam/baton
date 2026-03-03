@@ -57,7 +57,7 @@
 
       <div class="content">
         <div class="content-header">
-          <a href="${pageContext.request.contextPath}/alba/posting/list" class="back-btn">
+          <a href="${pageContext.request.contextPath}/alba/list" class="back-btn">
             <i class="ri-arrow-left-s-line"></i>
           </a>
           <div>
@@ -66,7 +66,7 @@
           </div>
         </div>
 
-        <form id="writeForm" action="${pageContext.request.contextPath}/alba/posting/write" method="post" enctype="multipart/form-data">
+        <form id="writeForm" action="${pageContext.request.contextPath}/alba/write" method="post" enctype="multipart/form-data">
           <div class="form-card">
             <div class="form-card-header">
               <span class="form-card-step">1</span>
@@ -220,7 +220,7 @@
     </div>
 
     <div class="submit-bar">
-      <a href="${pageContext.request.contextPath}/alba/posting/list" class="btn-ghost">목록으로</a>
+      <a href="${pageContext.request.contextPath}/alba/list" class="btn-ghost">목록으로</a>
       <button type="button" class="btn-primary" id="submitBtn" onclick="submitForm()">공고 등록하기</button>
     </div>
   </main>

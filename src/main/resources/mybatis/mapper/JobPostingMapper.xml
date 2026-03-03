@@ -2,45 +2,87 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.JobPostingMapper">
 
-    <insert id="insertPosting" parameterType="com.sp.app.model.JobPosting">
-        INSERT INTO job_posting (
-            user_idx, region_idx, title, employer, category, description,
-            pay_type, pay, work_period, work_days, start_time, end_time, time_negotiable,
-            start_date, end_date, location, location_detail, location_lat, location_lng,
-            deadline, contact, benefits, created_date, recruit_status
-        ) VALUES (
-            #{userIdx}, #{regionIdx}, #{title}, #{employer}, #{category}, #{description},
-            #{payType}, #{pay}, #{workPeriod}, #{workDays}, #{startTime}, #{endTime}, #{timeNegotiable, jdbcType=VARCHAR},
-            #{startDate, jdbcType=VARCHAR}, #{endDate, jdbcType=VARCHAR}, #{location}, #{locationDetail, jdbcType=VARCHAR}, #{locationLat, jdbcType=VARCHAR}, #{locationLng, jdbcType=VARCHAR},
-            #{deadline, jdbcType=VARCHAR}, #{contact}, #{benefits, jdbcType=VARCHAR}, SYSDATE, 'RECRUITING'
-        )
-    </insert>
+	<insert id="insertPosting"
+		parameterType="com.sp.app.model.JobPosting">
+		INSERT INTO job_posting (
+		title, employer, description,
+		pay, pay_type, work_period, work_days,
+		start_time, end_time,
+		time_negotiable, location, contact,
+		benefits, user_idx, region_idx,
+		category, createdDate
+		) VALUES (
+		#{title, jdbcType=VARCHAR},
+		#{employer,
+		jdbcType=VARCHAR},
+		#{description, jdbcType=CLOB},
+		#{pay,
+		jdbcType=INTEGER},
+		#{payType, jdbcType=VARCHAR},
+		#{workPeriod,
+		jdbcType=VARCHAR},
+		#{workDays, jdbcType=VARCHAR},
+		#{startTime,
+		jdbcType=VARCHAR},
+		#{endTime, jdbcType=VARCHAR},
+		#{timeNegotiable,
+		jdbcType=CHAR},
+		#{location, jdbcType=VARCHAR},
+		#{contact,
+		jdbcType=VARCHAR},
+		#{benefits, jdbcType=VARCHAR},
+		#{userIdx},
+		#{regionIdx},
+		#{category, jdbcType=VARCHAR},
+		SYSDATE
+		)
+	</insert>
 
-    <select id="listPosting" parameterType="map" resultType="com.sp.app.model.JobPosting">
-        SELECT posting_idx AS postingIdx, user_idx AS userIdx, title, employer, 
-               pay_type AS payType, pay, work_days AS workDays,
-               start_time AS startTime, end_time AS endTime,
-               created_date AS createdDate, recruit_status AS recruitStatus
-        FROM job_posting
-        ORDER BY posting_idx DESC
-        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
-    </select>
+	<update id="updatePosting"
+		parameterType="com.sp.app.model.JobPosting">
+		UPDATE job_posting
+		SET title=#{title},
+		description=#{description}, pay=#{pay},
+		pay_type=#{payType},
+		work_period=#{workPeriod}, work_days=#{workDays},
+		start_time=#{startTime},
+		end_time=#{endTime},
+		time_negotiable=#{timeNegotiable}, location=#{location},
+		contact=#{contact}, benefits=#{benefits}, category=#{category}
+		WHERE
+		posting_idx = #{postingIdx}
+	</update>
 
-    <select id="dataCount" parameterType="map" resultType="Integer">
-        SELECT COUNT(*) 
-        FROM job_posting
-    </select>
+	<delete id="deletePosting" parameterType="long">
+		DELETE FROM job_posting
+		WHERE posting_idx = #{postingIdx}
+	</delete>
 
-    <select id="findById" parameterType="Long" resultType="com.sp.app.model.JobPosting">
-        SELECT posting_idx AS postingIdx, user_idx AS userIdx, region_idx AS regionIdx,
-               title, employer, category, description,
-               pay_type AS payType, pay, work_period AS workPeriod, work_days AS workDays,
-               start_time AS startTime, end_time AS endTime, time_negotiable AS timeNegotiable,
-               start_date AS startDate, end_date AS endDate,
-               location, location_detail AS locationDetail, deadline, contact, benefits,
-               hit_count AS hitCount, created_date AS createdDate, recruit_status AS recruitStatus
-        FROM job_posting
-        WHERE posting_idx = #{postingIdx}
-    </select>
+	<select id="dataCount" parameterType="map" resultType="int">
+		SELECT
+		COUNT(*) FROM job_posting
+	</select>
+
+	<select id="listPosting" parameterType="map"
+		resultType="com.sp.app.model.JobPosting">
+		SELECT * FROM (
+		SELECT a.*, ROWNUM rnum FROM (
+		SELECT
+		posting_idx,
+		title,
+		employer,
+		pay,
+		pay_type,
+		location,
+		createdDate FROM job_posting
+		ORDER BY posting_idx DESC
+		) a WHERE ROWNUM &lt;= #{offset} + #{size}
+		) WHERE rnum &gt; #{offset}
+	</select>
+
+	<select id="findById" parameterType="long"
+		resultType="com.sp.app.model.JobPosting">
+		SELECT * FROM job_posting WHERE posting_idx = #{postingIdx}
+	</select>
 
 </mapper>

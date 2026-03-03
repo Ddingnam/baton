@@ -75,4 +75,30 @@ public class JobPostingController {
         
         return "alba/article";
     }
+
+    @GetMapping("update")
+    public String updateForm(@RequestParam long postingIdx, Model model) {
+        JobPosting dto = postingService.findById(postingIdx);
+        
+        if(dto == null) {
+            return "redirect:/alba/list";
+        }
+        
+        model.addAttribute("dto", dto);
+        model.addAttribute("mode", "update");
+        
+        return "alba/write";
+    }
+
+    @PostMapping("update")
+    public String updateSubmit(JobPosting dto) throws Exception {
+        postingService.updatePosting(dto);
+        return "redirect:/alba/article?postingIdx=" + dto.getPostingIdx();
+    }
+
+    @GetMapping("delete")
+    public String delete(@RequestParam long postingIdx) throws Exception {
+        postingService.deletePosting(postingIdx);
+        return "redirect:/alba/list";
+    }
 }
