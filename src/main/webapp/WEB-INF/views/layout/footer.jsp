@@ -44,10 +44,10 @@
                 <div class="link-group">
                     <h3>약관 및 정책</h3>
                     <ul>
-                        <li><a href="#" class="emphasis">개인정보처리방침</a></li>
+                        <li><a href="${pageContext.request.contextPath}/about/intro" class="emphasis">회사소개</a></li>
                         <li><a href="#">이용약관</a></li>
                         <li><a href="#">위치기반서비스 이용약관</a></li>
-                        <li><a href="#">청소년보호정책</a></li>
+                        <li><a href="#">개인정보처리방침</a></li>
                     </ul>
                 </div>
             </div>
