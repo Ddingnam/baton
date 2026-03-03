@@ -1,179 +1,207 @@
-if (typeof DUMMY_JOBS === 'undefined') {
-    var DUMMY_JOBS = []; 
-}
-
 const CAT_MAP = {
-  '서빙':'SERVING','주방보조':'KITCHEN_ASSISTANCE','매장관리':'SHOP_MANAGEMENT',
-  '음료제조':'BEVERAGE_MAKING','청소':'CLEANING','편의점':'CONVENIENCE_STORE',
-  '돌봄':'CHILD_CARE','과외/레슨':'TUTORING','배달':'ETC','기타':'ETC'
+  '서빙':'SERVING', '주방보조':'KITCHEN_ASSISTANCE', '매장관리':'SHOP_MANAGEMENT',
+  '음료제조':'BEVERAGE_MAKING', '청소':'CLEANING', '편의점':'CONVENIENCE_STORE',
+  '돌봄':'CHILD_CARE', '과외/레슨':'TUTORING', '배달':'ETC', '기타':'ETC'
 };
-const MIN_PAY_MAP = { '무관':0,'1만원+':10000,'1.2만원+':12000,'1.5만원+':15000,'2만원+':20000 };
-
+const MIN_PAY_MAP = { '무관':0, '1만원 이상':10000 };
 let liked = new Set();
+let currentView = 'table';
 let currentPage = 1;
-const PAGE_SIZE = 12; // 4단 그리드에 맞춰 12개로 설정
+const PAGE_SIZE = 10;
 let filteredJobs = [];
 
-function applyFilters() {
-    const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
-    
-    // 카테고리 필터값 (상단 툴바 버튼)
-    const catEl = document.querySelector('#categoryFilters .filter-btn.active');
-    const cat = catEl ? catEl.dataset.cat : '전체';
-    
-    // 기간 및 급여 필터값 (Select Box)
-    const period = document.getElementById('periodSelect').value;
-    const paySelectVal = document.getElementById('paySelect').value;
-    const minPay = MIN_PAY_MAP[paySelectVal] ?? 0;
-    const sort = document.getElementById('sortSelect').value;
-
-    let jobs = [...DUMMY_JOBS];
-
-    if (keyword) {
-        jobs = jobs.filter(j => 
-            (j.title || "").toLowerCase().includes(keyword) ||
-            (j.employer || "").toLowerCase().includes(keyword)
-        );
-    }
-    if (period === '1개월 이상') jobs = jobs.filter(j => j.period === 'MORE_THAN_A_MONTH');
-    if (period === '단기') jobs = jobs.filter(j => j.period === 'LESS_THAN_A_MONTH');
-    
-    if (cat !== '전체' && cat) jobs = jobs.filter(j => j.cat === cat || CAT_MAP[j.cat] === cat);
-    if (minPay > 0) jobs = jobs.filter(j => j.payTypeKey !== 'hour' || j.payNum >= minPay);
-
-    if (sort === 'pay_high') jobs.sort((a,b) => b.payNum - a.payNum);
-    else jobs.sort((a,b) => (a.dateOrder || 0) - (b.dateOrder || 0));
-
-    filteredJobs = jobs;
-    currentPage = 1;
-    document.getElementById('resultCount').textContent = jobs.length;
-    
-    renderCurrentPage();
-    renderPagination();
+function setQuickSearch(keyword) {
+  const input = document.getElementById('searchInput');
+  if(input) {
+    input.value = keyword;
+    applyFilters();
+  }
 }
 
-function clearFilters() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('periodSelect').value = '전체';
-    document.getElementById('paySelect').value = '무관';
-    document.getElementById('sortSelect').value = 'latest';
-    
-    document.querySelectorAll('#categoryFilters .filter-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector('#categoryFilters .filter-btn[data-cat="전체"]').classList.add('active');
-    
-    applyFilters();
+function switchView(v) {
+  currentView = v;
+  const tableView = document.getElementById('tableView');
+  const cardView  = document.getElementById('cardView');
+  if (tableView) tableView.classList.toggle('hidden', v !== 'table');
+  if (cardView)  {
+    cardView.classList.toggle('hidden', v !== 'card');
+    cardView.classList.toggle('visible', v === 'card');
+  }
+  const bt = document.getElementById('btnTable');
+  const bc = document.getElementById('btnCard');
+  if(bt) bt.classList.toggle('active', v === 'table');
+  if(bc) bc.classList.toggle('active', v === 'card');
+  renderCurrentPage();
+}
+
+function applyFilters() {
+  const keyword = document.getElementById('searchInput') ? document.getElementById('searchInput').value.trim().toLowerCase() : '';
+  const periodEl = document.querySelector('.filter-section[data-filter-type="period"] .chip.active');
+  const period = periodEl ? periodEl.textContent.trim() : '전체';
+  const catEl = document.querySelector('.filter-section[data-filter-type="category"] .chip.active');
+  const cat = catEl ? catEl.textContent.trim() : '전체';
+  const minPayEl = document.querySelector('.filter-section[data-filter-type="pay"] .chip.active');
+  const minPay = minPayEl ? (MIN_PAY_MAP[minPayEl.textContent.trim()] ?? 0) : 0;
+  const sort = document.getElementById('sortSelect') ? document.getElementById('sortSelect').value : 'latest';
+
+  let jobs = [...serverData];
+
+  if (keyword) {
+    jobs = jobs.filter(j =>
+      (j.title || '').toLowerCase().includes(keyword) ||
+      (j.employer || '').toLowerCase().includes(keyword) ||
+      (j.area || '').toLowerCase().includes(keyword)
+    );
+  }
+
+  if (period === '1개월 이상') jobs = jobs.filter(j => j.period === 'MORE_THAN_A_MONTH');
+  if (period === '단기') jobs = jobs.filter(j => j.period === 'LESS_THAN_A_MONTH');
+  if (cat !== '전체' && CAT_MAP[cat]) jobs = jobs.filter(j => j.cat === CAT_MAP[cat]);
+  if (minPay > 0) jobs = jobs.filter(j => j.payTypeKey !== 'hour' || j.payNum >= minPay);
+
+  if (sort === 'pay_high') {
+    jobs.sort((a, b) => b.payNum - a.payNum);
+  }
+
+  filteredJobs = jobs;
+  currentPage = 1;
+  const rc = document.getElementById('resultCount');
+  if (rc) rc.textContent = jobs.length;
+
+  renderCurrentPage();
+  renderPagination();
 }
 
 function renderCurrentPage() {
-    const start = (currentPage - 1) * PAGE_SIZE;
-    const pageJobs = filteredJobs.slice(start, start + PAGE_SIZE);
-    renderGridCards(pageJobs);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageJobs = filteredJobs.slice(start, start + PAGE_SIZE);
+  if (currentView === 'table') renderTable(pageJobs);
+  else renderCards(pageJobs);
 }
 
-// 중고거래 카드 컴포넌트와 동일한 형태로 렌더링
-function renderGridCards(jobs) {
-    const list = document.getElementById('albaGrid');
-    if (!list) return;
-
-    if (!jobs.length) {
-        list.innerHTML = `
-            <div class="tl-empty-state">
-                <i class="ri-search-line empty-icon"></i>
-                <p>검색 결과가 없어요</p>
-                <small>조건을 바꿔보거나 검색어를 다시 입력해보세요.</small>
-            </div>`;
-        return;
-    }
-
-    list.innerHTML = jobs.map((job, idx) => {
-        const isLiked = liked.has(job.id);
-        const imgHtml = job.img 
-            ? `<img src="${job.img}" alt="${job.title}">` 
-            : `<i class="ri-store-2-line placeholder-icon"></i>`;
-
-        return `
-        <div class="trade-card" onclick="location.href='${CONTEXT_PATH}/baton/posting/article?postingIdx=${job.id}'" style="animation-delay:${idx * 0.05}s">
-            <div class="card-image-box">
-                ${imgHtml}
-                <div class="badge-group">
-                    <span class="badge badge-pay">${job.payType}</span>
-                </div>
-                <button type="button" class="wish-btn ${isLiked ? 'active' : ''}" onclick="toggleLike(event, this, ${job.id})">
-                    <i class="${isLiked ? 'ri-heart-3-fill' : 'ri-heart-3-line'}"></i>
-                </button>
+function renderTable(jobs) {
+  const tbody = document.getElementById('tableBody');
+  if (!tbody) return;
+  if (!jobs.length) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="no-result"><span class="no-result-icon">🔍</span><strong>검색 결과가 없어요</strong><span>조건을 바꿔보거나 검색어를 다시 입력해보세요.</span></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = jobs.map((job, idx) => {
+    const isLiked = liked.has(job.id);
+    const timeHtml = (job.time === '협의' || job.time === '시간협의') ? `<span class="time-consult">시간협의</span>` : job.time;
+    return `<tr style="animation-delay:${idx * 0.04}s" onclick="location.href='${CONTEXT_PATH}/baton/posting/article?postingIdx=${job.id}'">
+        <td class="td-title">
+          <div class="company-nm">${job.employer}</div>
+          <a class="job-title-text" href="${CONTEXT_PATH}/baton/posting/article?postingIdx=${job.id}" onclick="event.stopPropagation()">${job.title}</a>
+        </td>
+        <td class="td-area-time">
+          <div class="area-text">${job.area}</div>
+          <div class="time-text">${timeHtml} · ${job.days}</div>
+        </td>
+        <td class="td-pay">
+          <span class="pay-type-badge ${job.payTypeKey}">${job.payType}</span>
+          <span class="pay-num">${job.payFmt}원</span>
+        </td>
+        <td class="td-date">
+          <div class="date-cell-wrap">
+            <div class="date-col-left"><span>${job.date}</span></div>
+            <div class="action-icons" onclick="event.stopPropagation()">
+              <button class="icon-btn ${isLiked ? 'liked' : ''}" type="button" onclick="toggleLike(event,this,${job.id})">
+                <i class="${isLiked ? 'ri-star-fill' : 'ri-star-line'}"></i>
+              </button>
             </div>
-            <div class="card-info">
-                <h3 class="card-title">${job.title}</h3>
-                <div class="card-price">${job.payFmt}원</div>
-                <div class="card-details">
-                    <div class="detail-item"><i class="ri-building-line"></i> ${job.employer}</div>
-                    <div class="detail-item"><i class="ri-map-pin-2-line"></i> ${job.area}</div>
-                    <div class="detail-item"><i class="ri-time-line"></i> ${job.days} · ${job.time}</div>
-                </div>
-                <div class="card-footer">
-                    <div class="host-info">
-                        <div class="host-avatar"><i class="ri-user-smile-line"></i></div>
-                        <span class="host-name">동네사장님</span>
-                    </div>
-                    <div class="interaction-info">
-                        <span><i class="ri-calendar-line"></i> ${job.date}</span>
-                    </div>
-                </div>
+          </div>
+        </td></tr>`;
+  }).join('');
+}
+
+function renderCards(jobs) {
+  const list = document.getElementById('cardView');
+  if (!list) return;
+  if (!jobs.length) {
+    list.innerHTML = `<div class="no-result" style="grid-column:1/-1"><span class="no-result-icon">🔍</span><strong>검색 결과가 없어요</strong><span>조건을 바꿔보거나 검색어를 다시 입력해보세요.</span></div>`;
+    return;
+  }
+  list.innerHTML = jobs.map((job, idx) => {
+    const isLiked = liked.has(job.id);
+    const thumbHtml = job.img ? `<img src="${job.img}" alt="${job.title}" onerror="this.parentNode.innerHTML='💼'">` : '💼';
+    return `<div class="job-card" style="animation-delay:${idx * 0.05}s" onclick="location.href='${CONTEXT_PATH}/baton/posting/article?postingIdx=${job.id}'">
+        <div class="card-header">
+          <div class="card-header-left">
+            <div class="job-thumb">${thumbHtml}</div>
+            <div>
+              <div class="job-employer">${job.employer}</div>
+              <div class="job-date">${job.date}</div>
             </div>
-        </div>`;
-    }).join('');
+          </div>
+          <div onclick="event.stopPropagation()">
+            <button class="icon-btn ${isLiked ? 'liked' : ''}" type="button" onclick="toggleLike(event,this,${job.id})">
+              <i class="${isLiked ? 'ri-star-fill' : 'ri-star-line'}"></i>
+            </button>
+          </div>
+        </div>
+        <div class="job-title-text card-title">${job.title}</div>
+        <div class="job-pay-row">
+          <span class="pay-type-badge ${job.payTypeKey}">${job.payType}</span>
+          ${job.payFmt}원
+        </div>
+        <div class="job-schedule">
+          <i class="ri-time-line" style="color:#1E3A8A"></i>
+          ${job.area} · ${job.days} · ${job.time}
+        </div></div>`;
+  }).join('');
 }
 
 function renderPagination() {
-    const total = Math.ceil(filteredJobs.length / PAGE_SIZE);
-    const pg = document.getElementById('pagination');
-    if (!pg) return;
-    if (total <= 1) { pg.innerHTML = ''; return; }
-
-    let html = `<button class="tl-page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>&#8249;</button>`;
-    const start = Math.max(1, currentPage-4), end = Math.min(total, start+9);
-    for (let i = start; i <= end; i++) {
-        html += `<button class="tl-page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
-    }
-    html += `<button class="tl-page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>&#8250;</button>`;
-    pg.innerHTML = html;
+  const total = Math.ceil(filteredJobs.length / PAGE_SIZE);
+  const pg = document.getElementById('pagination');
+  if (!pg) return;
+  if (total <= 1) { pg.innerHTML = ''; return; }
+  let html = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}><i class="ri-arrow-left-s-line"></i></button>`;
+  const start = Math.max(1, currentPage - 4);
+  const end = Math.min(total, start + 9);
+  for (let i = start; i <= end; i++) {
+    html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === total ? 'disabled' : ''}><i class="ri-arrow-right-s-line"></i></button>`;
+  pg.innerHTML = html;
 }
 
 function goPage(p) {
-    const total = Math.ceil(filteredJobs.length / PAGE_SIZE);
-    if (p < 1 || p > total) return;
-    currentPage = p;
-    renderCurrentPage();
-    renderPagination();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const total = Math.ceil(filteredJobs.length / PAGE_SIZE);
+  if (p < 1 || p > total) return;
+  currentPage = p;
+  renderCurrentPage();
+  renderPagination();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function toggleLike(e, btn, id) {
-    e.preventDefault(); 
-    e.stopPropagation();
-    const icon = btn.querySelector('i');
-    if (liked.has(id)) {
-        liked.delete(id); 
-        btn.classList.remove('active'); 
-        icon.className = 'ri-heart-3-line';
-    } else {
-        liked.add(id); 
-        btn.classList.add('active'); 
-        icon.className = 'ri-heart-3-fill';
-        btn.style.transform = 'scale(1.2)';
-        setTimeout(() => btn.style.transform = 'scale(1)', 200);
-    }
+  e.preventDefault(); e.stopPropagation();
+  const icon = btn.querySelector('i');
+  if (liked.has(id)) {
+    liked.delete(id);
+    btn.classList.remove('liked');
+    icon.className = 'ri-star-line';
+  } else {
+    liked.add(id);
+    btn.classList.add('liked');
+    icon.className = 'ri-star-fill';
+    btn.style.transform = 'scale(1.2)';
+    setTimeout(() => btn.style.transform = '', 180);
+  }
 }
 
-// 상단 카테고리 필터 클릭 이벤트 등록
-document.querySelectorAll('#categoryFilters .filter-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('#categoryFilters .filter-btn').forEach(c => c.classList.remove('active'));
-        this.classList.add('active');
-        applyFilters();
+document.querySelectorAll('.filter-section .filter-chips').forEach(group => {
+  group.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', function () {
+      group.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      applyFilters();
     });
+  });
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    applyFilters();
+  setTimeout(applyFilters, 100);
 });
