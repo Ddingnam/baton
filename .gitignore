@@ -35,3 +35,8 @@ application-*.properties
 KakaoAuthService.java
 MailSender.java
 .settings/org.eclipse.buildship.core.prefs
+
+bin/
+.settings/
+.classpath
+.project
