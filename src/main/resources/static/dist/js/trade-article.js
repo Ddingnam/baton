@@ -179,6 +179,74 @@ const ShareModule = (function () {
     return { share };
 })();
 
+const StatusModule = (function () {
+    const getModal = () => document.getElementById('statusModal');
+
+    function open() {
+        const modal = getModal();
+        if (modal) {
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function close() {
+        const modal = getModal();
+        if (modal) {
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+    }
+
+    function update(productIdx, status) {
+        const params = new URLSearchParams();
+        params.append('productIdx', productIdx);
+        params.append('status', status);
+
+        fetch(`${window.location.origin}/trade/updateStatus`, {
+            method: 'POST',
+            body: params
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            } else {
+                Toast.show('상태 변경 처리에 실패했습니다.');
+            }
+        })
+        .catch(() => Toast.show('네트워크 오류가 발생했습니다.'));
+    }
+
+    return { open, close, update };
+})();
+
+const PullUpModule = (function () {
+    function execute(productIdx) {
+        if (!confirm('🚀 이 게시글을 목록 맨 위로 올리시겠습니까?')) return;
+
+        const params = new URLSearchParams();
+        params.append('productIdx', productIdx);
+
+        fetch(`${window.location.origin}/trade/pullUp`, {
+            method: 'POST',
+            body: params
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                Toast.show('🚀 게시글이 맨 위로 올라갔습니다!');
+                setTimeout(() => location.reload(), 1200);
+            } else {
+                Toast.show(data.message || '끌어올리기를 할 수 없습니다.');
+            }
+        })
+        .catch(() => Toast.show('네트워크 오류가 발생했습니다.'));
+    }
+
+    return { execute };
+})();
+
 const Toast = (function () {
     let timer = null;
 

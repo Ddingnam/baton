@@ -232,16 +232,174 @@ background: var(--primary-light); }
 .wish-btn-large.active { border-color: #F86D7D; color: #F86D7D; background: #FFF5F6; }
 .share-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
 
-.owner-actions { margin-top: 10px; display: flex; gap: 10px; }
-.edit-btn, .delete-btn {
-    flex: 1; padding: 12px; border-radius: var(--radius-sm);
-    font-size: 14px; font-weight: 600; cursor: pointer;
-    font-family: inherit; transition: all .2s;
+.owner-actions-group {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
-.edit-btn { background: white; border: 1.5px solid var(--border); color: var(--text-sub); }
-.edit-btn:hover { border-color: var(--primary); color: var(--primary); }
-.delete-btn { background: white; border: 1.5px solid #FECACA; color: #DC2626; }
-.delete-btn:hover { background: #FEF2F2; }
+
+.manage-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.owner-actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.btn-manage {
+    height: 46px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-sub);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-manage.status-style:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+.btn-manage.pull-style:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+.btn-manage.edit-style:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+.btn-manage.delete-style {
+    border-color: #FECACA;
+    color: #DC2626;
+}
+.btn-manage.delete-style:hover {
+    background: #FEF2F2;
+    border-color: #FCA5A5;
+    color: #B91C1C;
+}
+
+.btn-manage.delete-style {
+    border-color: #FECACA;
+    color: #DC2626;
+}
+
+.btn-manage.delete-style:hover {
+    background: #FEF2F2;
+    border-color: #FCA5A5;
+}
+
+.btn-manage i {
+    font-size: 16px;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 450px;
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    padding: 24px;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-overlay.open .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.status-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.status-opt {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 16px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.status-opt:hover {
+    background: var(--bg);
+}
+
+.status-opt.active {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+.status-opt.hide-opt {
+    margin-top: 5px;
+    color: var(--text-sub);
+    border-style: dashed;
+}
 
 .tag-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .tag-chip-view {

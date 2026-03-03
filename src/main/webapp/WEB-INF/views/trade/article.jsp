@@ -301,16 +301,28 @@
 			        </div>
 			
 			        <c:if test="${loggedInUserId == trade.userIdx}">
-			            <div class="owner-actions">
-			                <button class="edit-btn"
-			                    onclick="location.href='${pageContext.request.contextPath}/trade/update?productIdx=${trade.productIdx}&page=${page}'">
-			                    ✏️ 수정
-			                </button>
-			                <button class="delete-btn"
-			                    onclick="confirmDelete(${trade.productIdx})">
-			                    🗑 삭제
-			                </button>
-			            </div>
+			            <div class="owner-actions-group">
+					        <p class="manage-label">게시글 관리</p>
+					        <div class="owner-actions-grid">
+							    <button type="button" class="btn-manage status-style" onclick="StatusModule.open()">
+							        <i class="ri-loop-left-line"></i> 상태 변경
+							    </button>
+							    
+							    <button type="button" class="btn-manage pull-style" onclick="PullUpModule.execute(${trade.productIdx})">
+							        <i class="ri-rocket-2-line"></i> 끌어올리기
+							    </button>
+							    
+							    <button type="button" class="btn-manage edit-style" 
+							        onclick="location.href='${pageContext.request.contextPath}/trade/update?productIdx=${trade.productIdx}&page=${page}'">
+							        <i class="ri-edit-line"></i> 수정
+							    </button>
+							    
+							    <button type="button" class="btn-manage delete-style" 
+							        onclick="confirmDelete(${trade.productIdx})">
+							        <i class="ri-delete-bin-line"></i> 삭제
+							    </button>
+							</div>
+					    </div>
 			        </c:if>
 			    </sec:authorize>
 			</div>
@@ -334,6 +346,23 @@
     data-wished="${false}"
     data-wish-count="${trade.likeCount}"
     style="display:none">
+</div>
+
+<div id="statusModal" class="modal-overlay" onclick="StatusModule.close()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3>상태 변경</h3>
+            <button type="button" class="close-modal" onclick="StatusModule.close()">✕</button>
+        </div>
+        <div class="status-options">
+            <button type="button" class="status-opt ${trade.tradeStatus == '판매중' ? 'active' : ''}" 
+                    onclick="StatusModule.update('${trade.productIdx}', '판매중')">판매중</button>
+            <button type="button" class="status-opt ${trade.tradeStatus == '예약중' ? 'active' : ''}" 
+                    onclick="StatusModule.update('${trade.productIdx}', '예약중')">예약중</button>
+            <button type="button" class="status-opt hide-opt" 
+                    onclick="StatusModule.update('${trade.productIdx}', '숨기기')">숨기기</button>
+        </div>
+    </div>
 </div>
 
 <script src="${pageContext.request.contextPath}/dist/js/trade-article.js"></script>
