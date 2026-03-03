@@ -60,9 +60,9 @@
             <div class="auth-social item-5">
                 <div class="social-divider">또는 간편 로그인</div>
                 <div class="social-orb-group">
-                    <a href="${pageContext.request.contextPath}/oauth2/authorization/kakao" class="social-orb">
-                        <i class="ri-kakao-talk-fill"></i>
-                    </a>
+                    <a href="javascript:void(0);" onclick="loginWithKakao();" class="social-orb">
+			            <i class="ri-kakao-talk-fill"></i>
+			        </a>
                     <a href="${pageContext.request.contextPath}/oauth2/authorization/google" class="social-orb">
                         <i class="ri-google-fill"></i>
                     </a>
