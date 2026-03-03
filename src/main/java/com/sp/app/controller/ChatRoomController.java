@@ -76,4 +76,20 @@ public class ChatRoomController {
         
         return "chat/tradeList"; 
     }
+    
+    @GetMapping("/list")
+    public String chatList(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        if (userDetails == null) {
+            return "redirect:/member/login";
+        }
+
+        Long myUserIdx = userDetails.getUserIdx();
+
+        List<ChatRoom> list = chatService.listAllChatRoom(myUserIdx);
+
+        model.addAttribute("list", list);
+        model.addAttribute("myUserIdx", myUserIdx);
+
+        return "chat/list";
+    }
 }

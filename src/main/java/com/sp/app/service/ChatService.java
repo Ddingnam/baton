@@ -14,4 +14,5 @@ public interface ChatService {
     String getCounterpartNickname(Long roomIdx, Long myUserIdx);
     List<ChatRoom> listTradeChatRoom(Long tradeIdx, Long myUserIdx);
     Map<String, Object> getTradeInfo(Long tradeIdx);
+    List<ChatRoom> listAllChatRoom(Long myUserIdx);
 }

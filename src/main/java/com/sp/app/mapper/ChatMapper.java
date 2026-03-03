@@ -18,4 +18,5 @@ public interface ChatMapper {
     String getCounterpartNickname(Map<String, Object> map);
     List<ChatRoom> listTradeChatRoom(Map<String, Object> map);
     Map<String, Object> getTradeInfo(Long tradeIdx);
+    List<ChatRoom> listAllChatRoom(Long myUserIdx);
 }

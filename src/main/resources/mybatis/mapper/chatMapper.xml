@@ -75,4 +75,24 @@
         FROM product p
         WHERE p.productIdx = #{tradeIdx}
     </select>
+    
+    <select id="listAllChatRoom" parameterType="Long" resultType="com.sp.app.model.ChatRoom">
+        SELECT 
+            c.roomIdx, c.tradeIdx,
+            u.userIdx, u.nickname, u.profile_photo AS profilePhoto,
+            t.title AS tradeTitle,
+            (SELECT saveName FROM productImages WHERE productIdx = c.tradeIdx AND imgOrder = 1) AS tradeSaveName,
+            (SELECT content FROM (SELECT content FROM chatMessage WHERE roomIdx = c.roomIdx ORDER BY msgIdx DESC) WHERE ROWNUM = 1) AS recentMessage,
+            (SELECT TO_CHAR(sendDate, 'MM-DD HH24:MI') FROM (SELECT sendDate FROM chatMessage WHERE roomIdx = c.roomIdx ORDER BY msgIdx DESC) WHERE ROWNUM = 1) AS recentDate,
+            (SELECT COUNT(*) FROM chatMessage m 
+             WHERE m.roomIdx = c.roomIdx AND m.userIdx != #{myUserIdx} 
+             AND <![CDATA[ m.sendDate > (SELECT lastReadDate FROM chatMember WHERE roomIdx = c.roomIdx AND userIdx = #{myUserIdx}) ]]>) AS unreadCount
+        FROM chatRoom c
+        JOIN chatMember my_m ON c.roomIdx = my_m.roomIdx AND my_m.userIdx = #{myUserIdx}
+        JOIN chatMember other_m ON c.roomIdx = other_m.roomIdx AND other_m.userIdx != #{myUserIdx}
+        JOIN users u ON other_m.userIdx = u.userIdx
+        LEFT JOIN product t ON c.tradeIdx = t.productIdx
+        ORDER BY recentDate DESC NULLS LAST
+    </select>
+    
 </mapper>

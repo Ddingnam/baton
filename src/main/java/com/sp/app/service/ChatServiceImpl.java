@@ -80,4 +80,9 @@ public class ChatServiceImpl implements ChatService {
     public Map<String, Object> getTradeInfo(Long tradeIdx) {
         return mapper.getTradeInfo(tradeIdx);
     }
+    
+    @Override
+    public List<ChatRoom> listAllChatRoom(Long myUserIdx) {
+        return mapper.listAllChatRoom(myUserIdx);
+    }
 }

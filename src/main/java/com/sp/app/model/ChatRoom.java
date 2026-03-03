@@ -11,4 +11,6 @@ public class ChatRoom {
     private String recentMessage; 
     private String recentDate;    
     private int unreadCount;
+    private String tradeTitle;     
+    private String tradeSaveName;
 }
