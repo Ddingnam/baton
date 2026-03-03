@@ -76,7 +76,7 @@
                 </div>
             </div>
         </div>
-
+ 
         <div class="trade-grid" id="albaGrid"></div>
 
         <div class="pagination-container" id="pagination"></div>
