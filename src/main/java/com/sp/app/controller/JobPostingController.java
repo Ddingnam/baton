@@ -15,12 +15,12 @@ import java.util.Map;
 @Controller
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/alba") // 클래스 기본 경로를 /alba 로 설정
+@RequestMapping("/alba")
 public class JobPostingController {
 
     private final JobPostingService postingService;
 
-    @GetMapping("list") // 실제 경로: /alba/list
+    @GetMapping("list")
     public String list(
             @RequestParam(value = "page", defaultValue = "1") int current_page,
             Model model) {
@@ -39,31 +39,29 @@ public class JobPostingController {
         model.addAttribute("dataCount", dataCount);
         model.addAttribute("page", current_page);
         
-        return "alba/list"; // 뷰 파일 (WEB-INF/views/alba/list.jsp)
+        return "alba/list";
     }
 
-    @GetMapping("write") // 실제 경로: /alba/write
+    @GetMapping("write")
     public String writeForm() {
         return "alba/write";
     }
 
-    @PostMapping("write") // 실제 경로: /alba/write
+    @PostMapping("write")
     public String writeSubmit(JobPosting dto) throws Exception {
         dto.setUserIdx(1L); 
         dto.setRegionIdx(100L); 
         
         postingService.insertPosting(dto);
         
-        // 작성 완료 후 이동할 경로 (posting 제거)
         return "redirect:/alba/list"; 
     }
 
-    @GetMapping("article") // 실제 경로: /alba/article?postingIdx=8
+    @GetMapping("article")
     public String article(@RequestParam long postingIdx, Model model) {
         JobPosting dto = postingService.findById(postingIdx);
         
         if(dto == null) {
-            // 없는 글일 경우 이동할 경로 (posting 제거)
             return "redirect:/alba/list";
         }
         

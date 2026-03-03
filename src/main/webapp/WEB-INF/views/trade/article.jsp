@@ -271,7 +271,7 @@
 			        <c:choose>
 			            <c:when test="${loggedInUserId == trade.userIdx}">
 			                <button class="chat-btn"
-			                    onclick="window.open('${pageContext.request.contextPath}/chat/tradeList?tradeIdx=${trade.productIdx}', 'chatList', 'width=450, height=700, left=200, top=100, scrollbars=yes, resizable=yes')">
+			                    onclick="window.open('${pageContext.request.contextPath}/chat/tradeList?tradeIdx=${trade.productIdx}', 'chatList', 'width=450, height=850, left=200, top=100, scrollbars=no, resizable=yes')">
 			                    💬 채팅 내역 확인하기
 			                </button>
 			            </c:when>
@@ -280,7 +280,7 @@
 			            </c:when>
 			            <c:otherwise>
 			                <button class="chat-btn"
-			                    onclick="window.open('${pageContext.request.contextPath}/chat/room?tradeIdx=${trade.productIdx}&toUserIdx=${trade.userIdx}', 'chatRoom', 'width=450, height=700, left=200, top=100, scrollbars=yes, resizable=yes')">
+			                    onclick="window.open('${pageContext.request.contextPath}/chat/room?tradeIdx=${trade.productIdx}&toUserIdx=${trade.userIdx}', 'chatRoom', 'width=450, height=850, left=200, top=100, scrollbars=yes, resizable=yes')">
 			                    💬 채팅으로 거래하기
 			                </button>
 			                <c:if test="${trade.price > 0}">
