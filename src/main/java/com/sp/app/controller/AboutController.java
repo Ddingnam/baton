@@ -15,6 +15,12 @@ public class AboutController {
         return "about/intro";
     }
 
+    @GetMapping("service")
+    public String service(Model model) {
+    	model.addAttribute("menu", "service");
+    	return "about/service";
+    }
+
     @GetMapping("terms")
     public String terms(Model model) {
         model.addAttribute("menu", "terms");
