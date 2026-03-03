@@ -75,4 +75,9 @@ public class ChatServiceImpl implements ChatService {
         map.put("myUserIdx", myUserIdx);
         return mapper.listTradeChatRoom(map);
     }
+    
+    @Override
+    public Map<String, Object> getTradeInfo(Long tradeIdx) {
+        return mapper.getTradeInfo(tradeIdx);
+    }
 }

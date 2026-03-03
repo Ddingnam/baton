@@ -64,4 +64,15 @@
         AND EXISTS (SELECT 1 FROM chatMember WHERE roomIdx = c.roomIdx AND userIdx = #{myUserIdx})
         ORDER BY recentDate DESC NULLS LAST
     </select>
+    
+    <select id="getTradeInfo" parameterType="Long" resultType="map">
+        SELECT 
+            p.productIdx, 
+            p.title, 
+            p.price,
+            TO_CHAR(p.createdDate, 'YYYY-MM-DD') AS createdDate,
+            (SELECT saveName FROM productImages WHERE productIdx = p.productIdx AND imgOrder = 1) AS saveName
+        FROM product p
+        WHERE p.productIdx = #{tradeIdx}
+    </select>
 </mapper>

@@ -17,4 +17,5 @@ public interface ChatMapper {
     void insertChatMember(Map<String, Object> map);
     String getCounterpartNickname(Map<String, Object> map);
     List<ChatRoom> listTradeChatRoom(Map<String, Object> map);
+    Map<String, Object> getTradeInfo(Long tradeIdx);
 }

@@ -1,6 +1,7 @@
 package com.sp.app.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -52,7 +53,11 @@ public class ChatRoomController {
         model.addAttribute("userIdx", myUserIdx);
         model.addAttribute("chatList", list);
         model.addAttribute("counterpartName", counterpartNickname);
-
+        
+        Map<String, Object> tradeInfo = chatService.getTradeInfo(tradeIdx);
+        
+        model.addAttribute("tradeInfo", tradeInfo);
+        
         return "chat/room";
     }
     
@@ -67,6 +72,7 @@ public class ChatRoomController {
         
         model.addAttribute("list", list);
         model.addAttribute("tradeIdx", tradeIdx);
+        model.addAttribute("myUserIdx", myUserIdx);
         
         return "chat/tradeList"; 
     }

@@ -6,27 +6,39 @@
 <head>
 <meta charset="UTF-8">
 <title>바톤 채팅방</title>
+<link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
 <style>
-    .chat-wrapper { display: flex; justify-content: center; padding: 20px; background: #f4f6f8; }
-    .chat-container { width: 100%; max-width: 500px; height: 750px; display: flex; flex-direction: column; background: #fff; border-radius: 16px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); overflow: hidden; }
-    .chat-header { background: #fff; padding: 15px 20px; text-align: center; font-weight: 700; font-size: 16px; border-bottom: 1px solid #eaeaea; color: #333; position: relative; z-index: 10;}
-    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; background: #f9fbfc; }
+    body, html { margin: 0; padding: 0; height: 100%; background: #fff; font-family: 'Noto Sans KR', sans-serif; }
+    
+    .chat-container { width: 100%; height: 100vh; display: flex; flex-direction: column; background: #fff; }
+
+    .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; font-size: 16px; background: #fff; position: relative; z-index: 10; border-bottom: 1px solid #f0f0f0;}
+    .header-left i { font-size: 24px; cursor: pointer; color: #333; }
+    .header-center { flex: 1; text-align: center; font-weight: 700; color: #333; }
+    .header-right { width: 24px; } 
+
+    .trade-banner { display: flex; padding: 12px 20px; background: #fafafa; border-bottom: 1px solid #eee; align-items: center; }
+    .trade-thumb { width: 45px; height: 45px; border-radius: 8px; background: #ddd; margin-right: 12px; object-fit: cover; border: 1px solid #eee;}
+    .trade-info { flex: 1; display: flex; flex-direction: column; }
+    .trade-title { font-size: 14px; font-weight: bold; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;}
+    .trade-date { font-size: 12px; color: #888; margin-top: 3px; }
+
+    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; background: #fff; } 
     
     .date-divider { text-align: center; margin: 20px 0; }
-    .date-divider span { background: rgba(0,0,0,0.1); color: #666; font-size: 12px; padding: 4px 12px; border-radius: 12px; }
+    .date-divider span { background: #f0f0f0; color: #666; font-size: 12px; padding: 5px 15px; border-radius: 15px; }
     .system-msg { text-align: center; margin-bottom: 20px; color: #888; font-size: 13px; }
 
     .msg-row { margin-bottom: 15px; display: flex; align-items: flex-end; }
     .msg-me { justify-content: flex-end; }
     .msg-other { justify-content: flex-start; }
     
-    .msg-bubble { padding: 10px 14px; border-radius: 14px; max-width: 75%; word-break: break-all; font-size: 14px; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .msg-bubble { padding: 10px 14px; border-radius: 14px; max-width: 75%; word-break: break-all; font-size: 14px; line-height: 1.4; }
     .msg-me .msg-bubble { background: #00B050; color: #fff; border-bottom-right-radius: 4px; }
-  
-    .msg-other .msg-bubble { background: #fff; color: #333; border: 1px solid #eaeaea; border-bottom-left-radius: 4px; }
+    .msg-other .msg-bubble { background: #f4f6f8; color: #333; border-bottom-left-radius: 4px; } 
     
     .msg-info { display: flex; flex-direction: column; justify-content: flex-end; margin: 0 6px; padding-bottom: 2px; }
     .msg-time { font-size: 11px; color: #999; }
@@ -35,67 +47,83 @@
     .profile-img { width: 36px; height: 36px; border-radius: 50%; margin-right: 10px; object-fit: cover; border: 1px solid #eaeaea; }
     .nickname { font-size: 12px; margin-bottom: 4px; color: #555; }
 
-    .chat-input-box { display: flex; padding: 15px; background: #fff; border-top: 1px solid #eaeaea; align-items: center; }
-    .chat-input-box textarea { flex: 1; padding: 10px 15px; border: 1px solid #ddd; border-radius: 20px; outline: none; resize: none; overflow: hidden; height: 42px; line-height: 20px; font-family: inherit; }
-    .chat-input-box button { width: 42px; height: 42px; margin-left: 10px; border: none; background: #00B050; color: white; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
-    .chat-input-box button:hover { background: #008f40; }
+    .chat-input-box { display: flex; padding: 15px; background: #fff; border-top: 1px solid #eee; align-items: center; }
+    .chat-input-box textarea { flex: 1; padding: 12px 15px; border: 1px solid #f0f0f0; background: #f8f9fa; border-radius: 20px; outline: none; resize: none; overflow: hidden; height: 44px; line-height: 20px; font-family: inherit; font-size: 14px;}
+    .chat-input-box textarea:focus { border-color: #00B050; background: #fff; }
+    .chat-input-box button { width: 44px; height: 44px; margin-left: 10px; border: none; background: #00B050; color: white; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
 </style>
 </head>
 <body>
-
-    <div class="chat-wrapper">
-        <div class="chat-container">
-            <div class="chat-header">
-                ${counterpartName}님과의 거래
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="header-left" onclick="history.back()">
+                <i class="ri-arrow-left-s-line"></i>
             </div>
-            
-            <div class="chat-messages" id="chatArea">
-                <div class="system-msg"><b>${counterpartName}</b>님과 대화를 시작합니다.</div>
-
-                <c:set var="lastDate" value="" />
+            <div class="header-center">${counterpartName}</div>
+            <div class="header-right"></div>
+        </div>
+        
+        <c:if test="${not empty tradeInfo}">
+            <div class="trade-banner">
+                <c:choose>
+                    <c:when test="${not empty tradeInfo.SAVENAME}">
+                        <img src="${pageContext.request.contextPath}/uploads/trade/${tradeInfo.SAVENAME}" class="trade-thumb" onerror="this.src='${pageContext.request.contextPath}/dist/images/noimage.png'">
+                    </c:when>
+                    <c:otherwise>
+                        <img src="${pageContext.request.contextPath}/dist/images/noimage.png" class="trade-thumb">
+                    </c:otherwise>
+                </c:choose>
                 
-                <c:forEach var="chat" items="${chatList}">
-                    <c:set var="msgDate" value="${fn:substring(chat.sendDate, 0, 10)}" />
-                    <c:set var="msgTime" value="${fn:substring(chat.sendDate, 11, 16)}" />
+                <div class="trade-info">
+                    <span class="trade-title">${tradeInfo.TITLE}</span>
+                    <span class="trade-date">작성일: ${tradeInfo.CREATEDDATE}</span>
+                </div>
+            </div>
+        </c:if>
 
-                    <c:if test="${msgDate != lastDate}">
-                        <div class="date-divider"><span>${msgDate}</span></div>
-                        <c:set var="lastDate" value="${msgDate}" />
+        <div class="chat-messages" id="chatArea">
+            <div class="system-msg"><b>${counterpartName}</b>님과 대화를 시작합니다.</div>
+
+            <c:set var="lastDate" value="" />
+            <c:forEach var="chat" items="${chatList}">
+                <c:set var="msgDate" value="${fn:substring(chat.sendDate, 0, 10)}" />
+                <c:set var="msgTime" value="${fn:substring(chat.sendDate, 11, 16)}" />
+
+                <c:if test="${msgDate != lastDate}">
+                    <div class="date-divider"><span>${msgDate}</span></div>
+                    <c:set var="lastDate" value="${msgDate}" />
+                </c:if>
+
+                <div class="msg-row ${chat.userIdx == userIdx ? 'msg-me' : 'msg-other'}">
+                    <c:if test="${chat.userIdx != userIdx}">
+                        <img src="${pageContext.request.contextPath}/uploads/profile/${chat.profilePhoto}" class="profile-img" onerror="this.src='${pageContext.request.contextPath}/dist/images/person.png'">
                     </c:if>
-
-                    <div class="msg-row ${chat.userIdx == userIdx ? 'msg-me' : 'msg-other'}">
+                    <div>
                         <c:if test="${chat.userIdx != userIdx}">
-                            <img src="${pageContext.request.contextPath}/uploads/profile/${chat.profilePhoto}" class="profile-img" onerror="this.src='${pageContext.request.contextPath}/dist/images/person.png'">
+                            <div class="nickname">${counterpartName}</div>
                         </c:if>
-                        <div>
-                            <c:if test="${chat.userIdx != userIdx}">
-                                <div class="nickname">${counterpartName}</div>
+                        <div style="display: flex; align-items: flex-end;">
+                            <c:if test="${chat.userIdx == userIdx}">
+                                <div class="msg-info">
+                                    <span class="unread-count"><c:if test="${chat.unreadCount > 0}">${chat.unreadCount}</c:if></span>
+                                    <span class="msg-time">${msgTime}</span>
+                                </div>
                             </c:if>
-                            <div style="display: flex; align-items: flex-end;">
-                                <c:if test="${chat.userIdx == userIdx}">
-                                    <div class="msg-info">
-                                        <span class="unread-count">
-											<c:if test="${chat.unreadCount > 0}">${chat.unreadCount}</c:if>
-										</span>
-                                        <span class="msg-time">${msgTime}</span>
-                                    </div>
-                                </c:if>
-                                <div class="msg-bubble">${chat.content}</div>
-                                <c:if test="${chat.userIdx != userIdx}">
-                                    <div class="msg-info">
-                                        <span class="msg-time">${msgTime}</span>
-                                    </div>
-                                </c:if>
-                            </div>
+                            <div class="msg-bubble">${chat.content}</div>
+                            <c:if test="${chat.userIdx != userIdx}">
+                                <div class="msg-info">
+                                    <span class="msg-time">${msgTime}</span>
+                                </div>
+                            </c:if>
                         </div>
                     </div>
-                </c:forEach>
-            </div>
+                </div>
+            </c:forEach>
+        </div>
 
-            <div class="chat-input-box">
-                <textarea id="chatInput" placeholder="메시지 보내기..." onkeydown="handleEnter(event)"></textarea>
-                <button onclick="sendMessage()"><i class="ri-send-plane-fill" style="font-size:18px;"></i></button>
-            </div>
+        <div class="chat-input-box">
+            <textarea id="chatInput" placeholder="메시지 보내기..." onkeydown="handleEnter(event)"></textarea>
+            <button onclick="sendMessage()"><i class="ri-send-plane-fill" style="font-size:18px;"></i></button>
         </div>
     </div>
 
@@ -113,17 +141,13 @@
         stompClient.connect({}, function (frame) {
             stompClient.subscribe('/topic/room/' + currentRoomIdx, function (chat) {
                 let message = JSON.parse(chat.body);
-                
                 if(message.msgType === 4) {
-                    if(message.userIdx !== myUserIdx) {
-                        removeUnreadCounts();
-                    }
+                    if(message.userIdx !== myUserIdx) removeUnreadCounts();
                 } else {
                     appendMessage(message);
                     sendReadEvent();
                 }
             });
-          
             sendReadEvent();
             scrollToBottom();
         });
@@ -141,13 +165,7 @@
         let content = input.value.trim();
         if(!content) return;
 
-        let messageModel = {
-            roomIdx: currentRoomIdx,
-            userIdx: myUserIdx,
-            content: content,
-            msgType: 1
-        };
-        
+        let messageModel = { roomIdx: currentRoomIdx, userIdx: myUserIdx, content: content, msgType: 1 };
         stompClient.send("/app/chat/send", {}, JSON.stringify(messageModel));
         input.value = '';
         input.focus();
@@ -161,7 +179,7 @@
     function appendMessage(message) {
         let chatArea = document.getElementById("chatArea");
         let isMe = (message.userIdx === myUserIdx);
-   
+        
         let now = new Date();
         let dateStr = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,'0') + "-" + String(now.getDate()).padStart(2,'0');
         let timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
@@ -183,14 +201,9 @@
         }
         
         html += '<div style="display: flex; align-items: flex-end;">';
-        
-        if(isMe) {
-            html += '<div class="msg-info"><span class="unread-count">1</span><span class="msg-time">' + timeStr + '</span></div>';
-        }
-        html += '<div class="msg-bubble">' + message.content.replace(/\n/g, '<br>') + '</div>'; // 줄바꿈 처리
-        if(!isMe) {
-            html += '<div class="msg-info"><span class="msg-time">' + timeStr + '</span></div>';
-        }
+        if(isMe) html += '<div class="msg-info"><span class="unread-count">1</span><span class="msg-time">' + timeStr + '</span></div>';
+        html += '<div class="msg-bubble">' + message.content.replace(/\n/g, '<br>') + '</div>';
+        if(!isMe) html += '<div class="msg-info"><span class="msg-time">' + timeStr + '</span></div>';
         html += '</div></div></div>';
         
         chatArea.insertAdjacentHTML('beforeend', html);
