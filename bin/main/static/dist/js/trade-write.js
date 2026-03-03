@@ -222,20 +222,27 @@ window.onload = function() {
 function submitForm() {
     const f = document.tradeForm;
 	const priceInput = document.getElementById('priceInput');
+	const shippingFeeInput = document.getElementById('shippingFeeInput');
 	const freeCheck = document.getElementById('freeCheck');
-	const rawPrice = PriceFormatter.unformat(priceInput.value);
+	const tradeType = f.tradeType.value;
 	
     if (!f.title.value.trim()) return alert('제목을 입력하세요.');
 	
+	const rawPrice = PriceFormatter.unformat(priceInput.value);
 	if (!freeCheck.checked && (!rawPrice || rawPrice === '0')) {
 		return alert('판매 가격을 입력하거나 무료나눔을 선택해주세요.');
 	}
 
-	priceInput.value = rawPrice || '0';
-	    
-	const shippingFeeInput = document.getElementById('shippingFeeInput');
-	if(shippingFeeInput) {
-		shippingFeeInput.value = PriceFormatter.unformat(shippingFeeInput.value) || '0';
+	priceInput.value = freeCheck.checked ? '0' : rawPrice;
+
+	if (shippingFeeInput) {
+		let rawShipping = PriceFormatter.unformat(shippingFeeInput.value);
+	        
+		if ((tradeType === '택배' || tradeType === '둘다가능') && !rawShipping) {
+			rawShipping = '0'; 
+		}
+	        
+		shippingFeeInput.value = rawShipping || '0';
 	}
     
     const mode = f.mode ? f.mode.value : 'write';

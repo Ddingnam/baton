@@ -9,7 +9,7 @@
 	    </selectKey>
 		INSERT INTO product(productIdx, title, content, price, shippingFee, userIdx, tradeType, 
 			tradePlace, regionIdx, productStatus, categoryIdx)
-		VALUES(#{productIdx}, #{title, jdbcType=VARCHAR}, #{content, jdbcType=VARCHAR}, #{price}, #{userIdx}, #{tradeType, jdbcType=VARCHAR},
+		VALUES(#{productIdx}, #{title, jdbcType=VARCHAR}, #{content, jdbcType=VARCHAR}, #{price}, #{shippingFee}, #{userIdx}, #{tradeType, jdbcType=VARCHAR},
 			#{tradePlace, jdbcType=VARCHAR}, 1, #{productStatus, jdbcType=VARCHAR}, 1)
 	</insert>
 	
@@ -92,6 +92,10 @@
 	        </if>
 	    </where>
 	</select>
+	
+	<update id="updateHitCount">
+		UPDATE product SET hitCount = hitCount + 1 WHERE productIdx = #{productIdx}
+	</update>
 	
 	<update id="updateTradePost">
 		UPDATE product SET title = #{title}, content = #{content}, price = #{price}, shippingFee = #{shippingFee},

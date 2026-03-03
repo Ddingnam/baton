@@ -226,5 +226,15 @@ public class TradeServiceImpl implements TradeService {
 	    }
 	    return result;
 	}
+
+	@Override
+	public void updateHitCount(long productIdx) throws Exception {
+		try {
+			mapper.updateHitCount(productIdx);
+		} catch (Exception e) {
+			log.info("viewCount : ", e);
+		}
+		
+	}
 	
 }
