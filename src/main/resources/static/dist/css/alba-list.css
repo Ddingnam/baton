@@ -1,11 +1,9 @@
 @charset "UTF-8";
 
 :root {
-  /* 1. 메인 컬러를 남색(Navy)으로 변경 */
   --primary: #1E3A8A; 
   --primary-dark: #172554;
   --primary-light: #EFF6FF;
-  
   --surface: #ffffff;
   --bg: #F7F8FA;
   --border: #E8EAED;
@@ -34,236 +32,80 @@ body {
 
 a { text-decoration: none; color: inherit; }
 
-/* ───────── Layout ───────── */
-#baton-layout-container { min-height: 100vh; padding-bottom: 100px; }
+#baton-layout-container { margin-top: 40px; min-height: 100vh; padding-bottom: 100px; }
 
 .baton-page {
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 28px;
-  /* 배너와 콘텐츠 사이 휑한 간격을 확 줄였습니다 */
-  padding: 10px 20px 60px 20px; 
+  grid-template-columns: 200px 1fr;
+  gap: 24px;
+  padding: 0 0 60px 0; 
 }
 
-/* ───────── Hero / Search Banner ───────── */
-.alba-hero {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  margin-top: 80px; 
-  /* 리스트와 바짝 붙도록 아래 여백(10px)을 줄였습니다 */
-  padding: 48px 0 10px 0;
-  animation: fadeInUp 0.7s cubic-bezier(0.165,0.84,0.44,1) forwards;
+.trade-main-container {
+  padding-top: 80px;
 }
 
-.alba-card {
-    background: #fff;
-    border-radius: 20px;
-    border: 1px solid var(--border-color);
-    overflow: hidden;
-    padding: 20px;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
+.trade-hero-section {
+  padding: 60px 0 40px 0;
 }
 
-.alba-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text-main);
-    margin-bottom: 10px;
-}
-
-.alba-pay {
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--primary);
-    margin-bottom: 12px;
-}
-
-.alba-meta {
-    background: var(--bg-color);
-    padding: 10px;
-    border-radius: 8px;
-    font-size: 12px;
-    color: var(--text-sub);
-    margin-top: auto;
-}
-
-.alba-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-    border-color: rgba(0, 185, 141, 0.3);
-}
-
-.alba-hero-inner {
+.hero-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
 }
 
-.alba-hero .sub-title {
-  font-size: 13px;
+.hero-inner .main-title {
+  font-size: 32px;
   font-weight: 800;
-  letter-spacing: 1px;
-  color: var(--primary);
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
-
-.alba-hero .main-title {
-  font-size: 34px;
-  font-weight: 800;
-  color: var(--text-main);
-  line-height: 1.3;
-  margin-bottom: 10px;
-}
-
-.alba-hero .main-title .highlight { color: var(--primary); }
-
-.alba-hero .desc {
-  font-size: 15px;
-  color: var(--text-sub);
-  margin-bottom: 28px;
-}
-
-.alba-search-box {
-  display: flex;
-  align-items: center;
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: 50px;
-  padding: 6px 6px 6px 22px;
-  width: 100%;
-  max-width: 560px;
-  transition: all 0.3s ease;
-}
-
-.alba-search-box:focus-within,
-.alba-search-box:hover {
-  border-color: var(--primary);
-  box-shadow: 0 4px 16px rgba(30, 58, 138, 0.12);
-}
-
-.alba-search-box input {
-  flex: 1;
-  border: none !important;
-  outline: none !important;
-  background: transparent;
-  height: 44px;
-  font-size: 14px;
-  font-family: inherit;
-  color: var(--text-main);
-}
-
-.alba-search-box .search-btn {
-  background: var(--text-main);
-  color: #fff;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 30px;
-  font-size: 14px;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.25s;
+  letter-spacing: -0.5px;
   white-space: nowrap;
 }
 
-.alba-search-box .search-btn:hover { background: var(--primary); }
-
-/* 🔥 새롭게 추가된 인기 퀵링크 태그 스타일 */
-.quick-tags-wrap {
-  width: 100%;
-  max-width: 560px;
-  margin-top: 20px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.quick-tags-wrap .tag-label {
-  font-size: 13px;
-  font-weight: 800;
-  color: #EF4444; /* 포인트 컬러(빨강) */
-  margin-right: 4px;
-}
-
-.quick-tag {
-  background: var(--primary-light);
-  color: var(--primary);
-  border: 1px solid rgba(30, 58, 138, 0.1);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
-}
-
-.quick-tag:hover {
-  background: var(--primary);
-  color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2);
-}
-
-/* ───────── Sidebar ───────── */
 .baton-sidebar {
   background: var(--surface);
   border-radius: var(--radius);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
-  padding: 24px;
+  padding: 24px 20px;
   position: sticky;
   top: 100px;
   height: fit-content;
 }
 
 .sidebar-header {
-  margin-bottom: 22px;
-  padding-bottom: 18px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
   border-bottom: 1px solid var(--border);
 }
 
 .location-label {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--primary);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
-  gap: 4px;
-  letter-spacing: .04em;
+  gap: 6px;
 }
 
-.location-name { font-size: 19px; font-weight: 800; }
+.location-name { font-size: 18px; font-weight: 800; }
 .location-name span { color: var(--primary); }
 
 .filter-section { margin-bottom: 24px; }
 
 .filter-title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-sub);
-  margin-bottom: 10px;
-  letter-spacing: .04em;
+  margin-bottom: 12px;
 }
 
 .filter-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .chip {
-  padding: 7px 16px;
+  padding: 8px 14px;
   border-radius: 100px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -271,8 +113,7 @@ a { text-decoration: none; color: inherit; }
   font-weight: 600;
   color: var(--text-sub);
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.175,0.885,0.32,1.275);
-  font-family: inherit;
+  transition: all 0.2s ease;
 }
 
 .chip:hover {
@@ -286,420 +127,224 @@ a { text-decoration: none; color: inherit; }
   color: #fff;
   border-color: var(--primary);
   box-shadow: 0 4px 12px rgba(30, 58, 138, 0.22);
-  transform: translateY(-1px);
 }
 
-/* ───────── Content Area ───────── */
 .content-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid var(--text-main);
+  margin-bottom: 0;
 }
 
-.result-count { font-size: 17px; font-weight: 800; }
-.result-count span { color: var(--primary); }
-
-.header-right { display: flex; align-items: center; gap: 10px; }
-
-.sort-select {
-  padding: 8px 28px 8px 14px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: #fff
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2372787F' d='M6 8L1 3h10z'/%3E%3C/svg%3E")
-    no-repeat right 10px center;
-  appearance: none;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-sub);
-  cursor: pointer;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.sort-select:focus,
-.sort-select:hover { border-color: var(--primary); }
-
-.view-toggle { display: flex; gap: 8px; }
-
-.view-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  cursor: pointer;
-  display: flex;
+.list-title-bar {
+  display: grid;
+  grid-template-columns: 150px 1fr 180px 140px 90px;
   align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  font-size: 18px;
-  transition: all 0.2s;
+  padding: 0 24px;
+  height: 56px;
+  background: #F8F9FB;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  margin-top: 16px;
 }
 
-.view-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
-.view-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-
-/* (참고) 삭제하셨던 공고 등록 버튼 CSS도 혹시 몰라 남겨두었습니다. 불필요하면 삭제하셔도 됩니다 */
-.btn-create-alba {
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  padding: 9px 18px;
-  border-radius: var(--radius-sm);
-  font-weight: 700;
+.list-title-bar span {
   font-size: 14px;
-  font-family: inherit;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.25s cubic-bezier(0.175,0.885,0.32,1.275);
-  text-decoration: none;
-}
-.btn-create-alba:hover {
-  background: var(--primary-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(30, 58, 138, 0.3);
+  font-weight: 700;
+  color: var(--text-sub);
+  text-align: center;
 }
 
-/* ───────── Table View ───────── */
-.job-container {
+.list-title-bar span:nth-child(2) {
+  text-align: left;
+  padding-left: 20px;
+}
+
+.job-list-container {
   background: var(--surface);
-  border-radius: var(--radius);
+  border-radius: 0 0 var(--radius) var(--radius);
   border: 1px solid var(--border);
+  border-top: none;
   overflow: hidden;
   box-shadow: var(--shadow);
-  margin-bottom: 8px;
 }
 
-.job-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.job-list-item {
+  display: grid;
+  grid-template-columns: 150px 1fr 180px 140px 90px;
+  align-items: center;
+  padding: 30px 24px;
+  border-bottom: 1px solid var(--border);
+  transition: all 0.2s ease;
+  min-height: 100px;
+  background: var(--surface);
+}
 
-.job-table th {
-  background: var(--bg);
-  padding: 14px 16px;
-  font-size: 12px;
+.job-list-item:last-child {
+  border-bottom: none;
+}
+
+.job-list-item:hover {
+  background: #F9FAFF;
+}
+
+.job-area-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+  padding-right: 10px;
+}
+
+.job-area-text {
+  font-size: 14px;
+  color: var(--text-sub);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.job-period-badge {
+  display: inline-flex;
+  justify-content: center;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--text-muted);
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-  letter-spacing: .04em;
+  background: var(--primary-light);
+  color: var(--primary);
+  width: fit-content;
+  margin: 0 auto;
 }
 
-.job-table th:nth-child(1) { width: 46%; }
-.job-table th:nth-child(2) { width: 24%; }
-.job-table th:nth-child(3) { width: 16%; }
-.job-table th:nth-child(4) { width: 14%; text-align: center; }
-
-.job-table td {
-  padding: 20px 16px;
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
-  animation: fadeInUp 0.5s ease both;
+.job-article-col {
+  padding: 0 24px;
+  min-width: 0;
 }
 
-.job-table tr:last-child td { border-bottom: none; }
-.job-table tr:hover { background: var(--primary-light); cursor: pointer; }
-.job-table tr:hover .job-title-text { color: var(--primary); }
-
-.td-title { overflow: hidden; }
-
-.company-nm {
-  font-size: 12px;
-  color: var(--text-muted);
+.job-employer {
+  font-size: 14px;
+  color: var(--text-sub);
   margin-bottom: 6px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.job-title-text {
-  font-size: 16px;
+.job-title {
+  font-size: 18px;
   font-weight: 700;
   color: var(--text-main);
-  line-height: 1.4;
-  margin-bottom: 10px;
-  text-decoration: none;
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color 0.2s;
-}
-
-.td-area-time .area-text {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.td-area-time .time-text {
-  font-size: 12px;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.time-consult {
-  display: inline-block;
-  background: var(--primary-light);
-  color: var(--primary);
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.td-pay { white-space: nowrap; }
-
-.pay-type-badge {
-  display: inline-block;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 800;
-  margin-right: 4px;
-  letter-spacing: .02em;
-}
-
-.pay-type-badge.hour  { background: var(--primary-light); color: var(--primary); }
-.pay-type-badge.month { background: #EEF2FF; color: #4F46E5; }
-
-.pay-num { font-size: 16px; font-weight: 800; }
-
-.td-date { text-align: center; }
-
-.date-cell-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.date-col-left { font-size: 12px; color: var(--text-muted); }
-.date-col-left .new { color: var(--primary); font-weight: 700; }
-
-.action-icons { display: flex; gap: 6px; }
-.action-icons.vertical { flex-direction: column; align-items: center; }
-
-.icon-btn {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.icon-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
-.icon-btn.liked { color: #F59E0B; border-color: #FDE68A; background: #FFFBEB; }
-
-.tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
-
-.job-tag {
-  padding: 3px 8px;
-  border-radius: 5px;
-  font-size: 11px;
-  font-weight: 700;
-  background: var(--bg);
-  color: var(--text-sub);
-  border: 1px solid var(--border);
-}
-
-/* ───────── Card View ───────── */
-.job-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-bottom: 40px;
-}
-
-.job-grid.visible { display: grid; }
-
-.job-card {
-  background: var(--surface);
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-  transition: all 0.35s cubic-bezier(0.165,0.84,0.44,1);
-  box-shadow: var(--shadow);
-  opacity: 0;
-  animation: fadeInUp 0.6s cubic-bezier(0.165,0.84,0.44,1) forwards;
-}
-
-.job-card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-md);
-  border-color: rgba(30, 58, 138, 0.3);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 14px;
-}
-
-.card-header-left { display: flex; align-items: center; gap: 12px; }
-
-.job-thumb {
-  width: 44px; height: 44px;
-  border-radius: var(--radius-sm);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  overflow: hidden;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
-  flex-shrink: 0;
-}
-
-.job-thumb img { width: 100%; height: 100%; object-fit: cover; }
-
-.job-employer { font-size: 14px; font-weight: 700; }
-.job-date { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-
-.job-title-text.card-title {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 10px;
-  white-space: normal;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.job-pay-row {
-  font-size: 17px;
-  font-weight: 800;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.job-schedule {
-  font-size: 13px;
-  color: var(--text-sub);
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.card-footer {
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-  margin-top: auto;
-}
-
-/* ───────── No Results ───────── */
-.no-result {
+.job-salary-col {
   text-align: center;
-  padding: 80px 20px;
-  color: var(--text-sub);
-}
-
-.no-result-icon { font-size: 48px; margin-bottom: 16px; display: block; }
-.no-result strong { display: block; font-size: 17px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
-.no-result span { font-size: 14px; }
-
-/* ───────── Pagination ───────── */
-.pagination {
   display: flex;
-  justify-content: center;
-  gap: 8px;
-  padding-top: 36px;
-}
-
-.page-btn {
-  width: 36px; height: 36px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-sub);
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.25s cubic-bezier(0.175,0.885,0.32,1.275);
-  display: flex; align-items: center; justify-content: center;
-}
-
-.page-btn:hover:not(:disabled) {
-  border-color: var(--primary);
-  color: var(--primary);
-  transform: translateY(-2px);
-}
-
-.page-btn.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
-}
-
-.page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-/* ───────── FAB ───────── */
-.fab {
-  position: fixed;
-  bottom: 100px; /* 챗봇과 겹치지 않게 수정됨 */
-  right: 36px;
-  background: var(--primary);
-  color: #fff !important;
-  padding: 14px 26px;
-  border-radius: 50px;
-  font-weight: 800;
-  font-size: 15px;
-  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  box-shadow: 0 10px 28px rgba(30, 58, 138, 0.35);
-  text-decoration: none;
-  z-index: 999;
-  transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+  gap: 8px;
 }
 
-.fab:hover {
-  background: var(--primary-dark);
-  transform: translateY(-4px);
-  box-shadow: 0 14px 36px rgba(30, 58, 138, 0.4);
+.pay-badge {
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid;
 }
 
-.hidden { display: none !important; }
+.pay-badge.hour {
+  background: #FFF5F5;
+  color: #E53E3E;
+  border-color: #FED7D7;
+}
 
-/* ───────── Responsive ───────── */
-@media (max-width: 960px) {
+.pay-badge.month {
+  background: #EEF2FF;
+  color: #4F46E5;
+  border-color: #C7D2FE;
+}
+
+.pay-amount {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.job-time-col {
+  text-align: center;
+  font-size: 15px;
+  color: var(--text-sub);
+}
+
+.job-date-col {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.job-date-col.recent {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.job-info-main, .job-details, .job-pay-info {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
   .baton-page {
     grid-template-columns: 1fr;
-    /* 모바일/태블릿 환경에서도 붕 뜨지 않도록 간격 축소 유지 */
-    padding: 10px 20px 60px 20px;
+    padding: 0 20px 60px 20px;
   }
-  .baton-sidebar { position: static; margin-bottom: 20px; }
+}
+
+@media (max-width: 960px) {
+  .list-title-bar {
+    display: none;
+  }
+  .job-list-item {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 12px;
+    padding: 20px;
+    min-height: auto;
+  }
+  .job-area-col {
+    grid-column: 1;
+    grid-row: 1;
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+  }
+  .job-period-badge {
+    margin: 0;
+  }
+  .job-salary-col {
+    grid-column: 2;
+    grid-row: 1;
+    align-items: flex-end;
+  }
+  .job-article-col {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    padding: 0;
+  }
+  .job-time-col, .job-date-col {
+    display: none;
+  }
 }
 
 @media (max-width: 768px) {
-  .content-header { flex-wrap: wrap; gap: 12px; }
-  .btn-create-alba { display: none; }
-  .job-grid { grid-template-columns: 1fr 1fr; }
-}
-
-@media (max-width: 480px) {
-  .job-grid { grid-template-columns: 1fr; }
-  .alba-hero .main-title { font-size: 26px; }
-  .fab { bottom: 100px; right: 20px; }
+  .job-list-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .job-salary-col {
+    align-items: flex-start;
+    margin-top: 10px;
+  }
 }
