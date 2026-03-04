@@ -2,13 +2,11 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.MemberMapper">
-	<select id="loginSnsMember" parameterType="map" resultType="com.sp.app.domain.dto.MemberDto">
-		SELECT m1.member_id, m1.login_id, sns_provider, sns_id, 
-			name, email,  
-			created_at, last_login, enabled
-		FROM member1 m1
-		LEFT OUTER JOIN member2 m2 ON m1.member_id = m2.member_id 
-		WHERE sns_provider = #{sns_provider} AND sns_id = #{sns_id}
+	<select id="loginSnsUser" parameterType="map" resultType="com.sp.app.domain.dto.UserDto">
+		SELECT userIdx, oauthId, provider, name, email,  
+			createdDate, lastLoginDate, status
+		FROM users
+		WHERE provider = #{provider} AND oauthId = #{oauthId}
 	</select>
 	
 	<select id="userSeq" resultType="Long">
@@ -92,16 +90,37 @@
 		SELECT * FROM dual
     </update>
 
-    <update id="insertSnsMember" parameterType="com.sp.app.domain.dto.MemberDto">
-		INSERT ALL
-		INTO member1(member_id, sns_provider, sns_id, 
-			enabled, created_at, update_at)
-		VALUES (#{member_id}, #{sns_provider}, #{sns_id}, 
-			1, SYSDATE, SYSDATE)
-		INTO member2(member_id, name, email, ipAddr)
-		VALUES (#{member_id}, #{name}, #{email, jdbcType=VARCHAR}, 
-			#{ipAddr, jdbcType=VARCHAR})
-		SELECT * FROM dual
+    <update id="insertSnsUser" parameterType="com.sp.app.domain.dto.UserDto">
+		INSERT INTO users (
+	        userIdx, 
+	        userId, 
+	        oauthId, 
+	        pwd, 
+	        name, 
+	        nickname, 
+	        email, 
+	        tel, 
+	        birth, 
+	        profile_photo, 
+	        score, 
+	        userLevel, 
+	        createdDate, 
+	        updatedDate, 
+	        lastLoginDate, 
+	        pwdFailCount, 
+	        status
+	    ) VALUES (
+	        #{userIdx}, 
+	        #{userId}, 
+	        #{oauthId, jdbcType=VARCHAR}, 
+	        #{pwd}, 
+	        #{name}, 
+	        #{nickname}, 
+	        #{email}, 
+	        #{tel}, 
+	        #{birth}, 
+	        #{profile_photo, jdbcType=VARCHAR}, 
+	        0, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 1)
     </update>
 
 	<insert id="insertMemberStatus" parameterType="com.sp.app.domain.dto.MemberDto">
@@ -168,7 +187,7 @@
 			status, createdDate, updatedDate, lastLoginDate,
 			TO_CHAR(birth, 'YYYY-MM-DD') birth, 
 			profile_photo, score, userLevel, pwdFailCount,
-			m2.authority
+			m2.authority, batonpoint, provider
 		FROM users m1
 		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
 		WHERE m1.userIdx = #{member_id}
@@ -179,7 +198,7 @@
 			status, createdDate, updatedDate, lastLoginDate,
 			TO_CHAR(birth, 'YYYY-MM-DD') birth, 
 			profile_photo, score, userLevel, pwdFailCount,
-			m2.authority
+			m2.authority, batonpoint, provider
 		FROM users m1
 		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
 		WHERE m1.userId = #{login_id}

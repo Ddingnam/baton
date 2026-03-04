@@ -60,7 +60,7 @@ public class MemberSnsController {
 			}
 			
 			// 시큐리티 로그인 처리
-			successHandler.forceLogin(dto);
+			// successHandler.forceLogin(dto);
 
 		} catch (Exception e) {
 			log.info("kakaoLogin : ", e);
