@@ -168,6 +168,69 @@ input[readonly] {
     background: var(--primary-light); border-color: var(--primary); color: var(--primary); font-weight: 700;
 }
 
+.custom-dropdown {
+    position: relative;
+    width: 100%;
+    user-select: none;
+}
+
+.dropdown-selected {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dropdown-selected:hover { border-color: var(--primary); }
+
+.custom-dropdown.active .dropdown-selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(0, 185, 141, 0.1);
+}
+
+.custom-dropdown.active .dropdown-selected i { transform: rotate(180deg); color: var(--primary); }
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid var(--border);
+    padding: 8px;
+    z-index: 100;
+    display: none;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.custom-dropdown.active .dropdown-menu { display: block; animation: slideIn 0.2s ease-out; }
+
+.dropdown-menu li {
+    padding: 12px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-main);
+    transition: all 0.2s;
+}
+
+.dropdown-menu li:hover { background: var(--primary-light); color: var(--primary); }
+
+.dropdown-menu li.active { background: var(--primary); color: #fff; font-weight: 600; }
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .tag-wrap { border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 8px; min-height: 50px; background: white; }
 
 .tag-chip { background: var(--primary-light); color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 5px; }

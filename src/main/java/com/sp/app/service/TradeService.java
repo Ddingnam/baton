@@ -17,6 +17,7 @@ public interface TradeService {
 	public List<String> findTagsByIdx(long productIdx);
 	
 	public List<Trade> tradeList(Map<String, Object> map);
+	public List<Map<String, Object>> categoryList();
 	public int dataCount(Map<String, Object> map);
 	
 }

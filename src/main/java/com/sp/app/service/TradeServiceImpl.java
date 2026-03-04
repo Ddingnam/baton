@@ -214,6 +214,11 @@ public class TradeServiceImpl implements TradeService {
 	    }
 	    return list;
 	}
+	
+	@Override
+	public List<Map<String, Object>> categoryList() {
+		return mapper.CategoryList();
+	}
 
 	@Override
 	public int dataCount(Map<String, Object> map) {

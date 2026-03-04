@@ -69,6 +69,39 @@ const toggleImage = (function() {
     return { init, remove, addExisting };
 })();
 
+document.addEventListener('DOMContentLoaded', function() {
+    const dropdown = document.getElementById('categoryDropdown');
+	if(!dropdown) return;
+	
+    const selected = dropdown.querySelector('.dropdown-selected');
+    const menu = dropdown.querySelector('.dropdown-menu');
+    const hiddenInput = document.getElementById('selectedCategory');
+    const selectedText = dropdown.querySelector('.selected-text');
+
+    selected.addEventListener('click', () => {
+        dropdown.classList.toggle('active');
+    });
+
+    menu.querySelectorAll('li').forEach(item => {
+        item.addEventListener('click', function() {
+            const value = this.dataset.value;
+            const text = this.innerText;
+
+            hiddenInput.value = value;
+            selectedText.innerText = text;
+
+            menu.querySelectorAll('li').forEach(li => li.classList.remove('active'));
+            this.classList.add('active');
+
+            dropdown.classList.remove('active');
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target)) dropdown.classList.remove('active');
+    });
+});
+
 const toggleTag = (function() {
     let tags = [];
     const tagInput = document.getElementById('tagInput');
@@ -212,6 +245,17 @@ window.onload = function() {
 					if (data.trade && data.trade.tradeType) {
 						TradeLogic.toggleOptions(data.trade.tradeType);
 					}
+					if(data.trade && data.trade.categoryIdx) {
+						const hiddenInput = document.getElementById('selectedCategory');
+						const selectedText = document.querySelector('.custom-dropdown .selected-text');
+					                    
+						hiddenInput.value = data.trade.categoryIdx;
+						const activeLi = document.querySelector(`.dropdown-menu li[data-value="${data.trade.categoryIdx}"]`);
+						if(activeLi) {
+							selectedText.innerText = activeLi.innerText;
+							activeLi.classList.add('active');
+						}
+					}
 	            })
 	            .catch(error => console.error('데이터 로드 실패:', error));
 	    } else {
@@ -226,11 +270,23 @@ function submitForm() {
 	const freeCheck = document.getElementById('freeCheck');
 	const tradeType = f.tradeType.value;
 	
-    if (!f.title.value.trim()) return alert('제목을 입력하세요.');
+	if (!f.title.value.trim()) {
+		alert('제목을 입력하세요.');
+		f.title.focus();
+		return;
+	}
+
+	if (!f.categoryIdx.value) {
+		alert('카테고리를 선택해주세요.');
+		f.categoryIdx.focus();
+		return;
+	}
 	
 	const rawPrice = PriceFormatter.unformat(priceInput.value);
 	if (!freeCheck.checked && (!rawPrice || rawPrice === '0')) {
-		return alert('판매 가격을 입력하거나 무료나눔을 선택해주세요.');
+		alert('판매 가격을 입력하거나 무료나눔을 선택해주세요.');
+		priceInput.focus();
+		return;
 	}
 
 	priceInput.value = freeCheck.checked ? '0' : rawPrice;

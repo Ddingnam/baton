@@ -13,7 +13,6 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
-
 <jsp:include page="/WEB-INF/views/layout/header.jsp" />
 
 <main class="trade-main-container">
@@ -36,15 +35,12 @@
             <div class="toolbar-top">
                 <div class="filter-group tl-filter-list">
                     <button class="filter-btn ${empty param.categoryIdx ? 'active' : ''}" onclick="tlSetCategory(''); return false;">전체</button>
-                    <button class="filter-btn ${param.categoryIdx == '1' ? 'active' : ''}" onclick="tlSetCategory('1'); return false;">전자기기</button>
-                    <button class="filter-btn ${param.categoryIdx == '2' ? 'active' : ''}" onclick="tlSetCategory('2'); return false;">남성의류</button>
-                    <button class="filter-btn ${param.categoryIdx == '3' ? 'active' : ''}" onclick="tlSetCategory('3'); return false;">여성의류</button>
-                    <button class="filter-btn ${param.categoryIdx == '4' ? 'active' : ''}" onclick="tlSetCategory('4'); return false;">뷰티</button>
-                    <button class="filter-btn ${param.categoryIdx == '5' ? 'active' : ''}" onclick="tlSetCategory('5'); return false;">스타굿즈</button>
-                    <button class="filter-btn ${param.categoryIdx == '6' ? 'active' : ''}" onclick="tlSetCategory('6'); return false;">가구/인테리어</button>
-                    <button class="filter-btn ${param.categoryIdx == '7' ? 'active' : ''}" onclick="tlSetCategory('7'); return false;">도서</button>
-                    <button class="filter-btn ${param.categoryIdx == '8' ? 'active' : ''}" onclick="tlSetCategory('8'); return false;">게임</button>
-                    <button class="filter-btn ${param.categoryIdx == '9' ? 'active' : ''}" onclick="tlSetCategory('9'); return false;">기타</button>
+				    <c:forEach var="vo" items="${categoryList}">
+				        <button class="filter-btn ${param.categoryIdx == vo.CATEGORYIDX ? 'active' : ''}" 
+				                onclick="tlSetCategory('${vo.CATEGORYIDX}'); return false;">
+				            ${vo.CATEGORYNAME}
+				        </button>
+				    </c:forEach>
                 </div>
                 <button class="btn-create-trade" onclick="location.href='${pageContext.request.contextPath}/trade/write'">
                     <i class="ri-add-line"></i> 판매하기

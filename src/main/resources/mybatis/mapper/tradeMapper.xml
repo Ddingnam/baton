@@ -10,7 +10,7 @@
 		INSERT INTO product(productIdx, title, content, price, shippingFee, userIdx, tradeType, 
 			tradePlace, regionIdx, productStatus, categoryIdx)
 		VALUES(#{productIdx}, #{title, jdbcType=VARCHAR}, #{content, jdbcType=VARCHAR}, #{price}, #{shippingFee}, #{userIdx}, #{tradeType, jdbcType=VARCHAR},
-			#{tradePlace, jdbcType=VARCHAR}, 1, #{productStatus, jdbcType=VARCHAR}, 1)
+			#{tradePlace, jdbcType=VARCHAR}, 1, #{productStatus, jdbcType=VARCHAR}, #{categoryIdx, jdbcType=VARCHAR})
 	</insert>
 	
 	<insert id="insertTradePostImg" parameterType="com.sp.app.model.TradeImg">
@@ -79,6 +79,12 @@
 	            ORDER BY p.productIdx DESC
 	        ) tb WHERE ROWNUM &lt;= #{end}
 	    ) WHERE rnum &gt;= #{start}
+	</select>
+	
+	<select id="CategoryList" resultType="map">
+	    SELECT categoryIdx, categoryName 
+	    FROM category 
+	    ORDER BY categoryIdx ASC
 	</select>
 	
 	<select id="dataCount" parameterType="map" resultType="int">

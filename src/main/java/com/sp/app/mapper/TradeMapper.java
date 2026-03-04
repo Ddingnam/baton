@@ -31,6 +31,7 @@ public interface TradeMapper {
 	public List<TradeImg> findImagesByIdx(long productIdx);
 	public List<String> findTagsByIdx(long productIdx);
 	public Long findTagIdxByName(String tagName);
+	public List<Map<String, Object>> CategoryList();
 	
 	public List<Trade> tradeList(Map<String, Object> map);
 	public int dataCount(Map<String, Object> map);

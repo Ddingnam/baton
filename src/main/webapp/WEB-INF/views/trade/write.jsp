@@ -8,6 +8,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${mode=='update'?'상품 수정':'상품 등록'} | 마켓</title>
+<jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/trade-write.css">
@@ -15,7 +16,6 @@
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/layout/header.jsp" />
-<jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 
 <div class="page-wrap">
 	<div class="header-content">
@@ -88,17 +88,22 @@
 
                         <div class="field">
                             <label>카테고리</label>
-                            <select name="categoryIdx">
-                                <option value="">카테고리를 선택하세요</option>
-                                <option value="1" ${trade.categoryIdx == 1 ? 'selected' : ''}>📱 전자기기</option>
-                                <option value="2" ${trade.categoryIdx == 2 ? 'selected' : ''}>👗 의류</option>
-                                <option value="3" ${trade.categoryIdx == 3 ? 'selected' : ''}>💄 뷰티</option>
-                                <option value="4" ${trade.categoryIdx == 4 ? 'selected' : ''}>⭐ 스타굿즈</option>
-                                <option value="5" ${trade.categoryIdx == 5 ? 'selected' : ''}>🏠 가구/인테리어</option>
-                                <option value="6" ${trade.categoryIdx == 6 ? 'selected' : ''}>📚 도서</option>
-                                <option value="7" ${trade.categoryIdx == 7 ? 'selected' : ''}>🎮 게임</option>
-                                <option value="8" ${trade.categoryIdx == 8 ? 'selected' : ''}>기타</option>
-                            </select>
+                            <div class="custom-dropdown" id="categoryDropdown">
+						        <input type="hidden" name="categoryIdx" id="selectedCategory" value="${trade.categoryIdx}">
+						        
+						        <div class="dropdown-selected">
+						            <span class="selected-text">${not empty trade.categoryName ? trade.categoryName : '카테고리를 선택하세요'}</span>
+						            <i class="ri-arrow-down-s-line"></i>
+						        </div>
+						        
+						        <ul class="dropdown-menu">
+						            <c:forEach var="vo" items="${categoryList}">
+						                <li data-value="${vo.CATEGORYIDX}" class="${trade.categoryIdx == vo.CATEGORYIDX ? 'active' : ''}">
+						                    ${vo.CATEGORYNAME}
+						                </li>
+						            </c:forEach>
+						        </ul>
+						    </div>
                         </div>
 
                         <div class="field" style="margin-bottom: 0;">

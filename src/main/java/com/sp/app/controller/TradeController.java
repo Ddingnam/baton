@@ -43,6 +43,10 @@ public class TradeController {
 	        @RequestParam(value = "categoryIdx", defaultValue = "") String categoryIdx,
 	        Model model) {
 		try {
+			
+			List<Map<String, Object>> categoryList = service.categoryList();
+	        model.addAttribute("categoryList", categoryList);
+			
 			int size = 12; // 한 페이지에 보여줄 개수
 	        int total_page = 0;
 	        int dataCount = 0;
@@ -97,7 +101,8 @@ public class TradeController {
 	
 	@GetMapping("write")
 	public String writeForm(Model model) {
-		
+		List<Map<String, Object>> categoryList = service.categoryList();
+	    model.addAttribute("categoryList", categoryList);
 		model.addAttribute("mode", "write");
 		
 		return "trade/write";
@@ -127,6 +132,8 @@ public class TradeController {
 				return "redirect:/trade/list";
 			}
 			
+			List<Map<String, Object>> categoryList = service.categoryList();
+	        model.addAttribute("categoryList", categoryList);
 			model.addAttribute("trade", dto);
 			model.addAttribute("mode", "update");
 			
