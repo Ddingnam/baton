@@ -20,4 +20,7 @@ public interface TradeService {
 	public List<Map<String, Object>> categoryList();
 	public int dataCount(Map<String, Object> map);
 	
+	public Map<String, Object> toggleWishList(long productIdx, long userIdx) throws Exception;
+	public boolean isUserLiked(long productIdx, long userIdx);
+	
 }

@@ -111,9 +111,10 @@
                                     </c:choose>
                                 </div>
 
-                                <button type="button" class="wish-btn tl-wish-btn ${item.likeByMe ? 'active' : ''}" onclick="tlToggleWish(event, ${item.productIdx})">
-                                    ${item.likeByMe ? '<i class="ri-heart-3-fill"></i>' : '<i class="ri-heart-3-line"></i>'}
-                                </button>
+                                <button type="button" class="wish-btn tl-wish-btn ${item.isLiked ? 'active' : ''}" 
+								        onclick="tlToggleWish(event, ${item.productIdx})">
+								    <i class="${item.isLiked ? 'ri-heart-3-fill' : 'ri-heart-3-line'}"></i>
+								</button>
                             </div>
 
                             <div class="card-info tl-card-body">
@@ -127,8 +128,7 @@
                                 </div>
 
                                 <div class="card-details">
-                                    <div class="detail-item"><i class="ri-price-tag-3-line"></i> 카테고리</div>
-                                    <div class="detail-item"><i class="ri-map-pin-2-line"></i> ${not empty item.tradePlace ? item.tradePlace : '장소 미정'}</div>
+                                    <div class="detail-item"><i class="ri-map-pin-2-line"></i> ${not empty item.tradePlace ? item.tradePlace : '택배 거래'}</div>
                                     <div class="detail-item"><i class="ri-time-line"></i> ${item.createdDate}</div>
                                 </div>
 
@@ -138,7 +138,7 @@
                                         <span class="host-name">동네이웃</span>
                                     </div>
                                     <div class="interaction-info tl-card-stats">
-                                        <span><i class="ri-eye-line"></i> 0</span>
+                                        <span><i class="ri-eye-line"></i> ${item.hitCount}</span>
                                         <span><i class="ri-chat-3-line"></i> ${item.chatCount}</span>
                                         <span><i class="ri-heart-3-fill wish-icon"></i> ${item.likeCount}</span>
                                     </div>

@@ -25,6 +25,7 @@ public class Trade {
 	private int likeCount;
 	private int chatCount;
 	private int pullCount;
+	private boolean isLiked;
 	
 	private String tradeType;
 	private String tradeStatus;
@@ -32,6 +33,7 @@ public class Trade {
 	
 	private String tradePlace;
 	private long regionIdx;	
+	private String coreAddress;
 
 	private String lastUpDate;
 	private String createdDate;
@@ -49,6 +51,11 @@ public class Trade {
 	private List<MultipartFile> newFiles;
 	private List<TradeImg> imageList;
 	
-	private boolean likeByMe;
-	
+	public boolean getIsLiked() {
+        return isLiked;
+    }
+    
+    public void setIsLiked(boolean isLiked) {
+        this.isLiked = isLiked;
+    }
 }

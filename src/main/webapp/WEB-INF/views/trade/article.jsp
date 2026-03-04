@@ -112,9 +112,9 @@
                 </p>
 
                 <div class="product-meta">
-                    <span>👁 조회 ${trade.hitCount}</span>
-                    <span>❤️ 찜 <span id="statWish">${trade.likeCount}</span></span>
-                    <span>💬 채팅 ${trade.chatCount}</span>
+                    <span> 조회 ${trade.hitCount}</span>
+                    <span> 찜 <span id="statWish">${trade.likeCount}</span></span>
+                    <span> 채팅 ${trade.chatCount}</span>
                     <span>${trade.createdDate}</span>
                 </div>
             </div>
@@ -162,7 +162,7 @@
                     
                     <c:if test="${trade.tradeType == '택배' || trade.tradeType == '둘다가능'}">
                         <div class="info-item full-width">
-                            <p class="info-label">택배비</p>
+                            <p class="info-label">배송비</p>
 
                             <c:choose>
                                 <c:when test="${not empty trade.shippingFee && trade.shippingFee > 0}">
@@ -213,7 +213,7 @@
                         <p class="seller-name">${trade.nickName}</p>
                         <p class="seller-region">
                             📍 <c:choose>
-                                <c:when test="${not empty regionName}">${regionName}</c:when>
+                                <c:when test="${not empty trade.coreAddress}">${trade.coreAddress}</c:when>
                                 <c:otherwise>동네 정보 없음</c:otherwise>
                             </c:choose>
                         </p>
@@ -292,10 +292,10 @@
 			        </c:choose>
 			
 			        <div class="secondary-actions">
-			            <button class="wish-btn-large ${false ? 'active' : ''}"
-			                id="wishBtnLarge" onclick="WishModule.toggle()">
-			                ${false ? '❤️' : '🤍'} 찜 ${trade.likeCount}
-			            </button>
+			            <button class="wish-btn-large ${isLiked ? 'active' : ''}"
+						    id="wishBtnLarge" onclick="WishModule.toggle()">
+						    ${isLiked ? '❤️' : '🤍'} 찜 ${trade.likeCount}
+						</button>
 			            <button class="share-btn" onclick="ShareModule.share()">🔗 공유</button>
 			        </div>
 			
@@ -342,7 +342,7 @@
 
 <div id="articleData"
     data-trade-idx="${trade.productIdx}"
-    data-wished="${false}"
+    data-wished="${isLiked}"
     data-wish-count="${trade.likeCount}"
     style="display:none">
 </div>

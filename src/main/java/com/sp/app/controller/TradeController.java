@@ -41,6 +41,7 @@ public class TradeController {
 	public String list(@RequestParam(value = "page", defaultValue = "1") int current_page,
 	        @RequestParam(value = "keyword", defaultValue = "") String keyword,
 	        @RequestParam(value = "categoryIdx", defaultValue = "") String categoryIdx,
+	        @AuthenticationPrincipal CustomUserDetails userDetails,
 	        Model model) {
 		try {
 			
@@ -54,6 +55,10 @@ public class TradeController {
 	        Map<String, Object> map = new HashMap<>();
 	        map.put("keyword", keyword);
 	        map.put("categoryIdx", categoryIdx);
+	        
+	        if (userDetails != null) {
+	            map.put("userIdx", userDetails.getMember().getUserIdx());
+	        }
 
 	        dataCount = service.dataCount(map);
 	        if (dataCount != 0) {
@@ -82,15 +87,22 @@ public class TradeController {
 	}
 	
 	@GetMapping("article")
-	public String article(@RequestParam("productIdx") long productIdx, Model model) {
+	public String article(@RequestParam("productIdx") long productIdx, 
+			@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 		try {
 			Trade dto = service.findByIdx(productIdx);
 			List<TradeImg> imageList = service.findImgsByIdx(productIdx);
 			List<String> tagList = service.findTagsByIdx(productIdx);
 			
+			boolean isLiked = false;
+	        if (userDetails != null) {
+	            isLiked = service.isUserLiked(productIdx, userDetails.getMember().getUserIdx());
+	        }
+			
 			model.addAttribute("trade", dto);
 			model.addAttribute("imageList", imageList);
 			model.addAttribute("tagList", tagList);
+			model.addAttribute("isLiked", isLiked);
 			
 		} catch (Exception e) {
 			log.info("article : ", e);
@@ -189,5 +201,34 @@ public class TradeController {
 		}
 		
 		return "redirect:/trade/list";
+	}
+	
+	@PostMapping("toggleLike")
+	@ResponseBody
+	public Map<String, Object> toggleLike(
+	        @RequestParam("productIdx") long productIdx,
+	        @AuthenticationPrincipal CustomUserDetails userDetails) {
+	    
+	    Map<String, Object> map = new HashMap<>();
+	    try {
+	        if (userDetails == null) {
+	            map.put("status", "loginRequired");
+	            return map;
+	        }
+
+	        long userIdx = userDetails.getMember().getUserIdx();
+	        
+	        Map<String, Object> result = service.toggleWishList(productIdx, userIdx);
+	        
+	        map.put("status", "success");
+	        map.put("isLiked", result.get("isLiked"));
+	        map.put("likeCount", result.get("likeCount"));
+	        
+	    } catch (Exception e) {
+	        map.put("status", "error");
+	        map.put("message", e.getMessage());
+	    }
+	    
+	    return map;
 	}
 }

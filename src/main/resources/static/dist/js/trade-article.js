@@ -96,57 +96,61 @@ const Lightbox = (function () {
     return { init, open, close, prev, next };
 })();
 
-const WishModule = (function () {
-    let wished     = false;
-    let wishCount  = 0;
-    let tradeIdx   = 0;
+const WishModule = {
+    isProcessing: false,
+    isLiked: false,
 
-    function init(initialWished, initialCount, idx) {
-        wished    = initialWished;
-        wishCount = initialCount;
-        tradeIdx  = idx;
-        updateUI();
-    }
+    init: function(wished, wishCount, tradeIdx) {
+        this.isLiked = wished;
+    },
 
-    function toggle() {
-        fetch('/trade/wish', {
+    toggle: function() {
+        if(this.isProcessing) return;
+        
+        const dataDiv = document.getElementById('articleData');
+        if(!dataDiv) return;
+        
+        const productIdx = dataDiv.getAttribute('data-trade-idx');
+        
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+        const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+        if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+        this.isProcessing = true;
+
+        fetch('/trade/toggleLike', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ tradeIdx: tradeIdx })
+            headers: headers,
+            body: new URLSearchParams({ productIdx: productIdx })
         })
-        .then(function (res) {
-            if (res.status === 401) { Toast.show('로그인이 필요합니다.'); return null; }
-            return res.json();
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'success') {
+                const btn = document.getElementById('wishBtnLarge');
+                const statWish = document.getElementById('statWish'); 
+                const statWishSide = document.getElementById('statWishSide');
+                
+                this.isLiked = data.isLiked;
+                
+                if(btn) {
+                    btn.classList.toggle('active', data.isLiked);
+                    btn.innerHTML = (data.isLiked ? '❤️' : '🤍') + ' 찜 ' + data.likeCount;
+                }
+                
+                if(statWish) statWish.innerText = data.likeCount;
+                if(statWishSide) statWishSide.innerText = data.likeCount;
+                
+                Toast.show(data.isLiked ? "관심 목록에 추가되었습니다." : "관심 목록에서 제거되었습니다.");
+            }
         })
-        .then(function (data) {
-            if (!data) return;
-            wished    = data.wished;
-            wishCount = data.wishCount;
-            updateUI();
+        .catch(err => {
+            console.error("찜하기 에러:", err);
+            Toast.show("처리 중 오류가 발생했습니다.");
         })
-        .catch(function () { Toast.show('오류가 발생했습니다.'); });
+        .finally(() => { this.isProcessing = false; });
     }
-
-    function updateUI() {
-        const headerBtn = document.getElementById('wishIconBtn');
-        if (headerBtn) {
-            headerBtn.classList.toggle('wish-active', wished);
-            headerBtn.title = wished ? '찜 취소' : '찜하기';
-            headerBtn.textContent = wished ? '❤️' : '🤍';
-        }
-
-        const largeBtn = document.getElementById('wishBtnLarge');
-        if (largeBtn) {
-            largeBtn.classList.toggle('active', wished);
-            largeBtn.innerHTML = (wished ? '❤️' : '🤍') + ' 찜 ' + wishCount;
-        }
-
-        const wishStat = document.getElementById('statWish');
-        if (wishStat) wishStat.textContent = wishCount;
-    }
-
-    return { init, toggle };
-})();
+};
 
 const ShareModule = (function () {
     function share() {

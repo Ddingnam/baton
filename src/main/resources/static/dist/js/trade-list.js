@@ -50,17 +50,55 @@ function tlGoPage(page) {
     location.href = '/trade/list?' + p.toString();
 }
 
-function tlToggleWish(e, tradeIdx) {
+function tlToggleWish(e, productIdx) {
     e.preventDefault();
     e.stopPropagation();
-    fetch('/trade/wish?tradeIdx=' + tradeIdx, { method: 'POST' })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-            const btn = e.currentTarget;
-            btn.classList.toggle('active', data.wished);
-            btn.textContent = data.wished ? '❤️' : '🤍';
-        })
-        .catch(function () { alert('로그인이 필요합니다.'); });
+
+    const btn = e.currentTarget; 
+    
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+    const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+    if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+    fetch('/trade/toggleLike', {
+        method: 'POST',
+        headers: headers,
+        body: new URLSearchParams({ productIdx: productIdx })
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("HTTP_ERROR");
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'loginRequired') {
+            alert('로그인이 필요한 서비스입니다.');
+            return;
+        }
+
+        if (data.status === 'success') {
+            const icon = btn.querySelector('i');
+
+            btn.classList.toggle('active', data.isLiked);
+            if (data.isLiked) {
+                icon.classList.replace('ri-heart-3-line', 'ri-heart-3-fill');
+            } else {
+                icon.classList.replace('ri-heart-3-fill', 'ri-heart-3-line');
+            }
+            
+            const card = btn.closest('.trade-card');
+            if (card) {
+                const wishIcon = card.querySelector('.wish-icon');
+                if (wishIcon) {
+                    wishIcon.parentElement.innerHTML = '<i class="ri-heart-3-fill wish-icon"></i> ' + data.likeCount;
+                }
+            }
+        }
+    })
+    .catch(err => {
+        console.error("찜하기 상세 에러:", err);
+        alert('처리 중 오류가 발생했습니다.');
+    });
 }
 
 function tlMobileFilter() {

@@ -3,15 +3,21 @@ package com.sp.app.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.sp.app.common.StorageService;
+import com.sp.app.domain.entity.Product;
+import com.sp.app.domain.entity.WishList;
+import com.sp.app.domain.entity.WishListId;
 import com.sp.app.mapper.TradeMapper;
 import com.sp.app.model.Trade;
 import com.sp.app.model.TradeImg;
+import com.sp.app.repository.ProductRepository;
+import com.sp.app.repository.WishListRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 public class TradeServiceImpl implements TradeService {
 	private final TradeMapper mapper;
 	private final StorageService storageService;
+	private final WishListRepository wishListRepository;
+    private final ProductRepository productRepository;
 
 	@Override
 	@Transactional
@@ -240,6 +248,42 @@ public class TradeServiceImpl implements TradeService {
 			log.info("viewCount : ", e);
 		}
 		
+	}
+
+	@Override
+	@Transactional
+	public Map<String, Object> toggleWishList(long productIdx, long userIdx) throws Exception {
+		Map<String, Object> result = new HashMap<>();
+        
+        WishListId id = new WishListId(productIdx, userIdx);
+        
+        Product product = productRepository.findById(productIdx)
+                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+
+        Optional<WishList> wishOpt = wishListRepository.findById(id);
+
+        if (wishOpt.isPresent()) {
+        	wishListRepository.delete(wishOpt.get());
+            product.updateLikeCount(-1);
+            result.put("isLiked", false);
+        } else {
+        	WishList newWish = WishList.builder()
+                    .productIdx(productIdx)
+                    .userIdx(userIdx)
+                    .build();
+        	wishListRepository.save(newWish);
+            product.updateLikeCount(1);
+            result.put("isLiked", true);
+        }
+
+        result.put("likeCount", product.getLikeCount());
+        return result;
+	}
+
+	@Override
+	public boolean isUserLiked(long productIdx, long userIdx) {
+		WishListId id = new WishListId(productIdx, userIdx);
+	    return wishListRepository.existsById(id);
 	}
 	
 }
