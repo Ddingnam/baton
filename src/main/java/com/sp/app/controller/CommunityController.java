@@ -11,4 +11,14 @@ public class CommunityController {
     public String list() {
         return "community/list";
     }
+    
+    @GetMapping("write")
+    public String write() {
+    	return "community/write";
+    }
+    
+    @GetMapping("article/{id}")
+    public String article() {
+    	return "community/article";
+    }
 }

@@ -1,0 +1,254 @@
+@charset "UTF-8";
+
+body {
+    background-color: #F8F9FA;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.main-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    padding-top: 140px; 
+    padding-bottom: 100px;
+    display: flex;
+    justify-content: center;
+}
+
+.write-box {
+    width: 720px;
+    background: #fff;
+    border: 1px solid #EAEBEE;
+    border-radius: 8px;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+.write-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #222;
+}
+
+.page-subject {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    color: #222;
+}
+
+.btn-cancel {
+    background: #fff;
+    border: 1px solid #ddd;
+    color: #666;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-right: 8px;
+}
+
+.btn-register {
+    background: #8A63FF;
+    border: 1px solid #8A63FF;
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background 0.2s;
+}
+
+.btn-register:hover {
+    background: #7048E8;
+}
+
+.row-group {
+    margin-bottom: 25px;
+}
+
+.category-wrapper {
+    display: flex;
+    gap: 8px;
+}
+
+.check-box input {
+    display: none;
+}
+
+.check-box span {
+    display: inline-block;
+    padding: 9px 18px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.check-box input:checked + span {
+    background: #222;
+    border-color: #222;
+    color: #fff;
+    font-weight: 600;
+}
+
+.input-title {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    font-size: 20px;
+    font-weight: 600;
+    padding: 15px 0;
+    outline: none;
+    box-sizing: border-box;
+    background: transparent;
+}
+
+.input-title::placeholder {
+    color: #bbb;
+}
+
+.file-drop-area {
+    width: 100%;
+    height: 120px;
+    background: #FAFAFA;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border 0.2s;
+}
+
+.file-drop-area:hover {
+    background: #F4F4F4;
+    border-color: #ccc;
+}
+
+.placeholder-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: #888;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.placeholder-text i {
+    font-size: 24px;
+    color: #aaa;
+}
+
+#fileInput {
+    display: none;
+}
+
+.file-preview-zone {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    margin-top: 10px;
+    padding-bottom: 5px;
+}
+
+.img-card {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+
+.img-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.btn-del {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.textarea-content {
+    width: 100%;
+    height: 400px;
+    border: none;
+    resize: none;
+    font-size: 15px;
+    line-height: 1.6;
+    outline: none;
+    padding: 10px 0;
+    background: transparent;
+}
+
+.textarea-content::placeholder {
+    color: #bbb;
+}
+
+.tag-section {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+    margin-top: 10px;
+    color: #888;
+}
+
+.tag-section i {
+    font-size: 18px;
+    margin-right: 12px;
+}
+
+.tag-input-area {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+#tagInput {
+    border: none;
+    outline: none;
+    font-size: 14px;
+    min-width: 100px;
+    background: transparent;
+}
+
+.tag-chip {
+    color: #8A63FF;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.tag-chip:hover {
+    text-decoration: line-through;
+}
