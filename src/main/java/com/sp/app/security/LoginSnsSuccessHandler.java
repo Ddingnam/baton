@@ -9,8 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.sp.app.common.RequestUtils;
-import com.sp.app.domain.dto.MemberDto;
 import com.sp.app.domain.dto.SessionInfo;
+import com.sp.app.domain.dto.UserDto;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -19,36 +19,34 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class LoginSnsSuccessHandler {
-	public void forceLogin(MemberDto dto) throws Exception{
+	public void forceLogin(UserDto dto) throws Exception{
 		try {
 			SessionInfo info = SessionInfo.builder()
-					.userIdx(dto.getMember_id())
-					.userId(dto.getSns_id())
+					.userIdx(dto.getUserIdx())
+					.userId(dto.getOauthId())
 					.name(dto.getName())
 					.email(dto.getEmail())
 					.userLevel(NumericRoleGranted.getUserLevel("USER"))					
-					.login_type(dto.getSns_provider())
+					.login_type(dto.getProvider())
 					.build();
 			
 			CustomUserDetails userDetails = CustomUserDetails.builder()
 					.sessionInfo(info)
-					.disabled(false)
-					.roles(Arrays.asList("USER"))
+					.disabled(dto.getStatus() == 0)
+					.roles(Arrays.asList(dto.getAuthority()))
 					.build();
 			
 			// 시큐리티 로그인 처리
 			Authentication authentication =
 					new UsernamePasswordAuthenticationToken(
 							userDetails,
-							null, // sns 로그인은 패스워드를 null 로 설정
+							null,
 							userDetails.getAuthorities()
 					);
 
 			SecurityContext securityContext = SecurityContextHolder.getContext();
 			securityContext.setAuthentication(authentication);
 			
-			// HttpSession에 SecurityContext를 직접 저장
-		    // "SPRING_SECURITY_CONTEXT"는 시큐리티가 세션에서 인증 정보를 찾을 때 사용하는 표준 키
 			HttpServletRequest request = RequestUtils.getCurrentRequest();
 		    HttpSession session = request.getSession(true);
 		    session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);	

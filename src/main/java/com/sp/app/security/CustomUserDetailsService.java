@@ -45,7 +45,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 				.email(member.getEmail())
 				.userLevel(NumericRoleGranted.getUserLevel(member.getAuthority()))
 				.avatar(member.getProfile_photo())
-				.login_type("local")
+				.login_type(member.getProvider())
 				.build();
 		
 		return CustomUserDetails.builder()

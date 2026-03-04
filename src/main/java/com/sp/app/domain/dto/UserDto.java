@@ -32,6 +32,9 @@ public class UserDto {
 	private String updatedDate;
 	private String lastLoginDate;
 	
+	private int batonpoint;
+	private String provider;
+	
 	private MultipartFile selectFile;		
 	
 	private String authority;

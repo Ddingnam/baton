@@ -1,8 +1,3 @@
-const CAT_MAP = {
-  '서빙':'SERVING', '주방보조':'KITCHEN_ASSISTANCE', '매장관리':'SHOP_MANAGEMENT',
-  '음료제조':'BEVERAGE_MAKING', '청소':'CLEANING', '편의점':'CONVENIENCE_STORE',
-  '돌봄':'CHILD_CARE', '과외/레슨':'TUTORING', '배달':'ETC', '기타':'ETC'
-};
 const MIN_PAY_MAP = { '무관':0, '1만원 이상':10000 };
 let currentPage = 1;
 const PAGE_SIZE = 10;
@@ -28,17 +23,25 @@ function getRelativeTime(dateStr) {
 }
 
 function applyFilters() {
-  const keyword = document.getElementById('searchInput') ? document.getElementById('searchInput').value.trim().toLowerCase() : '';
+  const keywordEl = document.getElementById('searchInput');
+  const keyword = keywordEl ? keywordEl.value.trim().toLowerCase() : '';
+  
   const periodEl = document.querySelector('.filter-section[data-filter-type="period"] .chip.active');
   const period = periodEl ? periodEl.textContent.trim() : '전체';
+  
   const catEl = document.querySelector('.filter-section[data-filter-type="category"] .chip.active');
   const cat = catEl ? catEl.textContent.trim() : '전체';
-  const minPayEl = document.querySelector('.filter-section[data-filter-type="pay"] .chip.active');
-  const minPay = minPayEl ? (MIN_PAY_MAP[minPayEl.textContent.trim()] ?? 0) : 0;
-  const sort = document.getElementById('sortSelect') ? document.getElementById('sortSelect').value : 'latest';
+  
+  // HTML 구조에 맞춰 minPay 입력창에서 직접 값을 가져오도록 수정
+  const minPayInput = document.getElementById('minPayInput');
+  const minPay = minPayInput ? (parseInt(minPayInput.value) || 0) : 0;
+  
+  const sortEl = document.getElementById('sortSelect');
+  const sort = sortEl ? sortEl.value : 'latest';
 
   let jobs = [...serverData];
 
+  // 1. 검색어 필터
   if (keyword) {
     jobs = jobs.filter(j =>
       (j.title || '').toLowerCase().includes(keyword) ||
@@ -47,17 +50,33 @@ function applyFilters() {
     );
   }
 
-  if (period === '1개월 이상') jobs = jobs.filter(j => j.period === 'MORE_THAN_A_MONTH');
-  if (period === '단기') jobs = jobs.filter(j => j.period === 'LESS_THAN_A_MONTH');
-  if (cat !== '전체' && CAT_MAP[cat]) jobs = jobs.filter(j => j.cat === CAT_MAP[cat]);
-  if (minPay > 0) jobs = jobs.filter(j => j.payTypeKey !== 'hour' || j.payNum >= minPay);
+  // 2. 근무기간 필터 (DB에 들어있는 실제 텍스트 값과 비교)
+  if (period !== '전체') {
+    jobs = jobs.filter(j => 
+        j.period === period || 
+        (period === '1개월 이상' && j.period === 'MORE_THAN_A_MONTH') ||
+        (period === '단기' && j.period === 'LESS_THAN_A_MONTH')
+    );
+  }
 
+  // 3. 카테고리 필터
+  if (cat !== '전체') {
+    jobs = jobs.filter(j => j.cat === cat || j.cat === CAT_MAP[cat]);
+  }
+
+  // 4. 최소 시급 필터
+  if (minPay > 0) {
+    jobs = jobs.filter(j => j.payTypeKey !== 'hour' || j.payNum >= minPay);
+  }
+
+  // 5. 정렬 (시급 높은 순)
   if (sort === 'pay_high') {
     jobs.sort((a, b) => b.payNum - a.payNum);
   }
 
   filteredJobs = jobs;
   currentPage = 1;
+  
   const rc = document.getElementById('resultCount');
   if (rc) rc.textContent = jobs.length;
 
