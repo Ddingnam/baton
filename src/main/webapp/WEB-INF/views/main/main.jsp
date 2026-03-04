@@ -6,6 +6,7 @@
 <head>
 <meta charset="UTF-8">
 <title>BATON | 연결의 가치를 잇다</title>
+<jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/main.css">
@@ -165,7 +166,6 @@
         </main>
     </div>
 
-    <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
     <jsp:include page="/WEB-INF/views/layout/footer.jsp"/>
     <script src="${pageContext.request.contextPath}/dist/js/main.js"></script>
     

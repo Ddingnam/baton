@@ -4,7 +4,7 @@ function closeIntroNow() {
         intro.style.opacity = '0';
         setTimeout(() => {
             intro.style.display = 'none';
-        }, 800); // 페이드아웃 대기 시간
+        }, 800);
     }
 }
 
@@ -56,7 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         const frameRate = 1000 / 60;
                         const totalFrames = Math.round(duration / frameRate);
                         
-                        // 촤라라락- 부드러운 감속 효과 함수
                         const easeOutQuart = t => 1 - (--t) * t * t * t;
 
                         const timer = setInterval(() => {

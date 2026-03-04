@@ -16,6 +16,7 @@
     --shadow-deep: 0 20px 40px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
+
 body { 
     margin: 0; 
     background: var(--baton-bg); 
@@ -129,6 +130,7 @@ a, a:link, a:visited, a:hover, a:active {
     max-width: 1440px; 
     margin: 80px auto 0; 
     padding: 0 24px; 
+    background: var(--baton-bg);
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
@@ -145,6 +147,7 @@ a, a:link, a:visited, a:hover, a:active {
     padding: 40px 60px 200px 20px; 
     box-sizing: border-box; 
     min-width: 0; 
+    background: var(--baton-bg);
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
 }
 
@@ -154,8 +157,9 @@ a, a:link, a:visited, a:hover, a:active {
 }
 
 .baton-section { 
-    padding-top: 160px; 
-    margin-bottom: 40px; 
+    padding-top: 60px; 
+    margin-bottom: 0; 
+    background: var(--baton-bg);
     animation: smoothFadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
@@ -166,6 +170,11 @@ a, a:link, a:visited, a:hover, a:active {
 .baton-section:nth-child(5) { animation-delay: 0.5s; }
 .baton-section:nth-child(6) { animation-delay: 0.6s; }
 .baton-section:nth-child(7) { animation-delay: 0.7s; }
+
+.baton-section.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
 
 .main-display-title { 
     font-size: 60px; 
@@ -662,7 +671,7 @@ a, a:link, a:visited, a:hover, a:active {
 .horizontal-action-card:hover .action-icon-box {
     transform: scale(1.1) rotate(-5deg);
 }
-
+ 
 .club-bg { background: #FFF4E6; }
 .job-bg { background: #E8F3FF; }
 
