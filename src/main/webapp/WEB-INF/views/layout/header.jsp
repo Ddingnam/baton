@@ -62,7 +62,7 @@
                                     <i class="ri-heart-3-line"></i> 찜 목록
                                 </a>
                                 <a href="${pageContext.request.contextPath}/chat/list" class="dropdown-item">
-                                    <i class="ri-chat-1-line"></i> 채팅 및 알림 <span class="badge-dot-inline"></span>
+                                    <i class="ri-chat-1-line"></i> 채팅 및 알림 <span class="badge-dot-inline" style="display: none;"></span>
                                 </a>
                                 
                                 <div class="dropdown-divider"></div>
@@ -89,7 +89,7 @@
 <c:if test="${!hideChatbot}">
 	<div id="baton-chatbot-trigger">
 		<div class="chatbot-icon-wrapper">
-			<i class="ri-chat-smile-3-fill"></i> <span class="notification-dot"></span>
+			<i class="ri-chat-smile-3-fill"></i> <span class="notification-dot" style="display: none;"></span>
 		</div>
 	</div>
 </c:if>
@@ -105,5 +105,65 @@
 <c:if test="${not empty message}">
 	<c:remove var="message" scope="session" />
 </c:if>
+
+<sec:authorize access="isAuthenticated()">
+<sec:authentication property="principal.member.userIdx" var="loggedInUserId" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        checkUnreadAlarms();
+        connectGlobalAlarm();
+        window.addEventListener('focus', checkUnreadAlarms);
+    });
+
+    function checkUnreadAlarms() {
+        let url = '${pageContext.request.contextPath}/chat/api/unread?_=' + new Date().getTime();
+        fetch(url, { cache: 'no-store' })
+            .then(response => response.text())
+            .then(count => {
+                
+                if(parseInt(count) > 0) {
+                    turnOnAlarmDots();
+                } else {
+                    turnOffAlarmDots(); 
+                }
+            })
+            .catch(error => console.error('채팅 알림 조회 실패:', error));
+    }
+
+    function connectGlobalAlarm() {
+        let socket = new SockJS('${pageContext.request.contextPath}/ws/chat');
+        let stompClient = Stomp.over(socket);
+        stompClient.debug = null; 
+
+        stompClient.connect({}, function (frame) {
+            stompClient.subscribe('/topic/alarms/${loggedInUserId}', function (message) {
+                if(message.body.includes('new_chat')) {
+                    turnOnAlarmDots(); 
+                } else if(message.body.includes('read_chat')) {
+                    checkUnreadAlarms();
+                }
+            });
+        });
+    }
+
+    function turnOnAlarmDots() {
+        let dot1 = document.querySelector('.badge-dot-inline');
+        let dot2 = document.querySelector('.notification-dot');
+        if(dot1) dot1.style.display = 'inline-block';
+        if(dot2) dot2.style.display = 'inline-block';
+    }
+
+    function turnOffAlarmDots() {
+        let dot1 = document.querySelector('.badge-dot-inline');
+        let dot2 = document.querySelector('.notification-dot');
+        if(dot1) dot1.style.display = 'none';
+        if(dot2) dot2.style.display = 'none';
+    }
+</script>
+</sec:authorize>
 
 <script src="${pageContext.request.contextPath}/dist/js/header.js"></script>

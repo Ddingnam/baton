@@ -392,7 +392,6 @@ html {
     background: #FF4D4F !important;
     border-radius: 50% !important;
     margin-left: 6px !important;
-    display: inline-block !important;
 }
 
 #baton-chatbot-trigger {
@@ -451,7 +450,6 @@ html {
     background-color: #3182F6 !important;
     border-radius: 50% !important;
     border: 2px solid #191F28 !important;
-    display: block !important;
     z-index: 10 !important;
     padding: 0 !important;
     margin: 0 !important;

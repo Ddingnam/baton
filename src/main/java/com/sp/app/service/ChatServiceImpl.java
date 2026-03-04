@@ -85,4 +85,14 @@ public class ChatServiceImpl implements ChatService {
     public List<ChatRoom> listAllChatRoom(Long myUserIdx) {
         return mapper.listAllChatRoom(myUserIdx);
     }
+    
+    @Override
+    public int getUnreadTotalCount(Long myUserIdx) {
+        return mapper.getUnreadTotalCount(myUserIdx);
+    }
+    
+    @Override
+    public List<Long> getRoomMembers(Long roomIdx) {
+        return mapper.getRoomMembers(roomIdx);
+    }
 }

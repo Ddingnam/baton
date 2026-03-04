@@ -15,4 +15,6 @@ public interface ChatService {
     List<ChatRoom> listTradeChatRoom(Long tradeIdx, Long myUserIdx);
     Map<String, Object> getTradeInfo(Long tradeIdx);
     List<ChatRoom> listAllChatRoom(Long myUserIdx);
+    int getUnreadTotalCount(Long myUserIdx);
+    List<Long> getRoomMembers(Long roomIdx);
 }

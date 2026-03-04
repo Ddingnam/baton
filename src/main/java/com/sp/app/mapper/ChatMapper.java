@@ -19,4 +19,6 @@ public interface ChatMapper {
     List<ChatRoom> listTradeChatRoom(Map<String, Object> map);
     Map<String, Object> getTradeInfo(Long tradeIdx);
     List<ChatRoom> listAllChatRoom(Long myUserIdx);
+    int getUnreadTotalCount(Long myUserIdx);
+    List<Long> getRoomMembers(Long roomIdx);
 }

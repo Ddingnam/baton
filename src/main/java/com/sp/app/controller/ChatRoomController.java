@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sp.app.model.ChatMessage;
 import com.sp.app.model.ChatRoom;
@@ -91,5 +92,15 @@ public class ChatRoomController {
         model.addAttribute("myUserIdx", myUserIdx);
 
         return "chat/list";
+    }
+    
+    @GetMapping("/api/unread")
+    @ResponseBody
+    public int getUnreadCount(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return 0;
+        }
+
+        return chatService.getUnreadTotalCount(userDetails.getUserIdx());
     }
 }
