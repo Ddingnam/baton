@@ -35,5 +35,35 @@
         SET BATONPOINT = NVL(BATONPOINT, 0) + #{point} 
         WHERE USERIDX = #{userIdx}
     </update>
+    
+    <update id="deductPointForEscrow" parameterType="map">
+        UPDATE USERS 
+        SET BATONPOINT = BATONPOINT - #{totalUsedPoint} 
+        WHERE USERIDX = #{buyerIdx} AND BATONPOINT >= #{totalUsedPoint}
+    </update>
+
+    <insert id="insertTradeTransaction" parameterType="map">
+        <selectKey keyProperty="tradeIdx" resultType="long" order="BEFORE">
+            SELECT SEQTRADETRANSACTION.NEXTVAL FROM DUAL
+        </selectKey>
+        
+        INSERT INTO TRADETRANSACTION (
+            TRADEIDX, PRODUCTIDX, BUYERIDX, SELLERIDX,
+            TRADEPRICE, SAFETYFEE, TOTALUSED_POINT, TRADESTATUS, 
+            RECIPIENTNAME, RECIPIENTPHONE, SHIPPINGADDRESS, TRADEDATE
+        ) VALUES (
+            #{tradeIdx}, #{productIdx}, #{buyerIdx}, #{sellerIdx},
+            #{tradePrice}, #{safetyFee}, #{totalUsedPoint}, 'PAY_COMPLETED',
+            #{recipientName}, #{recipientPhone}, #{shippingAddress}, SYSTIMESTAMP
+        )
+    </insert>
+
+    <insert id="insertPointHistoryForEscrow" parameterType="map">
+        INSERT INTO POINTHISTORY (
+            HISTORYIDX, TRADEIDX, AMOUNT, HISTORYTYPE, USERIDX, TOTALPOINT, CREATEDAT
+        ) VALUES (
+            SEQPOINTHISTORY.NEXTVAL, #{tradeIdx}, -#{totalUsedPoint}, 'USE_ESCROW', #{buyerIdx}, #{totalPoint}, SYSTIMESTAMP
+        )
+    </insert>
 
 </mapper>

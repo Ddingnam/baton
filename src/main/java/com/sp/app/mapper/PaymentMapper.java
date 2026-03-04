@@ -13,5 +13,7 @@ public interface PaymentMapper {
     public void insertPointHistory(PointHistory pointHistory);
     public int getCurrentPoint(long userIdx);
     public void updateUserPoint(Map<String, Object> map);
-   
+    public int deductPointForEscrow(Map<String, Object> map) throws Exception;
+    public void insertTradeTransaction(Map<String, Object> map) throws Exception;
+    public void insertPointHistoryForEscrow(Map<String, Object> map) throws Exception;
 }
