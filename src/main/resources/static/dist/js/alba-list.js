@@ -4,8 +4,6 @@ const CAT_MAP = {
   '돌봄':'CHILD_CARE', '과외/레슨':'TUTORING', '배달':'ETC', '기타':'ETC'
 };
 const MIN_PAY_MAP = { '무관':0, '1만원 이상':10000 };
-let liked = new Set();
-let currentView = 'table';
 let currentPage = 1;
 const PAGE_SIZE = 10;
 let filteredJobs = [];
@@ -18,20 +16,15 @@ function setQuickSearch(keyword) {
   }
 }
 
-function switchView(v) {
-  currentView = v;
-  const tableView = document.getElementById('tableView');
-  const cardView  = document.getElementById('cardView');
-  if (tableView) tableView.classList.toggle('hidden', v !== 'table');
-  if (cardView)  {
-    cardView.classList.toggle('hidden', v !== 'card');
-    cardView.classList.toggle('visible', v === 'card');
-  }
-  const bt = document.getElementById('btnTable');
-  const bc = document.getElementById('btnCard');
-  if(bt) bt.classList.toggle('active', v === 'table');
-  if(bc) bc.classList.toggle('active', v === 'card');
-  renderCurrentPage();
+function getRelativeTime(dateStr) {
+  if (!dateStr) return '';
+  const now = new Date();
+  const d = new Date(dateStr);
+  const diff = Math.floor((now - d) / 60000);
+  if (diff < 1) return '방금전';
+  if (diff < 60) return diff + '분전';
+  if (diff < 1440) return Math.floor(diff / 60) + '시간전';
+  return Math.floor(diff / 1440) + '일전';
 }
 
 function applyFilters() {
@@ -75,80 +68,36 @@ function applyFilters() {
 function renderCurrentPage() {
   const start = (currentPage - 1) * PAGE_SIZE;
   const pageJobs = filteredJobs.slice(start, start + PAGE_SIZE);
-  if (currentView === 'table') renderTable(pageJobs);
-  else renderCards(pageJobs);
+  renderList(pageJobs);
 }
 
-function renderTable(jobs) {
-  const tbody = document.getElementById('tableBody');
-  if (!tbody) return;
+function renderList(jobs) {
+  const container = document.getElementById('listView');
+  if (!container) return;
   if (!jobs.length) {
-    tbody.innerHTML = `<tr><td colspan="4"><div class="no-result"><span class="no-result-icon">🔍</span><strong>검색 결과가 없어요</strong><span>조건을 바꿔보거나 검색어를 다시 입력해보세요.</span></div></td></tr>`;
+    container.innerHTML = `<div class="no-result"><span class="no-result-icon">🔍</span><strong>검색 결과가 없어요</strong><span>조건을 바꿔보거나 검색어를 다시 입력해보세요.</span></div>`;
     return;
   }
-  tbody.innerHTML = jobs.map((job, idx) => {
-    const isLiked = liked.has(job.id);
-    const timeHtml = (job.time === '협의' || job.time === '시간협의') ? `<span class="time-consult">시간협의</span>` : job.time;
-    return `<tr style="animation-delay:${idx * 0.04}s" onclick="location.href='${CONTEXT_PATH}/baton/posting/article?postingIdx=${job.id}'">
-        <td class="td-title">
-          <div class="company-nm">${job.employer}</div>
-          <a class="job-title-text" href="${CONTEXT_PATH}/baton/posting/article?postingIdx=${job.id}" onclick="event.stopPropagation()">${job.title}</a>
-        </td>
-        <td class="td-area-time">
-          <div class="area-text">${job.area}</div>
-          <div class="time-text">${timeHtml} · ${job.days}</div>
-        </td>
-        <td class="td-pay">
-          <span class="pay-type-badge ${job.payTypeKey}">${job.payType}</span>
-          <span class="pay-num">${job.payFmt}원</span>
-        </td>
-        <td class="td-date">
-          <div class="date-cell-wrap">
-            <div class="date-col-left"><span>${job.date}</span></div>
-            <div class="action-icons" onclick="event.stopPropagation()">
-              <button class="icon-btn ${isLiked ? 'liked' : ''}" type="button" onclick="toggleLike(event,this,${job.id})">
-                <i class="${isLiked ? 'ri-star-fill' : 'ri-star-line'}"></i>
-              </button>
-            </div>
-          </div>
-        </td></tr>`;
-  }).join('');
-}
-
-function renderCards(jobs) {
-  const list = document.getElementById('cardView');
-  if (!list) return;
-  if (!jobs.length) {
-    list.innerHTML = `<div class="no-result" style="grid-column:1/-1"><span class="no-result-icon">🔍</span><strong>검색 결과가 없어요</strong><span>조건을 바꿔보거나 검색어를 다시 입력해보세요.</span></div>`;
-    return;
-  }
-  list.innerHTML = jobs.map((job, idx) => {
-    const isLiked = liked.has(job.id);
-    const thumbHtml = job.img ? `<img src="${job.img}" alt="${job.title}" onerror="this.parentNode.innerHTML='💼'">` : '💼';
-    return `<div class="job-card" style="animation-delay:${idx * 0.05}s" onclick="location.href='${CONTEXT_PATH}/baton/posting/article?postingIdx=${job.id}'">
-        <div class="card-header">
-          <div class="card-header-left">
-            <div class="job-thumb">${thumbHtml}</div>
-            <div>
-              <div class="job-employer">${job.employer}</div>
-              <div class="job-date">${job.date}</div>
-            </div>
-          </div>
-          <div onclick="event.stopPropagation()">
-            <button class="icon-btn ${isLiked ? 'liked' : ''}" type="button" onclick="toggleLike(event,this,${job.id})">
-              <i class="${isLiked ? 'ri-star-fill' : 'ri-star-line'}"></i>
-            </button>
-          </div>
-        </div>
-        <div class="job-title-text card-title">${job.title}</div>
-        <div class="job-pay-row">
-          <span class="pay-type-badge ${job.payTypeKey}">${job.payType}</span>
-          ${job.payFmt}원
-        </div>
-        <div class="job-schedule">
-          <i class="ri-time-line" style="color:#1E3A8A"></i>
-          ${job.area} · ${job.days} · ${job.time}
-        </div></div>`;
+  container.innerHTML = jobs.map((job, idx) => {
+    const relTime = getRelativeTime(job.date);
+    const isRecent = relTime.includes('분전') || relTime.includes('시간전') || relTime === '방금전';
+    const periodLabel = job.period === 'MORE_THAN_A_MONTH' ? '장기' : job.period === 'LESS_THAN_A_MONTH' ? '단기' : '';
+    return `<div class="job-list-item" style="animation-delay:${idx * 0.035}s" onclick="location.href='${CONTEXT_PATH}/alba/article?id=${job.id}'">
+      <div class="job-area-col">
+        <span class="job-area-text">${job.area}</span>
+        ${periodLabel ? `<span class="job-period-badge">${periodLabel}</span>` : ''}
+      </div>
+      <div class="job-article-col">
+        <div class="job-employer">${job.employer}</div>
+        <div class="job-title">${job.title}</div>
+      </div>
+      <div class="job-salary-col">
+        <span class="pay-badge ${job.payTypeKey}">${job.payType}</span>
+        <div class="pay-amount">${job.payFmt}원</div>
+      </div>
+      <div class="job-time-col">${job.time || '-'}</div>
+      <div class="job-date-col ${isRecent ? 'recent' : ''}">${relTime}</div>
+    </div>`;
   }).join('');
 }
 
@@ -174,22 +123,6 @@ function goPage(p) {
   renderCurrentPage();
   renderPagination();
   window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function toggleLike(e, btn, id) {
-  e.preventDefault(); e.stopPropagation();
-  const icon = btn.querySelector('i');
-  if (liked.has(id)) {
-    liked.delete(id);
-    btn.classList.remove('liked');
-    icon.className = 'ri-star-line';
-  } else {
-    liked.add(id);
-    btn.classList.add('liked');
-    icon.className = 'ri-star-fill';
-    btn.style.transform = 'scale(1.2)';
-    setTimeout(() => btn.style.transform = '', 180);
-  }
 }
 
 document.querySelectorAll('.filter-section .filter-chips').forEach(group => {

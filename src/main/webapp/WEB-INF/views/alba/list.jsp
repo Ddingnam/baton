@@ -12,104 +12,99 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/main.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/trade-list.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/alba-list.css">
 </head>
 <body>
+
 <jsp:include page="/WEB-INF/views/layout/header.jsp" />
-<section class="alba-hero">
-  <div class="alba-hero-inner">
-    <p class="sub-title">BATON PASS · 동네 알바</p>
-    <h1 class="main-title">우리 동네 <span class="highlight">알바</span>를<br>한 눈에 찾아보세요</h1>
-    <p class="desc">내 근처 단기·장기 알바, 지금 바로 지원해보세요</p>
-    <div class="alba-search-box">
-      <i class="ri-search-line" style="font-size:20px; color:#B0B8C1; margin-right:4px;"></i>
-      <input type="text" id="searchInput" placeholder="업체명 또는 공고 제목 검색" oninput="applyFilters()">
-      <button class="search-btn" onclick="applyFilters()">검색</button>
-    </div>
-    <div class="quick-tags-wrap">
-      <span class="tag-label">🔥 많이 찾아요</span>
-      <button class="quick-tag" onclick="setQuickSearch('당일지급')">#당일지급</button>
-      <button class="quick-tag" onclick="setQuickSearch('초보가능')">#초보가능</button>
-      <button class="quick-tag" onclick="setQuickSearch('대학가')">#대학가근처</button>
-      <button class="quick-tag" onclick="setQuickSearch('주휴수당')">#주휴수당</button>
-    </div>
-  </div>
-</section>
-<div id="baton-layout-container">
-  <main id="baton-main-content">
-    <div class="baton-page">
-      <aside class="baton-sidebar">
-        <div class="sidebar-header">
-          <div class="location-label"><i class="ri-map-pin-2-fill"></i> 현재 지역</div>
-          <div class="location-name">서울 중구 <span>신당동</span></div>
-        </div>
-        <div class="filter-section" data-filter-type="period">
-          <div class="filter-title">근무 기간</div>
-          <div class="filter-chips">
-            <button class="chip active" type="button" data-period="all">전체</button>
-            <button class="chip" type="button" data-period="long">1개월 이상</button>
-            <button class="chip" type="button" data-period="short">단기</button>
-          </div>
-        </div>
-        <div class="filter-section" data-filter-type="category">
-          <div class="filter-title">직종 카테고리</div>
-          <div class="filter-chips">
-            <button class="chip active" type="button">전체</button>
-            <button class="chip" type="button" data-cat="SERVING">서빙</button>
-            <button class="chip" type="button" data-cat="KITCHEN">주방보조</button>
-            <button class="chip" type="button" data-cat="SHOP">매장관리</button>
-            <button class="chip" type="button" data-cat="BEVERAGE">음료제조</button>
-          </div>
-        </div>
-        <div class="filter-section" data-filter-type="pay">
-          <div class="filter-title">최소 시급</div>
-          <div class="filter-chips">
-            <button class="chip active" type="button">무관</button>
-            <button class="chip" type="button">1만원 이상</button>
-          </div>
-        </div>
-      </aside>
-      <div class="content">
-        <div class="content-header">
-          <div class="result-count">채용정보 <span id="resultCount">0</span>건</div>
-          <div class="header-right">
-            <select class="sort-select" id="sortSelect" onchange="applyFilters()">
-              <option value="latest">최신순</option>
-              <option value="pay_high">시급 높은순</option>
-            </select>
-            <div class="view-toggle">
-              <button class="view-btn active" id="btnTable" onclick="switchView('table')">
-                <i class="ri-list-check"></i>
-              </button>
-              <button class="view-btn" id="btnCard" onclick="switchView('card')">
-                <i class="ri-layout-grid-line"></i>
-              </button>
+
+<main class="trade-main-container">
+    <section class="trade-hero-section">
+        <div class="container hero-inner">
+            <div class="hero-text-box">
+    			<span class="sub-title">BATON PASS · ALBA</span>
+    			<h1 class="main-title">이웃과 함께하는 우리 동네 <span class="highlight"> 알바</span></h1>
+    			<p class="desc">가까운 우리 동네 알바, 이웃과 함께 지금 바로 시작해보세요.</p>
+			</div>
+            <div class="hero-search-box">
+                <input type="text" id="searchInput" placeholder="어떤 알바를 찾고 있나요?" value="${param.keyword}" onkeypress="if(event.keyCode==13) applyFilters();">
+                <button class="search-btn" onclick="applyFilters()">검색</button>
             </div>
-          </div>
         </div>
-        <div id="tableView" class="job-container">
-          <table class="job-table">
-            <thead>
-              <tr>
-                <th>공고내용</th>
-                <th>지역 / 근무시간</th>
-                <th>급여</th>
-                <th>등록일</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
+    </section>
+
+    <div class="content-wrapper">
+        <div class="trade-toolbar">
+            <div class="toolbar-top">
+                <div class="filter-group tl-filter-list">
+                    <button class="filter-btn ${empty param.category ? 'active' : ''}" onclick="setCategory('');">전체</button>
+                    <button class="filter-btn ${param.category == 'SERVING' ? 'active' : ''}" onclick="setCategory('SERVING');">서빙</button>
+                    <button class="filter-btn ${param.category == 'KITCHEN' ? 'active' : ''}" onclick="setCategory('KITCHEN');">주방보조</button>
+                    <button class="filter-btn ${param.category == 'SHOP' ? 'active' : ''}" onclick="setCategory('SHOP');">매장관리</button>
+                    <button class="filter-btn ${param.category == 'BEVERAGE' ? 'active' : ''}" onclick="setCategory('BEVERAGE');">음료제조</button>
+                    <button class="filter-btn ${param.category == 'ETC' ? 'active' : ''}" onclick="setCategory('ETC');">기타</button>
+                </div>
+                <button class="btn-create-trade" onclick="location.href='${pageContext.request.contextPath}/alba/write'">
+                    <i class="ri-add-line"></i> 공고 등록하기
+                </button>
+            </div>
+
+            <div class="toolbar-bottom">
+                <div class="price-select-group">
+                    <input type="number" class="tl-price-input" id="minPayInput" placeholder="최소 시급" value="${param.minPay}">
+                    <button class="tl-price-apply" onclick="applyFilters()">적용</button>
+                </div>
+
+                <div class="action-group">
+                    <select class="detail-select sort-select" id="sortSelect" onchange="applyFilters()">
+                        <option value="latest" ${param.sort == 'latest' ? 'selected' : ''}>최신순</option>
+                        <option value="pay_high" ${param.sort == 'pay_high' ? 'selected' : ''}>시급 높은순</option>
+                    </select>
+                </div>
+            </div>
         </div>
-        <div id="cardView" class="job-grid hidden"></div>
-        <div class="pagination" id="pagination"></div>
-      </div>
+
+        <div id="baton-layout-container">
+            <div class="baton-page">
+                <aside class="baton-sidebar">
+                    <div class="sidebar-header">
+                        <div class="location-label"><i class="ri-map-pin-2-fill"></i> 현재 지역</div>
+                        <div class="location-name">서울 중구 <span>신당동</span></div>
+                    </div>
+                    <div class="filter-section" data-filter-type="period">
+                        <div class="filter-title">근무 기간</div>
+                        <div class="filter-chips">
+                            <button class="chip active" type="button" data-period="all">전체</button>
+                            <button class="chip" type="button" data-period="long">1개월 이상</button>
+                            <button class="chip" type="button" data-period="short">단기</button>
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="content">
+                    <div class="content-header">
+                        <div class="result-count">채용정보 <span id="resultCount">0</span>건</div>
+                    </div>
+                    
+                    <div class="list-title-bar">
+                        <span>지역</span>
+                        <span style="text-align:left;">모집제목 / 업체명</span>
+                        <span>급여</span>
+                        <span>근무시간</span>
+                        <span>등록일</span>
+                    </div>
+
+                    <div id="listView" class="job-list-container"></div>
+                    <div class="pagination" id="pagination"></div>
+                </div>
+            </div>
+        </div>
     </div>
-    <a href="${pageContext.request.contextPath}/alba/write" class="fab">
-      <i class="ri-pencil-fill"></i> 공고 등록하기
-    </a>
-  </main>
-</div>
+</main>
+
 <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
+
 <script>
 const CONTEXT_PATH = "${pageContext.request.contextPath}";
 const serverData = [
@@ -130,6 +125,12 @@ const serverData = [
 }${!status.last ? ',' : ''}
 </c:forEach>
 ];
+
+function setCategory(cat) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('category', cat);
+    window.location.href = url.toString();
+}
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/alba-list.js"></script>
 </body>
