@@ -2,40 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.JobPostingMapper">
 
-	<insert id="insertPosting"
-		parameterType="com.sp.app.model.JobPosting">
-		INSERT INTO job_posting (
-		title, employer, description,
-		pay, pay_type, work_period, work_days,
-		start_time, end_time,
-		time_negotiable, location, contact,
-		benefits, user_idx, region_idx,
-		category, createdDate
-		) VALUES (
-		#{title, jdbcType=VARCHAR},
-		#{employer,
-		jdbcType=VARCHAR},
-		#{description, jdbcType=CLOB},
-		#{pay,
-		jdbcType=INTEGER},
-		#{payType, jdbcType=VARCHAR},
-		#{workPeriod,
-		jdbcType=VARCHAR},
-		#{workDays, jdbcType=VARCHAR},
-		#{startTime,
-		jdbcType=VARCHAR},
-		#{endTime, jdbcType=VARCHAR},
-		#{timeNegotiable,
-		jdbcType=CHAR},
-		#{location, jdbcType=VARCHAR},
-		#{contact,
-		jdbcType=VARCHAR},
-		#{benefits, jdbcType=VARCHAR},
-		#{userIdx},
-		#{regionIdx},
-		#{category, jdbcType=VARCHAR},
-		SYSDATE
-		)
+	<insert id="insertPosting" parameterType="com.sp.app.model.JobPosting">
+    	INSERT INTO job_posting (
+        title, employer, description, pay, pay_type, 
+        work_period, work_days, start_time, end_time,
+        time_negotiable, location, contact, benefits, 
+        user_idx, region_idx, category, createdDate,
+        img_url  ) VALUES (
+        #{title, jdbcType=VARCHAR},
+        #{employer, jdbcType=VARCHAR},
+        #{description, jdbcType=CLOB},
+        #{pay, jdbcType=INTEGER},
+        #{payType, jdbcType=VARCHAR},
+        #{workPeriod, jdbcType=VARCHAR},
+        #{workDays, jdbcType=VARCHAR},
+        #{startTime, jdbcType=VARCHAR},
+        #{endTime, jdbcType=VARCHAR},
+        #{timeNegotiable, jdbcType=CHAR},
+        #{location, jdbcType=VARCHAR},
+        #{contact, jdbcType=VARCHAR},
+        #{benefits, jdbcType=VARCHAR},
+        #{userIdx},
+        #{regionIdx},
+        #{category, jdbcType=VARCHAR},
+        SYSDATE,
+        #{imgUrl, jdbcType=VARCHAR} )
 	</insert>
 
 	<update id="updatePosting"
@@ -66,17 +57,14 @@
 <select id="listPosting" parameterType="map" resultType="com.sp.app.model.JobPosting">
     SELECT * FROM (
         SELECT a.*, ROWNUM rnum FROM (
-            SELECT
-                posting_idx AS postingIdx,   title,
-                employer,
-                pay,
-                pay_type AS payType,         location,
-                createdDate 
-            FROM job_posting
-            ORDER BY posting_idx DESC
+           SELECT posting_idx AS postingIdx, title, employer, pay, pay_type AS payType, location, createdDate,
+                  category, work_period AS workPeriod, work_days AS workDays, 
+                  start_time AS startTime, end_time AS endTime
+           FROM job_posting 
+           ORDER BY posting_idx DESC
         ) a WHERE ROWNUM &lt;= #{offset} + #{size}
     ) WHERE rnum &gt; #{offset}
-</select>
+</select> 	
 
 <select id="findById" resultType="com.sp.app.model.JobPosting">
     SELECT 
@@ -89,7 +77,7 @@
         start_time AS startTime,
         end_time AS endTime,
         time_negotiable AS timeNegotiable,
-        title, employer, description, pay, location, contact, benefits, category, createdDate
+        img_url AS imgUrl, title, employer, description, pay, location, contact, benefits, category, createdDate
     FROM job_posting
     WHERE posting_idx = #{postingIdx}
 </select> 	

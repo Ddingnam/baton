@@ -23,7 +23,7 @@
     <section class="trade-hero-section">
         <div class="container hero-inner">
             <div class="hero-text-box">
-    			<span class="sub-title">BATON PASS · ALBA</span>
+    			<span class="sub-title">BATON ALBA</span>
     			<h1 class="main-title">이웃과 함께하는 우리 동네 <span class="highlight"> 알바</span></h1>
     			<p class="desc">가까운 우리 동네 알바, 이웃과 함께 지금 바로 시작해보세요.</p>
 			</div>
@@ -37,14 +37,14 @@
     <div class="content-wrapper">
         <div class="trade-toolbar">
             <div class="toolbar-top">
-                <div class="filter-group tl-filter-list">
-                    <button class="filter-btn ${empty param.category ? 'active' : ''}" onclick="setCategory('');">전체</button>
-                    <button class="filter-btn ${param.category == 'SERVING' ? 'active' : ''}" onclick="setCategory('SERVING');">서빙</button>
-                    <button class="filter-btn ${param.category == 'KITCHEN' ? 'active' : ''}" onclick="setCategory('KITCHEN');">주방보조</button>
-                    <button class="filter-btn ${param.category == 'SHOP' ? 'active' : ''}" onclick="setCategory('SHOP');">매장관리</button>
-                    <button class="filter-btn ${param.category == 'BEVERAGE' ? 'active' : ''}" onclick="setCategory('BEVERAGE');">음료제조</button>
-                    <button class="filter-btn ${param.category == 'ETC' ? 'active' : ''}" onclick="setCategory('ETC');">기타</button>
-                </div>
+                <div class="filter-group tl-filter-list filter-section" data-filter-type="category">
+    				<button class="filter-btn chip active" type="button">전체</button>
+    				<button class="filter-btn chip" type="button">서빙</button>
+    				<button class="filter-btn chip" type="button">주방보조</button>
+    				<button class="filter-btn chip" type="button">매장관리</button>
+    				<button class="filter-btn chip" type="button">음료제조</button>
+    				<button class="filter-btn chip" type="button">기타</button>
+				</div>
                 <button class="btn-create-trade" onclick="location.href='${pageContext.request.contextPath}/alba/write'">
                     <i class="ri-add-line"></i> 공고 등록하기
                 </button>
@@ -113,24 +113,20 @@ const serverData = [
   id: "${dto.postingIdx}",
   title: `${dto.title}`,
   employer: `${empty dto.employer ? '업체명' : dto.employer}`,
-  payType: "${dto.payType}",
-  payTypeKey: "${dto.payType == '시급' ? 'hour' : 'month'}",
+  payType: `${dto.payType}`,
+  payTypeKey: `${dto.payType == '시급' ? 'hour' : (dto.payType == '월급' ? 'month' : (dto.payType == '일급' ? 'day' : 'case'))}`,
   payNum: ${empty dto.pay ? 0 : dto.pay},
   payFmt: new Intl.NumberFormat('ko-KR').format(${empty dto.pay ? 0 : dto.pay}),
-  days: "${dto.workDays}",
+  days: `${dto.workDays}`,
   time: `${empty dto.workTime ? '시간협의' : dto.workTime}`,
-  area: "${dto.location}",
-  date: "${dto.createdDate}",
-  img: "${empty dto.thumbUrl ? '' : dto.thumbUrl}"
+  area: `${dto.location}`,
+  date: `${dto.createdDate}`,
+  img: `${empty dto.thumbUrl ? '' : dto.thumbUrl}`,
+  period: `${dto.workPeriod}`, 
+  cat: `${dto.category}` 
 }${!status.last ? ',' : ''}
 </c:forEach>
 ];
-
-function setCategory(cat) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('category', cat);
-    window.location.href = url.toString();
-}
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/alba-list.js"></script>
 </body>

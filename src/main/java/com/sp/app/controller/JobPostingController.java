@@ -1,9 +1,12 @@
 package com.sp.app.controller;
 
 import com.sp.app.model.JobPosting;
+import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.JobPostingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -48,13 +51,19 @@ public class JobPostingController {
     }
 
     @PostMapping("write")
-    public String writeSubmit(JobPosting dto) throws Exception {
-        dto.setUserIdx(1L); 
-        dto.setRegionIdx(100L); 
-        
-        postingService.insertPosting(dto);
-        
-        return "redirect:/alba/list"; 
+    public String writeSubmit(JobPosting dto, 
+            @AuthenticationPrincipal CustomUserDetails userDetails) throws Exception {
+        try {
+            if (userDetails != null) {
+                dto.setUserIdx(userDetails.getUserIdx());
+            }
+            
+            //service.insertJobPosting(dto, uploadPath); 
+            
+        } catch (Exception e) {
+            log.info("writeSubmit 에러: ", e);
+        }
+        return "redirect:/job/list";
     }
 
     @GetMapping("article")
