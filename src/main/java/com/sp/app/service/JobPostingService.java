@@ -3,6 +3,7 @@ package com.sp.app.service;
 import com.sp.app.model.JobPosting;
 import java.util.List;
 import java.util.Map;
+import org.apache.ibatis.annotations.Param;
 
 public interface JobPostingService {
     void insertPosting(JobPosting dto) throws Exception;
@@ -11,5 +12,5 @@ public interface JobPostingService {
     
     int dataCount(Map<String, Object> map);
     List<JobPosting> listPosting(Map<String, Object> map);
-    JobPosting findById(long postingIdx);
+    JobPosting findById(@Param("postingIdx") long postingIdx);
 }

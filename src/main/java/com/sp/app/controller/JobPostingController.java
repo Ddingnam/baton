@@ -58,21 +58,21 @@ public class JobPostingController {
     }
 
     @GetMapping("article")
-    public String article(@RequestParam long postingIdx, Model model) {
+    public String article(@RequestParam("postingIdx") long postingIdx, Model model) {
+
+        System.out.println("=== article 진입 ===");
+        System.out.println("postingIdx = " + postingIdx);
+
         JobPosting dto = postingService.findById(postingIdx);
-        
+
+        System.out.println("dto = " + dto);
+
         if(dto == null) {
+            System.out.println("dto null → 리스트 이동");
             return "redirect:/alba/list";
         }
-        
-        if (dto.getStartTime() != null && dto.getEndTime() != null) {
-            dto.setWorkTime(dto.getStartTime() + " ~ " + dto.getEndTime());
-        } else if ("Y".equals(dto.getTimeNegotiable())) {
-            dto.setWorkTime("시간협의 가능");
-        }
-        
+
         model.addAttribute("dto", dto);
-        
         return "alba/article";
     }
 

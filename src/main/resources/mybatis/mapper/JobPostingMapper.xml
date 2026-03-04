@@ -63,26 +63,35 @@
 		COUNT(*) FROM job_posting
 	</select>
 
-	<select id="listPosting" parameterType="map"
-		resultType="com.sp.app.model.JobPosting">
-		SELECT * FROM (
-		SELECT a.*, ROWNUM rnum FROM (
-		SELECT
-		posting_idx,
-		title,
-		employer,
-		pay,
-		pay_type,
-		location,
-		createdDate FROM job_posting
-		ORDER BY posting_idx DESC
-		) a WHERE ROWNUM &lt;= #{offset} + #{size}
-		) WHERE rnum &gt; #{offset}
-	</select>
+<select id="listPosting" parameterType="map" resultType="com.sp.app.model.JobPosting">
+    SELECT * FROM (
+        SELECT a.*, ROWNUM rnum FROM (
+            SELECT
+                posting_idx AS postingIdx,   title,
+                employer,
+                pay,
+                pay_type AS payType,         location,
+                createdDate 
+            FROM job_posting
+            ORDER BY posting_idx DESC
+        ) a WHERE ROWNUM &lt;= #{offset} + #{size}
+    ) WHERE rnum &gt; #{offset}
+</select>
 
-	<select id="findById" parameterType="long"
-		resultType="com.sp.app.model.JobPosting">
-		SELECT * FROM job_posting WHERE posting_idx = #{postingIdx}
-	</select>
+<select id="findById" resultType="com.sp.app.model.JobPosting">
+    SELECT 
+        posting_idx AS postingIdx, 	
+        user_idx AS userIdx,
+        region_idx AS regionIdx,
+        pay_type AS payType,
+        work_period AS workPeriod,
+        work_days AS workDays,
+        start_time AS startTime,
+        end_time AS endTime,
+        time_negotiable AS timeNegotiable,
+        title, employer, description, pay, location, contact, benefits, category, createdDate
+    FROM job_posting
+    WHERE posting_idx = #{postingIdx}
+</select> 	
 
 </mapper>

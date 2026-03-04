@@ -290,7 +290,7 @@
   <main id="baton-main-content">
     <div class="article-wrap">
 
-      <a href="${pageContext.request.contextPath}/alba/posting/list" class="back-nav">
+      <a href="${pageContext.request.contextPath}/alba/list" class="back-nav">
         <span class="back-icon">←</span>
         목록으로 돌아가기
       </a>
@@ -334,7 +334,7 @@
         <!-- 본문 -->
         <div class="article-body">
           <div class="body-title">공고 내용</div>
-          <div class="body-text">${dto.content}</div>
+          <div class="body-text">${dto.description}</div>
         </div>
 
         <!-- 지도 -->
@@ -360,7 +360,7 @@
 
         <!-- 하단 버튼 -->
         <div class="article-footer">
-          <a href="${pageContext.request.contextPath}/alba/posting/list" class="btn btn-outline">← 목록</a>
+          <a href="${pageContext.request.contextPath}/alba/list" class="btn btn-outline">← 목록</a>
           <button class="btn btn-heart" id="heartBtn" onclick="toggleHeart(this)" title="찜하기">♡</button>
           <button class="btn btn-outline" style="width:50px;height:50px;padding:0;flex-shrink:0;font-size:18px;" onclick="sharePost()" title="공유">↗</button>
           <button class="btn btn-primary" onclick="applyJob()">
