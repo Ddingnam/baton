@@ -19,4 +19,5 @@ public interface StorageService {
 	public boolean deleteFile(String directoryPath, String filename);
 	
 	public List<String> listAllFiles(String directoryPath);
+	public String upload(MultipartFile mf, String uploadPath);
 }

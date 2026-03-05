@@ -2,31 +2,68 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.JobPostingMapper">
 
-	<insert id="insertPosting" parameterType="com.sp.app.model.JobPosting">
-    	INSERT INTO job_posting (
-        title, employer, description, pay, pay_type, 
-        work_period, work_days, start_time, end_time,
-        time_negotiable, location, contact, benefits, 
-        user_idx, region_idx, category, createdDate,
-        IMGURL  ) VALUES (
-        #{title, jdbcType=VARCHAR},
-        #{employer, jdbcType=VARCHAR},
-        #{description, jdbcType=CLOB},
-        #{pay, jdbcType=INTEGER},
-        #{payType, jdbcType=VARCHAR},
-        #{workPeriod, jdbcType=VARCHAR},
-        #{workDays, jdbcType=VARCHAR},
-        #{startTime, jdbcType=VARCHAR},
-        #{endTime, jdbcType=VARCHAR},
-        #{timeNegotiable, jdbcType=CHAR},
-        #{location, jdbcType=VARCHAR},
-        #{contact, jdbcType=VARCHAR},
-        #{benefits, jdbcType=VARCHAR},
-        #{userIdx},
-        #{regionIdx},
-        #{category, jdbcType=VARCHAR},
-        SYSDATE,
-        #{imgUrl, jdbcType=VARCHAR} )
+	<insert id="insertPosting"
+		parameterType="com.sp.app.model.JobPosting">
+
+		<selectKey keyProperty="postingIdx" resultType="long"
+			order="BEFORE">
+			SELECT seq_job_posting.NEXTVAL FROM dual
+		</selectKey>
+
+		INSERT INTO job_posting (
+		posting_idx,
+		title,
+		employer,
+		description,
+		pay,
+		pay_type,
+		work_period,
+		work_days,
+		start_time,
+		end_time,
+		time_negotiable,
+		location,
+		contact,
+		benefits,
+		user_idx,
+		region_idx,
+		category,
+		created_date
+		)
+		VALUES (
+		#{postingIdx},
+		#{title},
+		#{employer},
+		#{description},
+		#{pay},
+		#{payType},
+		#{workPeriod},
+		#{workDays},
+		#{startTime},
+		#{endTime},
+		#{timeNegotiable},
+		#{location},
+		#{contact},
+		#{benefits},
+		#{userIdx},
+		#{regionIdx},
+		#{category},
+		SYSDATE
+		)
+	</insert>
+
+	<insert id="insertPostingImage">
+		INSERT INTO job_posting_image(
+		img_idx,
+		posting_idx,
+		img_url,
+		created_date
+		) VALUES(
+		seq_job_posting_img.NEXTVAL,
+		#{postingIdx},
+		#{imgUrl},
+		SYSDATE
+		)
 	</insert>
 
 	<update id="updatePosting"
@@ -54,38 +91,57 @@
 		COUNT(*) FROM job_posting
 	</select>
 
-<select id="listPosting" parameterType="map" resultType="com.sp.app.model.JobPosting">
-    SELECT * FROM (
-        SELECT a.*, ROWNUM rnum FROM (
-           SELECT posting_idx AS postingIdx, title, employer, pay, pay_type AS payType, location, createdDate,
-                  category, work_period AS workPeriod, work_days AS workDays, 
-                  start_time AS startTime, end_time AS endTime
-           FROM job_posting 
-           ORDER BY posting_idx DESC
-        ) a WHERE ROWNUM &lt;= #{offset} + #{size}
-    ) WHERE rnum &gt; #{offset}
-</select> 	
+	<select id="listPosting" parameterType="map"
+		resultType="com.sp.app.model.JobPosting">
+		SELECT * FROM (
+		SELECT a.*, ROWNUM rnum FROM (
+		SELECT
+		posting_idx AS postingIdx, title, employer, pay, pay_type AS payType,
+		location, createdDate,
+		category, work_period AS workPeriod, work_days
+		AS workDays,
+		start_time AS startTime, end_time AS endTime
+		FROM
+		job_posting
+		ORDER BY posting_idx DESC
+		) a WHERE ROWNUM &lt;= #{offset} +
+		#{size}
+		) WHERE rnum &gt; #{offset}
+	</select>
 
-<select id="findById" resultType="com.sp.app.model.JobPosting">
-    SELECT 
-        posting_idx AS postingIdx, 	
-        user_idx AS userIdx,
-        region_idx AS regionIdx,
-        pay_type AS payType,
-        work_period AS workPeriod,
-        work_days AS workDays,
-        start_time AS startTime,
-        end_time AS endTime,
-        time_negotiable AS timeNegotiable,
-        IMGURL AS imgUrl, title, employer, description, pay, location, contact, benefits, category, createdDate
-    FROM job_posting
-    WHERE posting_idx = #{postingIdx}
-</select> 	
+	<select id="findById" resultType="com.sp.app.model.JobPosting">
+		SELECT
+		posting_idx AS
+		postingIdx,
+		user_idx AS userIdx,
+		region_idx AS regionIdx,
+		pay_type AS
+		payType,
+		work_period AS workPeriod,
+		work_days AS workDays,
+		start_time AS
+		startTime,
+		end_time AS endTime,
+		time_negotiable AS timeNegotiable,
+		title, employer, description, pay,
+		location, contact, benefits,
+		category, created_date
+		FROM job_posting
+		WHERE posting_idx =
+		#{postingIdx}
+	</select>
 
-<update id="updateHitCount" parameterType="long">
-    UPDATE job_posting 
-    SET hit_count = hit_count + 1 
+	<update id="updateHitCount" parameterType="long">
+		UPDATE job_posting
+		SET
+		hit_count = hit_count + 1
+		WHERE posting_idx = #{postingIdx}
+	</update>
+	
+	<select id="findImagesByPostingIdx" resultType="String">
+    SELECT img_url
+    FROM job_posting_image
     WHERE posting_idx = #{postingIdx}
-</update>
+	</select>
 
 </mapper>

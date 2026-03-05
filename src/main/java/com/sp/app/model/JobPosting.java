@@ -53,7 +53,6 @@ public class JobPosting {
     private String responseTime;
     
     private String thumbUrl;
-    
-    private String imgUrl;
-    private MultipartFile upload;
+   
+    private List<String> imageList;
 }

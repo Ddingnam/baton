@@ -16,4 +16,6 @@ public interface JobPostingService {
     
     void updateHitCount(long postingIdx) throws Exception;
     
+    
+    
 }

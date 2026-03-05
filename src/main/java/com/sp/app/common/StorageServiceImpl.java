@@ -243,5 +243,15 @@ public class StorageServiceImpl implements StorageService {
 			throw new StorageException("Failed to read stored files", e);
 		}
 	}
+	
+	/**
+	 * @param mf 업로드할 파일
+	 * @param uploadPath 파일이 저장될 서버 경로
+	 * @return 서버에 저장된 파일명
+	 */
+	@Override
+	public String upload(MultipartFile mf, String uploadPath) {
+	    return uploadFileToServer(mf, uploadPath);
+	}
 
 }
