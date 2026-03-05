@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>아이디 찾기 | BATON</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/login-custom.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/login/login-custom.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
@@ -76,6 +76,6 @@
 </main>
 
 <jsp:include page="/WEB-INF/views/layout/footer.jsp"/>
-<script src="${pageContext.request.contextPath}/dist/js/findUserInfo.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/member/findUserInfo.js"></script>
 </body>
 </html>

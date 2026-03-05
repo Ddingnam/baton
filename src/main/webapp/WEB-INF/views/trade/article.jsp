@@ -12,7 +12,7 @@
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/trade-article.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/trade/trade-article.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
@@ -373,6 +373,6 @@
     </div>
 </div>
 
-<script src="${pageContext.request.contextPath}/dist/js/trade-article.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/trade/trade-article.js"></script>
 </body>
 </html>

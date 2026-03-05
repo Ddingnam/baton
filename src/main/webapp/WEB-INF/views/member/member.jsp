@@ -11,7 +11,7 @@
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/header.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/layout/header.css">
 
 </head>
 <body>

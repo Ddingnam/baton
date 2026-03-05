@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/payment_modal.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/payment/payment_modal.css">
 
 <input type="hidden" id="ctxPath" value="${pageContext.request.contextPath}">
 <input type="hidden" id="userEmail" value="${sessionScope.member.email}">

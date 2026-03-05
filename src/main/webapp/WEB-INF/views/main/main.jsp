@@ -9,7 +9,7 @@
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/main.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/main/main.css">
 </head>
 <body>
 
@@ -167,7 +167,7 @@
     </div>
 
     <jsp:include page="/WEB-INF/views/layout/footer.jsp"/>
-    <script src="${pageContext.request.contextPath}/dist/js/main.js"></script>
+    <script src="${pageContext.request.contextPath}/dist/js/main/main.js"></script>
     
 </body>
 </html>

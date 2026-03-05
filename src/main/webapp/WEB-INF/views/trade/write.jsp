@@ -11,7 +11,7 @@
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/trade-write.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/trade/trade-write.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
@@ -170,7 +170,7 @@
 		<input type="hidden" name="mode" value="${mode}">
     </form>
 </div>
-<script src="${pageContext.request.contextPath}/dist/js/trade-write.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/trade/trade-write.js"></script>
 <script> const contextPath = '${pageContext.request.contextPath}'; </script>
 </body>
 </html>

@@ -9,7 +9,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>중고거래 | BATON</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/trade-list.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/trade/trade-list.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
@@ -175,6 +175,6 @@
     <i class="ri-pencil-line"></i>
 </button>
 
-<script src="${pageContext.request.contextPath}/dist/js/trade-list.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/trade/trade-list.js"></script>
 </body>
 </html>

@@ -10,7 +10,7 @@
 <title>글쓰기 | BATON</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/community-write.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/community/community-write.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoMapKey}&libraries=services"></script>
@@ -165,49 +165,41 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
-<script src="${pageContext.request.contextPath}/dist/js/community-write.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/community/community-write.js"></script>
 
 <script>
-// [JSP 내부 스크립트] - 카카오 장소 검색 로직
-let ps = null; // 장소 검색 객체
+let ps = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. 카카오 장소 검색 객체 생성 (API 로드 확인)
     if (window.kakao && window.kakao.maps && window.kakao.maps.services) {
         ps = new kakao.maps.services.Places();
     } else {
         console.error("Kakao Maps API 로드 실패 (키 확인 필요)");
     }
     
-    // 2. 위치 버튼 클릭 시 모달 열기 이벤트 연결
     const btnLocation = document.getElementById('btnLocation');
     btnLocation.addEventListener('click', openPlaceModal);
 });
 
-// 모달 열기
 function openPlaceModal() {
     const card = document.getElementById('locationCard');
-    // 이미 위치가 등록된 경우 삭제 여부 확인
     if (card.style.display !== 'none') {
         if(confirm("설정된 위치를 변경하시겠습니까?")) {
-            removeLocation(); // 기존 위치 삭제
+            removeLocation();
         } else {
             return;
         }
     }
-    // 모달 표시
     document.getElementById('placeSearchModal').style.display = 'flex';
     setTimeout(() => document.getElementById('keyword').focus(), 100);
 }
 
-// 모달 닫기
 function closePlaceSearch() {
     document.getElementById('placeSearchModal').style.display = 'none';
     document.getElementById('keyword').value = '';
     document.getElementById('placesList').innerHTML = '';
 }
 
-// 장소 검색 실행
 function searchPlaces() {
     const keyword = document.getElementById('keyword').value.trim();
     if (!keyword) {
@@ -218,11 +210,9 @@ function searchPlaces() {
         alert('지도 서비스를 사용할 수 없습니다.');
         return;
     }
-    // 장소 검색 API 호출
     ps.keywordSearch(keyword, placesSearchCB);
 }
 
-// 장소 검색 콜백 함수
 function placesSearchCB(data, status, pagination) {
     if (status === kakao.maps.services.Status.OK) {
         displayPlaces(data); // 목록 표시
@@ -233,10 +223,9 @@ function placesSearchCB(data, status, pagination) {
     }
 }
 
-// 검색 결과 목록 표출
 function displayPlaces(places) {
     const listEl = document.getElementById('placesList');
-    listEl.innerHTML = ''; // 초기화
+    listEl.innerHTML = '';
 
     for (let i = 0; i < places.length; i++) {
         const item = getListItem(places[i]);
@@ -244,7 +233,6 @@ function displayPlaces(places) {
     }
 }
 
-// 리스트 아이템 생성 (HTML)
 function getListItem(place) {
     const el = document.createElement('li');
     el.className = 'place-item';
@@ -262,12 +250,9 @@ function getListItem(place) {
 
     el.innerHTML = itemStr;
 
-    // 아이템 클릭 시 선택 처리
     el.onclick = function () {
-        // community-write.js 에 있는 setLocation 호출 (데이터 저장 및 UI 반영)
-        // place_name: 장소명, address_name: 주소, y: 위도, x: 경도
         setLocation(place.place_name, place.address_name, place.y, place.x);
-        closePlaceSearch(); // 모달 닫기
+        closePlaceSearch();
     };
     return el;
 }

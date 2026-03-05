@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/header.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/layout/header.css">
 
 <header id="baton-header">
 	<div class="header-container">
@@ -166,4 +166,4 @@
 </script>
 </sec:authorize>
 
-<script src="${pageContext.request.contextPath}/dist/js/header.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/layout/header.js"></script>

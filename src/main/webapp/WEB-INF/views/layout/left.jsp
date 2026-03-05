@@ -8,7 +8,7 @@
 <title>BATON | Left</title>
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/dist/css/left.css">
+	href="${pageContext.request.contextPath}/dist/css/layout/left.css">
 <link
 	href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
 	rel="stylesheet">
@@ -60,6 +60,6 @@
 		<i class="ri-menu-unfold-line"></i>
 	</div>
 
-	<script src="${pageContext.request.contextPath}/dist/js/left.js"></script>
+	<script src="${pageContext.request.contextPath}/dist/js/layout/left.js"></script>
 </body>
 </html>

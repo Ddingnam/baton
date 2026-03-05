@@ -11,9 +11,9 @@
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/main.css?v=final">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/mypage_left.css?v=final">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/mypage_main.css?v=final">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/main/main.css?v=final">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/mypage/mypage_left.css?v=final">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/mypage/mypage_main.css?v=final">
 </head>
 <body>
 
@@ -462,8 +462,8 @@
 	<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 	<jsp:include page="/WEB-INF/views/payment/chargeModal.jsp" />
 	<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
-	<script src="${pageContext.request.contextPath}/dist/js/mypage_main.js"></script>
-	<script src="${pageContext.request.contextPath}/dist/js/payment.js"></script>
+	<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_main.js"></script>
+	<script src="${pageContext.request.contextPath}/dist/js/payment/payment.js"></script>
 	
 	<script>
 	document.querySelectorAll('.inner-tab').forEach(tab => {

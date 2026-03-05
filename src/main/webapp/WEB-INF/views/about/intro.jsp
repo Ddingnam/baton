@@ -10,7 +10,7 @@
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/about_intro.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/about/about_intro.css">
 </head>
 <body>
 

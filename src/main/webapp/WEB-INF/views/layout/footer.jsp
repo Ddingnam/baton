@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/footer.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/layout/footer.css">
 
 <footer id="baton-footer">
     <div class="footer-container">
@@ -79,4 +79,4 @@
     <button id="btn-top" title="위로 가기"><i class="ri-arrow-up-line"></i></button>
 </footer>
 
-<script src="${pageContext.request.contextPath}/dist/js/footer.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/layout/footer.js"></script>

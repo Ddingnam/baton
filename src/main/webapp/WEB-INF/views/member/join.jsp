@@ -8,7 +8,7 @@
 <title>회원가입 | BATON</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/join.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/member/join.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
@@ -122,8 +122,8 @@
 
 <jsp:include page="/WEB-INF/views/layout/footer.jsp"/>
 
-<script src="${pageContext.request.contextPath}/dist/js/util-async.js"></script>
-<script src="${pageContext.request.contextPath}/dist/js/join.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/util/util-async.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/member/join.js"></script>
 
 </body>
 </html>

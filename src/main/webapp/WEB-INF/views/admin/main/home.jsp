@@ -11,10 +11,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin_main.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_main.css">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="${pageContext.request.contextPath}/dist/js/admin_main.js" defer></script>
+    <script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js" defer></script>
 </head>
 <body>
 

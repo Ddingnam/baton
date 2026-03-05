@@ -13,7 +13,7 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/main.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/main/main.css">
 <style>
     .review-container { max-width: 800px; margin: 130px auto; padding: 0 20px; }
     .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
