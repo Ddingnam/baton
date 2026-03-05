@@ -135,6 +135,10 @@
 		UPDATE product SET tagIdx = #{tagIdx} WHERE productIdx = #{productIdx}
 	</update>
 	
+	<update id="updateTradeStatus">
+		UPDATE product SET tradeStatus = #{tradeStatus} WHERE productIdx = #{productIdx}
+	</update>
+	
 	<select id="findSaveName" parameterType="map" resultType="String">
         SELECT saveName 
         FROM productImages 

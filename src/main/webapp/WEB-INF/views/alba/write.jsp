@@ -127,8 +127,8 @@
               <div class="form-group">
                 <label for="pay">급여 금액 <span class="req">*</span></label>
                 <input type="number" id="pay" name="pay" min="0" step="100" placeholder="예) 12000" required oninput="onPayInput()">
-                <div class="warn-box" id="payWarn">⚠️ 입력하신 시급이 최저임금(10,030원)보다 낮아요!</div>
-                <div class="info-box"><strong>2025년 최저시급: 10,030원</strong></div>
+                <div class="warn-box" id="payWarn">⚠️ 입력하신 시급이 최저임금(10,320원)보다 낮아요!</div>
+                <div class="info-box"><strong>2026년 최저시급: 10,320원</strong></div>
               </div>
             </div>
           </div>

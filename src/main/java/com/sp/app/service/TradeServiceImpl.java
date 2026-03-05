@@ -285,5 +285,19 @@ public class TradeServiceImpl implements TradeService {
 		WishListId id = new WishListId(productIdx, userIdx);
 	    return wishListRepository.existsById(id);
 	}
+
+	@Override
+	public void updateTradeStatus(long productIdx, String tradeStatus) throws Exception {
+		Map<String, Object> map = new HashMap<>();
+		
+		try {
+			map.put("tradeStatus", tradeStatus);
+			map.put("productIdx", productIdx);
+			
+			mapper.updateTradeStatus(map);
+		} catch (Exception e) {
+			log.info("updateTradeStatus : ", e);
+		}
+	}
 	
 }
