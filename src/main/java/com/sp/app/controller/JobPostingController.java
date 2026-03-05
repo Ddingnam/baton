@@ -58,12 +58,12 @@ public class JobPostingController {
                 dto.setUserIdx(userDetails.getUserIdx());
             }
             
-            //service.insertJobPosting(dto, uploadPath); 
+            postingService.insertPosting(dto); 
             
         } catch (Exception e) {
             log.info("writeSubmit 에러: ", e);
         }
-        return "redirect:/job/list";
+        return "redirect:/alba/list";
     }
 
     @GetMapping("article")

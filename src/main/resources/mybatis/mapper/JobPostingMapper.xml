@@ -8,7 +8,7 @@
         work_period, work_days, start_time, end_time,
         time_negotiable, location, contact, benefits, 
         user_idx, region_idx, category, createdDate,
-        img_url  ) VALUES (
+        IMGURL  ) VALUES (
         #{title, jdbcType=VARCHAR},
         #{employer, jdbcType=VARCHAR},
         #{description, jdbcType=CLOB},
@@ -77,7 +77,7 @@
         start_time AS startTime,
         end_time AS endTime,
         time_negotiable AS timeNegotiable,
-        img_url AS imgUrl, title, employer, description, pay, location, contact, benefits, category, createdDate
+        IMGURL AS imgUrl, title, employer, description, pay, location, contact, benefits, category, createdDate
     FROM job_posting
     WHERE posting_idx = #{postingIdx}
 </select> 	
