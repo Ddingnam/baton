@@ -17,17 +17,13 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
 <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
-<!-- Core CSS Files -->
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/core.css" type="text/css">
 <!-- Main CSS Files -->
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/main2.css" type="text/css">
-<!-- Form CSS Files -->
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/forms.css" type="text/css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/main/main.css" type="text/css">
 
 <!-- Vendor JS Files -->
 <script type="text/javascript" src="${pageContext.request.contextPath}/dist/vendor/jquery/js/jquery.min.js"></script>
 
-<script type="text/javascript" src="${pageContext.request.contextPath}/dist/js/util-jquery.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/dist/js/util/util-jquery.js"></script>
 
 <script>
 	window.contextPath = '${pageContext.request.contextPath}';
