@@ -8,10 +8,10 @@ import com.sp.app.domain.dto.MemberDto;
 import com.sp.app.domain.dto.UserDto;
 
 public interface MemberService {
-	public MemberDto loginSnsMember(Map<String, Object> map);
+	public UserDto loginSnsUser(Map<String, Object> map);
 	
 	public void insertUser(UserDto dto, String uploadPath) throws Exception;
-	public void insertSnsMember(MemberDto dto) throws Exception;
+	public void insertSnsUser(UserDto dto) throws Exception;
 	public void insertMemberStatus(MemberDto dto) throws Exception;
 	
 	public void updatePassword(MemberDto dto) throws Exception;
@@ -46,6 +46,7 @@ public interface MemberService {
 	
 	public boolean isUserIdDuplicated(String userId);
 	public boolean isNicknameDuplicated(String nickname);
+	public boolean isEmailDuplicated(String email);
 	
 	public String findUserId(Map<String, Object> map);
 	public long findByUserIdAndEmail(Map<String, Object> map);

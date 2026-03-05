@@ -14,6 +14,9 @@ import lombok.Setter;
 public class KakaoUser {
 	private Long id;
 	private String nickname;
+	private String name;
+	private String birth;
+	private String tel;
 	private String email;
 	private boolean email_verified;
 }

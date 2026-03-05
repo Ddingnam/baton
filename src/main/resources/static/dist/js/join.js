@@ -3,36 +3,8 @@ const contextPath = document.getElementById('registerForm').dataset.contextPath;
 const checkStatus = {
     isIdVerified: false,
     isNicknameVerified: false,
-    isEmailVerified: true /* 임시 비활성화 */
+    isEmailVerified: true
 };
-
-document.querySelectorAll('.form-control').forEach(input => {
-    input.addEventListener('input', () => {
-        showStatusMsg(input, null);
-    });
-});
-
-document.querySelector('input[name="userId"]').addEventListener('input', () => {
-    checkStatus.isIdVerified = false;
-});
-
-document.querySelector('input[name="nickname"]').addEventListener('input', () => {
-    checkStatus.isNicknameVerified = false;
-});
-
-document.getElementById("email").addEventListener('input', function() {
-	// checkStatus.isEmailVerified = false;
-    const authRow = document.getElementById("emailAuthRow");
-    if(authRow.classList.contains("open")) {
-        authRow.classList.remove("open");
-        document.getElementById("authCode").value = "";
-        clearInterval(timerInterval);
-        
-        const sendBtn = document.getElementById("btnSendAuth");
-        sendBtn.innerText = "인증번호 전송";
-        sendBtn.disabled = false;
-    }
-});
 
 document.addEventListener("DOMContentLoaded", function() {
     const pwd = document.querySelector("input[name='pwd']");
@@ -117,27 +89,6 @@ function startAuth() {
     }
 }
 
-function showJoinForm(data) {
-    document.getElementById('displayTown').innerText = data.fullAddress;
-    
-    document.getElementById('fullAddress').value = data.fullAddress;
-    document.getElementById('coreAddress').value = data.coreAddress;
-    document.getElementById('regionCode').value = data.regionCode;
-    document.getElementById('lat').value = data.lat;
-    document.getElementById('lng').value = data.lng;
-    
-    document.getElementById('step-auth').style.display = 'none';
-    document.getElementById('step-join').style.display = 'block';
-    
-    window.scrollTo(0, 0);
-}
-
-function backToAuth() {
-    document.getElementById('step-join').style.display = 'none';
-    document.getElementById('step-auth').style.display = 'block';
-    window.scrollTo(0, 0);
-}
-
 let timerInterval;
 
 async function sendEmailAuth() {
@@ -180,7 +131,11 @@ async function sendEmailAuth() {
             document.getElementById("emailAuthRow").classList.add("open");
             startTimer(180);
             
-            showStatusMsg(emailField, null);
+            hideStatusMsg(emailField);
+		} else if(data.state === "duplicated") {
+			showBatonToast("이미 사용중인 이메일입니다.");
+            btnSendAuth.innerText = "인증번호 전송";
+            btnSendAuth.disabled = false;
         } else {
             showBatonToast(data.message || "발송에 실패했습니다.");
             btnSendAuth.innerText = "인증번호 전송";
@@ -264,7 +219,7 @@ async function verifyCode() {
             emailField.readOnly = true;
             userCodeField.readOnly = true;
             
-            showStatusMsg(emailField, null);
+            hideStatusMsg(emailField);
         } else {
             if (data.state === "invalidCode") {
                 showStatusMsg(userCodeField, "인증번호가 일치하지 않습니다.");
@@ -355,6 +310,8 @@ async function checkDuplication(type, element) {
 }
 
 async function sendRegister() {
+	document.querySelector(".btn-baton-login").blur();
+	
     const f = document.registerForm;
     
     const userId = f.userId;
@@ -454,38 +411,81 @@ async function sendRegister() {
 }
 
 function showStatusMsg(element, message, isError = true) {
-    const container = element.parentElement.classList.contains('input-with-btn') 
-                      ? element.parentElement.parentElement 
-                      : element.parentElement;
-                      
-    let msgBox = container.querySelector('.status-msg');
+    if (!element) return;
     
-    if (!msgBox) {
-        msgBox = document.createElement('span');
-        msgBox.className = 'status-msg';
-        
-        const timer = container.querySelector('.timer-container');
-        if (timer) {
-            timer.parentNode.insertBefore(msgBox, timer);
-        } else {
-            container.appendChild(msgBox);
-        }
-    }
+    hideStatusMsg(element);
+    if (!message) return;
 
-    if (!message) {
-        msgBox.innerText = "";
-        msgBox.className = 'status-msg';
-        element.classList.remove('input-error');
-        return;
-    }
+    const identifier = element.name || element.id;
+    const msgId = identifier + "-msg";
+    
+    const container = element.closest('.input-sequence');
+    if (!container) return;
 
+    const msgBox = document.createElement('span');
+    msgBox.id = msgId;
+    msgBox.className = 'status-msg ' + (isError ? 'error-msg' : 'success-msg');
     msgBox.innerText = message;
-    msgBox.className = isError ? 'status-msg error-msg' : 'status-msg success-msg';
     
-    if (isError) {
-        element.classList.add('input-error');
-    } else {
-        element.classList.remove('input-error');
+    msgBox.style.color = isError ? '#F04452' : '#3182F6';
+    msgBox.style.fontSize = '13px';
+    msgBox.style.marginTop = '8px';
+    msgBox.style.display = 'block';
+
+    container.appendChild(msgBox);
+    
+    if (isError) element.classList.add('input-error');
+}
+
+function hideStatusMsg(element) {
+    if (!element) return;
+
+    element.classList.remove('input-error');
+
+    const identifier = element.name || element.id;
+    const msgId = identifier + "-msg";
+    
+    const msgBox = document.getElementById(msgId);
+    if (msgBox) {
+        msgBox.remove();
+    }
+
+    const container = element.closest('.input-sequence');
+    if (container) {
+        const extraBoxes = container.querySelectorAll('.status-msg');
+        extraBoxes.forEach(box => box.remove());
     }
 }
 
+document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener('input', function(e) {
+        if (e.target.tagName !== 'INPUT') return;
+
+        const input = e.target;
+        
+        hideStatusMsg(input);
+
+        if (input.name === 'userId') checkStatus.isIdVerified = false;
+        if (input.name === 'nickname') checkStatus.isNicknameVerified = false;
+
+        if (input.id === 'email') {
+            const authRow = document.getElementById("emailAuthRow");
+            if (authRow && authRow.classList.contains("open")) {
+                authRow.classList.remove("open");
+                
+                if (window.timerInterval) {
+                    clearInterval(window.timerInterval);
+                }
+                const timerDisp = document.getElementById("timer");
+                if (timerDisp) timerDisp.innerText = "03:00";
+                
+                const sendBtn = document.getElementById("btnSendAuth");
+                if (sendBtn) {
+                    sendBtn.innerText = "인증번호 전송";
+                    sendBtn.disabled = false;
+                    sendBtn.classList.remove("verified");
+                }
+            }
+        }
+    });
+});

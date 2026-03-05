@@ -34,7 +34,7 @@
 	        pwdFailCount, 
 	        status
 	    ) VALUES (
-	        #{userIdx}, 
+	    	#{userIdx}, 
 	        #{userId}, 
 	        #{oauthId, jdbcType=VARCHAR}, 
 	        #{pwd}, 
@@ -45,6 +45,40 @@
 	        #{birth}, 
 	        #{profile_photo, jdbcType=VARCHAR}, 
 	        0, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 1)
+	</insert>
+	
+	<insert id="insertSnsUser" parameterType="com.sp.app.domain.dto.UserDto">
+	    INSERT INTO users (
+	        userIdx, 
+	        userId, 
+	        oauthId, 
+	        pwd,
+	        name, 
+	        nickname, 
+	        email, 
+	        tel, 
+	        birth, 
+	        profile_photo, 
+	        score, 
+	        userLevel, 
+	        createdDate, 
+	        updatedDate, 
+	        lastLoginDate, 
+	        pwdFailCount, 
+	        status,
+	        provider
+	    ) VALUES (
+	        #{userIdx},
+	        #{userId}, 
+	        #{oauthId, jdbcType=VARCHAR}, 
+	        #{pwd},
+	        #{name}, 
+	        #{nickname}, 
+	        #{email}, 
+	        #{tel}, 
+	        #{birth}, 
+	        #{profile_photo, jdbcType=VARCHAR}, 
+	        0, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 1, #{provider})
 	</insert>
 	
 	<insert id="insertRegion" parameterType="com.sp.app.domain.dto.UserDto">
@@ -88,39 +122,6 @@
 			#{addr1, jdbcType=VARCHAR}, #{addr2, jdbcType=VARCHAR},
 			#{ipAddr})
 		SELECT * FROM dual
-    </update>
-
-    <update id="insertSnsUser" parameterType="com.sp.app.domain.dto.UserDto">
-		INSERT INTO users (
-	        userIdx, 
-	        userId, 
-	        oauthId, 
-	        pwd, 
-	        name, 
-	        nickname, 
-	        email, 
-	        tel, 
-	        birth, 
-	        profile_photo, 
-	        score, 
-	        userLevel, 
-	        createdDate, 
-	        updatedDate, 
-	        lastLoginDate, 
-	        pwdFailCount, 
-	        status
-	    ) VALUES (
-	        #{userIdx}, 
-	        #{userId}, 
-	        #{oauthId, jdbcType=VARCHAR}, 
-	        #{pwd}, 
-	        #{name}, 
-	        #{nickname}, 
-	        #{email}, 
-	        #{tel}, 
-	        #{birth}, 
-	        #{profile_photo, jdbcType=VARCHAR}, 
-	        0, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 1)
     </update>
 
 	<insert id="insertMemberStatus" parameterType="com.sp.app.domain.dto.MemberDto">
@@ -309,6 +310,12 @@
 		SELECT COUNT(nickname)
 		FROM users
 		WHERE nickname = #{nickname}
+	</select>
+	
+	<select id="isEmailDuplicated" resultType="int">
+		SELECT COUNT(email)
+		FROM users
+		WHERE email = #{email}
 	</select>
 
 	<select id="findUserId" parameterType="map" resultType="String">

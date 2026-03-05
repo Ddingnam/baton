@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sp.app.common.RequestUtils;
-import com.sp.app.domain.dto.MemberDto;
+import com.sp.app.domain.dto.UserDto;
 import com.sp.app.oauth.KakaoAuthService;
 import com.sp.app.oauth.KakaoUser;
 import com.sp.app.security.LoginSnsSuccessHandler;
@@ -46,21 +46,23 @@ public class MemberSnsController {
 			map.put("sns_id", sns_id);
 			map.put("sns_provider", sns_provider);
 			
-			MemberDto dto = memberService.loginSnsMember(map);
+			UserDto dto = memberService.loginSnsUser(map);
 			if(dto == null) {
-				dto = new MemberDto();
+				dto = new UserDto();
 				
-				dto.setSns_id(sns_id);
-				dto.setSns_provider(sns_provider);
-				dto.setName(kakaoUser.getNickname());
+				dto.setUserId(sns_provider + "_" + sns_id);
+				dto.setOauthId(sns_id);
+				dto.setProvider(sns_provider);
+				dto.setNickname(kakaoUser.getNickname());
+				dto.setName(kakaoUser.getName());
+				dto.setBirth(kakaoUser.getBirth());
+				dto.setTel(kakaoUser.getTel());
 				dto.setEmail(kakaoUser.getEmail());
-				dto.setIpAddr(RequestUtils.getClientIp());
 				
-				memberService.insertSnsMember(dto);
+				memberService.insertSnsUser(dto);
 			}
 			
-			// 시큐리티 로그인 처리
-			// successHandler.forceLogin(dto);
+			successHandler.forceLogin(dto);
 
 		} catch (Exception e) {
 			log.info("kakaoLogin : ", e);

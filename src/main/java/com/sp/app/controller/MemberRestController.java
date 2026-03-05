@@ -86,6 +86,13 @@ public class MemberRestController {
 
         try {
         	guestInfo.clearAll();
+        	
+        	/*
+        	if(service.isEmailDuplicated(email)) {
+        		model.put("state", "duplicated");
+        		return ResponseEntity.ok(model);
+        	}
+        	*/
             
             String subject = "[BATON] 회원가입을 위한 이메일 인증번호입니다.";
             String authCode = MyUtil.generateAuthCode();

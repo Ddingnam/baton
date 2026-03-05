@@ -110,12 +110,18 @@ async function sendEmailAuthForPwd() {
 	const f = document.findPwdForm;
     const userId = f.userId.value.trim();
     const email = f.email.value.trim();
+	const btnMain = document.getElementById("btnMain");
+	const btnMainText = document.getElementById("btnMainText");
 
 	hideError();
 	
 	if (!userId) { showError("아이디를 입력해 주세요."); f.userId.focus(); return; }
 	if (!email) { showError("이메일을 입력해 주세요."); f.email.focus(); return; }
-
+	
+	btnMain.disabled = true;
+    btnMainText.innerText = "전송 중...";
+    btnMain.style.opacity = "0.7";
+	
     const formData = new FormData();
     formData.append("userId", userId);
     formData.append("email", email);
@@ -131,12 +137,19 @@ async function sendEmailAuthForPwd() {
             document.getElementById("emailAuthRow").classList.add("open");
             startTimer(180);
             showBatonToast("인증번호가 발송되었습니다.", false);
+			
+			btnMainText.innerText = "인증번호 재전송";
         } else {
             showError(result.message || "정보가 일치하지 않습니다.");
+			btnMainText.innerText = "인증번호 전송";
         }
     } catch (e) {
 		console.error("sendEmailAuthForPwd Error:", e);
         showBatonToast("네트워크 통신 중 오류가 발생했습니다.");
+		btnMainText.innerText = "인증번호 전송";
+	} finally {
+        btnMain.disabled = false;
+        btnMain.style.opacity = "1";
     }
 }
 
@@ -223,6 +236,9 @@ async function sendPwdUpdate() {
     const f = document.pwdUpdateForm;
     const pwd = f.userPwd.value.trim();
     const pwdCheck = f.userPwdCheck.value.trim();
+	
+	const btnSubmit = document.querySelector(".btn-baton-login");
+	const btnText = btnSubmit.querySelector("span");
     
     hideError();
 
@@ -245,6 +261,11 @@ async function sendPwdUpdate() {
         f.userPwdCheck.focus(); 
         return; 
     }
+	
+	btnSubmit.disabled = true;
+    btnSubmit.style.opacity = "0.7";
+    btnSubmit.style.cursor = "not-allowed";
+    btnText.innerText = "변경 중...";
 
     const url = `${contextPath}/member/updatePassword`;
     const formData = new FormData();
@@ -262,15 +283,27 @@ async function sendPwdUpdate() {
 
         if (data.state === "success") {
             showBatonToast("비밀번호가 성공적으로 변경되었습니다.", false);
+			
+			btnText.innerText = "변경 완료";
+			
 			setTimeout(() => {
                 location.href = `${contextPath}/member/login`;
             }, 2000);
         } else {
             showError("비밀번호 변경에 실패했습니다.");
+			btnSubmit.disabled = false;
+            btnSubmit.style.opacity = "1";
+            btnSubmit.style.cursor = "pointer";
+            btnText.innerText = "비밀번호 변경하기";
         }
 
     } catch (error) {
         console.error("sendPwdUpdate Error:", error);
         showBatonToast("서버 통신 중 오류가 발생했습니다.");
+		
+		btnSubmit.disabled = false;
+        btnSubmit.style.opacity = "1";
+        btnSubmit.style.cursor = "pointer";
+        btnText.innerText = "비밀번호 변경하기";
     }
 }

@@ -28,9 +28,15 @@ public class MemberServiceImpl implements MemberService {
 	// private final MailSender mailSender;
 
 	@Override
-	public MemberDto loginSnsMember(Map<String, Object> map) {
-		// TODO Auto-generated method stub
-		return null;
+	public UserDto loginSnsUser(Map<String, Object> map) {
+		UserDto dto = null;
+		try {
+			dto = mapper.loginSnsUser(map);
+		} catch (Exception e) {
+
+			log.info("loginSnsUser : ", e);
+		}
+		return dto;
 	}
 
 	@Transactional(rollbackFor = Exception.class)
@@ -49,7 +55,7 @@ public class MemberServiceImpl implements MemberService {
 			dto.setUserIdx(seq);
 			
 			mapper.insertUser(dto);
-			mapper.insertRegion(dto);
+			// mapper.insertRegion(dto);
 			
 			dto.setAuthority("USER");
 			mapper.insertAuthority(dto);
@@ -61,9 +67,17 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public void insertSnsMember(MemberDto dto) throws Exception {
-		// TODO Auto-generated method stub
-		
+	public void insertSnsUser(UserDto dto) throws Exception {
+		try {
+			Long seq = mapper.userSeq();
+			dto.setUserIdx(seq);
+			
+			mapper.insertSnsUser(dto);
+			
+		} catch (Exception e) {
+			log.info("insertSnsMember : ", e);
+			throw e;
+		}
 	}
 
 	@Override
@@ -247,6 +261,11 @@ public class MemberServiceImpl implements MemberService {
 	public boolean isNicknameDuplicated(String nickname) {
 		return mapper.isNicknameDuplicated(nickname) > 0;
 	}
+	
+	@Override
+	public boolean isEmailDuplicated(String email) {
+		return mapper.isEmailDuplicated(email) > 0;
+	}
 
 	@Override
 	public String findUserId(Map<String, Object> map) {
@@ -283,5 +302,4 @@ public class MemberServiceImpl implements MemberService {
 			throw e;
 		}
 	}
-
 }
