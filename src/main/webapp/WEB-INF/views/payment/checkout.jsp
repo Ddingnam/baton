@@ -69,19 +69,19 @@
         </div>
 
         <div class="payment-summary">
-            <div class="summary-row">
-                <span>상품 금액</span>
-                <span><fmt:formatNumber value="${product.price}" pattern="#,###"/>원</span>
-            </div>
-            <div class="summary-row">
-                <span>안전결제 수수료</span>
-                <span><fmt:formatNumber value="${safetyFee}" pattern="#,###"/>원</span>
-            </div>
-            <div class="summary-row total">
-                <span>총 결제 포인트</span>
-                <span class="price"><fmt:formatNumber value="${totalPrice}" pattern="#,###"/> P</span>
-            </div>
-        </div>
+		    <div class="summary-row">
+		        <span>상품 금액</span>
+		        <span><fmt:formatNumber value="${product.price}" pattern="#,###"/>원</span>
+		    </div>
+		    <div class="summary-row">
+		        <span>안전결제 수수료</span>
+		        <span style="color: #3182F6; font-weight: bold;">무료</span>
+		    </div>
+		    <div class="summary-row total">
+		        <span>총 결제 포인트</span>
+		        <span class="price"><fmt:formatNumber value="${totalPrice}" pattern="#,###"/> P</span>
+		    </div>
+		</div>
 
         <button type="button" class="btn-pay" onclick="requestEscrowPayment()">
             <fmt:formatNumber value="${totalPrice}" pattern="#,###"/>원 결제하기

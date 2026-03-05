@@ -75,8 +75,8 @@ public class EscrowController {
             Trade trade = tradeService.findByIdx(productIdx); 
 
             int price = trade.getPrice();
-            int safetyFee = (int) (price * 0.035);
-            int totalPrice = price + safetyFee;
+            int safetyFee = 0;
+            int totalPrice = price;
 
             mav.addObject("product", trade); 
             mav.addObject("safetyFee", safetyFee);
