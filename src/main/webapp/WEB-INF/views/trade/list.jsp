@@ -62,12 +62,25 @@
                         <span class="toggle-label">거래 가능만 보기</span>
                     </label>
                     <span class="divider">|</span>
-                    <select class="detail-select sort-select" onchange="tlChangeSort(this.value)">
-                        <option value="latest" ${param.sort == 'latest' || empty param.sort ? 'selected' : ''}>최신순</option>
-                        <option value="price_asc" ${param.sort == 'price_asc' ? 'selected' : ''}>낮은 가격순</option>
-                        <option value="price_desc" ${param.sort == 'price_desc' ? 'selected' : ''}>높은 가격순</option>
-                        <option value="popular" ${param.sort == 'popular' ? 'selected' : ''}>인기순</option>
-                    </select>
+                    <div class="custom-dropdown sort-dropdown" id="sortDropdown" style="width: 140px;">
+				        <div class="dropdown-selected">
+				            <span id="selectedSortText">
+				                <c:choose>
+				                    <c:when test="${param.sort == 'price_asc'}">낮은 가격순</c:when>
+				                    <c:when test="${param.sort == 'price_desc'}">높은 가격순</c:when>
+				                    <c:when test="${param.sort == 'popular'}">인기순</c:when>
+				                    <c:otherwise>최신순</c:otherwise>
+				                </c:choose>
+				            </span>
+				            <i class="ri-arrow-down-s-line"></i>
+				        </div>
+				        <ul class="dropdown-menu">
+				            <li data-value="latest" class="${param.sort == 'latest' || empty param.sort ? 'active' : ''}">최신순</li>
+				            <li data-value="price_asc" class="${param.sort == 'price_asc' ? 'active' : ''}">낮은 가격순</li>
+				            <li data-value="price_desc" class="${param.sort == 'price_desc' ? 'active' : ''}">높은 가격순</li>
+				            <li data-value="popular" class="${param.sort == 'popular' ? 'active' : ''}">인기순</li>
+				        </ul>
+				    </div>
                 </div>
             </div>
         </div>
@@ -157,13 +170,13 @@
             </c:choose>
         </div>
 
-        <c:if test="${not empty pageInfo && pageInfo.totalPage > 1}">
+        <c:if test="${total_page > 1}">
             <div class="pagination-container tl-pagination">
-                <button class="tl-page-btn" onclick="tlGoPage(${pageInfo.currentPage - 1})" ${pageInfo.currentPage <= 1 ? 'disabled' : ''}>&#8249;</button>
+                <button class="tl-page-btn" onclick="tlGoPage(${page - 1})" ${page <= 1 ? 'disabled' : ''}>&#8249;</button>
                 <c:forEach begin="${pageInfo.startPage}" end="${pageInfo.endPage}" var="p">
                     <button class="tl-page-btn ${pageInfo.currentPage == p ? 'active' : ''}" onclick="tlGoPage(${p})">${p}</button>
                 </c:forEach>
-                <button class="tl-page-btn" onclick="tlGoPage(${pageInfo.currentPage + 1})" ${pageInfo.currentPage >= pageInfo.totalPage ? 'disabled' : ''}>&#8250;</button>
+                <button class="tl-page-btn" onclick="tlGoPage(${pageInfo.currentPage + 1})" ${pageInfo.currentPage >= total_page ? 'disabled' : ''}>&#8250;</button>
             </div>
         </c:if>
     </div>

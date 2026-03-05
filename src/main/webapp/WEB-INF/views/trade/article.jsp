@@ -314,7 +314,7 @@
 							    
 							    <c:choose>
 								    <c:when test="${trade.tradeStatus == '판매완료'}">
-								        <button type="button" class="btn-manage edit-style disabled-style" style="opacity: 0.5; cursor: not-allowed;" 
+								        <button type="button" class="btn-manage edit-style disabled-style" 
 								                onclick="showBatonToast('판매 완료된 게시글은 수정할 수 없습니다.')">
 								            <i class="ri-edit-line"></i> 수정
 								        </button>

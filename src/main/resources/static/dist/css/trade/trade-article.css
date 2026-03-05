@@ -289,6 +289,17 @@ background: var(--primary-light); }
     background: var(--primary-light);
 }
 
+.btn-manage.disabled-style {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: auto;
+}
+
+.btn-manage.disabled-style:hover {
+    background-color: inherit !important;
+    transform: none !important;
+}
+
 .btn-manage.delete-style {
     border-color: #FECACA;
     color: #DC2626;

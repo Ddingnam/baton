@@ -29,6 +29,31 @@ function tlChangeSort(val) {
     tlNavigate(p);
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    const sortDropdown = document.getElementById('sortDropdown');
+    if (!sortDropdown) return;
+
+    const selected = sortDropdown.querySelector('.dropdown-selected');
+    const menuItems = sortDropdown.querySelectorAll('.dropdown-menu li');
+
+    selected.addEventListener('click', function(e) {
+        e.stopPropagation();
+        sortDropdown.classList.toggle('active');
+    });
+
+    menuItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const sortVal = this.getAttribute('data-value');
+
+            tlChangeSort(sortVal);
+        });
+    });
+
+    document.addEventListener('click', function() {
+        sortDropdown.classList.remove('active');
+    });
+});
+
 function tlApplyFilter() {
     const p = tlGetParams();
     const min = document.getElementById('tlPriceMin').value.trim();
