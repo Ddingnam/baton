@@ -1,30 +1,27 @@
 package com.sp.app.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpSession;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.sp.app.common.StorageService;
 import com.sp.app.domain.dto.CommunityDto;
 import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.service.CommunityService;
@@ -39,18 +36,19 @@ import lombok.extern.slf4j.Slf4j;
 public class CommunityApiController {
 
     private final CommunityService communityService;
-    private final StorageService storageService;
+
+    @Value("${file.upload-root}/community")
+    private String uploadPath;
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> write(
-            @RequestPart("dto") CommunityDto dto,
-            @RequestPart(value = "uploadFiles", required = false) List<MultipartFile> uploadFiles,
-            HttpSession session) {
+            @RequestPart(value = "dto") CommunityDto dto, // JSON 데이터
+            @RequestPart(value = "uploadFiles", required = false) List<MultipartFile> uploadFiles, // 파일 데이터
+            @SessionAttribute(name = "member", required = false) SessionInfo info) {
         
         Map<String, Object> map = new HashMap<>();
         
         try {
-            SessionInfo info = (SessionInfo) session.getAttribute("member");
             if (info == null) {
                 map.put("status", "false");
                 map.put("message", "로그인이 필요한 서비스입니다.");
@@ -60,87 +58,128 @@ public class CommunityApiController {
             dto.setMemberIdx(info.getUserIdx());
             dto.setWriterNickname(info.getName());
 
-            List<String> savedFiles = new ArrayList<>();
-            String rootPath = storageService.getRealPath("/uploads/community");
+            dto.setSelectFiles(uploadFiles);
 
-            if (uploadFiles != null && !uploadFiles.isEmpty()) {
-                for (MultipartFile file : uploadFiles) {
-                    String filename = storageService.uploadFileToServer(file, rootPath); 
-                    if (filename != null) {
-                        savedFiles.add(filename);
-                    }
-                }
-            }
-            dto.setImageFiles(savedFiles);
-
-            Long id = communityService.createCommunity(dto);
+            communityService.insertCommunity(dto, uploadPath);
             
             map.put("status", "true");
             map.put("message", "게시글이 등록되었습니다.");
-            map.put("id", id);
             
             return ResponseEntity.ok(map);
             
         } catch (Exception e) {
             log.error("글 등록 실패", e);
             map.put("status", "false");
-            map.put("message", "등록 중 오류가 발생했습니다: " + e.getMessage());
+            map.put("message", "등록 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(map);
         }
     }
     
     @GetMapping
-    public ResponseEntity<Page<CommunityDto>> list(
-            @PageableDefault(size = 10, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<CommunityDto> list = communityService.getCommunityList(pageable);
-        return ResponseEntity.ok(list);
+    public ResponseEntity<Map<String, Object>> list(
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "schType", defaultValue = "all") String schType,
+            @RequestParam(name = "kwd", defaultValue = "") String kwd) {
+        
+        try {
+            Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
+            Page<CommunityDto> list = communityService.getCommunityList(pageable, schType, kwd);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("list", list.getContent());
+            response.put("totalPage", list.getTotalPages());
+            response.put("totalElements", list.getTotalElements());
+            response.put("currentPage", page);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("리스트 조회 실패", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CommunityDto> detail(@PathVariable Long id) {
+    public ResponseEntity<CommunityDto> detail(@PathVariable("id") Long id) {
         try {
+            communityService.updateHitCount(id); // 조회수 증가
             CommunityDto dto = communityService.getCommunity(id);
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
+            log.error("상세 조회 실패", e);
             return ResponseEntity.notFound().build();
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<String> update(
-            @PathVariable Long id, 
-            @RequestBody CommunityDto dto,
-            HttpSession session) {
+    @PostMapping("/{id}")
+    public ResponseEntity<Map<String, Object>> update(
+            @PathVariable("id") Long id, 
+            @RequestPart(value = "dto") CommunityDto dto,
+            @RequestPart(value = "uploadFiles", required = false) List<MultipartFile> uploadFiles,
+            @SessionAttribute(name = "member", required = false) SessionInfo info) {
         
-        SessionInfo info = (SessionInfo) session.getAttribute("member");
+        Map<String, Object> map = new HashMap<>();
+
         if (info == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            map.put("status", "false");
+            map.put("message", "로그인이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(map);
         }
 
         try {
+            CommunityDto existing = communityService.getCommunity(id);
+            if(existing == null || !existing.getMemberIdx().equals(info.getUserIdx())) {
+                 map.put("status", "false");
+                 map.put("message", "수정 권한이 없습니다.");
+                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
+            }
+
             dto.setId(id);
-            dto.setMemberIdx(info.getUserIdx());
+            dto.setSelectFiles(uploadFiles);
             
-            communityService.updateCommunity(id, dto);
+            communityService.updateCommunity(dto, uploadPath);
             
-            return ResponseEntity.ok("수정되었습니다.");
+            map.put("status", "true");
+            map.put("message", "수정되었습니다.");
+            return ResponseEntity.ok(map);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("수정 실패: " + e.getMessage());
+            log.error("수정 실패", e);
+            map.put("status", "false");
+            map.put("message", "수정 실패: " + e.getMessage());
+            return ResponseEntity.badRequest().body(map);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id, HttpSession session) {
-        SessionInfo info = (SessionInfo) session.getAttribute("member");
+    public ResponseEntity<Map<String, Object>> delete(
+            @PathVariable("id") Long id, 
+            @SessionAttribute(name = "member", required = false) SessionInfo info) {
+        
+        Map<String, Object> map = new HashMap<>();
+        
         if (info == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            map.put("status", "false");
+            map.put("message", "로그인이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(map);
         }
 
         try {
-            communityService.deleteCommunity(id); 
-            return ResponseEntity.ok("삭제되었습니다.");
+            CommunityDto existing = communityService.getCommunity(id);
+            if(existing != null && (existing.getMemberIdx().equals(info.getUserIdx()) || info.getUserLevel() >= 51)) {
+                communityService.deleteCommunity(id, uploadPath); 
+                map.put("status", "true");
+                map.put("message", "삭제되었습니다.");
+                return ResponseEntity.ok(map);
+            } else {
+                map.put("status", "false");
+                map.put("message", "삭제 권한이 없습니다.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
+            }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("삭제 실패: " + e.getMessage());
+            log.error("삭제 실패", e);
+            map.put("status", "false");
+            map.put("message", "삭제 중 오류가 발생했습니다.");
+            return ResponseEntity.badRequest().body(map);
         }
     }
 }

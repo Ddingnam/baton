@@ -1,13 +1,12 @@
 package com.sp.app.repository;
 
-import com.sp.app.domain.entity.Community;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import com.sp.app.domain.entity.Community;
 
 public interface CommunityRepository extends JpaRepository<Community, Long> {
-    @Modifying
-    @Query("UPDATE Community c SET c.hitCount = c.hitCount + 1 WHERE c.id = :id")
-    void updateHitCount(@Param("id") Long id);
+    Page<Community> findBySubjectContaining(String keyword, Pageable pageable);
+    Page<Community> findByContentContaining(String keyword, Pageable pageable);
+    Page<Community> findBySubjectContainingOrContentContaining(String subject, String content, Pageable pageable);
 }
