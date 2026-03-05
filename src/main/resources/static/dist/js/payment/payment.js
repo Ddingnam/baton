@@ -4,7 +4,8 @@ IMP.init("imp25654160");
 function showCustomAlert(title, msg, type, callback) {
     $('#chargeStep1, #chargeStep2').hide();
     $('#chargeStepAlert').show();
-    $('#chargeModalOverlay').css('display', 'flex').hide().fadeIn(200);
+
+    $('#chargeModalOverlay').css('display', 'flex');
 
     $('#alertTitle').text(title);
     $('#alertMessage').text(msg);
@@ -25,14 +26,17 @@ function showCustomAlert(title, msg, type, callback) {
 
 function openChargeModal() {
     let input = $('#customChargeInput');
-    if(!input.val()) input.val(''); 
+
+    input.val(''); 
+    
     $('#chargeStep1').show();
     $('#chargeStepAlert, #chargeStep2').hide();
-    $('#chargeModalOverlay').css('display', 'flex').hide().fadeIn(200);
+
+    $('#chargeModalOverlay').css('display', 'flex');
 }
 
 function closeChargeModal() {
-    $('#chargeModalOverlay').fadeOut(200);
+    $('#chargeModalOverlay').hide();
 }
 
 function changeAmount(step) {
@@ -58,7 +62,8 @@ function openConfirmStep() {
     $('#saveAmountText').text(savedPoint.toLocaleString());
 
     $('#chargeStep1').hide();
-    $('#chargeStep2').fadeIn(200);
+
+    $('#chargeStep2').show();
 }
 
 
