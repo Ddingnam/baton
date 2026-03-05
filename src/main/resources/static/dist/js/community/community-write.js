@@ -8,18 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
     initCharCount();
     initCategoryPills();
     initPoll();
-    // initLocation();  <-- [삭제] JSP에서 모달 창 제어로 변경됨
-    
-    // 등록 버튼 이벤트 연결
+    // initLocation();
+	
     const submitBtn = document.querySelector('.btn-submit');
     const submitFullBtn = document.querySelector('.btn-submit-full');
     if(submitBtn) submitBtn.addEventListener('click', sendPost);
     if(submitFullBtn) submitFullBtn.addEventListener('click', sendPost);
 });
-
-// ---------------------------------------------------------
-// [1] 카테고리 & 글자수 로직
-// ---------------------------------------------------------
 function initCategoryPills() {
     document.querySelectorAll('.cat-pill input').forEach(radio => {
         radio.addEventListener('change', () => {
@@ -51,9 +46,6 @@ function initCharCount() {
     });
 }
 
-// ---------------------------------------------------------
-// [2] 파일 업로드 로직
-// ---------------------------------------------------------
 function initFileZone() {
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
@@ -117,9 +109,7 @@ function removeFile(idx) {
     renderFileList();
 }
 
-// ---------------------------------------------------------
-// [3] 태그 입력 로직
-// ---------------------------------------------------------
+
 function initTagInput() {
     const input = document.getElementById('tagInput');
     if(!input) return;
@@ -161,9 +151,6 @@ function removeTag(idx) {
     renderTags();
 }
 
-// ---------------------------------------------------------
-// [4] 투표(Poll) 기능
-// ---------------------------------------------------------
 function initPoll() {
     const btnPoll = document.getElementById('btnPoll');
     const btnAddOption = document.querySelector('.btn-add-option');
@@ -236,10 +223,7 @@ function removePollOption(idx) {
     renderPollOptions();
 }
 
-// ---------------------------------------------------------
-// [5] 위치(Location) 데이터 처리 (UI 업데이트만 담당)
-// ---------------------------------------------------------
-// JSP의 검색 모달에서 이 함수를 호출합니다.
+
 window.setLocation = function(name, addr, lat, lng) {
     // Hidden Fields 저장
     document.getElementById('placeName').value = name;
@@ -247,11 +231,9 @@ window.setLocation = function(name, addr, lat, lng) {
     document.getElementById('latitude').value = lat;
     document.getElementById('longitude').value = lng;
 
-    // UI 업데이트
     document.getElementById('displayPlaceName').innerText = name;
     document.getElementById('displayAddress').innerText = addr;
 
-    // 카드 보이기
     const card = document.getElementById('locationCard');
     const btn = document.getElementById('btnLocation');
     
@@ -260,7 +242,6 @@ window.setLocation = function(name, addr, lat, lng) {
     card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 };
 
-// 위치 삭제 (UI 및 데이터 초기화)
 window.removeLocation = function() {
     document.getElementById('placeName').value = '';
     document.getElementById('address').value = '';
@@ -271,13 +252,9 @@ window.removeLocation = function() {
     document.getElementById('btnLocation').classList.remove('active');
 }
 
-// 삭제 버튼 이벤트 연결
 document.querySelector('.btn-del-loc')?.addEventListener('click', window.removeLocation);
 
 
-// ---------------------------------------------------------
-// [6] 게시글 등록 (AJAX)
-// ---------------------------------------------------------
 function sendPost() {
     const subject = document.getElementById('subject').value.trim();
     const content = document.getElementById('content').value.trim();
