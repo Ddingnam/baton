@@ -52,7 +52,7 @@ public class JobPostingServiceImpl implements JobPostingService {
     }
 
     @Override
-    @Transactional(readOnly = true) // 단순 조회는 readOnly를 설정하면 성능이 최적화됩니다.
+    @Transactional(readOnly = true) 
     public int dataCount(Map<String, Object> map) {
         return mapper.dataCount(map);
     }
@@ -74,4 +74,15 @@ public class JobPostingServiceImpl implements JobPostingService {
     public JobPosting findById(long postingIdx) {
         return mapper.findById(postingIdx);
     }
+
+	@Override
+	public void updateHitCount(long postingIdx) throws Exception {
+		try {
+	        mapper.updateHitCount(postingIdx);
+	    } catch (Exception e) {
+	    	log.error("updateHitCount 에러: ", e);
+	        throw e;
+	    }
+		
+	}
 }

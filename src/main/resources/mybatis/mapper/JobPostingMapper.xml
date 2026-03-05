@@ -82,4 +82,10 @@
     WHERE posting_idx = #{postingIdx}
 </select> 	
 
+<update id="updateHitCount" parameterType="long">
+    UPDATE job_posting 
+    SET hit_count = hit_count + 1 
+    WHERE posting_idx = #{postingIdx}
+</update>
+
 </mapper>

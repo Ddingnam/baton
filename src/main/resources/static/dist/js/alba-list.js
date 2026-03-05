@@ -101,7 +101,10 @@ function renderList(jobs) {
     const relTime = getRelativeTime(job.date);
     const isRecent = relTime.includes('분전') || relTime.includes('시간전') || relTime === '방금전';
     const periodLabel = job.period === 'MORE_THAN_A_MONTH' ? '장기' : job.period === 'LESS_THAN_A_MONTH' ? '단기' : '';
-    return `<div class="job-list-item" style="animation-delay:${idx * 0.035}s" onclick="location.href='${CONTEXT_PATH}/alba/article?postingIdx=${job.id}'">
+    
+    // 이 부분의 경로를 /article/ID 형식으로 수정합니다.
+    return `<div class="job-list-item" style="animation-delay:${idx * 0.035}s" 
+                 onclick="location.href='${CONTEXT_PATH}/alba/article/${job.id}'">
       <div class="job-area-col">
         <span class="job-area-text">${job.area}</span>
         ${periodLabel ? `<span class="job-period-badge">${periodLabel}</span>` : ''}

@@ -14,4 +14,5 @@ public interface JobPostingMapper {
     int dataCount(Map<String, Object> map);
     List<JobPosting> listPosting(Map<String, Object> map);
     JobPosting findById(long postingIdx);
+	void updateHitCount(long postingIdx);
 }

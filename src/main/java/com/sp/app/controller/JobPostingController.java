@@ -58,6 +58,10 @@ public class JobPostingController {
                 dto.setUserIdx(userDetails.getUserIdx());
             }
             
+            //if (locationDetail != null && !locationDetail.trim().isEmpty()) {
+            //    dto.setLocation(dto.getLocation() + " " + locationDetail.trim());
+            //}
+            
             postingService.insertPosting(dto); 
             
         } catch (Exception e) {
@@ -66,23 +70,29 @@ public class JobPostingController {
         return "redirect:/alba/list";
     }
 
-    @GetMapping("article")
-    public String article(@RequestParam("postingIdx") long postingIdx, Model model) {
+    @GetMapping("article/{num}")
+    public String article(@PathVariable("num") long num, 
+                          @RequestParam(value = "page", defaultValue = "1") String page,
+                          Model model) {
+        try {
+           postingService.updateHitCount(num); 
+            
+            JobPosting dto = postingService.findById(num);
+            
+            if (dto == null) {
+                log.info("@@@ 게시글 데이터가 없음: " + num);
+                return "redirect:/alba/list?page=" + page;
+            }
 
-        System.out.println("=== article 진입 ===");
-        System.out.println("postingIdx = " + postingIdx);
-
-        JobPosting dto = postingService.findById(postingIdx);
-
-        System.out.println("dto = " + dto);
-
-        if(dto == null) {
-            System.out.println("dto null → 리스트 이동");
-            return "redirect:/alba/list";
+            model.addAttribute("dto", dto);
+            model.addAttribute("page", page);
+            
+            return "alba/article";
+            
+        } catch (Exception e) {
+            log.error("@@@ 상세보기 로직 에러 발생: ", e); 
+            return "redirect:/alba/list?page=" + page;
         }
-
-        model.addAttribute("dto", dto);
-        return "alba/article";
     }
 
     @GetMapping("update")
@@ -102,7 +112,8 @@ public class JobPostingController {
     @PostMapping("update")
     public String updateSubmit(JobPosting dto) throws Exception {
         postingService.updatePosting(dto);
-        return "redirect:/alba/article?postingIdx=" + dto.getPostingIdx();
+        //return "redirect:/alba/article?postingIdx=" + dto.getPostingIdx();
+        return "redirect:/alba/article/" + dto.getPostingIdx();
     }
 
     @GetMapping("delete")

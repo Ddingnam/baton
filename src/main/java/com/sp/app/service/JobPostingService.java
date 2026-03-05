@@ -13,4 +13,7 @@ public interface JobPostingService {
     int dataCount(Map<String, Object> map);
     List<JobPosting> listPosting(Map<String, Object> map);
     JobPosting findById(@Param("postingIdx") long postingIdx);
+    
+    void updateHitCount(long postingIdx) throws Exception;
+    
 }
