@@ -40,6 +40,9 @@ public class TradeController {
 	@GetMapping("list")
 	public String list(@RequestParam(value = "page", defaultValue = "1") int current_page,
 	        @RequestParam(value = "keyword", defaultValue = "") String keyword,
+	        @RequestParam(value = "priceMin", required = false) String priceMin,
+	        @RequestParam(value = "priceMax", required = false) String priceMax,
+	        @RequestParam(value = "available", required = false) String available,
 	        @RequestParam(value = "categoryIdx", defaultValue = "") String categoryIdx,
 	        @AuthenticationPrincipal CustomUserDetails userDetails,
 	        Model model) {
@@ -55,6 +58,9 @@ public class TradeController {
 	        Map<String, Object> map = new HashMap<>();
 	        map.put("keyword", keyword);
 	        map.put("categoryIdx", categoryIdx);
+	        map.put("priceMin", priceMin);
+	        map.put("priceMax", priceMax);
+	        map.put("available", available);
 	        
 	        if (userDetails != null) {
 	            map.put("userIdx", userDetails.getMember().getUserIdx());
@@ -80,6 +86,9 @@ public class TradeController {
 	        model.addAttribute("total_page", total_page);
 	        model.addAttribute("keyword", keyword);
 	        model.addAttribute("categoryIdx", categoryIdx);
+	        model.addAttribute("priceMin", priceMin);
+	        model.addAttribute("priceMax", priceMax);
+	        model.addAttribute("available", available);
 		} catch (Exception e) {
 			log.info("list", e);
 		}
@@ -141,6 +150,10 @@ public class TradeController {
 			Trade dto = Objects.requireNonNull(service.findByIdx(productIdx));
 			
 			if(dto == null || userDetails == null || dto.getUserIdx() != userDetails.getUserIdx()) {
+				return "redirect:/trade/list";
+			}
+			
+			if(dto.getProductStatus().equals("판매완료")) {
 				return "redirect:/trade/list";
 			}
 			

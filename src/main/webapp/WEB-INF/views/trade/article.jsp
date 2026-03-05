@@ -312,10 +312,20 @@
 							        <i class="ri-rocket-2-line"></i> 끌어올리기
 							    </button>
 							    
-							    <button type="button" class="btn-manage edit-style" 
-							        onclick="location.href='${pageContext.request.contextPath}/trade/update?productIdx=${trade.productIdx}&page=${page}'">
-							        <i class="ri-edit-line"></i> 수정
-							    </button>
+							    <c:choose>
+								    <c:when test="${trade.tradeStatus == '판매완료'}">
+								        <button type="button" class="btn-manage edit-style disabled-style" style="opacity: 0.5; cursor: not-allowed;" 
+								                onclick="showBatonToast('판매 완료된 게시글은 수정할 수 없습니다.')">
+								            <i class="ri-edit-line"></i> 수정
+								        </button>
+								    </c:when>
+								    <c:otherwise>
+								        <button type="button" class="btn-manage edit-style" 
+								            onclick="location.href='${pageContext.request.contextPath}/trade/update?productIdx=${trade.productIdx}&page=${page}'">
+								            <i class="ri-edit-line"></i> 수정
+								        </button>
+								    </c:otherwise>
+								</c:choose>
 							    
 							    <button type="button" class="btn-manage delete-style" 
 							        onclick="confirmDelete(${trade.productIdx})">

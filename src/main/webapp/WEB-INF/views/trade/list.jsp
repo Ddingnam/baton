@@ -102,10 +102,10 @@
                                         </c:otherwise>
                                     </c:choose>
                                     <c:choose>
-                                        <c:when test="${item.tradeStatus == 'SOLD'}">
+                                        <c:when test="${item.tradeStatus == '판매완료'}">
                                             <span class="badge badge-sold">판매완료</span>
                                         </c:when>
-                                        <c:when test="${item.tradeStatus == 'RESERVED'}">
+                                        <c:when test="${item.tradeStatus == '예약중'}">
                                             <span class="badge badge-reserved">예약중</span>
                                         </c:when>
                                     </c:choose>

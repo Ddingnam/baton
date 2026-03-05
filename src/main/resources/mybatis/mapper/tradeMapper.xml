@@ -70,7 +70,7 @@
 	        SELECT ROWNUM rnum, tb.* FROM (
 	            SELECT 
 	                p.productIdx, p.title, p.price, p.userIdx, p.tradePlace,
-	                p.tradeType, p.tradeStatus, p.createdDate, p.hitCount, p.likeCount, p.chatCount,
+	                p.tradeType, p.tradeStatus, p.productStatus, p.createdDate, p.hitCount, p.likeCount, p.chatCount,
 	                r.coreAddress, 
 	                (SELECT imgUrl FROM productImages WHERE productIdx = p.productIdx AND imgOrder = 1) as imgUrl,
 	                
@@ -84,16 +84,42 @@
 	            FROM product p
 	            LEFT JOIN region r ON p.regionIdx = r.regionIdx 
 	            <where>
-	                <if test="userRegionIdx != null">
-	                    AND p.regionIdx = #{userRegionIdx}
-	                </if>
-	                <if test="keyword != null and keyword != ''">
-	                    AND (p.title LIKE '%' || #{keyword} || '%' OR p.content LIKE '%' || #{keyword} || '%')
-	                </if>
-	                <if test="categoryIdx != null and categoryIdx != ''">
-	                    AND p.categoryIdx = #{categoryIdx}
-	                </if>
-	            </where>
+				    p.tradeStatus != '숨기기'
+    
+				    <if test="available == 'true'">
+				        AND p.tradeStatus NOT IN ('판매완료', '예약중')
+				    </if>
+				    
+				    <if test="priceMin != null and priceMin != ''">
+				        AND p.price &gt;= #{priceMin}
+				    </if>
+				    
+				    <if test="priceMax != null and priceMax != ''">
+				        AND p.price &lt;= #{priceMax}
+				    </if>
+				
+				    <if test="userRegionIdx != null">
+				        AND p.regionIdx = #{userRegionIdx}
+				    </if>
+				    
+				    <if test="keyword != null and keyword != ''">
+				        AND (
+				            p.title LIKE '%' || #{keyword} || '%' 
+				            OR p.content LIKE '%' || #{keyword} || '%'
+				            OR EXISTS (
+				                SELECT 1 
+				                FROM productTag pt
+				                JOIN tag t ON pt.tagIdx = t.tagIdx
+				                WHERE pt.productIdx = p.productIdx 
+				                AND t.tagName = #{keyword}
+				            )
+				        )
+				    </if>
+				    
+				    <if test="categoryIdx != null and categoryIdx != ''">
+				        AND p.categoryIdx = #{categoryIdx}
+				    </if>
+				</where>
 	            ORDER BY p.productIdx DESC
 	        ) tb WHERE ROWNUM &lt;= #{end}
 	    ) WHERE rnum &gt;= #{start}
@@ -106,18 +132,44 @@
 	</select>
 	
 	<select id="dataCount" parameterType="map" resultType="int">
-	    SELECT COUNT(*) FROM product
+	    SELECT COUNT(*) 
+	    FROM product p
 	    <where>
-	    	<if test="userRegionIdx != null">
-				AND p.regionIdx = #{regionIdx}
-			</if>
-	        <if test="keyword != null and keyword != ''">
-	            AND (title LIKE '%' || #{keyword} || '%' OR content LIKE '%' || #{keyword} || '%')
-	        </if>
-	        <if test="categoryIdx != null and categoryIdx != ''">
-	            AND categoryIdx = #{categoryIdx}
-	        </if>
-	    </where>
+			p.tradeStatus != '숨기기'
+    
+		    <if test="available == 'true'">
+		        AND p.tradeStatus NOT IN ('판매완료', '예약중')
+		    </if>
+		    <if test="priceMin != null and priceMin != ''">
+		        AND p.price &gt;= #{priceMin}
+		    </if>
+		    
+		    <if test="priceMax != null and priceMax != ''">
+		        AND p.price &lt;= #{priceMax}
+		    </if>
+		
+		    <if test="userRegionIdx != null">
+		        AND p.regionIdx = #{userRegionIdx}
+		    </if>
+		    
+		    <if test="keyword != null and keyword != ''">
+		        AND (
+		            p.title LIKE '%' || #{keyword} || '%' 
+		            OR p.content LIKE '%' || #{keyword} || '%'
+		            OR EXISTS (
+		                SELECT 1 
+		                FROM productTag pt
+		                JOIN tag t ON pt.tagIdx = t.tagIdx
+		                WHERE pt.productIdx = p.productIdx 
+		                AND t.tagName = #{keyword}
+		            )
+		        )
+		    </if>
+		    
+		    <if test="categoryIdx != null and categoryIdx != ''">
+		        AND p.categoryIdx = #{categoryIdx}
+		    </if>
+		</where>
 	</select>
 	
 	<update id="updateHitCount">
