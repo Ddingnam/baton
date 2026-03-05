@@ -284,7 +284,7 @@
 			                </button>
 			                <c:if test="${trade.price > 0}">
 				                <button class="pay-btn"
-	                            	onclick="location.href='${pageContext.request.contextPath}/'">
+	                            	onclick="location.href='${pageContext.request.contextPath}/escrow/checkout?productIdx=${trade.productIdx}'">
 	                            	<i class="ri-wallet-3-line"></i> 안전 결제하기
 	                        	</button>
 	                        </c:if>
