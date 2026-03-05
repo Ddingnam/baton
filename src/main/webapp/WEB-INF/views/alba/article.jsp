@@ -166,7 +166,9 @@
                     <div class="manage-grid">
                         <button type="button" class="btn-manage" onclick="StatusModule.open()"><i class="ri-loop-left-line"></i> 상태 변경</button>
                         <button type="button" class="btn-manage" onclick="PullUpModule.execute(${alba.albaIdx})"><i class="ri-arrow-up-circle-line"></i> 끌어올리기</button>
-                        <button type="button" class="btn-manage" onclick="location.href='${pageContext.request.contextPath}/alba/update?albaIdx=${alba.albaIdx}&page=${page}'"><i class="ri-edit-line"></i> 수정</button>
+                        <button type="button" class="btn-manage" onclick="location.href='${pageContext.request.contextPath}/alba/update?postingIdx=${dto.postingIdx}&page=${page}'">
+    					<i class="ri-edit-line"></i> 수정
+						</button>
                         <button type="button" class="btn-manage danger" onclick="confirmDelete(${alba.albaIdx})"><i class="ri-delete-bin-line"></i> 삭제</button>
                     </div>
                 </section>

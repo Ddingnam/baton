@@ -92,22 +92,28 @@
 	</select>
 
 	<select id="listPosting" parameterType="map"
-		resultType="com.sp.app.model.JobPosting">
-		SELECT * FROM (
-		SELECT a.*, ROWNUM rnum FROM (
-		SELECT
-		posting_idx AS postingIdx, title, employer, pay, pay_type AS payType,
-		location, createdDate,
-		category, work_period AS workPeriod, work_days
-		AS workDays,
-		start_time AS startTime, end_time AS endTime
-		FROM
-		job_posting
-		ORDER BY posting_idx DESC
-		) a WHERE ROWNUM &lt;= #{offset} +
-		#{size}
-		) WHERE rnum &gt; #{offset}
-	</select>
+        resultType="com.sp.app.model.JobPosting">
+    SELECT * FROM (
+        SELECT a.*, ROWNUM rnum FROM (
+            SELECT
+                posting_idx AS postingIdx,
+                title,
+                employer,
+                pay,
+                pay_type AS payType,
+                location,
+                created_date AS createdDate,
+                category,
+                work_period AS workPeriod,
+                work_days AS workDays,
+                start_time AS startTime,
+                end_time AS endTime
+            FROM
+                job_posting
+            ORDER BY posting_idx DESC
+        ) a WHERE ROWNUM &lt;= #{offset} + #{size}
+    ) WHERE rnum &gt; #{offset}
+</select>
 
 	<select id="findById" resultType="com.sp.app.model.JobPosting">
 		SELECT

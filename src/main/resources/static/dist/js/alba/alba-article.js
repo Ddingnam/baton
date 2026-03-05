@@ -1,16 +1,13 @@
-// 이미지 갤러리 슬라이드 처리
 const Gallery = (function () {
     function selectThumb(idx) {
         const indicators = document.querySelectorAll('.indicator-dot');
         indicators.forEach((el, i) => {
             el.classList.toggle('active', i === idx);
         });
-        // 실제 프로젝트에서는 이미지 배열을 받아 src를 교체하는 로직 추가
     }
     return { selectThumb };
 })();
 
-// 관심(찜) 기능
 const WishModule = (function () {
     let wished = false;
     let albaIdx = 0;
@@ -51,7 +48,6 @@ const WishModule = (function () {
     return { init, toggle };
 })();
 
-// 상태 변경 모달 제어
 const StatusModule = (function () {
     const getModal = () => document.getElementById('statusModal');
 
@@ -94,7 +90,6 @@ const StatusModule = (function () {
     return { open, close, update };
 })();
 
-// 끌어올리기 기능
 const PullUpModule = (function () {
     function execute(albaIdx) {
         if (!confirm('이 공고를 목록 최상단으로 끌어올리시겠습니까?')) return;
@@ -121,7 +116,6 @@ const PullUpModule = (function () {
     return { execute };
 })();
 
-// 토스트 메시지
 const Toast = (function () {
     let timer = null;
     function show(msg) {
@@ -135,7 +129,6 @@ const Toast = (function () {
     return { show };
 })();
 
-// 주소 복사
 function copyAddress(address) {
     if (navigator.clipboard) {
         navigator.clipboard.writeText(address).then(() => {
@@ -154,11 +147,11 @@ function copyAddress(address) {
 
 function confirmDelete(albaIdx) {
     if (confirm('이 공고를 정말 삭제하시겠습니까?\n삭제된 공고는 복구할 수 없습니다.')) {
-        location.href = '/alba/delete?albaIdx=' + albaIdx;
+        //location.href = '/alba/delete?postingIdx=' + albaIdx;
+		location.href = CONTEXT_PATH + '/alba/delete?postingIdx=' + idx;
     }
 }
 
-// 스크립트 초기화
 window.addEventListener('DOMContentLoaded', function () {
     const articleEl = document.getElementById('articleData');
     if (articleEl) {
