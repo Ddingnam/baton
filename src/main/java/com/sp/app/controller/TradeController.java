@@ -203,6 +203,18 @@ public class TradeController {
 		return "redirect:/trade/list";
 	}
 	
+	@PostMapping("updateStatus")
+	@ResponseBody
+	public void updateTradeStatus(@RequestParam("productIdx") long productIdx, 
+			@RequestParam("tradeStatus") String tradeStatus) {
+		try {
+	        service.updateTradeStatus(productIdx, tradeStatus);
+
+	    } catch (Exception e) {
+	    	log.info("updateTradeStatus : ", e);
+	    }
+	}
+	
 	@PostMapping("toggleLike")
 	@ResponseBody
 	public Map<String, Object> toggleLike(

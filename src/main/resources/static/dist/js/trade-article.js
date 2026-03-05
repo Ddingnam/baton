@@ -141,12 +141,13 @@ const WishModule = {
                 if(statWish) statWish.innerText = data.likeCount;
                 if(statWishSide) statWishSide.innerText = data.likeCount;
                 
-                Toast.show(data.isLiked ? "관심 목록에 추가되었습니다." : "관심 목록에서 제거되었습니다.");
+				
+                showBatonToast(data.isLiked ? "관심 목록에 추가되었습니다." : "관심 목록에서 제거되었습니다.");
             }
         })
         .catch(err => {
             console.error("찜하기 에러:", err);
-            Toast.show("처리 중 오류가 발생했습니다.");
+            showBatonToast("오류가 발생했습니다.");
         })
         .finally(() => { this.isProcessing = false; });
     }
@@ -167,7 +168,7 @@ const ShareModule = (function () {
     function copyLink() {
         if (navigator.clipboard) {
             navigator.clipboard.writeText(location.href).then(function () {
-                Toast.show('링크가 복사되었습니다!');
+                showBatonToast('링크가 복사되었습니다.');
             });
         } else {
             const ta = document.createElement('textarea');
@@ -176,7 +177,7 @@ const ShareModule = (function () {
             ta.select();
             document.execCommand('copy');
             document.body.removeChild(ta);
-            Toast.show('링크가 복사되었습니다!');
+            showBatonToast('링크가 복사되었습니다!');
         }
     }
 
@@ -202,24 +203,35 @@ const StatusModule = (function () {
         }
     }
 
-    function update(productIdx, status) {
+    function update(productIdx, tradeStatus) {
         const params = new URLSearchParams();
         params.append('productIdx', productIdx);
-        params.append('status', status);
+        params.append('tradeStatus', tradeStatus);
 
         fetch(`${window.location.origin}/trade/updateStatus`, {
             method: 'POST',
             body: params
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                location.reload();
-            } else {
-                Toast.show('상태 변경 처리에 실패했습니다.');
-            }
+        .then(() => {
+            close();
+
+            const msg = tradeStatus === '숨기기' 
+                        ? '게시글이 숨김 처리되었습니다. 목록으로 이동합니다.' 
+                        : `상품 상태가 [${tradeStatus}]로 변경되었습니다.`;
+            showBatonToast(msg);
+
+            setTimeout(() => {
+                if (tradeStatus === '숨기기') {
+                    location.href = '/trade/list'; 
+                } else {
+                    location.reload();
+                }
+            }, 1200);
         })
-        .catch(() => Toast.show('네트워크 오류가 발생했습니다.'));
+        .catch(err => {
+            console.error("통신 실패:", err);
+            showBatonToast("상태 변경 중 오류가 발생했습니다.");
+        });
     }
 
     return { open, close, update };
@@ -239,31 +251,16 @@ const PullUpModule = (function () {
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success') {
-                Toast.show('🚀 게시글이 맨 위로 올라갔습니다!');
+                showBatonToast('🚀 게시글이 맨 위로 올라갔습니다!');
                 setTimeout(() => location.reload(), 1200);
             } else {
-                Toast.show(data.message || '끌어올리기를 할 수 없습니다.');
+                showBatonToast(data.message || '끌어올리기를 할 수 없습니다.');
             }
         })
-        .catch(() => Toast.show('네트워크 오류가 발생했습니다.'));
+        .catch(() => showBatonToast('네트워크 오류가 발생했습니다.'));
     }
 
     return { execute };
-})();
-
-const Toast = (function () {
-    let timer = null;
-
-    function show(msg) {
-        const el = document.getElementById('toast');
-        if (!el) return;
-        el.textContent = msg;
-        el.classList.add('show');
-        clearTimeout(timer);
-        timer = setTimeout(function () { el.classList.remove('show'); }, 2500);
-    }
-
-    return { show };
 })();
 
 function confirmDelete(productIdx) {

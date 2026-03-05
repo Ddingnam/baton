@@ -45,12 +45,13 @@
 				        </c:otherwise>
                     </c:choose>
 
-                    <c:if test="${trade.tradeStatus == '판매완료' || trade.tradeStatus == '예약중'}">
+                    <c:if test="${trade.tradeStatus == '판매완료' || trade.tradeStatus == '예약중' || trade.tradeStatus == '숨기기'}">
                         <div class="status-overlay">
                             <span class="status-overlay-badge">
                                 <c:choose>
                                     <c:when test="${trade.tradeStatus == '판매완료'}">판매완료</c:when>
                                     <c:when test="${trade.tradeStatus == '예약중'}">예약 중</c:when>
+                                    <c:when test="${trade.tradeStatus == '숨기기'}">숨겨진 상품</c:when>
                                 </c:choose>
                             </span>
                         </div>
@@ -338,8 +339,6 @@
     <p class="lightbox-count" id="lightboxCount">1 / 1</p>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <div id="articleData"
     data-trade-idx="${trade.productIdx}"
     data-wished="${isLiked}"
@@ -355,10 +354,10 @@
         </div>
         <div class="status-options">
             <button type="button" class="status-opt ${trade.tradeStatus == '판매중' ? 'active' : ''}" 
-                    onclick="StatusModule.update('${trade.productIdx}', '판매중')">판매중</button>
+                    onclick="StatusModule.update('${trade.productIdx}', '판매중')">판매 중</button>
             <button type="button" class="status-opt ${trade.tradeStatus == '예약중' ? 'active' : ''}" 
-                    onclick="StatusModule.update('${trade.productIdx}', '예약중')">예약중</button>
-            <button type="button" class="status-opt hide-opt" 
+                    onclick="StatusModule.update('${trade.productIdx}', '예약중')">예약 중</button>
+            <button type="button" class="status-opt ${trade.tradeStatus == '숨기기' ? 'active' : 'hide-opt'}" 
                     onclick="StatusModule.update('${trade.productIdx}', '숨기기')">숨기기</button>
         </div>
     </div>

@@ -19,6 +19,7 @@ public interface TradeMapper {
 	
 	public void updateTradePost(Trade dto) throws SQLException;
 	public void updateTradePostTag(long productIdx) throws SQLException;
+	public void updateTradeStatus(Map<String, Object> map) throws SQLException;
 	public String findSaveName(@Param("productIdx") long productIdx, @Param("imgOrder") int order);
 	public int getLastOrder(long productIdx);
 	
