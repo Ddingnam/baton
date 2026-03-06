@@ -272,8 +272,12 @@
 			            <c:when test="${loggedInUserId == trade.userIdx}">
 			                <button class="chat-btn"
 			                    onclick="window.open('${pageContext.request.contextPath}/chat/tradeList?tradeIdx=${trade.productIdx}', 'chatList', 'width=450, height=850, left=200, top=100, scrollbars=no, resizable=yes')">
-			                    💬 채팅 내역 확인하기
+			                    채팅 내역 확인하기
 			                </button>
+			                <button class="pay-btn" style="margin-top: 10px;"
+						        onclick="openShippingModal()">
+						        운송장 입력하기
+						    </button>
 			            </c:when>
 			            <c:when test="${trade.tradeStatus == '판매완료'}">
 			                <button class="chat-btn" disabled>판매 완료된 상품입니다</button>
@@ -281,7 +285,7 @@
 			            <c:otherwise>
 			                <button class="chat-btn"
 			                    onclick="window.open('${pageContext.request.contextPath}/chat/room?tradeIdx=${trade.productIdx}&toUserIdx=${trade.userIdx}', 'chatRoom', 'width=450, height=850, left=200, top=100, scrollbars=yes, resizable=yes')">
-			                    💬 채팅으로 거래하기
+			                    채팅으로 거래하기
 			                </button>
 			                <c:if test="${trade.price > 0}">
 				                <button class="pay-btn"
@@ -373,6 +377,85 @@
     </div>
 </div>
 
+<div id="shippingModal" class="modal-overlay" onclick="closeShippingModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3>운송장 정보 입력</h3>
+            <button type="button" class="close-modal" onclick="closeShippingModal()">✕</button>
+        </div>
+        
+        <div style="padding: 15px 0;">
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom: 5px; font-weight: 600;">택배사</label>
+                <select id="deliveryCompany" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                    <option value="CJ대한통운">CJ대한통운</option>
+                    <option value="우체국택배">우체국택배</option>
+                    <option value="한진택배">한진택배</option>
+                    <option value="롯데택배">롯데택배</option>
+                    <option value="로젠택배">로젠택배</option>
+                    <option value="GS25편의점택배">GS25편의점택배</option>
+                    <option value="CU편의점택배">CU편의점택배</option>
+                </select>
+            </div>
+            
+            <div>
+                <label style="display:block; margin-bottom: 5px; font-weight: 600;">운송장 번호</label>
+                <input type="text" id="trackingNumber" placeholder="- 없이 숫자만 입력" 
+                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+            </div>
+        </div>
+        
+        <button type="button" class="pay-btn" style="margin-top: 10px;" onclick="submitShippingInfo()">
+            발송 처리 완료하기
+        </button>
+    </div>
+</div>
+
 <script src="${pageContext.request.contextPath}/dist/js/trade/trade-article.js"></script>
+<script>
+function openShippingModal() {
+    document.getElementById('shippingModal').classList.add('open');
+}
+
+function closeShippingModal() {
+    document.getElementById('shippingModal').classList.remove('open');
+    document.getElementById('trackingNumber').value = '';
+}
+
+function submitShippingInfo() {
+    const company = document.getElementById('deliveryCompany').value;
+    const trackingNo = document.getElementById('trackingNumber').value.trim();
+
+    if (!trackingNo) {
+        alert('운송장 번호를 입력해주세요.');
+        document.getElementById('trackingNumber').focus();
+        return;
+    }
+
+    const params = new URLSearchParams();
+    params.append('productIdx', '${trade.productIdx}');
+    params.append('deliveryCompany', company);
+    params.append('trackingNumber', trackingNo);
+
+    fetch('${pageContext.request.contextPath}/escrow/shipping', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.state === 'true') {
+            alert(data.message);
+            location.reload(); 
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('발송 처리 중 오류가 발생했습니다.');
+    });
+}
+</script>
 </body>
 </html>

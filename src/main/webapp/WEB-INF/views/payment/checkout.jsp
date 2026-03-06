@@ -50,7 +50,21 @@
         <input type="hidden" name="sellerIdx" value="${product.userIdx}">
         <input type="hidden" name="tradePrice" value="${product.price}">
         <input type="hidden" name="safetyFee" value="${safetyFee}">
-        <input type="hidden" name="totalUsedPoint" value="${totalPrice}">
+        <input type="hidden" name="totalUsedPoint" value="${product.price + product.shippingFee}">
+
+        <c:if test="${product.shippingFee > 0}">
+            <h3>배송/결제 방식</h3>
+            <div class="form-group" style="display: flex; gap: 20px;">
+                <label style="display: flex; align-items: center; gap: 5px;">
+                    <input type="radio" name="shippingType" value="prepaid" onchange="updateTotal()" checked>
+                    선불 (배송비 포함 결제)
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px;">
+                    <input type="radio" name="shippingType" value="cod" onchange="updateTotal()">
+                    착불 (배송비는 수령 시 지불)
+                </label>
+            </div>
+        </c:if>
 
         <h3>배송지 정보</h3>
         <div class="form-group">
@@ -74,17 +88,21 @@
 		        <span><fmt:formatNumber value="${product.price}" pattern="#,###"/>원</span>
 		    </div>
 		    <div class="summary-row">
+		        <span>배송비</span>
+		        <span id="displayShippingFee"><fmt:formatNumber value="${product.shippingFee}" pattern="#,###"/>원</span>
+		    </div>
+		    <div class="summary-row">
 		        <span>안전결제 수수료</span>
 		        <span style="color: #3182F6; font-weight: bold;">무료</span>
 		    </div>
 		    <div class="summary-row total">
 		        <span>총 결제 포인트</span>
-		        <span class="price"><fmt:formatNumber value="${totalPrice}" pattern="#,###"/> P</span>
+		        <span class="price" id="displayTotal"><fmt:formatNumber value="${product.price + product.shippingFee}" pattern="#,###"/> P</span>
 		    </div>
 		</div>
 
         <button type="button" class="btn-pay" onclick="requestEscrowPayment()">
-            <fmt:formatNumber value="${totalPrice}" pattern="#,###"/>원 결제하기
+            <fmt:formatNumber value="${product.price + product.shippingFee}" pattern="#,###"/>원 결제하기
         </button>
     </form>
 </div>
@@ -92,6 +110,30 @@
 <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 
 <script>
+    const productPrice = ${product.price};
+    const shippingFee = ${product.shippingFee};
+
+    function updateTotal() {
+        let currentShipping = shippingFee;
+        let currentTotal = productPrice + shippingFee;
+
+        const shippingTypeElement = document.querySelector('input[name="shippingType"]:checked');
+        if (shippingTypeElement && shippingTypeElement.value === 'cod') {
+            currentShipping = 0;
+            currentTotal = productPrice;
+        }
+
+        document.getElementById('displayShippingFee').innerText = currentShipping.toLocaleString() + '원';
+        document.getElementById('displayTotal').innerText = currentTotal.toLocaleString() + ' P';
+        
+        document.querySelector('input[name="totalUsedPoint"]').value = currentTotal;
+
+        const payBtn = document.querySelector('.btn-pay');
+        if (!payBtn.disabled) {
+            payBtn.innerText = currentTotal.toLocaleString() + '원 결제하기';
+        }
+    }
+
     function requestEscrowPayment() {
         if(!document.getElementById('recipientName').value) {
             alert('수령인 이름을 입력해주세요.'); return;
@@ -124,7 +166,9 @@
             } else {
                 alert(data.msg); 
                 payBtn.disabled = false;
-                payBtn.innerText = '<fmt:formatNumber value="${totalPrice}" pattern="#,###"/>원 결제하기';
+                
+                let currentTotal = document.querySelector('input[name="totalUsedPoint"]').value;
+                payBtn.innerText = parseInt(currentTotal).toLocaleString() + '원 결제하기';
                 
                 if (data.msg.includes("로그인")) {
                     location.href = '${pageContext.request.contextPath}/member/login';
@@ -135,6 +179,8 @@
             console.error('결제 오류:', error);
             alert('결제 처리 중 문제가 발생했습니다. 다시 시도해 주세요.');
             payBtn.disabled = false;
+            let currentTotal = document.querySelector('input[name="totalUsedPoint"]').value;
+            payBtn.innerText = parseInt(currentTotal).toLocaleString() + '원 결제하기';
         });
     }
 </script>

@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.model.Trade;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.EscrowService;
@@ -99,6 +101,12 @@ public class EscrowController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         
         Map<String, Object> model = new HashMap<>();
+
+        if (userDetails == null) {
+            model.put("state", "false");
+            model.put("message", "로그인 시간이 만료되었습니다. 다시 로그인해 주세요.");
+            return model;
+        }
         
         try {
             paramMap.put("sellerIdx", userDetails.getUserIdx());
@@ -108,6 +116,8 @@ public class EscrowController {
             model.put("state", "true");
             model.put("message", "발송 처리가 완료되었습니다.");
         } catch (Exception e) {
+            e.printStackTrace(); 
+            
             model.put("state", "false");
             model.put("message", "발송 처리에 실패했습니다. 다시 시도해 주세요.");
         }

@@ -448,6 +448,22 @@ background: var(--primary-light); }
     color: rgba(255,255,255,0.7); font-size: 14px;
 }
 
+#shippingModal {
+    align-items: center; 
+}
+
+#shippingModal .modal-content {
+    border-radius: 20px;
+    transform: translateY(30px); 
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#shippingModal.open .modal-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
 @media (max-width: 992px) {
     .article-layout { grid-template-columns: 1fr; }
     .action-card { position: static; }
