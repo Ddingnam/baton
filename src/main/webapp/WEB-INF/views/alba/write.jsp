@@ -66,7 +66,14 @@
           </div>
         </div>
 
-        <form id="writeForm" action="${pageContext.request.contextPath}/alba/write" method="post" enctype="multipart/form-data">
+        <form id="writeForm" action="${pageContext.request.contextPath}/alba/${mode}" method="post" enctype="multipart/form-data">
+          
+          <input type="hidden" name="mode" value="${mode}">
+          <c:if test="${mode == 'update'}">
+              <input type="hidden" name="postingIdx" value="${dto.postingIdx}">
+              <input type="hidden" name="page" value="${page}">
+          </c:if>
+
           <div class="form-card">
             <div class="form-card-header">
               <span class="form-card-step">1</span>
@@ -75,34 +82,34 @@
             <div class="form-card-body">
               <div class="form-group">
                 <label for="title">공고 제목 <span class="req">*</span></label>
-                <input type="text" id="title" name="title" maxlength="50" placeholder="예) 주말 카페 서빙 알바 구합니다" required oninput="updatePreview(); updateCharCount('title','titleCount',50)">
+                <input type="text" id="title" name="title" maxlength="50" placeholder="예) 주말 카페 서빙 알바 구합니다" required oninput="updatePreview(); updateCharCount('title','titleCount',50)" value="${dto.title}">
                 <div class="char-count"><span id="titleCount">0</span>/50자</div>
               </div>
               <div class="form-group">
                 <label for="employer">업체명</label>
-                <input type="text" id="employer" name="employer" maxlength="30" placeholder="예) 약수상회, 이웃알바" oninput="updatePreview()">
+                <input type="text" id="employer" name="employer" maxlength="30" placeholder="예) 약수상회, 이웃알바" oninput="updatePreview()" value="${dto.employer}">
               </div>
               <div class="form-group">
                 <label>카테고리 <span class="req">*</span></label>
                 <select name="category" required>
-                  <option value="" disabled selected>하는 일 선택</option>
-                  <option value="SERVING">서빙</option>
-                  <option value="KITCHEN_ASSISTANCE">주방보조/설거지</option>
-                  <option value="KITCHEN_COOK">주방장/조리사</option>
-                  <option value="BEVERAGE_MAKING">음료 제조</option>
-                  <option value="SHOP_MANAGEMENT">매장관리/판매</option>
-                  <option value="CONVENIENCE_STORE">편의점</option>
-                  <option value="CLEANING">업체청소</option>
-                  <option value="TUTORING">과외/레슨</option>
-                  <option value="CHILD_CARE">아이돌봄</option>
-                  <option value="MOVING_ASSISTANCE">짐 옮기기</option>
-                  <option value="LIGHT_WORK">심부름/소일거리</option>
-                  <option value="ETC">기타</option>
+                  <option value="" disabled ${empty dto.category ? 'selected' : ''}>하는 일 선택</option>
+                  <option value="SERVING" ${dto.category == 'SERVING' ? 'selected' : ''}>서빙</option>
+                  <option value="KITCHEN_ASSISTANCE" ${dto.category == 'KITCHEN_ASSISTANCE' ? 'selected' : ''}>주방보조/설거지</option>
+                  <option value="KITCHEN_COOK" ${dto.category == 'KITCHEN_COOK' ? 'selected' : ''}>주방장/조리사</option>
+                  <option value="BEVERAGE_MAKING" ${dto.category == 'BEVERAGE_MAKING' ? 'selected' : ''}>음료 제조</option>
+                  <option value="SHOP_MANAGEMENT" ${dto.category == 'SHOP_MANAGEMENT' ? 'selected' : ''}>매장관리/판매</option>
+                  <option value="CONVENIENCE_STORE" ${dto.category == 'CONVENIENCE_STORE' ? 'selected' : ''}>편의점</option>
+                  <option value="CLEANING" ${dto.category == 'CLEANING' ? 'selected' : ''}>업체청소</option>
+                  <option value="TUTORING" ${dto.category == 'TUTORING' ? 'selected' : ''}>과외/레슨</option>
+                  <option value="CHILD_CARE" ${dto.category == 'CHILD_CARE' ? 'selected' : ''}>아이돌봄</option>
+                  <option value="MOVING_ASSISTANCE" ${dto.category == 'MOVING_ASSISTANCE' ? 'selected' : ''}>짐 옮기기</option>
+                  <option value="LIGHT_WORK" ${dto.category == 'LIGHT_WORK' ? 'selected' : ''}>심부름/소일거리</option>
+                  <option value="ETC" ${dto.category == 'ETC' ? 'selected' : ''}>기타</option>
                 </select>
               </div>
               <div class="form-group">
                 <label for="description">공고 내용 <span class="req">*</span></label>
-                <textarea id="description" name="description" rows="6" maxlength="1000" placeholder="업무 내용 등을 자세히 적어주세요." required oninput="updateCharCount('description','descCount',1000)"></textarea>
+                <textarea id="description" name="description" rows="6" maxlength="1000" placeholder="업무 내용 등을 자세히 적어주세요." required oninput="updateCharCount('description','descCount',1000)">${dto.description}</textarea>
                 <div class="char-count"><span id="descCount">0</span>/1000자</div>
               </div>
             </div>
@@ -122,11 +129,11 @@
                   <button type="button" class="chip" data-val="월급" data-key="month" onclick="selectPayType(this)">월급</button>
                   <button type="button" class="chip" data-val="건당" data-key="건당" onclick="selectPayType(this)">건당</button>
                 </div>
-                <input type="hidden" name="payType" id="payTypeHidden" value="시급">
+                <input type="hidden" name="payType" id="payTypeHidden" value="${not empty dto.payType ? dto.payType : '시급'}">
               </div>
               <div class="form-group">
                 <label for="pay">급여 금액 <span class="req">*</span></label>
-                <input type="number" id="pay" name="pay" min="0" step="100" placeholder="예) 12000" required oninput="onPayInput()">
+                <input type="number" id="pay" name="pay" min="0" step="100" placeholder="예) 12000" required oninput="onPayInput()" value="${dto.pay}">
                 <div class="warn-box" id="payWarn">⚠️ 입력하신 시급이 최저임금(10,320원)보다 낮아요!</div>
                 <div class="info-box"><strong>2026년 최저시급: 10,320원</strong></div>
               </div>
@@ -145,7 +152,7 @@
                   <button type="button" class="chip active" data-val="MORE_THAN_A_MONTH" onclick="selectWorkType(this)">1개월 이상</button>
                   <button type="button" class="chip" data-val="LESS_THAN_A_MONTH" onclick="selectWorkType(this)">단기</button>
                 </div>
-                <input type="hidden" name="workPeriod" id="workPeriodHidden" value="MORE_THAN_A_MONTH">
+                <input type="hidden" name="workPeriod" id="workPeriodHidden" value="${not empty dto.workPeriod ? dto.workPeriod : 'MORE_THAN_A_MONTH'}">
               </div>
               <div class="form-group">
                 <label>근무 요일 <span class="req">*</span></label>
@@ -163,17 +170,17 @@
                   <button type="button" class="shortcut-btn" onclick="selectWeekend()">주말</button>
                   <button type="button" class="shortcut-btn" onclick="selectAllDays()">매일</button>
                 </div>
-                <input type="hidden" name="workDays" id="workDaysHidden" value="">
+                <input type="hidden" name="workDays" id="workDaysHidden" value="${dto.workDays}">
               </div>
               <div class="form-group">
                 <label>근무 시간 <span class="req">*</span></label>
                 <div class="time-row">
-                  <input type="time" id="startTime" name="startTime" oninput="updatePreview()">
+                  <input type="time" id="startTime" name="startTime" oninput="updatePreview()" value="${dto.startTime}">
                   <span class="time-sep">–</span>
-                  <input type="time" id="endTime" name="endTime" oninput="updatePreview()">
+                  <input type="time" id="endTime" name="endTime" oninput="updatePreview()" value="${dto.endTime}">
                 </div>
                 <div class="time-check">
-                  <input type="checkbox" id="timeNegotiable" name="timeNegotiable" value="Y" onchange="toggleTimeInput(this)">
+                  <input type="checkbox" id="timeNegotiable" name="timeNegotiable" value="Y" onchange="toggleTimeInput(this)" ${dto.timeNegotiable == 'Y' ? 'checked' : ''}>
                   <label for="timeNegotiable">시간 협의 가능</label>
                 </div>
               </div>
@@ -189,14 +196,14 @@
               <div class="form-group">
                 <label for="location">근무 지역 <span class="req">*</span></label>
                 <div class="input-with-btn">
-                  <input type="text" id="location" name="location" placeholder="주소 검색 버튼을 눌러 검색하세요" required readonly onclick="searchAddress()">
+                  <input type="text" id="location" name="location" placeholder="주소 검색 버튼을 눌러 검색하세요" required readonly onclick="searchAddress()" value="${dto.location}">
                   <button type="button" class="addr-btn" onclick="searchAddress()"><i class="ri-map-pin-line"></i> 검색</button>
                 </div>
-                <input type="text" id="locationDetail" name="locationDetail" placeholder="상세 주소 입력" style="margin-top:8px;">
+                <input type="text" id="locationDetail" name="locationDetail" placeholder="상세 주소 입력" style="margin-top:8px;" value="${dto.locationDetail}">
               </div>
               <div class="form-group">
                 <label for="contact">연락처 <span class="req">*</span></label>
-                <input type="tel" id="contact" name="contact" placeholder="예) 010-1234-5678" required>
+                <input type="tel" id="contact" name="contact" placeholder="예) 010-1234-5678" required value="${dto.contact}">
               </div>
             </div>
           </div>
@@ -221,9 +228,9 @@
 
     <div class="submit-bar">
       <a href="${pageContext.request.contextPath}/alba/list" class="btn-ghost">목록으로</a>
-      <button type="button" class="btn-primary" id="submitBtn" onclick="submitForm()">공고 등록하기</button>
+      <button type="button" class="btn-primary" id="submitBtn" onclick="submitForm()">${mode == 'update' ? '공고 수정하기' : '공고 등록하기'}</button>
     </div>
-  </main>
+</main>
 </div>
 <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 <script>const CONTEXT_PATH = "${pageContext.request.contextPath}";</script>
