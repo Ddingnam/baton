@@ -44,6 +44,7 @@ public class TradeController {
 	        @RequestParam(value = "priceMax", required = false) String priceMax,
 	        @RequestParam(value = "available", required = false) String available,
 	        @RequestParam(value = "categoryIdx", defaultValue = "") String categoryIdx,
+	        @RequestParam(value = "sort", defaultValue = "newest") String sort,
 	        @AuthenticationPrincipal CustomUserDetails userDetails,
 	        Model model) {
 		try {
@@ -61,6 +62,7 @@ public class TradeController {
 	        map.put("priceMin", priceMin);
 	        map.put("priceMax", priceMax);
 	        map.put("available", available);
+	        map.put("sort", sort);
 	        
 	        if (userDetails != null) {
 	            map.put("userIdx", userDetails.getMember().getUserIdx());
@@ -89,6 +91,7 @@ public class TradeController {
 	        model.addAttribute("priceMin", priceMin);
 	        model.addAttribute("priceMax", priceMax);
 	        model.addAttribute("available", available);
+	        model.addAttribute("sort", sort);
 		} catch (Exception e) {
 			log.info("list", e);
 		}
@@ -255,5 +258,22 @@ public class TradeController {
 	    }
 	    
 	    return map;
+	}
+	
+	@PostMapping("pullUp")
+	@ResponseBody
+	public Map<String, Object> tradePullUp(@RequestParam("productIdx") long productIdx) {
+		Map<String, Object> map = new HashMap<>();
+		
+		try {
+	        service.updateLastUpDate(productIdx);
+	        
+	        map.put("status", "success");
+		} catch (Exception e) {
+			log.info("tradePullUp : ", e);
+			map.put("status", "error");
+		}
+		
+		return map;
 	}
 }

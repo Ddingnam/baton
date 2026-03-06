@@ -252,8 +252,12 @@ window.onload = function() {
 						hiddenInput.value = data.trade.categoryIdx;
 						const activeLi = document.querySelector(`.dropdown-menu li[data-value="${data.trade.categoryIdx}"]`);
 						if(activeLi) {
-							selectedText.innerText = activeLi.innerText;
+							selectedText.innerText = activeLi.innerText.trim(); 
+							    
+							menuItems.forEach(li => li.classList.remove('active'));
 							activeLi.classList.add('active');
+							    
+							selectedText.style.display = 'inline-block';
 						}
 					}
 	            })

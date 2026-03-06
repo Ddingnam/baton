@@ -8,6 +8,7 @@
     --text-main: #191F28;
     --text-sub: #4E5968;
     --text-light: #8B95A1;
+    --border: #EAECEF;
     --border-color: #EAECEF;
 }
 
@@ -140,6 +141,8 @@ a {
     margin-bottom: 30px;
     animation: fadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) 0.1s forwards;
     opacity: 0;
+    position: relative; 
+    z-index: 100;
 }
 
 .toolbar-top {
@@ -211,6 +214,8 @@ a {
     align-items: center;
     flex-wrap: wrap;
     gap: 16px;
+    position: relative;
+    z-index: 101;
 }
 
 .price-select-group {
@@ -282,29 +287,12 @@ a {
     color: var(--text-main);
 }
 
-.detail-select {
-    padding: 6px 28px 6px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    outline: none;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-sub);
-    appearance: none;
-    background: #fff url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5" stroke="%238B95A1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat right 8px center;
-    background-size: 16px;
-    cursor: pointer;
-    transition: border-color 0.2s;
-}
-
-.detail-select:hover {
-    border-color: var(--text-main);
-}
-
 .action-group {
     display: flex;
     align-items: center;
     gap: 12px;
+    position: relative;
+    z-index: 102;
 }
 
 .divider {
@@ -323,6 +311,75 @@ a {
     font-weight: 600;
     color: var(--text-main);
     user-select: none;
+}
+
+
+.custom-dropdown {
+    position: relative;
+    width: 140px;
+    user-select: none;
+    z-index: 102;
+}
+
+.dropdown-selected {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.dropdown-selected:hover { border-color: var(--primary); }
+
+.custom-dropdown.active .dropdown-selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 185, 141, 0.1);
+}
+
+.custom-dropdown.active .dropdown-selected i { transform: rotate(180deg); color: var(--primary); }
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    border: 1px solid var(--border-color);
+    padding: 6px;
+    z-index: 9999;
+    display: none;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.custom-dropdown.active .dropdown-menu {
+    display: block;
+    animation: slideIn 0.2s ease-out;
+}
+
+.dropdown-menu li {
+    padding: 10px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-main);
+    transition: all 0.2s;
+}
+
+.dropdown-menu li:hover { background: var(--primary-light); color: var(--primary); }
+.dropdown-menu li.active { background: var(--primary); color: #fff; font-weight: 600; }
+
+.toolbar-bottom {
+    position: relative;
+    z-index: 10;
 }
 
 .green-switch {
@@ -426,7 +483,8 @@ a {
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     margin-bottom: 40px;
-    perspective: 1000px;
+    position: relative;
+    z-index: 1;
 }
 
 .trade-card {

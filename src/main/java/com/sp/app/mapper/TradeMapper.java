@@ -37,5 +37,6 @@ public interface TradeMapper {
 	public List<Trade> tradeList(Map<String, Object> map);
 	public int dataCount(Map<String, Object> map);
 	public void updateHitCount(long productIdx) throws SQLException;
-	
+	public void updateLastUpDate(long productIdx) throws SQLException;
+	public void updatePullCount(long productIdx) throws SQLException;
 }

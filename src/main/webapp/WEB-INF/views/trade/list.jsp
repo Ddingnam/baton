@@ -66,9 +66,9 @@
 				        <div class="dropdown-selected">
 				            <span id="selectedSortText">
 				                <c:choose>
-				                    <c:when test="${param.sort == 'price_asc'}">낮은 가격순</c:when>
-				                    <c:when test="${param.sort == 'price_desc'}">높은 가격순</c:when>
-				                    <c:when test="${param.sort == 'popular'}">인기순</c:when>
+				                    <c:when test="${param.sort == 'lowPrice'}">낮은 가격순</c:when>
+				                    <c:when test="${param.sort == 'highPrice'}">높은 가격순</c:when>
+				                    <c:when test="${param.sort == 'hitCount'}">인기순</c:when>
 				                    <c:otherwise>최신순</c:otherwise>
 				                </c:choose>
 				            </span>
@@ -76,9 +76,9 @@
 				        </div>
 				        <ul class="dropdown-menu">
 				            <li data-value="latest" class="${param.sort == 'latest' || empty param.sort ? 'active' : ''}">최신순</li>
-				            <li data-value="price_asc" class="${param.sort == 'price_asc' ? 'active' : ''}">낮은 가격순</li>
-				            <li data-value="price_desc" class="${param.sort == 'price_desc' ? 'active' : ''}">높은 가격순</li>
-				            <li data-value="popular" class="${param.sort == 'popular' ? 'active' : ''}">인기순</li>
+				            <li data-value="lowPrice" class="${param.sort == 'lowPrice' ? 'active' : ''}">낮은 가격순</li>
+				            <li data-value="highPrice" class="${param.sort == 'highPrice' ? 'active' : ''}">높은 가격순</li>
+				            <li data-value="hitCount" class="${param.sort == 'hitCount' ? 'active' : ''}">인기순</li>
 				        </ul>
 				    </div>
                 </div>

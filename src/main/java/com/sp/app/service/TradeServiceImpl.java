@@ -1,5 +1,6 @@
 package com.sp.app.service;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -298,6 +299,17 @@ public class TradeServiceImpl implements TradeService {
 		} catch (Exception e) {
 			log.info("updateTradeStatus : ", e);
 		}
+	}
+
+	@Override
+	public void updateLastUpDate(long productIdx) throws SQLException {
+		try {
+			mapper.updateLastUpDate(productIdx);
+			mapper.updatePullCount(productIdx);
+		} catch (Exception e) {
+			log.info("updateLastUpDate : ", e);
+		}
+		
 	}
 	
 }

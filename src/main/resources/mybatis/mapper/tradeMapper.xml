@@ -120,7 +120,20 @@
 				        AND p.categoryIdx = #{categoryIdx}
 				    </if>
 				</where>
-	            ORDER BY p.productIdx DESC
+	            <choose>
+	                <when test="sort == 'lowPrice'">
+	                    ORDER BY p.price ASC
+	                </when>
+	                <when test="sort == 'highPrice'">
+	                    ORDER BY p.price DESC
+	                </when>
+	                <when test="sort == 'hitCount'">
+	                    ORDER BY p.hitCount DESC
+	                </when>
+	                <otherwise>
+	                    ORDER BY p.lastUpDate DESC, p.productIdx DESC
+					</otherwise>
+	            </choose>
 	        ) tb WHERE ROWNUM &lt;= #{end}
 	    ) WHERE rnum &gt;= #{start}
 	</select>
@@ -189,6 +202,14 @@
 	
 	<update id="updateTradeStatus">
 		UPDATE product SET tradeStatus = #{tradeStatus} WHERE productIdx = #{productIdx}
+	</update>
+	
+	<update id="updateLastUpDate">
+		UPDATE product SET lastUpDate = SYSDATE WHERE productIdx = #{productIdx}
+	</update>
+	
+	<update id="updatePullCount">
+		UPDATE product SET pullCount = pullCount + 1 WHERE productIdx = #{productIdx}
 	</update>
 	
 	<select id="findSaveName" parameterType="map" resultType="String">
