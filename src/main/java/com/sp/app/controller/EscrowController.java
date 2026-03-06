@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -89,5 +90,28 @@ public class EscrowController {
         }
 
         return mav;
+    }
+    
+    @PostMapping("/shipping")
+    @ResponseBody
+    public Map<String, Object> updateShipping(
+            @RequestParam Map<String, Object> paramMap,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        
+        Map<String, Object> model = new HashMap<>();
+        
+        try {
+            paramMap.put("sellerIdx", userDetails.getUserIdx());
+            
+            escrowService.updateShippingInfo(paramMap);
+            
+            model.put("state", "true");
+            model.put("message", "발송 처리가 완료되었습니다.");
+        } catch (Exception e) {
+            model.put("state", "false");
+            model.put("message", "발송 처리에 실패했습니다. 다시 시도해 주세요.");
+        }
+        
+        return model;
     }
 }

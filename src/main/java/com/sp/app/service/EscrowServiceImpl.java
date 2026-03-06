@@ -33,4 +33,13 @@ public class EscrowServiceImpl implements EscrowService {
 
         paymentMapper.insertPointHistoryForEscrow(paramMap);
     }
+    
+    @Override
+    public void updateShippingInfo(Map<String, Object> paramMap) throws Exception {
+        try {
+            paymentMapper.updateShippingInfo(paramMap);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 }

@@ -66,4 +66,11 @@
         )
     </insert>
 
+	<update id="updateShippingInfo" parameterType="map">
+	    UPDATE TRADETRANSACTION
+	    SET deliveryCompany = #{deliveryCompany},
+	        trackingNumber = #{trackingNumber},
+	        tradeStatus = 'SHIPPING',  shippingDate = SYSDATE     WHERE productIdx = #{productIdx} 
+	      AND sellerIdx = #{sellerIdx} 
+	</update>
 </mapper>

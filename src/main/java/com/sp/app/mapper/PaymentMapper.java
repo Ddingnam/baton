@@ -16,4 +16,5 @@ public interface PaymentMapper {
     public void insertTradeTransaction(Map<String, Object> map) throws Exception;
     public void insertPointHistoryForEscrow(Map<String, Object> map) throws Exception;
     public int getCurrentPoint(long userIdx);
+    public void updateShippingInfo(Map<String, Object> map) throws Exception;
 }
