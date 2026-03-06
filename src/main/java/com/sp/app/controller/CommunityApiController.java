@@ -1,5 +1,6 @@
 package com.sp.app.controller;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import com.sp.app.domain.dto.CommunityDto;
 import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.service.CommunityService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,39 +43,38 @@ public class CommunityApiController {
     private String uploadPath;
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> write(
-            @RequestPart(value = "dto") CommunityDto dto, // JSON 데이터
-            @RequestPart(value = "uploadFiles", required = false) List<MultipartFile> uploadFiles, // 파일 데이터
-            @SessionAttribute(name = "member", required = false) SessionInfo info) {
+    public Map<String, Object> write(
+			@RequestPart(value = "dto") CommunityDto dto,
+			@RequestPart(value = "uploadFiles", required = false) List<MultipartFile> uploadFiles,
+			HttpSession session) { 
         
-        Map<String, Object> map = new HashMap<>();
-        
-        try {
-            if (info == null) {
-                map.put("status", "false");
-                map.put("message", "로그인이 필요한 서비스입니다.");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(map);
-            }
+    	Map<String, Object> state = new HashMap<>();
+		try {
+			SessionInfo info = (SessionInfo) session.getAttribute("member");
+			if (info == null) {
+				state.put("status", "false");
+				state.put("message", "로그인이 필요합니다.");
+				return state;
+			}
 
-            dto.setMemberIdx(info.getUserIdx());
-            dto.setWriterNickname(info.getName());
+			dto.setMemberIdx(info.getUserIdx());
+			dto.setWriterNickname(info.getName());
+			dto.setSelectFiles(uploadFiles);
 
-            dto.setSelectFiles(uploadFiles);
+			String root = session.getServletContext().getRealPath("/");
+			String path = root + "uploads" + File.separator + "community";
 
-            communityService.insertCommunity(dto, uploadPath);
-            
-            map.put("status", "true");
-            map.put("message", "게시글이 등록되었습니다.");
-            
-            return ResponseEntity.ok(map);
-            
-        } catch (Exception e) {
-            log.error("글 등록 실패", e);
-            map.put("status", "false");
-            map.put("message", "등록 중 오류가 발생했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(map);
-        }
-    }
+			communityService.insertCommunity(dto, path);
+
+			state.put("status", "true");
+			state.put("message", "게시글이 등록되었습니다.");
+		} catch (Exception e) {
+			log.error("Community Insert Error", e);
+			state.put("status", "false");
+			state.put("message", "등록 중 오류가 발생했습니다.");
+		}
+		return state;
+	}
     
     @GetMapping
     public ResponseEntity<Map<String, Object>> list(
@@ -102,7 +103,7 @@ public class CommunityApiController {
     @GetMapping("/{id}")
     public ResponseEntity<CommunityDto> detail(@PathVariable("id") Long id) {
         try {
-            communityService.updateHitCount(id); // 조회수 증가
+            communityService.updateHitCount(id);
             CommunityDto dto = communityService.getCommunity(id);
             return ResponseEntity.ok(dto);
         } catch (Exception e) {

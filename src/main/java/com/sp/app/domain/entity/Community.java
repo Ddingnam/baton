@@ -17,6 +17,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,10 +32,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Community {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "community_id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "community_seq")
+	@SequenceGenerator(name = "community_seq", sequenceName = "community_seq", allocationSize = 1)
+	@Column(name = "community_id")
+	private Long id;
 
     @Column(nullable = false)
     private Long memberIdx;

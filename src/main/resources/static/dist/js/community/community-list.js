@@ -1,77 +1,53 @@
 document.addEventListener("DOMContentLoaded", () => {
-    renderActiveFilters();
+    const savedMode = localStorage.getItem('cmViewMode') || 'grid';
+    cmSwitchView(savedMode);
+
+    const fab = document.getElementById('cmFab');
+    if (fab) {
+        window.addEventListener('scroll', () => {
+            fab.style.display = window.scrollY > 300 ? 'flex' : 'none';
+        });
+    }
 });
 
-function cmApplyFilter() {
-    const keyword = document.getElementById('cmSearchInput').value.trim();
-    const photoOnly = document.getElementById('cmPhotoOnly').checked;
-    const sort = document.querySelector('.sort-select').value;
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    if (keyword) urlParams.set('keyword', keyword);
-    else urlParams.delete('keyword');
-    
-    if (photoOnly) urlParams.set('photoOnly', 'true');
-    else urlParams.delete('photoOnly');
-    
-    if (sort) urlParams.set('sort', sort);
-    urlParams.set('page', '1');
-    
-    window.location.href = window.location.pathname + '?' + urlParams.toString();
-}
+function cmSwitchView(mode) {
+    const area = document.getElementById('cmContentArea');
+    const gridBtn = document.getElementById('grid-view-btn');
+    const listBtn = document.getElementById('list-view-btn');
 
-function cmSetCategory(categoryIdx) {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (categoryIdx) urlParams.set('categoryIdx', categoryIdx);
-    else urlParams.delete('categoryIdx');
-    urlParams.set('page', '1');
-    window.location.href = window.location.pathname + '?' + urlParams.toString();
-}
+    if (!area || !gridBtn || !listBtn) return;
 
-function cmChangeSort(sortValue) {
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.set('sort', sortValue);
-    urlParams.set('page', '1');
-    window.location.href = window.location.pathname + '?' + urlParams.toString();
-}
+    localStorage.setItem('cmViewMode', mode);
 
-function cmGoPage(page) {
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.set('page', page);
-    window.location.href = window.location.pathname + '?' + urlParams.toString();
-}
-
-function cmToggleWish(event, boardIdx) {
-    event.preventDefault();
-    event.stopPropagation();
-    const btn = event.currentTarget;
-    btn.classList.toggle('active');
-    btn.innerHTML = btn.classList.contains('active') ? '<i class="ri-heart-3-fill"></i>' : '<i class="ri-heart-3-line"></i>';
-}
-
-function renderActiveFilters() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const filterContainer = document.getElementById('cmActiveFilters');
-    if (!filterContainer) return;
-    filterContainer.innerHTML = '';
-    const keyword = urlParams.get('keyword');
-    const photoOnly = urlParams.get('photoOnly');
-    if (keyword) {
-        const chip = document.createElement('div');
-        chip.innerHTML = `검색어: ${keyword} <i class="ri-close-line" onclick="removeFilter('keyword')"></i>`;
-        filterContainer.appendChild(chip);
-    }
-    if (photoOnly === 'true') {
-        const chip = document.createElement('div');
-        chip.innerHTML = `사진 있는 글 <i class="ri-close-line" onclick="removeFilter('photoOnly')"></i>`;
-        filterContainer.appendChild(chip);
+    if (mode === 'grid') {
+        area.classList.remove('list-mode');
+        area.classList.add('grid-mode');
+        gridBtn.classList.add('active');
+        listBtn.classList.remove('active');
+    } else {
+        area.classList.remove('grid-mode');
+        area.classList.add('list-mode');
+        listBtn.classList.add('active');
+        gridBtn.classList.remove('active');
     }
 }
 
-function removeFilter(paramKey) {
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.delete(paramKey);
-    urlParams.set('page', '1');
-    window.location.href = window.location.pathname + '?' + urlParams.toString();
+function submitSearch() {
+    const f = document.searchForm;
+    f.page.value = "1";
+    f.submit();
+}
+
+function filterByCategory(category) {
+    const f = document.searchForm;
+    f.category.value = category;
+    f.page.value = "1";
+    f.submit();
+}
+
+function filterBySort(sortValue) {
+    const f = document.searchForm;
+    f.sort.value = sortValue;
+    f.page.value = "1";
+    f.submit();
 }

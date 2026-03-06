@@ -17,6 +17,7 @@ import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.FlashMapManager;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
+import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.domain.dto.UserDto;
 import com.sp.app.service.MemberService;
 
@@ -64,6 +65,21 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler{
 	        Authentication authentication) throws IOException, ServletException {
 
 		request.getSession().setAttribute("msg", authentication.getName() + "님, 환영합니다!");
+		
+		try {
+		    UserDto dto2 = memberService.findById(authentication.getName());
+		    SessionInfo info = new SessionInfo();
+		    info.setUserIdx(dto2.getUserIdx());
+		    info.setUserId(dto2.getUserId());
+		    info.setName(dto2.getName());
+		    info.setEmail(dto2.getEmail());
+		    info.setUserLevel(dto2.getUserLevel());
+		    info.setAvatar(dto2.getProfile_photo());
+		    info.setLogin_type("local");
+		    request.getSession().setAttribute("member", info);
+		} catch (Exception e) {
+			
+		}
 	    
 	    SavedRequest savedRequest = requestCache.getRequest(request, response);
 

@@ -2,16 +2,18 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>커뮤니티 | BATON</title>
-<jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/community/community-list.css">
-<link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>커뮤니티 | BATON</title>
+    <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/community/community-list.css">
 </head>
 <body>
 
@@ -19,29 +21,33 @@
 
 <main class="cm-main-container">
     <section class="cm-hero-section">
-        <div class="container hero-inner">
+        <div class="hero-inner">
             <div class="hero-text-box">
                 <span class="sub-title">BATON COMMUNITY</span>
                 <h1 class="main-title">우리 동네 <span class="highlight">커뮤니티</span></h1>
                 <p class="desc">이웃들과 다양한 동네 소식을 나누고 질문해보세요.</p>
             </div>
-            <div class="hero-search-box">
-                <input type="text" id="cmSearchInput" placeholder="관심있는 소식이나 태그를 검색해보세요" value="${param.keyword}" onkeypress="if(event.keyCode==13) cmApplyFilter();">
-                <button class="search-btn" onclick="cmApplyFilter()">검색</button>
-            </div>
+            
+            <form name="searchForm" class="hero-search-box" action="${pageContext.request.contextPath}/community/list" method="get">
+                <input type="hidden" name="category" value="${category}">
+                <input type="hidden" name="sort" value="${sort}">
+                <input type="hidden" name="page" value="1">
+                <input type="text" name="kwd" id="cmSearchInput" placeholder="관심있는 소식이나 내용을 검색해보세요" value="${kwd}" autocomplete="off">
+                <button type="button" class="search-btn" onclick="submitSearch()">검색</button>
+            </form>
         </div>
     </section>
 
     <div class="content-wrapper">
         <div class="cm-toolbar">
             <div class="toolbar-top">
-                <div class="filter-group cm-filter-list">
-                    <button class="filter-btn active">전체</button>
-                    <button class="filter-btn">동네질문</button>
-                    <button class="filter-btn">동네맛집</button>
-                    <button class="filter-btn">동네소식</button>
-                    <button class="filter-btn">분실/실종</button>
-                    <button class="filter-btn">일상</button>
+                <div class="filter-group">
+                    <button type="button" class="filter-btn ${empty category ? 'active' : ''}" onclick="location.href='${pageContext.request.contextPath}/community/list'">전체</button>
+                    <button type="button" class="filter-btn ${category == '동네질문' ? 'active' : ''}" onclick="filterByCategory('동네질문')">동네질문</button>
+                    <button type="button" class="filter-btn ${category == '동네맛집' ? 'active' : ''}" onclick="filterByCategory('동네맛집')">동네맛집</button>
+                    <button type="button" class="filter-btn ${category == '동네소식' ? 'active' : ''}" onclick="filterByCategory('동네소식')">동네소식</button>
+                    <button type="button" class="filter-btn ${category == '분실/실종' ? 'active' : ''}" onclick="filterByCategory('분실/실종')">분실/실종</button>
+                    <button type="button" class="filter-btn ${category == '일상' ? 'active' : ''}" onclick="filterByCategory('일상')">일상</button>
                 </div>
                 <button class="btn-create-cm" onclick="location.href='${pageContext.request.contextPath}/community/write'">
                     <i class="ri-pencil-line"></i> 글쓰기
@@ -57,92 +63,82 @@
                         <i class="ri-list-unordered"></i> 글로 보기
                     </button>
                 </div>
-
                 <div class="action-group">
-                    <label class="toggle-switch-wrap">
-                        <input type="checkbox" class="purple-switch" id="cmPhotoOnly">
-                        <span class="toggle-label">사진 있는 글만</span>
-                    </label>
-                    <span class="divider">|</span>
-                    <select class="detail-select sort-select">
-                        <option value="latest">최신순</option>
-                        <option value="popular">인기순</option>
+                    <select class="detail-select sort-select" onchange="filterBySort(this.value)">
+                        <option value="latest" ${sort == 'latest' ? 'selected' : ''}>최신순</option>
+                        <option value="hit" ${sort == 'hit' ? 'selected' : ''}>조회순</option>
+                        <option value="like" ${sort == 'like' ? 'selected' : ''}>좋아요순</option>
                     </select>
                 </div>
             </div>
         </div>
 
         <div class="cm-content-area grid-mode" id="cmContentArea">
-            <c:forEach var="i" begin="1" end="8">
-                <div class="cm-item-card" onclick="location.href='#'">
-                    <div class="card-visual">
-                        <div class="card-img-box">
-                            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500" alt="community">
-                        </div>
-                        <div class="card-badge">동네소식</div>
-                        <button type="button" class="card-wish" onclick="event.stopPropagation(); this.classList.toggle('active');">
-                            <i class="ri-heart-3-line"></i>
-                        </button>
+            <c:if test="${empty list}">
+                <div class="no-data-box">
+                    <i class="ri-inbox-2-line"></i>
+                    <p>등록된 게시글이 없습니다.</p>
+                </div>
+            </c:if>
+
+            <c:forEach var="dto" items="${list}" varStatus="vs">
+                <a href="${pageContext.request.contextPath}/community/article?id=${dto.id}&page=${page}" class="cm-item-card" style="animation-delay: ${vs.index * 0.05}s">
+                    <div class="card-visual ${empty dto.imageFiles ? 'no-image' : ''}">
+                        <c:choose>
+                            <c:when test="${not empty dto.imageFiles}">
+                                <img src="${pageContext.request.contextPath}/uploads/community/${dto.imageFiles[0]}" alt="thumbnail">
+                            </c:when>
+                            <c:otherwise>
+                                <i class="ri-image-line"></i>
+                            </c:otherwise>
+                        </c:choose>
+                        <span class="card-badge">${dto.category}</span>
                     </div>
 
                     <div class="card-body">
-                        <h3 class="card-title">오늘 날씨가 너무 좋아서 산책 나왔어요! ☀️</h3>
-                        <p class="card-text">공원에 사람들도 많고 꽃도 조금씩 피기 시작했네요. 다들 오늘 점심 드시고 가벼운 산책 어떠신가요? 기분이 너무 좋네요.</p>
+                        <h3 class="card-title">${dto.subject}</h3>
+                        <p class="card-text">
+                            <c:out value="${fn:substring(fn:replace(dto.content, '<br>', ' '), 0, 80)}${fn:length(dto.content) > 80 ? '...' : ''}" />
+                        </p>
 
                         <div class="card-meta">
-                            <span class="meta-item"><i class="ri-map-pin-2-line"></i> 강남구 역삼동</span>
-                            <span class="meta-item"><i class="ri-time-line"></i> 10분 전</span>
+                            <c:if test="${not empty dto.placeName}">
+                                <span class="meta-item"><i class="ri-map-pin-2-line"></i>${dto.placeName}</span>
+                            </c:if>
+                            <span class="meta-item">
+                                <i class="ri-time-line"></i>
+                                <c:set var="rawDate" value="${dto.regDate}" />
+                                <c:out value="${fn:substring(rawDate, 0, 16).replace('T', ' ')}" />
+                            </span>
                         </div>
 
                         <div class="card-footer">
                             <div class="user-info">
                                 <div class="user-avatar"><i class="ri-user-6-line"></i></div>
-                                <span class="user-nick">동네이웃${i}</span>
+                                <span class="user-nick">${dto.writerNickname}</span>
                             </div>
                             <div class="stats-info">
-                                <span><i class="ri-eye-line"></i> ${i * 7}</span>
-                                <span><i class="ri-chat-1-line"></i> ${i}</span>
-                                <span><i class="ri-heart-3-fill"></i> ${i + 2}</span>
+                                <span><i class="ri-eye-line"></i>${dto.hitCount}</span>
+                                <span><i class="ri-heart-3-fill"></i>${dto.likeCount}</span>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </c:forEach>
         </div>
 
         <div class="pagination-container">
-            <button class="cm-page-btn" disabled>&#8249;</button>
-            <button class="cm-page-btn active">1</button>
-            <button class="cm-page-btn">2</button>
-            <button class="cm-page-btn">3</button>
-            <button class="cm-page-btn">&#8250;</button>
+            ${dataCount == 0 ? "" : paging}
         </div>
     </div>
 </main>
 
 <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 
-<button class="cm-fab" onclick="location.href='${pageContext.request.contextPath}/community/write'">
+<button class="cm-fab" id="cmFab" onclick="location.href='${pageContext.request.contextPath}/community/write'">
     <i class="ri-pencil-line"></i>
 </button>
 
-<script>
-function cmSwitchView(mode) {
-    const area = document.getElementById('cmContentArea');
-    const gridBtn = document.getElementById('grid-view-btn');
-    const listBtn = document.getElementById('list-view-btn');
-    if (mode === 'grid') {
-        area.classList.remove('list-mode');
-        area.classList.add('grid-mode');
-        gridBtn.classList.add('active');
-        listBtn.classList.remove('active');
-    } else {
-        area.classList.remove('grid-mode');
-        area.classList.add('list-mode');
-        listBtn.classList.add('active');
-        gridBtn.classList.remove('active');
-    }
-}
-</script>
+<script src="${pageContext.request.contextPath}/dist/js/community/community-list.js"></script>
 </body>
 </html>
