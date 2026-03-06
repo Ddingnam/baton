@@ -1,7 +1,6 @@
 const Gallery = (function () {
     function selectThumb(idx) {
-        const indicators = document.querySelectorAll('.indicator-dot');
-        indicators.forEach((el, i) => {
+        document.querySelectorAll('.indicator-dot').forEach((el, i) => {
             el.classList.toggle('active', i === idx);
         });
     }
@@ -9,20 +8,20 @@ const Gallery = (function () {
 })();
 
 const WishModule = (function () {
-    let wished = false;
-    let albaIdx = 0;
+    let wished   = false;
+    let albaIdx  = 0;
 
     function init(initialWished, idx) {
-        wished = initialWished;
+        wished  = initialWished;
         albaIdx = idx;
         updateUI();
     }
 
     function toggle() {
         fetch('/alba/wish', {
-            method: 'POST',
+            method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ albaIdx: albaIdx })
+            body:    JSON.stringify({ albaIdx: albaIdx })
         })
         .then(res => {
             if (res.status === 401) { Toast.show('로그인이 필요합니다.'); return null; }
@@ -39,10 +38,11 @@ const WishModule = (function () {
 
     function updateUI() {
         const btn = document.getElementById('wishBtnLarge');
-        if (btn) {
-            btn.classList.toggle('active', wished);
-            btn.innerHTML = wished ? '<i class="ri-heart-3-fill"></i>' : '<i class="ri-heart-3-line"></i>';
-        }
+        if (!btn) return;
+        btn.classList.toggle('active', wished);
+        btn.innerHTML = wished
+            ? '<i class="ri-heart-3-fill"></i>'
+            : '<i class="ri-heart-3-line"></i>';
     }
 
     return { init, toggle };
@@ -53,28 +53,22 @@ const StatusModule = (function () {
 
     function open() {
         const modal = getModal();
-        if (modal) {
-            modal.classList.add('open');
-            document.body.style.overflow = 'hidden';
-        }
+        if (modal) { modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
     }
 
     function close() {
         const modal = getModal();
-        if (modal) {
-            modal.classList.remove('open');
-            document.body.style.overflow = '';
-        }
+        if (modal) { modal.classList.remove('open'); document.body.style.overflow = ''; }
     }
 
     function update(albaIdx, status) {
         const params = new URLSearchParams();
         params.append('albaIdx', albaIdx);
-        params.append('status', status);
+        params.append('status',  status);
 
         fetch(`${window.location.origin}/alba/updateStatus`, {
             method: 'POST',
-            body: params
+            body:   params
         })
         .then(res => res.json())
         .then(data => {
@@ -99,7 +93,7 @@ const PullUpModule = (function () {
 
         fetch(`${window.location.origin}/alba/pullUp`, {
             method: 'POST',
-            body: params
+            body:   params
         })
         .then(res => res.json())
         .then(data => {
@@ -145,17 +139,17 @@ function copyAddress(address) {
     }
 }
 
+// 버그 수정: 기존 코드에서 CONTEXT_PATH 와 idx 변수가 섞여있던 문제 수정
 function confirmDelete(albaIdx) {
     if (confirm('이 공고를 정말 삭제하시겠습니까?\n삭제된 공고는 복구할 수 없습니다.')) {
-        //location.href = '/alba/delete?postingIdx=' + albaIdx;
-		location.href = CONTEXT_PATH + '/alba/delete?postingIdx=' + idx;
+        location.href = CONTEXT_PATH + '/alba/delete?postingIdx=' + albaIdx;
     }
 }
 
 window.addEventListener('DOMContentLoaded', function () {
     const articleEl = document.getElementById('articleData');
     if (articleEl) {
-        const wished = articleEl.dataset.wished === 'true';
+        const wished  = articleEl.dataset.wished === 'true';
         const albaIdx = parseInt(articleEl.dataset.albaIdx) || 0;
         WishModule.init(wished, albaIdx);
     }
