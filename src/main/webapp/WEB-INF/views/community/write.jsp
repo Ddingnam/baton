@@ -70,6 +70,58 @@
                 </div>
                 <div id="tagContainer" class="tag-list"></div>
             </div>
+            
+            <div class="poll-wrapper">
+			    <div class="poll-toggle-header">
+			        <div class="toggle-label">
+			            <i class="ri-bar-chart-horizontal-fill"></i>
+			            <span>투표 만들기</span>
+			        </div>
+			        <label class="switch">
+			            <input type="checkbox" id="chkPollToggle">
+			            <span class="slider round"></span>
+			        </label>
+			    </div>
+			    
+			    <div id="pollForm" class="poll-card">
+			        <div class="poll-input-group">
+			            <input type="text" id="pollTitle" class="input-poll-title" placeholder="무엇을 투표해볼까요?" autocomplete="off">
+			        </div>
+					<div class="poll-options-list" id="pollOptionContainer">
+					    <div class="poll-option-item">
+					        <input type="text" name="pollOption" placeholder="항목 1" class="input-option" autocomplete="off">
+					    </div>
+					    <div class="poll-option-item">
+					        <input type="text" name="pollOption" placeholder="항목 2" class="input-option" autocomplete="off">
+					    </div>
+					</div>
+			        
+			        <button type="button" class="btn-add-option-dashed" onclick="addPollOption()">
+			            <i class="ri-add-line"></i> 항목 추가하기
+			        </button>
+			
+			        <div class="poll-settings-bar">
+			            <div class="setting-group">
+			                <div class="date-picker-box">
+			                    <i class="ri-calendar-event-line"></i>
+			                    <input type="date" id="pollEndDate" class="input-date-hidden" required>
+			                    <span id="dateDisplay">종료일 선택</span>
+			                </div>
+			            </div>
+			            
+			            <div class="setting-toggles">
+			                <label class="mini-check" title="복수 선택 허용">
+			                    <input type="checkbox" id="pollMultiple">
+			                    <span class="check-btn">복수선택</span>
+			                </label>
+			                <label class="mini-check" title="익명 투표">
+			                    <input type="checkbox" id="pollAnonymous">
+			                    <span class="check-btn">익명</span>
+			                </label>
+			            </div>
+			        </div>
+			    </div>
+			</div>
 
             <div class="location-card" id="locationCard" style="display: none;">
                 <div class="loc-icon"><i class="ri-map-pin-fill"></i></div>

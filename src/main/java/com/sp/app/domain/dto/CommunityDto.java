@@ -38,4 +38,10 @@ public class CommunityDto {
     
     private boolean userLiked;
     private boolean userScraped;
+    
+    private String pollTitle; 
+    private List<String> pollOptions;
+    private String pollEndDate;
+    private Boolean pollMultiple;
+    private Boolean pollAnonymous;
 }
