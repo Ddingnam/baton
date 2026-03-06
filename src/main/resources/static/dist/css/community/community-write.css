@@ -593,20 +593,16 @@ body {
 	border-radius: 3px;
 }
 
-/* ================= 투표 디자인 개선 (Final Polish) ================= */
-
-/* 전체 컨테이너: 부드러운 그림자와 둥근 모서리로 입체감 부여 */
 .poll-wrapper {
     margin-top: 30px;
     background: #fff;
-    border-radius: 20px; /* 더 둥글게 */
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); /* 부드러운 그림자 */
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    border: 1px solid rgba(0,0,0,0.03); /* 아주 연한 테두리 */
+    border: 1px solid rgba(0,0,0,0.03);
 }
 
-/* 1. 토글 스위치 헤더: 깔끔한 흰색 배경과 부드러운 구분선 */
 .poll-toggle-header {
     padding: 20px 24px;
     display: flex;
@@ -633,12 +629,11 @@ body {
     border-radius: 8px;
 }
 
-/* iOS 스타일 스위치 (업그레이드) */
 .switch {
     position: relative;
     display: inline-block;
-    width: 50px; /* 약간 더 넓게 */
-    height: 28px; /* 약간 더 높게 */
+    width: 50px;
+    height: 28px;
 }
 
 .switch input { 
@@ -649,7 +644,7 @@ body {
     position: absolute;
     cursor: pointer;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #E5E8ED; /* 기본 회색 변경 */
+    background-color: #E5E8ED;
     transition: .3s cubic-bezier(0.4, 0.0, 0.2, 1);
     border-radius: 34px;
 }
@@ -657,12 +652,12 @@ body {
 .slider:before {
     position: absolute;
     content: "";
-    height: 22px; width: 22px; /* 크기 조정 */
+    height: 22px; width: 22px;
     left: 3px; bottom: 3px;
     background-color: white;
     transition: .3s cubic-bezier(0.4, 0.0, 0.2, 1);
     border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.15); /* 그림자 추가 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 
 input:checked + .slider {
@@ -673,7 +668,6 @@ input:checked + .slider:before {
     transform: translateX(22px);
 }
 
-/* 2. 투표 폼 본문 (애니메이션 개선) */
 .poll-card {
     max-height: 0;
     opacity: 0;
@@ -690,13 +684,12 @@ input:checked + .slider:before {
     padding-top: 10px;
 }
 
-/* 3. 입력 필드 스타일 (세련되게) */
 .input-poll-title {
     width: 100%;
     border: none;
-    border-bottom: 2px solid #E5E8ED; /* 연한 회색 */
+    border-bottom: 2px solid #E5E8ED;
     padding: 14px 0;
-    font-size: 18px; /* 폰트 키움 */
+    font-size: 18px;
     font-weight: 700;
     outline: none;
     transition: 0.3s;
@@ -726,7 +719,6 @@ input:checked + .slider:before {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 포커스 시 카드처럼 떠오르는 효과 */
 .poll-option-item:focus-within {
     background: #fff;
     border-color: var(--primary-glow);
@@ -775,12 +767,11 @@ input:checked + .slider:before {
     color: var(--danger);
 }
 
-/* 4. 항목 추가 버튼 (더 눈에 띄게) */
 .btn-add-option-dashed {
     width: 100%;
     padding: 14px;
-    border: 2px dashed rgba(138, 99, 255, 0.2); /* 브랜드 컬러 점선 */
-    background: rgba(138, 99, 255, 0.03); /* 아주 연한 브랜드 배경 */
+    border: 2px dashed rgba(138, 99, 255, 0.2);
+    background: rgba(138, 99, 255, 0.03);
     color: var(--primary);
     border-radius: 12px;
     font-weight: 600;
@@ -804,7 +795,6 @@ input:checked + .slider:before {
     font-size: 18px;
 }
 
-/* 5. 하단 설정 바 (깔끔하게 정리) */
 .poll-settings-bar {
     display: flex;
     justify-content: space-between;
@@ -824,7 +814,7 @@ input:checked + .slider:before {
     font-weight: 500;
     cursor: pointer;
     padding: 8px 16px;
-    border-radius: 100px; /* 타원형 버튼 */
+    border-radius: 100px;
     background: #F0F2F5;
     transition: 0.2s;
 }
@@ -844,7 +834,6 @@ input:checked + .slider:before {
     opacity: 0; width: 100%; height: 100%; cursor: pointer; left: 0; top: 0;
 }
 
-/* 6. 체크 버튼 스타일 (직관적인 필(fill) 스타일) */
 .setting-toggles {
     display: flex;
     gap: 10px;
@@ -859,7 +848,7 @@ input:checked + .slider:before {
     align-items: center;
     padding: 8px 16px;
     border-radius: 100px;
-    background: #F0F2F5; /* 기본 회색 배경 */
+    background: #F0F2F5;
     font-size: 14px;
     color: var(--text-2);
     cursor: pointer;
@@ -867,16 +856,15 @@ input:checked + .slider:before {
     font-weight: 600;
 }
 
-/* 선택되었을 때 스타일 */
 .mini-check input:checked + .check-btn {
     background: var(--primary);
     color: white;
-    box-shadow: 0 4px 12px rgba(138, 99, 255, 0.2); /* 부드러운 그림자 */
+    box-shadow: 0 4px 12px rgba(138, 99, 255, 0.2);
     transform: translateY(-1px);
 }
 
 .mini-check input:checked + .check-btn::before {
-    content: "\EB7B"; /* remixicon 체크 아이콘 */
+    content: "\EB7B";
     font-family: 'remixicon' !important;
     margin-right: 6px;
     font-size: 16px;
