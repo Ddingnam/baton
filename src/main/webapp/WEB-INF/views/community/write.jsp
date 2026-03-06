@@ -12,7 +12,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/community/community-write.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
-
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoMapKey}&libraries=services"></script>
 </head>
 <body>
@@ -34,7 +33,6 @@
                 <h1 class="page-title">글쓰기</h1>
             </div>
             <div class="editor-header-right">
-                <button type="button" class="btn-temp-save">임시저장</button>
                 <button type="button" class="btn-submit">등록</button>
             </div>
         </div>
@@ -73,26 +71,6 @@
                 <div id="tagContainer" class="tag-list"></div>
             </div>
 
-            <div class="poll-section" id="pollSection" style="display: none;">
-                <div class="poll-header">
-                    <h3>투표 만들기</h3>
-                    <button type="button" class="btn-close-poll"><i class="ri-close-line"></i></button>
-                </div>
-                <div class="poll-body">
-                    <input type="text" class="poll-title-input" id="pollTitle" placeholder="투표 제목을 입력하세요">
-                    <div class="poll-options-list" id="pollOptionContainer"></div>
-                    <button type="button" class="btn-add-option">+ 항목 추가</button>
-                    <div class="poll-settings">
-                        <label><input type="checkbox" id="pollMulti"> 복수 선택 허용</label>
-                        <label><input type="checkbox" id="pollAnonymous"> 익명 투표</label>
-                    </div>
-                    <div class="poll-date">
-                        <span>종료일</span>
-                        <input type="date" id="pollEndDate">
-                    </div>
-                </div>
-            </div>
-
             <div class="location-card" id="locationCard" style="display: none;">
                 <div class="loc-icon"><i class="ri-map-pin-fill"></i></div>
                 <div class="loc-info">
@@ -109,10 +87,6 @@
                     <i class="ri-map-pin-line"></i>
                     <span>위치</span>
                 </button>
-                <button type="button" class="tool-btn" id="btnPoll">
-                    <i class="ri-bar-chart-horizontal-line"></i>
-                    <span>투표</span>
-                </button>
             </div>
             <button type="button" class="btn-submit-full">등록하기</button>
         </div>
@@ -126,21 +100,6 @@
                 <li>사진을 첨부하면 더 많은 이웃들이 관심을 가질 수 있어요.</li>
                 <li>판매/홍보 목적의 글은 <strong>중고거래</strong> 혹은 <strong>알바</strong> 게시판을 이용해주세요.</li>
             </ul>
-        </div>
-        <div class="sidebar-box">
-            <h3>공개 설정</h3>
-            <div class="visibility-options">
-                <label class="vis-option">
-                    <input type="radio" name="visibility" value="public" checked>
-                    <div class="vis-icon"><i class="ri-earth-line"></i></div>
-                    <div class="vis-text"><strong>전체 공개</strong><small>모든 이웃이 볼 수 있어요</small></div>
-                </label>
-                <label class="vis-option">
-                    <input type="radio" name="visibility" value="neighbor">
-                    <div class="vis-icon"><i class="ri-community-line"></i></div>
-                    <div class="vis-text"><strong>동네 이웃만</strong><small>인증된 동네 이웃만 볼 수 있어요</small></div>
-                </label>
-            </div>
         </div>
     </div>
 </div>
@@ -158,7 +117,6 @@
             <button type="button" onclick="searchPlaces()">검색</button>
         </div>
         <ul id="placesList" class="place-result-list"></ul>
-        <div id="pagination" class="place-pagination"></div>
     </div>
 </div>
 
@@ -168,17 +126,19 @@
 <script src="${pageContext.request.contextPath}/dist/js/community/community-write.js"></script>
 
 <script>
-let ps = null;
+let placesService = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     if (window.kakao && window.kakao.maps && window.kakao.maps.services) {
-        ps = new kakao.maps.services.Places();
+        placesService = new kakao.maps.services.Places();
     } else {
-        console.error("Kakao Maps API 로드 실패 (키 확인 필요)");
+        console.error("Kakao Maps API Load Failed");
     }
     
     const btnLocation = document.getElementById('btnLocation');
-    btnLocation.addEventListener('click', openPlaceModal);
+    if(btnLocation) {
+        btnLocation.addEventListener('click', openPlaceModal);
+    }
 });
 
 function openPlaceModal() {
@@ -206,16 +166,16 @@ function searchPlaces() {
         alert('검색어를 입력해주세요!');
         return;
     }
-    if(!ps) {
+    if(!placesService) {
         alert('지도 서비스를 사용할 수 없습니다.');
         return;
     }
-    ps.keywordSearch(keyword, placesSearchCB);
+    placesService.keywordSearch(keyword, placesSearchCallback);
 }
 
-function placesSearchCB(data, status, pagination) {
+function placesSearchCallback(data, status, pagination) {
     if (status === kakao.maps.services.Status.OK) {
-        displayPlaces(data); // 목록 표시
+        displayPlaces(data);
     } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
         alert('검색 결과가 존재하지 않습니다.');
     } else if (status === kakao.maps.services.Status.ERROR) {
@@ -224,37 +184,33 @@ function placesSearchCB(data, status, pagination) {
 }
 
 function displayPlaces(places) {
-    const listEl = document.getElementById('placesList');
-    listEl.innerHTML = '';
-
+    const listElement = document.getElementById('placesList');
+    listElement.innerHTML = '';
     for (let i = 0; i < places.length; i++) {
         const item = getListItem(places[i]);
-        listEl.appendChild(item);
+        listElement.appendChild(item);
     }
 }
 
 function getListItem(place) {
-    const el = document.createElement('li');
-    el.className = 'place-item';
-    
-    let itemStr = '<div class="info">' +
+    const element = document.createElement('li');
+    element.className = 'place-item';
+    let itemHtml = '<div class="info">' +
                   '   <h5>' + place.place_name + '</h5>';
-
     if (place.road_address_name) {
-        itemStr += '    <span class="road-addr">' + place.road_address_name + '</span>' +
+        itemHtml += '    <span class="road-addr">' + place.road_address_name + '</span>' +
                    '    <span class="jibun-addr">(지번) ' + place.address_name + '</span>';
     } else {
-        itemStr += '    <span>' + place.address_name + '</span>';
+        itemHtml += '    <span>' + place.address_name + '</span>';
     }
-    itemStr += '</div>';
+    itemHtml += '</div>';
 
-    el.innerHTML = itemStr;
-
-    el.onclick = function () {
+    element.innerHTML = itemHtml;
+    element.onclick = function () {
         setLocation(place.place_name, place.address_name, place.y, place.x);
         closePlaceSearch();
     };
-    return el;
+    return element;
 }
 </script>
 

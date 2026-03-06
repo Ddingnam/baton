@@ -1,46 +1,46 @@
 let fileList = [];
 let tagList = [];
-let pollOptions = ['', ''];
 
 document.addEventListener('DOMContentLoaded', () => {
     initFileZone();
     initTagInput();
     initCharCount();
     initCategoryPills();
-    initPoll();
-    // initLocation();
-	
+    
     const submitBtn = document.querySelector('.btn-submit');
     const submitFullBtn = document.querySelector('.btn-submit-full');
     if(submitBtn) submitBtn.addEventListener('click', sendPost);
     if(submitFullBtn) submitFullBtn.addEventListener('click', sendPost);
 });
+
 function initCategoryPills() {
     document.querySelectorAll('.cat-pill input').forEach(radio => {
         radio.addEventListener('change', () => {
-            const map = {
+            const placeholderMap = {
                 '일상': '오늘 있었던 일을 이웃들과 나눠보세요!',
                 '동네질문': '동네에 대해 궁금한 것을 물어보세요!',
                 '동네맛집': '맛있었던 곳을 자랑해보세요!',
                 '동네소식': '우리 동네 소식을 알려주세요!',
                 '분실/실종': '분실물이나 실종 반려동물을 알려주세요!',
             };
-            const ta = document.querySelector('.textarea-main');
-            if (ta && map[radio.value]) ta.placeholder = map[radio.value];
+            const textarea = document.querySelector('.textarea-main');
+            if (textarea && placeholderMap[radio.value]) {
+                textarea.placeholder = placeholderMap[radio.value];
+            }
         });
     });
 }
 
 function initCharCount() {
-    const ta = document.querySelector('.textarea-main');
+    const textarea = document.querySelector('.textarea-main');
     const counter = document.getElementById('charCount');
-    if (!ta || !counter) return;
+    if (!textarea || !counter) return;
 
-    ta.addEventListener('input', () => {
-        const len = ta.value.length;
-        counter.textContent = len;
-        if (len > 2000) {
-            ta.value = ta.value.substring(0, 2000);
+    textarea.addEventListener('input', () => {
+        const length = textarea.value.length;
+        counter.textContent = length;
+        if (length > 2000) {
+            textarea.value = textarea.value.substring(0, 2000);
             counter.textContent = 2000;
         }
     });
@@ -55,8 +55,14 @@ function initFileZone() {
     if(fileInput) fileInput.addEventListener('change', e => handleFiles(e.target.files));
     
     if(dropZone) {
-        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.background = '#f0f2f5'; });
-        dropZone.addEventListener('dragleave', e => { e.preventDefault(); dropZone.style.background = ''; });
+        dropZone.addEventListener('dragover', e => { 
+            e.preventDefault(); 
+            dropZone.style.background = '#f0f2f5'; 
+        });
+        dropZone.addEventListener('dragleave', e => { 
+            e.preventDefault(); 
+            dropZone.style.background = ''; 
+        });
         dropZone.addEventListener('drop', e => {
             e.preventDefault();
             dropZone.style.background = '';
@@ -87,28 +93,27 @@ function renderFileList() {
     const items = list.querySelectorAll('.media-item');
     items.forEach(item => item.remove());
 
-    fileList.forEach((item, idx) => {
+    fileList.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'media-item';
-        div.innerHTML = `<img src="${item.url}"><button type="button" class="media-del-btn" data-idx="${idx}"><i class="ri-close-line"></i></button>`;
+        div.innerHTML = `<img src="${item.url}"><button type="button" class="media-del-btn" data-index="${index}"><i class="ri-close-line"></i></button>`;
         list.appendChild(div);
     });
 
     list.querySelectorAll('.media-del-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            const idx = parseInt(e.currentTarget.dataset.idx);
-            removeFile(idx);
+            const index = parseInt(e.currentTarget.dataset.index);
+            removeFile(index);
         });
     });
 
     document.getElementById('fileCount').innerText = fileList.length;
 }
 
-function removeFile(idx) {
-    fileList.splice(idx, 1);
+function removeFile(index) {
+    fileList.splice(index, 1);
     renderFileList();
 }
-
 
 function initTagInput() {
     const input = document.getElementById('tagInput');
@@ -137,108 +142,34 @@ function addTag(text) {
 function renderTags() {
     const container = document.getElementById('tagContainer');
     container.innerHTML = '';
-    tagList.forEach((tag, idx) => {
+    tagList.forEach((tag, index) => {
         const span = document.createElement('span');
         span.className = 'tag-badge';
         span.innerText = '#' + tag;
-        span.addEventListener('click', () => removeTag(idx));
+        span.addEventListener('click', () => removeTag(index));
         container.appendChild(span);
     });
 }
 
-function removeTag(idx) {
-    tagList.splice(idx, 1);
+function removeTag(index) {
+    tagList.splice(index, 1);
     renderTags();
 }
 
-function initPoll() {
-    const btnPoll = document.getElementById('btnPoll');
-    const btnAddOption = document.querySelector('.btn-add-option');
-    const btnClosePoll = document.querySelector('.btn-close-poll');
-
-    if(btnPoll) btnPoll.addEventListener('click', togglePoll);
-    if(btnAddOption) btnAddOption.addEventListener('click', addPollOption);
-    if(btnClosePoll) btnClosePoll.addEventListener('click', togglePoll);
-
-    renderPollOptions(); 
-}
-
-function togglePoll() {
-    const section = document.getElementById('pollSection');
-    const btn = document.getElementById('btnPoll');
-    
-    if (section.style.display === 'none') {
-        section.style.display = 'block';
-        btn.classList.add('active');
-        section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } else {
-        section.style.display = 'none';
-        btn.classList.remove('active');
-    }
-}
-
-function addPollOption() {
-    if (pollOptions.length >= 10) {
-        showToast('투표 항목은 최대 10개까지 가능해요');
-        return;
-    }
-    pollOptions.push('');
-    renderPollOptions();
-}
-
-function renderPollOptions() {
-    const container = document.getElementById('pollOptionContainer');
-    if(!container) return;
-    container.innerHTML = '';
-
-    pollOptions.forEach((val, idx) => {
-        const div = document.createElement('div');
-        div.className = 'poll-option-item';
-        let html = `<input type="text" class="poll-input" value="${val}" placeholder="항목 ${idx + 1}" data-idx="${idx}">`;
-        if (pollOptions.length > 2) {
-            html += `<button type="button" class="btn-del-option" data-idx="${idx}"><i class="ri-close-line"></i></button>`;
-        }
-        div.innerHTML = html;
-        container.appendChild(div);
-    });
-
-    container.querySelectorAll('.poll-input').forEach(input => {
-        input.addEventListener('input', (e) => {
-            const idx = parseInt(e.target.dataset.idx);
-            pollOptions[idx] = e.target.value;
-        });
-    });
-
-    container.querySelectorAll('.btn-del-option').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const idx = parseInt(e.currentTarget.dataset.idx);
-            removePollOption(idx);
-        });
-    });
-}
-
-function removePollOption(idx) {
-    if (pollOptions.length <= 2) return;
-    pollOptions.splice(idx, 1);
-    renderPollOptions();
-}
-
-
-window.setLocation = function(name, addr, lat, lng) {
-    // Hidden Fields 저장
+window.setLocation = function(name, address, lat, lng) {
     document.getElementById('placeName').value = name;
-    document.getElementById('address').value = addr;
+    document.getElementById('address').value = address;
     document.getElementById('latitude').value = lat;
     document.getElementById('longitude').value = lng;
 
     document.getElementById('displayPlaceName').innerText = name;
-    document.getElementById('displayAddress').innerText = addr;
+    document.getElementById('displayAddress').innerText = address;
 
     const card = document.getElementById('locationCard');
     const btn = document.getElementById('btnLocation');
     
     card.style.display = 'flex';
-    btn.classList.add('active');
+    if(btn) btn.classList.add('active');
     card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 };
 
@@ -249,15 +180,21 @@ window.removeLocation = function() {
     document.getElementById('longitude').value = '';
 
     document.getElementById('locationCard').style.display = 'none';
-    document.getElementById('btnLocation').classList.remove('active');
+    const btn = document.getElementById('btnLocation');
+    if(btn) btn.classList.remove('active');
 }
 
 document.querySelector('.btn-del-loc')?.addEventListener('click', window.removeLocation);
 
-
 function sendPost() {
     const subject = document.getElementById('subject').value.trim();
     const content = document.getElementById('content').value.trim();
+    const categoryElement = document.querySelector('input[name="category"]:checked');
+
+    if (!categoryElement) {
+        showToast('카테고리를 선택해주세요');
+        return;
+    }
 
     if (!subject || !content) {
         showToast('제목과 내용을 모두 입력해주세요');
@@ -265,28 +202,17 @@ function sendPost() {
     }
 
     const dto = {
-        category: document.querySelector('input[name="category"]:checked').value,
+        category: categoryElement.value,
         subject: subject,
         content: content,
-        visibility: document.querySelector('input[name="visibility"]:checked').value,
         tags: tagList,
         placeName: document.getElementById('placeName').value || null,
         address: document.getElementById('address').value || null,
         latitude: document.getElementById('latitude').value ? parseFloat(document.getElementById('latitude').value) : null,
-        longitude: document.getElementById('longitude').value ? parseFloat(document.getElementById('longitude').value) : null,
-        pollTitle: document.getElementById('pollTitle').value,
-        pollOptions: pollOptions.filter(o => o.trim()),
-        pollEndDate: document.getElementById('pollEndDate').value,
-        pollMulti: document.getElementById('pollMulti').checked,
-        pollAnonymous: document.getElementById('pollAnonymous').checked
+        longitude: document.getElementById('longitude').value ? parseFloat(document.getElementById('longitude').value) : null
     };
 
-    if (dto.pollTitle && dto.pollOptions.length < 2) {
-        showToast('투표 항목을 2개 이상 입력해주세요');
-        return;
-    }
-
-    const ctx = document.querySelector('meta[name="contextPath"]')?.content || '';
+    const contextPath = document.querySelector('meta[name="contextPath"]')?.content || '';
     const formData = new FormData();
     formData.append('dto', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
     
@@ -294,39 +220,39 @@ function sendPost() {
         formData.append('uploadFiles', item.file);
     });
 
-    const btns = document.querySelectorAll('.btn-submit, .btn-submit-full');
-    btns.forEach(b => {
-        b.disabled = true;
-        b.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> 등록 중...';
+    const buttons = document.querySelectorAll('.btn-submit, .btn-submit-full');
+    buttons.forEach(btn => {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> 등록 중...';
     });
 
-    fetch(ctx + '/api/community', {
+    fetch(contextPath + '/api/community', {
         method: 'POST',
         body: formData
     })
-    .then(res => res.json())
+    .then(response => response.json())
     .then(data => {
         if (data.status === "true") {
             showToast(data.message);
-            setTimeout(() => { location.href = ctx + '/community/list'; }, 800);
+            setTimeout(() => { location.href = contextPath + '/community/list'; }, 800);
         } else {
             throw new Error(data.message || '등록 실패');
         }
     })
-    .catch(err => {
-        showToast(err.message || '등록에 실패했어요.');
-        btns.forEach(b => {
-            b.disabled = false;
-            b.innerText = '등록';
+    .catch(error => {
+        showToast(error.message || '등록에 실패했어요.');
+        buttons.forEach(btn => {
+            btn.disabled = false;
+            btn.innerText = '등록';
         });
     });
 }
 
-function showToast(msg) {
+function showToast(message) {
     const container = document.getElementById('toastContainer');
     const div = document.createElement('div');
     div.className = 'toast';
-    div.innerHTML = `<i class="ri-notification-badge-fill"></i> ${msg}`;
+    div.innerHTML = `<i class="ri-notification-badge-fill"></i> ${message}`;
     container.appendChild(div);
     setTimeout(() => div.remove(), 3000);
 }

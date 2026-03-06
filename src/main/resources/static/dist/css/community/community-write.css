@@ -1,8 +1,6 @@
 @charset "UTF-8";
 
-@import
-	url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap')
-	;
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
 	--primary: #8A63FF;
@@ -49,7 +47,7 @@ body {
 	background: var(--surface);
 	border-radius: var(--radius-lg);
 	box-shadow: var(--shadow-sm);
-	min-height: 800px;
+	min-height: 600px;
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
@@ -98,22 +96,6 @@ body {
 .editor-header-right {
 	display: flex;
 	gap: 8px;
-}
-
-.btn-temp-save {
-	padding: 8px 16px;
-	border: 1px solid var(--border);
-	background: white;
-	color: var(--text-2);
-	border-radius: 8px;
-	font-size: 14px;
-	font-weight: 500;
-	cursor: pointer;
-	transition: var(--transition);
-}
-
-.btn-temp-save:hover {
-	background: var(--surface-2);
 }
 
 .btn-submit {
@@ -337,100 +319,6 @@ body {
 	color: #ff4d4d;
 }
 
-.poll-section {
-	background: var(--surface-2);
-	border-radius: 16px;
-	padding: 20px;
-	border: 1px solid var(--border);
-}
-
-.poll-header {
-	display: flex;
-	justify-content: space-between;
-	margin-bottom: 16px;
-}
-
-.poll-header h3 {
-	margin: 0;
-	font-size: 16px;
-	color: var(--text-1);
-}
-
-.btn-close-poll {
-	background: none;
-	border: none;
-	font-size: 18px;
-	color: var(--text-3);
-	cursor: pointer;
-}
-
-.poll-body {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-}
-
-.poll-title-input, .poll-option-item input {
-	width: 100%;
-	padding: 12px;
-	border: 1px solid var(--border);
-	border-radius: 8px;
-	outline: none;
-	font-size: 14px;
-	box-sizing: border-box;
-}
-
-.poll-option-item {
-	display: flex;
-	gap: 8px;
-}
-
-.poll-option-item button {
-	background: white;
-	border: 1px solid var(--border);
-	color: var(--danger);
-	width: 44px;
-	border-radius: 8px;
-	cursor: pointer;
-}
-
-.btn-add-option {
-	padding: 10px;
-	background: white;
-	border: 1px dashed var(--border-focus);
-	color: var(--primary);
-	border-radius: 8px;
-	font-weight: 600;
-	cursor: pointer;
-}
-
-.poll-settings {
-	display: flex;
-	gap: 16px;
-	margin-top: 8px;
-}
-
-.poll-settings label {
-	font-size: 13px;
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	cursor: pointer;
-}
-
-.poll-date {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	font-size: 13px;
-}
-
-.poll-date input {
-	border: 1px solid var(--border);
-	padding: 6px;
-	border-radius: 6px;
-}
-
 .location-card {
 	display: flex;
 	align-items: center;
@@ -555,68 +443,6 @@ body {
 	margin-bottom: 8px;
 }
 
-.visibility-options {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-}
-
-.vis-option {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	padding: 12px;
-	border: 1px solid var(--border);
-	border-radius: 12px;
-	cursor: pointer;
-	transition: 0.2s;
-}
-
-.vis-option:hover {
-	background: var(--surface-2);
-}
-
-.vis-option input {
-	display: none;
-}
-
-.vis-option input:checked+.vis-icon {
-	background: var(--primary);
-	color: white;
-}
-
-.vis-option input:checked ~ .vis-text strong {
-	color: var(--primary);
-}
-
-.vis-icon {
-	width: 36px;
-	height: 36px;
-	background: var(--surface-2);
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: var(--text-3);
-	font-size: 18px;
-}
-
-.vis-text {
-	display: flex;
-	flex-direction: column;
-}
-
-.vis-text strong {
-	font-size: 14px;
-	color: var(--text-1);
-}
-
-.vis-text small {
-	font-size: 12px;
-	color: var(--text-3);
-}
-
-/* --- [NEW] 장소 검색 모달 스타일 --- */
 .place-modal-overlay {
 	position: fixed;
 	top: 0;
@@ -643,16 +469,11 @@ body {
 	animation: slideUp 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-@keyframes slideUp {from { transform:translateY(20px);
-	opacity: 0;
+@keyframes slideUp {
+	from { transform:translateY(20px); opacity: 0; }
+	to { transform: translateY(0); opacity: 1; }
 }
 
-to {
-	transform: translateY(0);
-	opacity: 1;
-}
-
-}
 .place-modal-header {
 	display: flex;
 	justify-content: space-between;
