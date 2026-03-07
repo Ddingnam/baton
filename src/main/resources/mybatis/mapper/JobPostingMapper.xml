@@ -2,55 +2,37 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.JobPostingMapper">
 
-	<insert id="insertPosting"
-		parameterType="com.sp.app.model.JobPosting">
+	<insert id="insertPosting" parameterType="com.sp.app.model.JobPosting">
+    <selectKey keyProperty="postingIdx" resultType="long" order="BEFORE">
+        SELECT seq_job_posting.NEXTVAL FROM dual
+    </selectKey>
 
-		<selectKey keyProperty="postingIdx" resultType="long"
-			order="BEFORE">
-			SELECT seq_job_posting.NEXTVAL FROM dual
-		</selectKey>
-
-		INSERT INTO job_posting (
-		posting_idx,
-		title,
-		employer,
-		description,
-		pay,
-		pay_type,
-		work_period,
-		work_days,
-		start_time,
-		end_time,
-		time_negotiable,
-		location,
-		contact,
-		benefits,
-		user_idx,
-		region_idx,
-		category,
-		created_date
-		)
-		VALUES (
-		#{postingIdx},
-		#{title},
-		#{employer},
-		#{description},
-		#{pay},
-		#{payType},
-		#{workPeriod},
-		#{workDays},
-		#{startTime},
-		#{endTime},
-		#{timeNegotiable},
-		#{location},
-		#{contact},
-		#{benefits},
-		#{userIdx},
-		#{regionIdx},
-		#{category},
-		SYSDATE
-		)
-	</insert>
+    INSERT INTO job_posting (
+        posting_idx,  title, employer, description, pay, pay_type,
+        work_period, work_days, start_time, end_time, time_negotiable,
+        location, contact, benefits, user_idx, region_idx, category, created_date
+    )
+    VALUES (
+        #{postingIdx}, #{title},
+        #{employer},
+        #{description, jdbcType=CLOB},
+        #{pay},
+        #{payType},
+        #{workPeriod},
+        #{workDays},
+        #{startTime, jdbcType=VARCHAR},
+        #{endTime, jdbcType=VARCHAR},
+        #{timeNegotiable, jdbcType=VARCHAR},
+        #{location},
+        #{contact, jdbcType=VARCHAR},
+        #{benefits, jdbcType=VARCHAR},
+        #{userIdx},
+        #{regionIdx},
+        #{category},
+        SYSDATE
+    )
+</insert>
+	
 
 	<insert id="insertPostingImage">
 		INSERT INTO job_posting_image(

@@ -54,5 +54,5 @@ public class JobPosting {
     
     private String thumbUrl;
    
-    private List<String> imageList;
+    private List<JobPostingImage> imageList; 
 }

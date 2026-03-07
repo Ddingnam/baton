@@ -13,152 +13,166 @@
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/alba/alba-article.css">
+<style>
+  html { scroll-behavior: smooth; }
+</style>
 </head>
 <body>
 
 <jsp:include page="/WEB-INF/views/layout/header.jsp" />
 
-<main class="daangn-layout">
+<main class="albamon-layout">
 
-    <section class="gallery-section">
-        <div class="main-image-wrap">
-            <c:choose>
-                <c:when test="${not empty imageList}">
-                    <img id="mainImage" src="${pageContext.request.contextPath}${imageList[0].imgUrl}" alt="${dto.title}">
-                </c:when>
-
-                <c:otherwise>
-                    <div class="no-image-placeholder"><i class="ri-store-2-line"></i></div>
-                </c:otherwise>
-            </c:choose>
-
-            <c:if test="${dto.recruitStatus == '모집완료'}">
-                <div class="status-overlay">
-                    <span class="status-overlay-badge">모집완료</span>
-                </div>
+    <header class="detail-recruit-header">
+        <h1 class="recruit-title">
+            ${dto.title}
+            <span class="status-text ${dto.recruitStatus == '모집완료' ? 'closed' : 'open'}">${dto.recruitStatus}</span>
+        </h1>
+        <div class="recruit-company">
+            <span>${dto.employer}</span>
+        </div>
+        
+        <div class="recruit-chips">
+            <span class="chip">근로계약서작성</span>
+            <span class="chip">초보가능</span>
+            <span class="chip">빠른연락가능</span>
+            <c:if test="${not empty tagList}">
+                <c:forEach var="tag" items="${tagList}">
+                    <span class="chip">${tag}</span>
+                </c:forEach>
             </c:if>
         </div>
+    </header>
 
-        <c:if test="${not empty imageList && imageList.size() > 1}">
-            <div class="image-indicators">
-                <c:forEach var="item" items="${imageList}" varStatus="st">
-                    <button type="button" class="indicator-dot ${st.index == 0 ? 'active' : ''}"
-                            onclick="Gallery.selectThumb(${st.index})"></button>
-                </c:forEach>
-            </div>
-        </c:if>
-    </section>
+    <div class="tabs-header-wrap" id="tabMenu">
+        <ul class="tabs-header-container">
+            <li class="tab-item active" onclick="scrollToSection('section-conditions', this)">근무조건</li>
+            <li class="tab-item" onclick="scrollToSection('section-description', this)">상세요강</li>
+            <li class="tab-item" onclick="scrollToSection('section-company', this)">기업정보</li>
+        </ul>
+    </div>
 
     <div class="content-container">
 
+        <section id="section-conditions" class="scroll-section" style="padding-top: 20px;">
+            <div class="summary-section">
+                <div class="pay-highlight">
+                    <span class="pay-label">급여</span>
+                    <strong class="pay-type">${dto.payType}</strong>
+                    <strong class="pay-amount"><fmt:formatNumber value="${dto.pay}" pattern="#,###"/>원</strong>
+                </div>
 
-
-        <section class="article-header">
-            <div class="badges">
-                <span class="badge category-badge">${dto.categoryName}</span>
-                <span class="badge status-badge">${dto.recruitStatus}</span>
+                <ul class="summary-list">
+                    <li>
+                        <i class="ri-calendar-check-line"></i>
+                        <div class="summary-text">
+                            <span class="label">근무기간</span>
+                            <span class="value">${dto.workPeriod}</span>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="ri-calendar-event-line"></i>
+                        <div class="summary-text">
+                            <span class="label">근무요일</span>
+                            <span class="value">${dto.workDays}</span>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="ri-time-line"></i>
+                        <div class="summary-text">
+                            <span class="label">근무시간</span>
+                            <span class="value">${dto.workTime} <c:if test="${dto.timeNegotiable == 'Y'}"><span class="nego">(협의가능)</span></c:if></span>
+                        </div>
+                    </li>
+                </ul>
             </div>
-            <h1 class="article-title">${dto.title}</h1>
-            <div class="article-meta">등록일 ${dto.createdDate}</div>
-        </section>
 
-        <section class="conditions-section">
-            <h2 class="section-title">근무 조건</h2>
-            <div class="condition-grid">
-
-                <div class="cond-item pay-highlight">
-                    <div class="cond-icon"><i class="ri-money-cny-circle-fill"></i></div>
-                    <div class="cond-text">
-                        <span class="label">급여</span>
-                        <span class="value navy-text">
-                            ${dto.wageType} <fmt:formatNumber value="${dto.wage}" pattern="#,###"/>원
-                        </span>
-                    </div>
-                </div>
-
-                <div class="cond-item">
-                    <div class="cond-icon"><i class="ri-calendar-event-line"></i></div>
-                    <div class="cond-text">
-                        <span class="label">근무기간 / 요일</span>
-                        <span class="value">${dto.workPeriod} · ${dto.workDays}</span>
-                    </div>
-                </div>
-
-                <div class="cond-item">
-                    <div class="cond-icon"><i class="ri-time-line"></i></div>
-                    <div class="cond-text">
-                        <span class="label">근무시간</span>
-                        <span class="value">
-                            ${dto.workHours}
-                            <c:if test="${dto.timeNegotiable == 'Y'}"> (시간협의)</c:if>
-                        </span>
-                    </div>
-                </div>
-
+            <div class="detail-table-section">
+                <h2 class="section-title">상세 근무조건</h2>
+                <table class="detail-table">
+                    <tbody>
+                        <tr>
+                            <th>모집분야</th>
+                            <td>${dto.category}</td>
+                        </tr>
+                        <tr>
+                            <th>모집상태</th>
+                            <td>${dto.recruitStatus}</td>
+                        </tr>
+                        <c:if test="${not empty dto.location}">
+                        <tr>
+                            <th>근무지역</th>
+                            <td>
+                                ${dto.location} ${dto.locationDetail}
+                                <button type="button" class="btn-copy-mini" onclick="copyAddress('${dto.location} ${dto.locationDetail}')">주소복사</button>
+                            </td>
+                        </tr>
+                        </c:if>
+                    </tbody>
+                </table>
             </div>
         </section>
 
-        <section class="trust-badges-section">
-            <h2 class="section-title">안심할 수 있는 일자리에요</h2>
-            <ul class="trust-list">
-                <li><i class="ri-check-double-line"></i><span>알바 인증 완료</span></li>
-                <li><i class="ri-file-paper-2-line"></i><span>근로계약서 작성 약속</span></li>
-                <li><i class="ri-shield-check-line"></i><span>4대 사회보험 가입</span></li>
-            </ul>
-        </section>
+        <div class="divider"></div>
 
-        <section class="description-section">
-            <h2 class="section-title">상세 요강</h2>
-            <p class="article-text">${dto.content}</p>
-
-            <c:if test="${not empty tagList}">
-                <div class="tag-list">
-                    <c:forEach var="tag" items="${tagList}">
-                        <span class="tag-chip">#${tag}</span>
-                    </c:forEach>
+        <section id="section-description" class="scroll-section">
+            <h2 class="section-title">상세 모집요강</h2>
+            
+            <c:if test="${not empty imageList}">
+                <div class="gallery-section-inner">
+                    <div class="main-image-wrap">
+                        <img id="mainImage" src="${pageContext.request.contextPath}${imageList[0].imgUrl}" alt="${dto.title}">
+                    </div>
+                    <c:if test="${imageList.size() > 1}">
+                        <div class="image-indicators">
+                            <c:forEach var="item" items="${imageList}" varStatus="st">
+                                <button type="button" class="indicator-dot ${st.index == 0 ? 'active' : ''}"
+                                        onclick="Gallery.selectThumb(${st.index})"></button>
+                            </c:forEach>
+                        </div>
+                    </c:if>
                 </div>
             </c:if>
 
+            <div class="article-text">${dto.description}</div>
+
             <div class="article-stats">
-                <span>조회 ${dto.hitCount}</span> · <span>관심 ${dto.likeCount}</span> · <span>지원 ${dto.chatCount}</span>
+                <span><i class="ri-eye-line"></i> 조회 ${dto.hitCount}</span>
+                <span><i class="ri-heart-3-line"></i> 관심 ${dto.likeCount}</span>
+                <span><i class="ri-message-3-line"></i> 지원 ${dto.chatCount}</span>
             </div>
         </section>
 
-        <c:if test="${not empty dto.workPlace}">
-            <section class="location-section">
-                <h2 class="section-title">근무 지역</h2>
-                <div class="location-box">
-                    <i class="ri-map-pin-2-fill"></i>
-                    <span class="address-text">${dto.workPlace}</span>
-                    <button class="btn-copy" onclick="copyAddress('${dto.workPlace}')">복사</button>
+        <div class="divider"></div>
+
+        <section id="section-company" class="scroll-section">
+            <h2 class="section-title">기업 정보</h2>
+            <section class="safety-warning albamon-warning">
+                <div class="warning-icon"><i class="ri-shield-star-fill"></i></div>
+                <div class="warning-text">
+                    <strong>안심하고 지원하세요!</strong>
+                    <p>채권추심 고액알바 및 통장, 비밀번호 요구는 보이스피싱 사기 범죄일 수 있습니다. 가담 시 사기방조죄로 처벌받을 수 있으니 절대 응하지 마세요.</p>
                 </div>
             </section>
-        </c:if>
-
-        <section class="safety-warning">
-            <div class="warning-header">
-                <i class="ri-error-warning-fill"></i> 지원 전 주의사항
-            </div>
-            <p><strong>채권추심 고액알바 및 통장, 비밀번호 요구</strong>는 보이스피싱 사기 범죄일 수 있습니다. 가담 시 사기방조죄로 처벌받을 수 있으니 절대 응하지 마세요.</p>
         </section>
 
         <sec:authorize access="isAuthenticated()">
             <sec:authentication property="principal.member.userIdx" var="loggedInUserId" />
             <c:if test="${loggedInUserId == dto.userIdx}">
                 <section class="owner-manage-section">
-                    <h2 class="section-title">내 공고 관리</h2>
+                    <h2 class="section-title" style="border:none; margin-bottom:10px;">내 공고 관리</h2>
                     <div class="manage-grid">
                         <button type="button" class="btn-manage" onclick="StatusModule.open()">
                             <i class="ri-loop-left-line"></i> 상태 변경
                         </button>
-                        <button type="button" class="btn-manage" onclick="PullUpModule.execute(${dto.albaIdx})">
+                        <button type="button" class="btn-manage" onclick="PullUpModule.execute(${dto.postingIdx})">
                             <i class="ri-arrow-up-circle-line"></i> 끌어올리기
                         </button>
                         <button type="button" class="btn-manage"
                                 onclick="location.href='${pageContext.request.contextPath}/alba/update?postingIdx=${dto.postingIdx}&page=${page}'">
                             <i class="ri-edit-line"></i> 수정
                         </button>
-                        <button type="button" class="btn-manage danger" onclick="confirmDelete(${dto.albaIdx})">
+                        <button type="button" class="btn-manage danger" onclick="confirmDelete(${dto.postingIdx})">
                             <i class="ri-delete-bin-line"></i> 삭제
                         </button>
                     </div>
@@ -177,72 +191,59 @@
             </button>
         </div>
         <div class="bottom-right">
-
             <sec:authorize access="isAnonymous()">
-                <button class="btn-action btn-call" onclick="location.href='tel:${dto.tel}'">
+                <button class="btn-action btn-call" onclick="location.href='tel:${dto.contact}'">
                     <i class="ri-phone-fill"></i> 전화/문자
                 </button>
-                <button class="btn-action btn-apply"
-                        onclick="location.href='${pageContext.request.contextPath}/member/login'">
-                    온라인 지원
-                </button>
+                <button class="btn-action btn-apply" onclick="location.href='${pageContext.request.contextPath}/member/login'">온라인 지원</button>
             </sec:authorize>
-
             <sec:authorize access="isAuthenticated()">
                 <c:choose>
                     <c:when test="${loggedInUserId == dto.userIdx}">
-                        <button class="btn-action btn-apply full-width"
-                                onclick="window.open('${pageContext.request.contextPath}/chat/albaList?albaIdx=${dto.albaIdx}', 'chatList', 'width=450,height=850')">
-                            지원 내역 보기 (${dto.chatCount})
-                        </button>
+                        <button class="btn-action btn-apply full-width" onclick="window.open('${pageContext.request.contextPath}/chat/albaList?albaIdx=${dto.postingIdx}', 'chatList', 'width=450,height=850')">지원 내역 보기 (${dto.chatCount})</button>
                     </c:when>
                     <c:when test="${dto.recruitStatus == '모집완료'}">
                         <button class="btn-action btn-apply disabled full-width" disabled>모집이 완료되었습니다</button>
                     </c:when>
                     <c:otherwise>
-                        <button class="btn-action btn-call" onclick="location.href='tel:${dto.tel}'">
-                            <i class="ri-phone-fill"></i> 전화/문자
-                        </button>
-                        <button class="btn-action btn-apply"
-                                onclick="window.open('${pageContext.request.contextPath}/chat/room?albaIdx=${dto.albaIdx}&toUserIdx=${dto.userIdx}', 'chatRoom', 'width=450,height=850')">
-                            온라인 지원
-                        </button>
+                        <button class="btn-action btn-call" onclick="location.href='tel:${dto.contact}'"><i class="ri-phone-fill"></i> 전화/문자</button>
+                        <button class="btn-action btn-apply" onclick="window.open('${pageContext.request.contextPath}/chat/room?albaIdx=${dto.postingIdx}&toUserIdx=${dto.userIdx}', 'chatRoom', 'width=450,height=850')">온라인 지원</button>
                     </c:otherwise>
                 </c:choose>
             </sec:authorize>
-
         </div>
     </div>
 </div>
 
 <div id="statusModal" class="modal-overlay" onclick="StatusModule.close()">
     <div class="modal-content" onclick="event.stopPropagation()">
-        <div class="modal-header">
-            <h3>모집 상태 변경</h3>
-            <button type="button" class="close-modal" onclick="StatusModule.close()">
-                <i class="ri-close-line"></i>
-            </button>
-        </div>
+        <div class="modal-header"><h3>모집 상태 변경</h3><button type="button" class="close-modal" onclick="StatusModule.close()"><i class="ri-close-line"></i></button></div>
         <div class="status-options">
-            <button type="button"
-                    class="status-opt ${dto.recruitStatus == '모집중'   ? 'active' : ''}"
-                    onclick="StatusModule.update('${dto.albaIdx}', '모집중')">모집중</button>
-            <button type="button"
-                    class="status-opt ${dto.recruitStatus == '모집완료' ? 'active' : ''}"
-                    onclick="StatusModule.update('${dto.albaIdx}', '모집완료')">모집완료</button>
+            <button type="button" class="status-opt ${dto.recruitStatus == '모집중' ? 'active' : ''}" onclick="StatusModule.update('${dto.postingIdx}', '모집중')">모집중</button>
+            <button type="button" class="status-opt ${dto.recruitStatus == '모집완료' ? 'active' : ''}" onclick="StatusModule.update('${dto.postingIdx}', '모집완료')">모집완료</button>
         </div>
     </div>
 </div>
 
 <div class="toast" id="toast"></div>
-
-<div id="articleData"
-     data-alba-idx="${dto.albaIdx}"
-     data-wished="${isWished}"
-     style="display:none"></div>
+<div id="articleData" data-alba-idx="${dto.postingIdx}" data-wished="${isWished}" style="display:none"></div>
 
 <script>
   const CONTEXT_PATH = "${pageContext.request.contextPath}";
+  
+  function scrollToSection(id, element) {
+      const el = document.getElementById(id);
+      if(el) {
+          const headerOffset = 110;
+          const elementPosition = el.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+          
+          window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+          
+          document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
+          element.classList.add('active');
+      }
+  }
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/alba/alba-article.js"></script>
 </body>
