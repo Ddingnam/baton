@@ -3,13 +3,51 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.TradeMapper">
 
+	<sql id="where-condition">
+		<where>
+			p.tradeStatus NOT IN ('숨기기', '임시저장')
+			
+			<if test="available == 'true'">
+				AND p.tradeStatus NOT IN ('판매완료', '예약중')
+			</if>
+			
+			<if test="priceMin != null and priceMin != ''">
+				AND p.price &gt;= #{priceMin}
+			</if>
+			
+			<if test="priceMax != null and priceMax != ''">
+				AND p.price &lt;= #{priceMax}
+			</if>
+		
+			<if test="userRegionIdx != null">
+				AND p.regionIdx = #{userRegionIdx}
+			</if>
+			
+			<if test="keyword != null and keyword != ''">
+				AND (
+					p.title LIKE '%' || #{keyword} || '%' 
+					OR p.content LIKE '%' || #{keyword} || '%'
+					OR EXISTS (
+						SELECT 1 FROM productTag pt
+						JOIN tag t ON pt.tagIdx = t.tagIdx
+						WHERE pt.productIdx = p.productIdx AND t.tagName = #{keyword}
+					)
+				)
+			</if>
+			
+			<if test="categoryIdx != null and categoryIdx != ''">
+				AND p.categoryIdx = #{categoryIdx}
+			</if>
+		</where>
+	</sql>
+
 	<insert id="insertTradePost" parameterType="com.sp.app.model.Trade">
 		<selectKey keyProperty="productIdx" resultType="long" order="BEFORE">
 	        SELECT seq_product.NEXTVAL FROM DUAL
 	    </selectKey>
-		INSERT INTO product(productIdx, title, content, price, shippingFee, userIdx, tradeType, 
+		INSERT INTO product(productIdx, title, content, price, shippingFee, userIdx, tradeStatus, tradeType, 
 			tradePlace, regionIdx, productStatus, categoryIdx)
-		VALUES(#{productIdx}, #{title, jdbcType=VARCHAR}, #{content, jdbcType=VARCHAR}, #{price}, #{shippingFee}, #{userIdx}, #{tradeType, jdbcType=VARCHAR},
+		VALUES(#{productIdx}, #{title, jdbcType=VARCHAR}, #{content, jdbcType=VARCHAR}, #{price}, #{shippingFee}, #{userIdx}, #{tradeStatus, jdbcType=VARCHAR}, #{tradeType, jdbcType=VARCHAR},
 			#{tradePlace, jdbcType=VARCHAR}, #{regionIdx}, #{productStatus, jdbcType=VARCHAR}, #{categoryIdx, jdbcType=VARCHAR})
 	</insert>
 	
@@ -45,6 +83,14 @@
 	    FROM product p
 	    JOIN users u ON p.userIdx = u.userIdx
 	    LEFT JOIN region r ON p.regionIdx = r.regionIdx  WHERE p.productIdx = #{productIdx}
+	</select>
+	
+	<select id="findTempTradeByUserIdx" parameterType="long" resultType="com.sp.app.model.Trade">
+		SELECT * FROM (
+			SELECT * FROM product 
+			WHERE userIdx = #{userIdx} AND tradeStatus = '임시저장'
+			ORDER BY updatedDate DESC
+		) WHERE ROWNUM = 1
 	</select>
 	
 	<select id="findImagesByIdx" parameterType="long" resultType="com.sp.app.model.TradeImg">
@@ -83,43 +129,7 @@
 	                
 	            FROM product p
 	            LEFT JOIN region r ON p.regionIdx = r.regionIdx 
-	            <where>
-				    p.tradeStatus != '숨기기'
-    
-				    <if test="available == 'true'">
-				        AND p.tradeStatus NOT IN ('판매완료', '예약중')
-				    </if>
-				    
-				    <if test="priceMin != null and priceMin != ''">
-				        AND p.price &gt;= #{priceMin}
-				    </if>
-				    
-				    <if test="priceMax != null and priceMax != ''">
-				        AND p.price &lt;= #{priceMax}
-				    </if>
-				
-				    <if test="userRegionIdx != null">
-				        AND p.regionIdx = #{userRegionIdx}
-				    </if>
-				    
-				    <if test="keyword != null and keyword != ''">
-				        AND (
-				            p.title LIKE '%' || #{keyword} || '%' 
-				            OR p.content LIKE '%' || #{keyword} || '%'
-				            OR EXISTS (
-				                SELECT 1 
-				                FROM productTag pt
-				                JOIN tag t ON pt.tagIdx = t.tagIdx
-				                WHERE pt.productIdx = p.productIdx 
-				                AND t.tagName = #{keyword}
-				            )
-				        )
-				    </if>
-				    
-				    <if test="categoryIdx != null and categoryIdx != ''">
-				        AND p.categoryIdx = #{categoryIdx}
-				    </if>
-				</where>
+	            <include refid="where-condition"/>
 	            <choose>
 	                <when test="sort == 'lowPrice'">
 	                    ORDER BY p.price ASC
@@ -147,42 +157,7 @@
 	<select id="dataCount" parameterType="map" resultType="int">
 	    SELECT COUNT(*) 
 	    FROM product p
-	    <where>
-			p.tradeStatus != '숨기기'
-    
-		    <if test="available == 'true'">
-		        AND p.tradeStatus NOT IN ('판매완료', '예약중')
-		    </if>
-		    <if test="priceMin != null and priceMin != ''">
-		        AND p.price &gt;= #{priceMin}
-		    </if>
-		    
-		    <if test="priceMax != null and priceMax != ''">
-		        AND p.price &lt;= #{priceMax}
-		    </if>
-		
-		    <if test="userRegionIdx != null">
-		        AND p.regionIdx = #{userRegionIdx}
-		    </if>
-		    
-		    <if test="keyword != null and keyword != ''">
-		        AND (
-		            p.title LIKE '%' || #{keyword} || '%' 
-		            OR p.content LIKE '%' || #{keyword} || '%'
-		            OR EXISTS (
-		                SELECT 1 
-		                FROM productTag pt
-		                JOIN tag t ON pt.tagIdx = t.tagIdx
-		                WHERE pt.productIdx = p.productIdx 
-		                AND t.tagName = #{keyword}
-		            )
-		        )
-		    </if>
-		    
-		    <if test="categoryIdx != null and categoryIdx != ''">
-		        AND p.categoryIdx = #{categoryIdx}
-		    </if>
-		</where>
+	    <include refid="where-condition"/>
 	</select>
 	
 	<update id="updateHitCount">
@@ -191,7 +166,7 @@
 	
 	<update id="updateTradePost">
 		UPDATE product SET title = #{title}, content = #{content}, price = #{price}, shippingFee = #{shippingFee},
-			tradeType = #{tradeType}, tradePlace = #{tradePlace}, productStatus = #{productStatus},
+			tradeStatus = #{tradeStatus}, tradeType = #{tradeType}, tradePlace = #{tradePlace}, productStatus = #{productStatus},
 			categoryIdx = #{categoryIdx}, updatedDate = SYSDATE
 		WHERE productIdx = #{productIdx}
 	</update>

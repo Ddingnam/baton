@@ -311,5 +311,32 @@ public class TradeServiceImpl implements TradeService {
 		}
 		
 	}
+
+	@Override
+	public void saveTradePost(Trade dto, String uploadPath) throws Exception {
+		Trade temp = mapper.findTempTradeByUserIdx(dto.getUserIdx());
+
+	    if ("임시저장".equals(dto.getTradeStatus()) && temp != null) {
+	        dto.setProductIdx(temp.getProductIdx());
+	    }
+
+	    if (dto.getProductIdx() == 0) {
+	        this.insertTradePost(dto, uploadPath);
+	    } else {
+	        this.updateTradePost(dto, uploadPath);
+	    }
+		
+	}
+
+	@Override
+	public Trade findTempTradeByUserIdx(long UserIdx) {
+		Trade dto = null;
+		try {
+			dto = mapper.findTempTradeByUserIdx(UserIdx);
+		} catch (Exception e) {
+			log.info("findTempTradeByUserIdx : ", e);
+		}
+		return dto;
+	}
 	
 }

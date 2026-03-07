@@ -11,11 +11,13 @@ public interface TradeService {
 	public void insertTradePost(Trade dto, String uploadPath) throws Exception;
 	public void updateTradePost(Trade dto, String uploadPath) throws Exception;
 	public void deleteTradePost(long productIdx, String uploadPath) throws Exception;
+	public void saveTradePost(Trade dto, String uploadPath) throws Exception;
 	public void updateHitCount(long productIdx) throws Exception;
 	public void updateTradeStatus(long productIdx, String tradeStatus) throws Exception;
 	public void updateLastUpDate(long productIdx) throws SQLException;
 	
 	public Trade findByIdx(long productIdx);
+	public Trade findTempTradeByUserIdx(long UserIdx);
 	public List<TradeImg> findImgsByIdx(long productIdx);
 	public List<String> findTagsByIdx(long productIdx);
 	

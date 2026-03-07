@@ -246,7 +246,31 @@ input[readonly] {
 
 #tagInput { border: none !important; box-shadow: none !important; flex: 1; min-width: 100px; background: transparent; }
 
-.submit-container { position: sticky; top: 96px; }
+.submit-container {
+    position: sticky;
+    top: 96px;
+    display: flex;
+    flex-direction: column;
+}
+
+.temp-submit-btn {
+    width: 100%;
+    padding: 20px;
+    background: var(--text-sub);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    margin-bottom: 12px;
+}
+
+.temp-submit-btn:hover {
+    background: #5a6066;
+    transform: translateY(-1px);
+}
 
 .submit-btn {
     width: 100%; padding: 20px; background: var(--primary); color: white; border: none;

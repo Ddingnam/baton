@@ -157,8 +157,13 @@
 						    <input type="text" name="tradePlace" id="locationInput" placeholder="예) 강남역 1번 출구 앞" value="${trade.tradePlace}">
 						</div>
                     </div>
-
-                    <button type="button" class="submit-btn" onclick="submitForm()">${mode=='update' ? '수정 완료하기' : '게시글 등록하기'}</button>
+					<c:if test="${mode != 'update'}">
+						<button type="button" class="temp-submit-btn" onclick="submitForm('임시저장')">임시저장</button>
+                    </c:if>
+                    <button type="button" class="submit-btn" 
+					    onclick="submitForm('${not empty trade.tradeStatus ? trade.tradeStatus : '판매중'}')">
+					    ${mode=='update' ? '수정 완료하기' : '게시글 등록하기'}
+					</button>
                     <button type="button" class="cancel-btn" onclick="history.back()">취소</button>
                 </div>
             </div>
@@ -168,6 +173,8 @@
 		    <input type="hidden" name="productIdx" value="${trade.productIdx}">
 		</c:if>
 		<input type="hidden" name="mode" value="${mode}">
+		<input type="hidden" name="tradeStatus" id="tradeStatus" value="${not empty trade.tradeStatus ? trade.tradeStatus : '판매중'}">
+		<input type="hidden" id="tempProductIdx" value="${tempProductIdx}">
     </form>
 </div>
 <script src="${pageContext.request.contextPath}/dist/js/trade/trade-write.js"></script>

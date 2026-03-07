@@ -124,10 +124,21 @@ public class TradeController {
 	}
 	
 	@GetMapping("write")
-	public String writeForm(Model model) {
-		List<Map<String, Object>> categoryList = service.categoryList();
-	    model.addAttribute("categoryList", categoryList);
-		model.addAttribute("mode", "write");
+	public String writeForm(Model model,
+			@AuthenticationPrincipal CustomUserDetails userDetails) {
+		try {
+			List<Map<String, Object>> categoryList = service.categoryList();
+		    model.addAttribute("categoryList", categoryList);
+			model.addAttribute("mode", "write");
+			
+			Trade dto = service.findTempTradeByUserIdx((userDetails.getMember().getUserIdx()));
+	        if (dto != null) {
+	            model.addAttribute("tempProductIdx", dto.getProductIdx());
+	        }
+			
+		} catch (Exception e) {
+			log.info("writeForm : ", e);
+		}
 		
 		return "trade/write";
 	}
@@ -136,10 +147,9 @@ public class TradeController {
 	public String writeSubmit(Trade dto, 
 			@AuthenticationPrincipal CustomUserDetails userDetails) throws Exception{
 		try {
-			if (userDetails != null) {
-	            dto.setUserIdx(userDetails.getUserIdx());
-	        }
-			service.insertTradePost(dto, uploadPath);
+			dto.setUserIdx(userDetails.getUserIdx());
+
+			service.saveTradePost(dto, uploadPath);
 		} catch (Exception e) {
 			log.info("writeSubmit : ", e);
 		}
