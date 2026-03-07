@@ -59,7 +59,7 @@ public class CommunityApiController {
 
 			dto.setMemberIdx(info.getUserIdx());
 			dto.setWriterNickname(info.getName());
-			dto.setSelectFiles(uploadFiles);
+			dto.setUploadFiles(uploadFiles);
 
 			String root = session.getServletContext().getRealPath("/");
 			String path = root + "uploads" + File.separator + "community";
@@ -136,7 +136,7 @@ public class CommunityApiController {
             }
 
             dto.setId(id);
-            dto.setSelectFiles(uploadFiles);
+            dto.setUploadFiles(uploadFiles);
             
             communityService.updateCommunity(dto, uploadPath);
             

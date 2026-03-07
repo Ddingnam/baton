@@ -31,7 +31,7 @@ public class CommunityDto {
     private Double latitude;
     private Double longitude;
     
-    private List<MultipartFile> selectFiles;
+    private List<MultipartFile> uploadFiles;
     
     private List<String> imageFiles;
     private List<String> tags;

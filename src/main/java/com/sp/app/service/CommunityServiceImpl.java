@@ -69,7 +69,7 @@ public class CommunityServiceImpl implements CommunityService {
 				}
 			}
 
-			List<MultipartFile> files = dto.getSelectFiles();
+			List<MultipartFile> files = dto.getUploadFiles();
 			if (files != null && !files.isEmpty()) {
 				for (MultipartFile mf : files) {
 					if(mf.isEmpty()) continue;
@@ -162,7 +162,7 @@ public class CommunityServiceImpl implements CommunityService {
 			community.setPlaceName(dto.getPlaceName());
 			community.setAddress(dto.getAddress());
 
-			List<MultipartFile> files = dto.getSelectFiles();
+			List<MultipartFile> files = dto.getUploadFiles();
 			if (files != null && !files.isEmpty()) {
 				for (MultipartFile mf : files) {
 					if(mf.isEmpty()) continue;

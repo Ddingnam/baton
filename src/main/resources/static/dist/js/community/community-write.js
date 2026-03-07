@@ -229,7 +229,7 @@ function addPollOption() {
 	const div = document.createElement('div');
 	div.className = 'poll-option-item';
 	div.innerHTML = `
-	        <input type="text" name="pollOption" placeholder="항목 ${count}" class="input-option" autocomplete="off">
+	        <input type="text" name="pollOptions" placeholder="항목 ${count}" class="input-option" autocomplete="off">
 	        <button type="button" class="btn-del-option" onclick="this.parentElement.remove()">
 	            <i class="ri-close-line"></i>
 	        </button>
@@ -246,122 +246,83 @@ function addPollOption() {
 	});
 }
 
-function sendPost() {
-	const subject = document.getElementById('subject').value.trim();
-	const content = document.getElementById('content').value.trim();
-	const categoryElement = document.querySelector('input[name="category"]:checked');
+function sendOk() {
+    const f = document.communityForm;
+    const subject = f.subject.value.trim();
+    const content = f.content.value.trim();
+    
+    const categoryElement = document.querySelector('input[name="category"]:checked');
+    if (!categoryElement) {
+        showToast('카테고리를 선택해주세요');
+        return;
+    }
 
-	if (!categoryElement) {
-		showToast('카테고리를 선택해주세요');
-		return;
-	}
+    if (!subject) {
+        showToast('제목을 입력해주세요');
+        f.subject.focus();
+        return;
+    }
+    if (!content) {
+        showToast('내용을 입력해주세요');
+        f.content.focus();
+        return;
+    }
 
-	if (!subject || !content) {
-		showToast('제목과 내용을 모두 입력해주세요');
-		return;
-	}
+    const usePoll = document.getElementById('chkPollToggle');
+    if (usePoll && usePoll.checked) {
+        const pollTitle = document.getElementById('pollTitle').value.trim();
+        if (!pollTitle) {
+            showToast('투표 제목을 입력해주세요.');
+            return;
+        }
 
-	let pollTitle = null;
-	let pollOptions = [];
-	let pollEndDate = null;
-	let pollMultiple = false;
-	let pollAnonymous = false;
+        const pollInputs = document.querySelectorAll('input[name="pollOptions"]');
+        let validOptionCount = 0;
+        pollInputs.forEach(input => {
+            if(input.value.trim() !== "") validOptionCount++;
+        });
 
-	const usePoll = document.getElementById('chkPollToggle')?.checked;
+        if (validOptionCount < 2) {
+            showToast('투표 항목은 최소 2개 이상 입력해야 합니다.');
+            return;
+        }
+        
+        const pollEndDate = document.getElementById('pollEndDate').value;
+        if(!pollEndDate) {
+            showToast('투표 종료일을 선택해주세요.');
+            return;
+        }
+    } else {
+        const pollArea = document.getElementById('pollForm');
+        if(pollArea) {
+            const inputs = pollArea.querySelectorAll('input');
+            inputs.forEach(input => input.disabled = true);
+        }
+    }
 
-	if (usePoll) {
-		pollTitle = document.getElementById('pollTitle').value.trim();
-		if (!pollTitle) {
-			showToast('투표 제목을 입력해주세요.');
-			return;
-		}
+	const dataTransfer = new DataTransfer();
+	fileList.forEach(obj => dataTransfer.items.add(obj.file));
+	    
+	const fileInput = document.querySelector('input[name="uploadFiles"]');
+	fileInput.files = dataTransfer.files;
 
-		document.querySelectorAll('input[name="pollOption"]').forEach(input => {
-			if (input.value.trim()) pollOptions.push(input.value.trim());
-		});
+    const oldTags = f.querySelectorAll('input[name="tags"]');
+    oldTags.forEach(t => t.remove());
+    
+    tagList.forEach(tag => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'tags'; 
+        input.value = tag;
+        f.appendChild(input);
+    });
 
-		if (pollOptions.length < 2) {
-			showToast('투표 항목은 최소 2개 이상이어야 합니다.');
-			return;
-		}
+    
+    const contextPath = document.querySelector('meta[name="contextPath"]').getAttribute('content');
+    const mode = f.mode.value;
 
-		pollEndDate = document.getElementById('pollEndDate').value;
-		pollMultiple = document.getElementById('pollMultiple').checked;
-		pollAnonymous = document.getElementById('pollAnonymous').checked;
-	}
-
-	const dto = {
-		category: categoryElement.value,
-		subject: subject,
-		content: content,
-		tags: tagList,
-		placeName: document.getElementById('placeName').value || null,
-		address: document.getElementById('address').value || null,
-		latitude: document.getElementById('latitude').value ? parseFloat(document.getElementById('latitude').value) : null,
-		longitude: document.getElementById('longitude').value ? parseFloat(document.getElementById('longitude').value) : null,
-		pollTitle: pollTitle,
-		pollOptions: pollOptions,
-		pollEndDate: pollEndDate,
-		pollMultiple: pollMultiple,
-		pollAnonymous: pollAnonymous
-	};
-
-	const contextPath = document.querySelector('meta[name="contextPath"]')?.content || '';
-
-	const csrfMeta = document.querySelector('meta[name="_csrf"]');
-	const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
-	const csrfToken = csrfMeta ? csrfMeta.content : null;
-	const csrfHeader = csrfHeaderMeta ? csrfHeaderMeta.content : null;
-
-	const formData = new FormData();
-	formData.append('dto', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
-
-	fileList.forEach(item => {
-		formData.append('uploadFiles', item.file);
-	});
-
-	const buttons = document.querySelectorAll('.btn-submit, .btn-submit-full');
-	buttons.forEach(btn => {
-		btn.disabled = true;
-		const originalText = btn.innerText;
-		btn.dataset.originalText = originalText;
-		btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> 등록 중...';
-	});
-
-	const requestOptions = {
-		method: 'POST',
-		body: formData
-	};
-
-	if (csrfToken && csrfHeader) {
-		requestOptions.headers = {
-			[csrfHeader]: csrfToken
-		};
-	}
-
-	fetch(contextPath + '/api/community', requestOptions)
-		.then(response => {
-			if (!response.ok) {
-				throw new Error('Network response was not ok');
-			}
-			return response.json();
-		})
-		.then(data => {
-			if (data.status === "true") {
-				showToast(data.message);
-				setTimeout(() => { location.href = contextPath + '/community/list'; }, 800);
-			} else {
-				throw new Error(data.message || '등록 실패');
-			}
-		})
-		.catch(error => {
-			console.error(error);
-			showToast(error.message || '등록에 실패했어요.');
-			buttons.forEach(btn => {
-				btn.disabled = false;
-				btn.innerHTML = btn.dataset.originalText || '등록';
-			});
-		});
+    f.action = contextPath + "/community/" + mode;
+    f.submit();
 }
 
 function showToast(message) {

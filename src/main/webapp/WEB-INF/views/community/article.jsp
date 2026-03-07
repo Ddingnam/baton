@@ -149,10 +149,27 @@
 
 <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 
-<script>
+<script> 
+    $(function(){
+        var mapContainer = document.getElementById('map'); 
+        if(mapContainer && mapContainer.getAttribute('data-lat')) {
+            var lat = mapContainer.getAttribute('data-lat');
+            var lng = mapContainer.getAttribute('data-lng');
+            
+            var mapOption = { 
+                center: new kakao.maps.LatLng(lat, lng), 
+                level: 3 
+            };
+            var map = new kakao.maps.Map(mapContainer, mapOption); 
+            var marker = new kakao.maps.Marker({ position: new kakao.maps.LatLng(lat, lng) });
+            marker.setMap(map);
+        }
+    });
+    
+
     const contextPath = "${pageContext.request.contextPath}";
     const communityId = "${dto.id}";
-    const currentMemberIdx = "${sessionScope.member.userIdx}"; 
+    const currentMemberIdx = "${sessionScope.member.userIdx}";
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/community/community-article.js"></script>
 

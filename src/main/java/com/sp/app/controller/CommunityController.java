@@ -1,5 +1,6 @@
 package com.sp.app.controller;
 
+import java.io.File;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.service.CommunityService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -103,13 +105,18 @@ public class CommunityController {
     }
 
     @PostMapping("write")
-    public String writeSubmit(CommunityDto dto, @SessionAttribute("member") SessionInfo info) throws Exception {
+    public String writeSubmit(CommunityDto dto, HttpSession session) throws Exception {
+        SessionInfo info = (SessionInfo) session.getAttribute("member");
+
+        dto.setMemberIdx(info.getUserIdx());
+        dto.setWriterNickname(info.getName());
+
         try {
-            dto.setMemberIdx(info.getUserIdx());
             service.insertCommunity(dto, uploadPath);
         } catch (Exception e) {
-            log.info("writeSubmit : ", e);
+            log.error("writeSubmit error", e);
         }
+
         return "redirect:/community/list";
     }
 
@@ -151,6 +158,55 @@ public class CommunityController {
             return "redirect:/community/list?" + query;
         }
     }
+    
+ 	@GetMapping("update")
+ 	public String updateForm(@RequestParam("id") long id,
+ 			@RequestParam("page") String page,
+ 			@SessionAttribute("member") SessionInfo info,
+ 			Model model) throws Exception {
+ 		
+ 		CommunityDto dto = service.getCommunity(id);
+ 		if (dto == null || !dto.getMemberIdx().equals(info.getUserIdx())) {
+ 			return "redirect:/community/list?page=" + page;
+ 		}
+
+ 		model.addAttribute("mode", "update");
+ 		model.addAttribute("page", page);
+ 		model.addAttribute("dto", dto);
+ 		
+ 		model.addAttribute("kakaoMapKey", kakaoMapKey); 
+
+ 		return "community/write";
+ 	}
+
+ 	@PostMapping("update")
+ 	public String updateSubmit(CommunityDto dto,
+ 			@RequestParam("page") String page,
+ 			@SessionAttribute("member") SessionInfo info) throws Exception {
+
+ 		try {
+ 			dto.setMemberIdx(info.getUserIdx());
+ 			service.updateCommunity(dto, uploadPath);
+ 		} catch (Exception e) {
+ 			e.printStackTrace();
+ 		}
+
+ 		return "redirect:/community/article/" + dto.getId() + "?page=" + page;
+ 	}
+
+ 	@GetMapping("delete")
+ 	public String delete(@RequestParam("id") long id,
+ 			@RequestParam("page") String page,
+ 			@SessionAttribute("member") SessionInfo info) throws Exception {
+
+ 		try {
+ 			service.deleteCommunity(id, uploadPath);
+ 		} catch (Exception e) {
+ 			e.printStackTrace();
+ 		}
+
+ 		return "redirect:/community/list?page=" + page;
+ 	}
     
     @PostMapping("like")
     public ResponseEntity<?> like(@RequestParam("id") long id, @SessionAttribute("member") SessionInfo info) {
