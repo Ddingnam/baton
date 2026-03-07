@@ -29,7 +29,7 @@
 				<div class="pb-left">
 					<div class="pb-avatar"><i class="ri-user-smile-fill"></i></div>
 					<div class="pb-info">
-						<h2 class="pb-name">${sessionScope.member.userName != null ? sessionScope.member.userName : '박바통'} 님</h2>
+						<h2 class="pb-name">${sessionScope.member.name != null ? sessionScope.member.name : '박바통'} 님</h2>
 						<span class="pb-desc">서초4동 · 매너온도 <strong class="theme-text">36.5℃</strong></span>
 						<div class="manner-bar-wrap">
 							<div class="manner-bar-bg">

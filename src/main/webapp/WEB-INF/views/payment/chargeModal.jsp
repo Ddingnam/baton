@@ -4,7 +4,7 @@
 <input type="hidden" id="ctxPath" value="${pageContext.request.contextPath}">
 <input type="hidden" id="userEmail" value="${sessionScope.member.email}">
 <input type="hidden" id="userName" value="${sessionScope.member.name}">
-<input type="hidden" id="userTel" value="${sessionScope.member.tel}">
+<input type="hidden" id="userTel" value="">
 <input type="hidden" id="userIdx" value="${sessionScope.member.userIdx}">
 
 <div id="chargeModalOverlay" class="baton-modal-overlay">
