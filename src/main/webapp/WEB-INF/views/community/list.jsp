@@ -82,7 +82,7 @@
             </c:if>
 
             <c:forEach var="dto" items="${list}" varStatus="vs">
-                <a href="${pageContext.request.contextPath}/community/article?id=${dto.id}&page=${page}" class="cm-item-card" style="animation-delay: ${vs.index * 0.05}s">
+                <a href="${pageContext.request.contextPath}/community/article/${dto.id}?page=${page}" class="cm-item-card" style="animation-delay: ${vs.index * 0.05}s">
                     <div class="card-visual ${empty dto.imageFiles ? 'no-image' : ''}">
                         <c:choose>
                             <c:when test="${not empty dto.imageFiles}">
