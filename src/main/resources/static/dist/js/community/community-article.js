@@ -59,8 +59,6 @@ function formatPollDate() {
 function initPoll() {
     const pollSection = document.getElementById('pollSection');
     if (!pollSection) return;
-
-
 }
 
 function toggleLike(id) {
@@ -69,8 +67,10 @@ function toggleLike(id) {
         return;
     }
 
-    fetch(`${contextPath}/api/community/${id}/like`, {
-        method: 'POST'
+    fetch(`${contextPath}/community/like`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `id=${id}`
     })
     .then(resp => resp.json())
     .then(data => {
@@ -96,8 +96,10 @@ function toggleScrap(id) {
         return;
     }
 
-    fetch(`${contextPath}/api/community/${id}/scrap`, {
-        method: 'POST'
+    fetch(`${contextPath}/community/scrap`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `id=${id}`
     })
     .then(resp => resp.json())
     .then(data => {
@@ -130,7 +132,7 @@ document.addEventListener('click', (e) => {
 
 function deleteArticle(id) {
     if(confirm('정말 삭제하시겠습니까?')) {
-        location.href = `${contextPath}/community/delete?id=${id}`;
+        location.href = `${contextPath}/community/delete?id=${id}&page=${currentPage}`;
     }
 }
 

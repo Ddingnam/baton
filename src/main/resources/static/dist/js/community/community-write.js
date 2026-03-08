@@ -18,11 +18,18 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (chkPoll && pollForm) {
 		chkPoll.addEventListener('change', (e) => {
 			if (e.target.checked) {
-				pollForm.classList.add('active');
+				pollForm.style.display = 'block';
+				setTimeout(() => pollForm.classList.add('active'), 10);
 			} else {
 				pollForm.classList.remove('active');
+				setTimeout(() => pollForm.style.display = 'none', 300);
 			}
 		});
+		
+		if (chkPoll.checked) {
+            pollForm.style.display = 'block';
+            pollForm.classList.add('active');
+        }
 	}
 
 	const dateInput = document.getElementById('pollEndDate');
@@ -30,6 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (dateInput) {
 		const today = new Date().toISOString().split('T')[0];
 		dateInput.setAttribute('min', today);
+
+        if(dateInput.value) {
+            dateDisplay.innerText = dateInput.value + ' 마감';
+            dateDisplay.style.color = 'var(--primary)';
+            dateDisplay.style.fontWeight = 'bold';
+        }
 
 		dateInput.addEventListener('change', function() {
 			if (this.value) {

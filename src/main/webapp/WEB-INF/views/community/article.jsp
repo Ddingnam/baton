@@ -40,10 +40,10 @@
                 <c:if test="${sessionScope.member.userIdx == dto.memberIdx}">
                     <div class="more-btn-wrapper">
                         <button type="button" class="btn-more" onclick="toggleMenu()">
-                            <i class="ri-more-fill"></i>
+                             <i class="ri-more-fill"></i>
                         </button>
                         <div class="dropdown-menu" id="dropdownMenu">
-                            <button type="button" onclick="location.href='${pageContext.request.contextPath}/community/update?id=${dto.id}'">수정</button>
+                            <button type="button" onclick="location.href='${pageContext.request.contextPath}/community/update?id=${dto.id}&page=${page}'">수정</button>
                             <button type="button" class="danger" onclick="deleteArticle('${dto.id}')">삭제</button>
                         </div>
                     </div>
@@ -150,26 +150,10 @@
 <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 
 <script> 
-    $(function(){
-        var mapContainer = document.getElementById('map'); 
-        if(mapContainer && mapContainer.getAttribute('data-lat')) {
-            var lat = mapContainer.getAttribute('data-lat');
-            var lng = mapContainer.getAttribute('data-lng');
-            
-            var mapOption = { 
-                center: new kakao.maps.LatLng(lat, lng), 
-                level: 3 
-            };
-            var map = new kakao.maps.Map(mapContainer, mapOption); 
-            var marker = new kakao.maps.Marker({ position: new kakao.maps.LatLng(lat, lng) });
-            marker.setMap(map);
-        }
-    });
-    
-
     const contextPath = "${pageContext.request.contextPath}";
     const communityId = "${dto.id}";
     const currentMemberIdx = "${sessionScope.member.userIdx}";
+    const currentPage = "${page}";
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/community/community-article.js"></script>
 
