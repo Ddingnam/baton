@@ -1,4 +1,4 @@
-package com.sp.app.controller; // 프로젝트 경로에 맞게 수정해 주세요.
+package com.sp.app.controller;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,6 +75,12 @@ public class EscrowController {
         }
 
         try {
+        	int tradeCount = escrowService.checkTradeExist(productIdx);
+            if (tradeCount > 0) {
+                mav.setViewName("redirect:/"); 
+                return mav;
+            }
+            
             Trade trade = tradeService.findByIdx(productIdx); 
 
             int price = trade.getPrice();
@@ -120,6 +126,33 @@ public class EscrowController {
             
             model.put("state", "false");
             model.put("message", "발송 처리에 실패했습니다. 다시 시도해 주세요.");
+        }
+        
+        return model;
+    }
+    
+    @PostMapping("/confirm")
+    @ResponseBody
+    public Map<String, Object> confirmPurchase(
+            @RequestParam("productIdx") long productIdx,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        
+        Map<String, Object> model = new HashMap<>();
+        
+        if (userDetails == null) {
+            model.put("state", "false");
+            model.put("message", "로그인이 필요합니다.");
+            return model;
+        }
+        
+        try {
+            escrowService.confirmPurchase(productIdx, userDetails.getUserIdx());
+            model.put("state", "true");
+            model.put("message", "구매가 확정되었습니다. 판매자에게 정산이 완료되었습니다!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.put("state", "false");
+            model.put("message", e.getMessage());
         }
         
         return model;

@@ -73,4 +73,38 @@
 	        tradeStatus = 'SHIPPING',  shippingDate = SYSDATE     WHERE productIdx = #{productIdx} 
 	      AND sellerIdx = #{sellerIdx} 
 	</update>
+	
+	<select id="getTradeTransactionByProduct" parameterType="long" resultType="map">
+	    SELECT TRADEIDX, PRODUCTIDX, BUYERIDX, SELLERIDX, 
+	           TRADEPRICE, SAFETYFEE, TOTALUSED_POINT, TRADESTATUS
+	    FROM TRADETRANSACTION
+	    WHERE PRODUCTIDX = #{productIdx}
+	</select>
+	
+	<update id="confirmTradeStatus" parameterType="long">
+	    UPDATE TRADETRANSACTION
+	    SET TRADESTATUS = 'CONFIRMED'
+	    WHERE PRODUCTIDX = #{productIdx} AND TRADESTATUS = 'SHIPPING'
+	</update>
+	
+	<update id="addSellerPoint" parameterType="map">
+	    UPDATE USERS
+	    SET BATONPOINT = BATONPOINT + #{settlementAmount}
+	    WHERE USERIDX = #{sellerIdx}
+	</update>
+	
+	<insert id="insertPointHistoryForSeller" parameterType="map">
+	    INSERT INTO POINTHISTORY (
+	        HISTORYIDX, TRADEIDX, AMOUNT, HISTORYTYPE, USERIDX, TOTALPOINT, CREATEDAT
+	    ) VALUES (
+	        SEQPOINTHISTORY.NEXTVAL, #{tradeIdx}, #{settlementAmount}, 'SETTLEMENT_ESCROW', #{sellerIdx}, #{totalPoint}, SYSTIMESTAMP
+	    )
+	</insert>
+	
+	<select id="checkTradeExist" parameterType="long" resultType="int">
+	    SELECT COUNT(*) 
+	    FROM TRADETRANSACTION 
+	    WHERE PRODUCTIDX = #{productIdx}
+	</select>
+	
 </mapper>

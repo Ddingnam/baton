@@ -33,6 +33,7 @@ public class TradeController {
 	private final TradeService service;
 	private final StorageService storageService;
 	private final MyUtil myUtil;
+	private final com.sp.app.service.EscrowService escrowService;
 	
 	@Value("${file.upload-root}/trade")
     private String uploadPath;
@@ -111,6 +112,9 @@ public class TradeController {
 	            isLiked = service.isUserLiked(productIdx, userDetails.getMember().getUserIdx());
 	        }
 			
+	        Map<String, Object> escrowInfo = escrowService.getTradeTransaction(productIdx);
+	        model.addAttribute("escrowInfo", escrowInfo);
+	        
 			model.addAttribute("trade", dto);
 			model.addAttribute("imageList", imageList);
 			model.addAttribute("tagList", tagList);

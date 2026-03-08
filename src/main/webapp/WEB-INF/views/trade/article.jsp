@@ -269,32 +269,80 @@
 			        <sec:authentication property="principal.member.userIdx" var="loggedInUserId" />
 			        
 			        <c:choose>
-			            <c:when test="${loggedInUserId == trade.userIdx}">
-			                <button class="chat-btn"
-			                    onclick="window.open('${pageContext.request.contextPath}/chat/tradeList?tradeIdx=${trade.productIdx}', 'chatList', 'width=450, height=850, left=200, top=100, scrollbars=no, resizable=yes')">
-			                    채팅 내역 확인하기
-			                </button>
-			                <button class="pay-btn" style="margin-top: 10px;"
-						        onclick="openShippingModal()">
-						        운송장 입력하기
-						    </button>
-			            </c:when>
-			            <c:when test="${trade.tradeStatus == '판매완료'}">
-			                <button class="chat-btn" disabled>판매 완료된 상품입니다</button>
-			            </c:when>
-			            <c:otherwise>
-			                <button class="chat-btn"
-			                    onclick="window.open('${pageContext.request.contextPath}/chat/room?tradeIdx=${trade.productIdx}&toUserIdx=${trade.userIdx}', 'chatRoom', 'width=450, height=850, left=200, top=100, scrollbars=yes, resizable=yes')">
-			                    채팅으로 거래하기
-			                </button>
-			                <c:if test="${trade.price > 0}">
-				                <button class="pay-btn"
-	                            	onclick="location.href='${pageContext.request.contextPath}/escrow/checkout?productIdx=${trade.productIdx}'">
-	                            	<i class="ri-wallet-3-line"></i> 안전 결제하기
-	                        	</button>
-	                        </c:if>
-			            </c:otherwise>
-			        </c:choose>
+					    <c:when test="${loggedInUserId == trade.userIdx}">
+					        <button class="chat-btn"
+					            onclick="window.open('${pageContext.request.contextPath}/chat/tradeList?tradeIdx=${trade.productIdx}', 'chatList', 'width=450, height=850, left=200, top=100, scrollbars=no, resizable=yes')">
+					            채팅 내역 확인하기
+					        </button>
+					
+					        <c:choose>
+					            <c:when test="${not empty escrowInfo and escrowInfo.TRADESTATUS == 'PAY_COMPLETED'}">
+					                <button class="pay-btn" style="margin-top: 10px;" onclick="openShippingModal()">
+					                    운송장 입력하기
+					                </button>
+					            </c:when>
+					            <c:when test="${not empty escrowInfo and escrowInfo.TRADESTATUS == 'SHIPPING'}">
+					                <button class="pay-btn" style="margin-top: 10px;" disabled>
+					                    배송 중 (구매자 확정 대기)
+					                </button>
+					            </c:when>
+					            <c:when test="${not empty escrowInfo and escrowInfo.TRADESTATUS == 'CONFIRMED'}">
+								    <button class="chat-btn" style="margin-top: 10px; cursor: not-allowed;" disabled>
+								        판매 완료된 상품입니다
+								    </button>
+								</c:when>
+					        </c:choose>
+					    </c:when>
+					
+					    <c:when test="${trade.tradeStatus == '판매완료'}">
+					        <button class="chat-btn" disabled>판매 완료된 상품입니다</button>
+					    </c:when>
+					
+					    <c:otherwise>
+					        <button class="chat-btn"
+					            onclick="window.open('${pageContext.request.contextPath}/chat/room?tradeIdx=${trade.productIdx}&toUserIdx=${trade.userIdx}', 'chatRoom', 'width=450, height=850, left=200, top=100, scrollbars=yes, resizable=yes')">
+					            채팅으로 거래하기
+					        </button>
+					
+					        <c:if test="${trade.price > 0}">
+					            <c:choose>
+					                <c:when test="${empty escrowInfo}">
+					                    <button class="pay-btn"
+					                        onclick="location.href='${pageContext.request.contextPath}/escrow/checkout?productIdx=${trade.productIdx}'">
+					                        <i class="ri-wallet-3-line"></i> 안전 결제하기
+					                    </button>
+					                </c:when>
+					
+					                <c:when test="${not empty escrowInfo and escrowInfo.BUYERIDX == loggedInUserId}">
+					                    <c:choose>
+					                        <c:when test="${escrowInfo.TRADESTATUS == 'PAY_COMPLETED'}">
+					                            <button class="pay-btn" style="margin-top: 10px;" disabled>
+					                                판매자의 발송을 대기 중입니다
+					                            </button>
+					                        </c:when>
+					                        <c:when test="${escrowInfo.TRADESTATUS == 'SHIPPING'}">
+					                            <button class="pay-btn" style="margin-top: 10px; background-color: #00C471;"
+					                                onclick="confirmTradePurchase(${trade.productIdx})">
+					                                구매 확정하기
+					                            </button>
+					                        </c:when>
+					                        <c:when test="${escrowInfo.TRADESTATUS == 'CONFIRMED'}">
+					                            <button class="pay-btn" style="margin-top: 10px; background-color: #00C471;" disabled>
+					                                구매 확정 완료
+					                            </button>
+					                        </c:when>
+					                    </c:choose>
+					                </c:when>
+					
+					                <c:otherwise>
+					                    <button class="pay-btn" style="margin-top: 10px; background-color: #999;" disabled>
+					                        다른 사용자가 안전결제를 진행 중입니다
+					                    </button>
+					                </c:otherwise>
+					            </c:choose>
+					        </c:if>
+					    </c:otherwise>
+					</c:choose>
 			
 			        <div class="secondary-actions">
 			            <button class="wish-btn-large ${isLiked ? 'active' : ''}"
@@ -454,6 +502,31 @@ function submitShippingInfo() {
     .catch(error => {
         console.error('Error:', error);
         alert('발송 처리 중 오류가 발생했습니다.');
+    });
+}
+
+function confirmTradePurchase(productIdx) {
+    if(!confirm("물건을 무사히 받으셨나요? 구매 확정 시 판매자에게 돈이 정산되며 환불이 불가능합니다.")) return;
+
+    const params = new URLSearchParams();
+    params.append('productIdx', productIdx);
+
+    fetch('${pageContext.request.contextPath}/escrow/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.state === 'true') {
+            alert(data.message);
+            location.reload(); 
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
     });
 }
 </script>
