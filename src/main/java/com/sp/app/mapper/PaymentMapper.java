@@ -22,4 +22,5 @@ public interface PaymentMapper {
     public void addSellerPoint(Map<String, Object> map) throws Exception;
     public void insertPointHistoryForSeller(Map<String, Object> map) throws Exception;
     public int checkTradeExist(long productIdx) throws Exception;
+    public void updateArticleStatusToSoldOut(long productIdx) throws Exception;
 }

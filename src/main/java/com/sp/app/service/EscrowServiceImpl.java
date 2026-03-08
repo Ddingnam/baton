@@ -89,7 +89,7 @@ public class EscrowServiceImpl implements EscrowService {
             historyMap.put("sellerIdx", sellerIdx);
             historyMap.put("totalPoint", currentPoint);
             paymentMapper.insertPointHistoryForSeller(historyMap);
-
+            paymentMapper.updateArticleStatusToSoldOut(productIdx);
         } catch (Exception e) {
             throw e;
         }

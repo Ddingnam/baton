@@ -107,4 +107,9 @@
 	    WHERE PRODUCTIDX = #{productIdx}
 	</select>
 	
+	<update id="updateArticleStatusToSoldOut" parameterType="long">
+	    UPDATE TRADE 
+	    SET TRADESTATUS = '판매완료'
+	    WHERE PRODUCTIDX = #{productIdx}
+	</update>
 </mapper>
