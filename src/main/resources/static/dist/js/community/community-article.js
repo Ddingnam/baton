@@ -1,5 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-    initMap();
+    try {
+        initMap();
+    } catch (e) {
+        console.error("Map initialization failed:", e);
+    }
+    
     initPoll();
     loadReplies();
     formatPollDate();
@@ -9,28 +14,38 @@ function initMap() {
     const mapContainer = document.getElementById('map');
     if (!mapContainer) return;
 
-    const lat = mapContainer.dataset.lat;
-    const lng = mapContainer.dataset.lng;
+    const latStr = mapContainer.dataset.lat;
+    const lngStr = mapContainer.dataset.lng;
 
-    const options = {
-        center: new kakao.maps.LatLng(lat, lng),
-        level: 3
-    };
+    if (!latStr || !lngStr) return;
 
-    const map = new kakao.maps.Map(mapContainer, options);
-    
-    // 마커 표시
-    const markerPosition  = new kakao.maps.LatLng(lat, lng); 
-    const marker = new kakao.maps.Marker({
-        position: markerPosition
+    const lat = parseFloat(latStr);
+    const lng = parseFloat(lngStr);
+
+    if (typeof kakao === 'undefined' || !kakao.maps) {
+        console.error("Kakao Maps API is not loaded.");
+        return;
+    }
+
+    kakao.maps.load(() => {
+        const options = {
+            center: new kakao.maps.LatLng(lat, lng),
+            level: 3
+        };
+
+        const map = new kakao.maps.Map(mapContainer, options);
+        
+        const markerPosition  = new kakao.maps.LatLng(lat, lng); 
+        const marker = new kakao.maps.Marker({
+            position: markerPosition
+        });
+        marker.setMap(map);
+        
+        // 지도 확대/축소 및 드래그 막기 (필요시 제거)
+        map.setDraggable(false);
+        map.setZoomable(false);
     });
-    marker.setMap(map);
-    
-    map.setDraggable(false);
-    map.setZoomable(false);
 }
-
-let pollData = null;
 
 function formatPollDate() {
     const el = document.getElementById('pollEndDate');
@@ -120,19 +135,21 @@ function toggleScrap(id) {
 
 function toggleMenu() {
     const menu = document.getElementById('dropdownMenu');
-    menu.classList.toggle('show');
+    if(menu) menu.classList.toggle('show');
 }
 
 document.addEventListener('click', (e) => {
     const wrapper = document.querySelector('.more-btn-wrapper');
     if (wrapper && !wrapper.contains(e.target)) {
-        document.getElementById('dropdownMenu').classList.remove('show');
+        document.getElementById('dropdownMenu')?.classList.remove('show');
     }
 });
 
 function deleteArticle(id) {
     if(confirm('정말 삭제하시겠습니까?')) {
-        location.href = `${contextPath}/community/delete?id=${id}&page=${currentPage}`;
+        // [수정] page 파라미터가 없으면 1로 설정
+        const pageParam = currentPage ? currentPage : '1';
+        location.href = `${contextPath}/community/delete?id=${id}&page=${pageParam}`;
     }
 }
 

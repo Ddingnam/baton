@@ -161,6 +161,8 @@ public class CommunityServiceImpl implements CommunityService {
 			community.setCategory(dto.getCategory());
 			community.setPlaceName(dto.getPlaceName());
 			community.setAddress(dto.getAddress());
+			community.setLatitude(dto.getLatitude());
+			community.setLongitude(dto.getLongitude());
 
 			List<MultipartFile> files = dto.getUploadFiles();
 			if (files != null && !files.isEmpty()) {

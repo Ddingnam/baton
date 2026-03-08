@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/community/community-article.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoMapKey}&libraries=services"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoMapKey}&libraries=services&autoload=false"></script>
 </head>
 <body>
 
@@ -91,7 +91,7 @@
                 </div>
             </c:if>
 
-            <c:if test="${not empty dto.latitude}">
+            <c:if test="${dto.latitude != null && dto.latitude != 0}">
                 <div class="map-card">
                     <div class="map-header">
                         <i class="ri-map-pin-fill"></i>
@@ -100,7 +100,10 @@
                             <span>${dto.address}</span>
                         </div>
                     </div>
-                    <div id="map" class="map-view" data-lat="${dto.latitude}" data-lng="${dto.longitude}"></div>
+                    <div id="map" class="map-view" 
+                         style="width:100%; height:320px; background-color:#f0f0f0; border-radius:12px; margin-top:10px;" 
+                         data-lat="${dto.latitude}" data-lng="${dto.longitude}">
+                    </div>
                 </div>
             </c:if>
 

@@ -6,11 +6,18 @@ document.addEventListener('DOMContentLoaded', () => {
 	initTagInput();
 	initCharCount();
 	initCategoryPills();
-
+	
+	const datePickerBox = document.querySelector('.date-picker-box');
+		if (datePickerBox) {
+	        datePickerBox.addEventListener('click', () => {
+	            document.getElementById('pollEndDate').showPicker();
+	        });
+	    }
+		
 	const submitBtn = document.querySelector('.btn-submit');
 	const submitFullBtn = document.querySelector('.btn-submit-full');
-	if (submitBtn) submitBtn.addEventListener('click', sendPost);
-	if (submitFullBtn) submitFullBtn.addEventListener('click', sendPost);
+	if (submitBtn) submitBtn.addEventListener('click', sendOk);
+	if (submitFullBtn) submitFullBtn.addEventListener('click', sendOk);
 
 	const chkPoll = document.getElementById('chkPollToggle');
 	const pollForm = document.getElementById('pollForm');
@@ -18,16 +25,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (chkPoll && pollForm) {
 		chkPoll.addEventListener('change', (e) => {
 			if (e.target.checked) {
-				pollForm.style.display = 'block';
 				setTimeout(() => pollForm.classList.add('active'), 10);
 			} else {
 				pollForm.classList.remove('active');
-				setTimeout(() => pollForm.style.display = 'none', 300);
 			}
 		});
 		
 		if (chkPoll.checked) {
-            pollForm.style.display = 'block';
             pollForm.classList.add('active');
         }
 	}
@@ -300,11 +304,6 @@ function sendOk() {
             return;
         }
         
-        const pollEndDate = document.getElementById('pollEndDate').value;
-        if(!pollEndDate) {
-            showToast('투표 종료일을 선택해주세요.');
-            return;
-        }
     } else {
         const pollArea = document.getElementById('pollForm');
         if(pollArea) {

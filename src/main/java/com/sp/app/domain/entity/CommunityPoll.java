@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,11 +27,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class CommunityPoll {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "poll_id")
-    private Long pollId;
-
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "poll_seq_gen")
+	@SequenceGenerator(name = "poll_seq_gen", sequenceName = "community_poll_seq", allocationSize = 1)
+	@Column(name = "poll_id")
+	private Long pollId;
+	
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id")
     private Community community;

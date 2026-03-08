@@ -680,6 +680,7 @@ input:checked + .slider:before {
 .poll-card.active {
     max-height: 1000px;
     opacity: 1;
+    overflow: visible;
     padding: 24px;
     padding-top: 10px;
 }
