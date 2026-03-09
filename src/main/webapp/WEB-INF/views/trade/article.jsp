@@ -329,11 +329,15 @@
 											    </button>
 					                        </c:when>
 					                        <c:when test="${escrowInfo.TRADESTATUS == 'SHIPPING'}">
-					                            <button class="pay-btn" style="margin-top: 10px; background-color: #00C471;"
-					                                onclick="confirmTradePurchase(${trade.productIdx})">
-					                                구매 확정하기
-					                            </button>
-					                        </c:when>
+											    <button class="pay-btn" style="margin-top: 10px; background-color: #00C471;"
+											        onclick="confirmTradePurchase(${trade.productIdx})">
+											        구매 확정하기
+											    </button>
+											    <button class="pay-btn" style="margin-top: 10px; background-color: #FF4D4F; border-color: #FF4D4F;"
+											        onclick="requestRefundViaChat(${trade.productIdx}, ${trade.userIdx})">
+											        반품 / 환불 요청하기
+											    </button>
+											</c:when>
 					                        <c:when test="${escrowInfo.TRADESTATUS == 'CONFIRMED'}">
 					                            <button class="pay-btn" style="margin-top: 10px; background-color: #00C471;" disabled>
 					                                구매 확정 완료
@@ -565,6 +569,15 @@ function cancelTrade(productIdx) {
         alert('취소 처리 중 오류가 발생했습니다.');
     });
 } 
+
+
+function requestRefundViaChat(productIdx, sellerIdx) {
+    if(confirm("반품 및 환불은 판매자와의 채팅을 통해 직접 협의해야 합니다.\n판매자와 1:1 채팅을 시작하시겠습니까?")) {
+
+        const url = '${pageContext.request.contextPath}/chat/room?tradeIdx=' + productIdx + '&toUserIdx=' + sellerIdx;
+        window.open(url, 'chatRoom', 'width=450, height=850, left=200, top=100, scrollbars=yes, resizable=yes');
+    }
+}
 </script>
 </body>
 </html>
