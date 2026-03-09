@@ -51,6 +51,7 @@ dependencies {
 	implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl'
 	
 	implementation 'org.springframework.security:spring-security-taglibs'
+	implementation 'org.json:json:20251224'
 }
 
 tasks.named('test') {

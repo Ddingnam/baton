@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.sp.app.common.MyUtil;
 import com.sp.app.common.StorageService;
 import com.sp.app.model.Trade;
+import com.sp.app.model.TradeAiResponse;
 import com.sp.app.model.TradeImg;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.TradeService;
@@ -34,6 +36,7 @@ public class TradeController {
 	private final StorageService storageService;
 	private final MyUtil myUtil;
 	private final com.sp.app.service.EscrowService escrowService;
+	private final com.sp.app.service.TradeAiService tradeAiService;
 	
 	@Value("${file.upload-root}/trade")
     private String uploadPath;
@@ -290,4 +293,31 @@ public class TradeController {
 		
 		return map;
 	}
+	
+	@PostMapping("aigenerate")
+    @ResponseBody
+    public Map<String, Object> aiVisionGenerate(@RequestParam("imageFile") MultipartFile imageFile) {
+        Map<String, Object> model = new HashMap<>();
+        
+        try {
+            if (imageFile == null || imageFile.isEmpty()) {
+                model.put("status", "false");
+                model.put("message", "이미지 파일이 없습니다.");
+                return model;
+            }
+
+            TradeAiResponse response = tradeAiService.analyzeProductImage(imageFile);
+            
+            model.put("status", "success");
+            model.put("title", response.getTitle());
+            model.put("content", response.getContent());
+            
+        } catch (Exception e) {
+            log.info("aiVisionGenerate : ", e);
+            model.put("status", "error");
+            model.put("message", "AI 분석 중 오류가 발생했습니다.");
+        }
+        
+        return model;
+    }
 }

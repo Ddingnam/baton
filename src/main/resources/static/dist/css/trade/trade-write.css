@@ -116,6 +116,13 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
 
 textarea { resize: vertical; min-height: 400px; }
 
+.content-count-wrap {
+    text-align: right;
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
 .free-check-wrapper {
     margin-top: 12px;
     display: flex;
@@ -333,6 +340,66 @@ input[readonly] {
 .submit-btn:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 16px rgba(255,111,15,0.2); }
 
 .cancel-btn { width: 100%; padding: 15px; background: white; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-sub); cursor: pointer; }
+
+.ai-input-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.ai-input-group input {
+    flex: 1;
+}
+
+.ai-magic-btn {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0 16px;
+    height: 48px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.ai-magic-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(110, 142, 251, 0.4);
+}
+
+.ai-magic-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.ai-status-msg {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #6e8efb;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(110, 142, 251, 0.2);
+    border-top: 2px solid #6e8efb;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
 @media (max-width: 992px) {
     .grid-layout { grid-template-columns: 1fr; }

@@ -57,13 +57,21 @@
                     <p class="card-title">상품 정보</p>
                     <div class="field">
                         <label>제목</label>
-                        <input type="text" name="title" id="titleInput" maxlength="50" placeholder="어떤 물건을 파시나요?" value="${trade.title}">
+                        <div class="ai-input-group">
+					        <input type="text" name="title" id="titleInput" maxlength="50" placeholder="어떤 물건을 파시나요?" value="${trade.title}">
+					        <button type="button" id="btnAiAssistant" class="ai-magic-btn">
+					            <i class="ri-magic-line"></i> AI 작성
+					        </button>
+					    </div>
+					    <div id="aiStatus" class="ai-status-msg" style="display: none;">
+					        <span class="ai-spinner"></span> 이미지를 분석하여 AI가 내용을 구성하고 있습니다...
+					    </div>
                     </div>
 
                     <div class="field" style="margin-bottom: 0;">
                         <label>상품 설명</label>
                         <textarea name="content" id="contentInput" placeholder="브랜드, 모델명, 구매 시기, 사용 기간, 하자 여부 등 자세히 작성할수록 빨리 팔려요 😊">${trade.content}</textarea>
-                        <div style="text-align: right; margin-top: 8px; color: var(--text-muted); font-size: 13px;">
+                        <div class="content-count-wrap">
                             <span id="contentCount">0/2000</span>
                         </div>
                     </div>

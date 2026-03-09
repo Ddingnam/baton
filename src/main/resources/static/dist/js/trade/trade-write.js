@@ -1,3 +1,59 @@
+const AiAssistant = (function() {
+
+    async function generateByImage() {
+        const firstFileItem = toggleImage.getFiles()[0]; 
+        
+        if (!firstFileItem) {
+            alert('먼저 상품 사진을 최소 1장 등록해주세요!');
+            return;
+        }
+
+        const btn = document.getElementById('btnAiAssistant');
+        const statusMsg = document.getElementById('aiStatus');
+        
+        btn.disabled = true;
+        statusMsg.style.display = 'flex';
+
+        const formData = new FormData();
+        if (firstFileItem.isExisting) {
+            formData.append("imageUrl", firstFileItem.url);
+        } else {
+            formData.append("imageFile", firstFileItem.file);
+        }
+
+        try {
+            const response = await fetch(`${contextPath}/trade/aigenerate`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                document.getElementById('titleInput').value = data.title;
+                document.getElementById('contentInput').value = data.content;
+                
+                const countSpan = document.getElementById('contentCount');
+                if(countSpan) countSpan.textContent = `${data.content.length}/2000`;
+            } else {
+                alert('이미지 분석에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('AI Vision Error:', error);
+        } finally {
+            btn.disabled = false;
+            statusMsg.style.display = 'none';
+        }
+    }
+
+    return {
+        init: function() {
+            const btn = document.getElementById('btnAiAssistant');
+            if(btn) btn.addEventListener('click', generateByImage);
+        }
+    };
+})();
+
 const toggleImage = (function() {
     let uploadedFiles = [];
     const previewList = document.getElementById('previewList');
@@ -66,7 +122,7 @@ const toggleImage = (function() {
         imgCount.textContent = uploadedFiles.length + '/5';
     }
 
-    return { init, remove, addExisting };
+    return { init, remove, addExisting, getFiles: () => uploadedFiles};
 })();
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -307,6 +363,7 @@ window.onload = function() {
     toggleTag.init();
     PriceFormatter.init();
     MapManager.init();
+	AiAssistant.init();
 
     const urlParams = new URLSearchParams(window.location.search);
     const productIdx = urlParams.get('productIdx');
