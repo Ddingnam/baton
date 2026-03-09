@@ -32,7 +32,14 @@ function initMap() {
         const marker = new kakao.maps.Marker({ position: new kakao.maps.LatLng(lat, lng) });
         marker.setMap(map);
         map.setDraggable(false);
-        map.setZoomable(false);
+        map.setZoomable(true);
+
+        // 클릭 시 카카오맵으로 이동
+        mapContainer.style.cursor = 'pointer';
+        kakao.maps.event.addListener(map, 'click', () => {
+            const placeName = mapContainer.closest('.map-card').querySelector('strong')?.innerText || '';
+            window.open(`https://map.kakao.com/link/map/${encodeURIComponent(placeName)},${lat},${lng}`, '_blank');
+        });
     });
 }
 
