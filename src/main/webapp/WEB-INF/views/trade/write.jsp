@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/trade/trade-write.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+<jsp:include page="/WEB-INF/views/api/api.jsp"/>
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/layout/header.jsp" />
@@ -144,7 +145,7 @@
 						    </div>
 						</div>
 						
-						<div class="field" id="shippingFeeField" style="margin-top: 20px; display: none;">
+						<div class="field" id="shippingFeeField">
 						    <label>배송비</label>
 						    <div class="price-wrap">
 						        <span class="won-sign">₩</span>
@@ -152,11 +153,20 @@
 						    </div>
 						</div>
 						
-						<div class="field" id="locationField" style="margin-top: 20px;">
+						<div class="field" id="locationField">
 						    <label>거래 희망 장소</label>
-						    <input type="text" name="tradePlace" id="locationInput" placeholder="예) 강남역 1번 출구 앞" value="${trade.tradePlace}">
+						    <div class="location-search-wrap">
+						        <input type="text" name="tradePlace" id="locationInput" 
+						               placeholder="예) 강남역 1번 출구 앞, OO빌딩 정문" value="${trade.tradePlace}">
+						    </div>
+                            <div id="map"></div>
+                            <p class="map-info-text"><i class="ri-information-line"></i> 지도를 클릭하여 위치를 표시해주세요.</p>
+                            
+                            <input type="hidden" name="latitude" id="latitude" value="${trade.latitude}">
+                            <input type="hidden" name="longitude" id="longitude" value="${trade.longitude}">
 						</div>
                     </div>
+                    
 					<c:if test="${mode != 'update'}">
 						<button type="button" class="temp-submit-btn" onclick="submitForm('임시저장')">임시저장</button>
                     </c:if>
@@ -177,6 +187,7 @@
 		<input type="hidden" id="tempProductIdx" value="${tempProductIdx}">
     </form>
 </div>
+
 <script src="${pageContext.request.contextPath}/dist/js/trade/trade-write.js"></script>
 <script> const contextPath = '${pageContext.request.contextPath}'; </script>
 </body>

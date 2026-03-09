@@ -32,6 +32,8 @@ public class Trade {
 	private String productStatus;
 	
 	private String tradePlace;
+	private String latitude;
+	private String longitude;
 	private long regionIdx;	
 	private String coreAddress;
 
