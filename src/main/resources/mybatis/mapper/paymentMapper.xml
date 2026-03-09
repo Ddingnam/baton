@@ -75,10 +75,13 @@
 	</update>
 	
 	<select id="getTradeTransactionByProduct" parameterType="long" resultType="map">
-	    SELECT TRADEIDX, PRODUCTIDX, BUYERIDX, SELLERIDX, 
-	           TRADEPRICE, SAFETYFEE, TOTALUSED_POINT, TRADESTATUS
-	    FROM TRADETRANSACTION
-	    WHERE PRODUCTIDX = #{productIdx}
+	    SELECT * FROM (
+	        SELECT TRADEIDX, PRODUCTIDX, BUYERIDX, SELLERIDX, 
+	               TRADEPRICE, SAFETYFEE, TOTALUSED_POINT, TRADESTATUS
+	        FROM TRADETRANSACTION
+	        WHERE PRODUCTIDX = #{productIdx}
+	        ORDER BY TRADEIDX DESC
+	    ) WHERE ROWNUM = 1
 	</select>
 	
 	<update id="confirmTradeStatus" parameterType="long">
@@ -104,11 +107,11 @@
 	<select id="checkTradeExist" parameterType="long" resultType="int">
 	    SELECT COUNT(*) 
 	    FROM TRADETRANSACTION 
-	    WHERE PRODUCTIDX = #{productIdx}
+	    WHERE PRODUCTIDX = #{productIdx} AND TRADESTATUS != 'CANCELED'
 	</select>
 	
 	<update id="updateArticleStatusToSoldOut" parameterType="long">
-	    UPDATE TRADE 
+	    UPDATE PRODUCT 
 	    SET TRADESTATUS = '판매완료'
 	    WHERE PRODUCTIDX = #{productIdx}
 	</update>
@@ -120,7 +123,7 @@
 	</update>
 
 	<update id="updateArticleStatusToOnSale" parameterType="long">
-	    UPDATE TRADE 
+	    UPDATE PRODUCT 
 	    SET TRADESTATUS = '판매중'
 	    WHERE PRODUCTIDX = #{productIdx}
 	</update>
