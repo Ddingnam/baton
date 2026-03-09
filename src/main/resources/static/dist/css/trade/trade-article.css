@@ -464,6 +464,21 @@ background: var(--primary-light); }
     opacity: 1;
 }
 
+#map {
+    width: 100%;
+    height: 300px;
+    margin-top: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+#map {
+    cursor: grab;
+}
+#map:active {
+    cursor: grabbing;
+}
+
 @media (max-width: 992px) {
     .article-layout { grid-template-columns: 1fr; }
     .action-card { position: static; }

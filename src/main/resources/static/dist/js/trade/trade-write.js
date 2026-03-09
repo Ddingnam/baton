@@ -274,13 +274,11 @@ const initDropdown = () => {
     const hiddenInput = document.getElementById('selectedCategory');
     const selectedText = dropdown.querySelector('.selected-text');
 
-    // 클릭 이벤트 (전파 방지 포함)
     selected.addEventListener('click', (e) => {
         e.stopPropagation();
         dropdown.classList.toggle('active');
     });
 
-    // 항목 선택 이벤트
     menu.querySelectorAll('li').forEach(item => {
         item.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -290,16 +288,13 @@ const initDropdown = () => {
             hiddenInput.value = val;
             selectedText.innerText = txt;
 
-            // active 클래스 이동
             menu.querySelectorAll('li').forEach(li => li.classList.remove('active'));
             this.classList.add('active');
 
-            // 메뉴 닫기
             dropdown.classList.remove('active');
         });
     });
 
-    // 외부 클릭 시 닫기
     document.addEventListener('click', (e) => {
         if (!dropdown.contains(e.target)) {
             dropdown.classList.remove('active');

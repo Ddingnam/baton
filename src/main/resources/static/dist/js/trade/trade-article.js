@@ -263,6 +263,46 @@ const PullUpModule = (function () {
     return { execute };
 })();
 
+const MapModule = (function () {
+    function init() {
+        const mapContainer = document.getElementById('map');
+        if (!mapContainer) return;
+		
+		const dataDiv = document.getElementById('articleData');
+		const lat = parseFloat(dataDiv.getAttribute('data-lat'));
+		const lng = parseFloat(dataDiv.getAttribute('data-lng'));
+
+        if (isNaN(lat) || isNaN(lng)) {
+            mapContainer.style.display = 'none';
+            return;
+        }
+
+        const mapOption = {
+            center: new kakao.maps.LatLng(lat, lng),
+            level: 3
+        };
+
+        const map = new kakao.maps.Map(mapContainer, mapOption);
+
+        const markerPosition = new kakao.maps.LatLng(lat, lng);
+        const marker = new kakao.maps.Marker({
+            position: markerPosition
+        });
+        marker.setMap(map);
+
+        map.setDraggable(true);
+        map.setZoomable(true);
+		
+		const zoomControl = new kakao.maps.ControlPosition.RIGHT;
+		map.addControl(new kakao.maps.ZoomControl(), zoomControl);
+		        
+		const mapTypeControl = new kakao.maps.ControlPosition.TOPRIGHT;
+		map.addControl(new kakao.maps.MapTypeControl(), mapTypeControl);
+    }
+
+    return { init };
+})();
+
 function confirmDelete(productIdx) {
     if (confirm('정말 삭제하시겠습니까?\n삭제된 게시글은 복구할 수 없습니다.')) {
         location.href = '/trade/delete?productIdx=' + productIdx;
@@ -272,6 +312,7 @@ function confirmDelete(productIdx) {
 window.addEventListener('DOMContentLoaded', function () {
     Gallery.init();
     Lightbox.init();
+	MapModule.init();
 
     const articleEl   = document.getElementById('articleData');
     if (articleEl) {

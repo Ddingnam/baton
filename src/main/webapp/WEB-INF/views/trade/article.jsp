@@ -14,6 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/trade/trade-article.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+<jsp:include page="/WEB-INF/views/api/api.jsp"/>
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/layout/header.jsp" />
@@ -158,6 +159,7 @@
                         <div class="info-item full-width">
                             <p class="info-label">거래 희망 장소</p>
                             <p class="info-value">📍 ${trade.tradePlace}</p>
+                            <div id="map"></div>
                         </div>
                     </c:if>
                     
@@ -411,6 +413,8 @@
     data-trade-idx="${trade.productIdx}"
     data-wished="${isLiked}"
     data-wish-count="${trade.likeCount}"
+    data-lat="${trade.latitude}"
+    data-lng="${trade.longitude}"
     style="display:none">
 </div>
 
