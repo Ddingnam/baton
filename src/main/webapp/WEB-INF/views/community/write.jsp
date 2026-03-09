@@ -37,15 +37,17 @@
 				<input type="hidden" id="placeName" name="placeName" value="${dto.placeName}">
 
 				<div class="editor-header">
-					<div class="editor-header-left">
-						<button type="button" class="back-btn" onclick="history.back()">
-							<i class="ri-arrow-left-line"></i>
-						</button>
-						<h1 class="page-title">글쓰기</h1>
-					</div>
-					<div class="editor-header-right">
-						<button type="button" class="btn-submit" onclick="sendOk();">${mode=='update'?'수정':'등록'}</button>
-					</div>
+				    <div class="editor-header-left">
+				        <button type="button" class="back-btn" onclick="history.back()">
+				            <i class="ri-arrow-left-line"></i>
+				        </button>
+				        <h1 class="page-title">글쓰기</h1>
+				    </div>
+				    
+				    <div class="editor-header-right" style="display: flex; gap: 8px;">
+				        <button type="button" class="btn-temp-save" onclick="saveTemp();">임시저장</button>
+				        <button type="button" class="btn-submit" onclick="sendOk();">${mode=='update'?'수정':'등록'}</button>
+				    </div>
 				</div>
 
 				<div class="editor-body">
@@ -150,7 +152,10 @@
 							<i class="ri-map-pin-line"></i> <span>위치</span>
 						</button>
 					</div>
-					<button type="button" class="btn-submit-full" onclick="sendOk();">${mode=='update'?'수정하기':'등록하기'}</button>
+					<div class="footer-btns">
+						<button type="button" class="btn-temp-save" onclick="saveTemp();">임시저장</button>
+						<button type="button" class="btn-submit-full" onclick="sendOk();">${mode=='update'?'수정하기':'등록하기'}</button>
+					</div>
 				</div>
 			</form>
 		</div>

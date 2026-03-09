@@ -56,14 +56,19 @@
         </div>
     </section>
 
-    <section class="sec-philosophy reveal-item">
-        <div class="frame">
-            <div class="txt-box">
-                <h2 class="tit-ph">
-                    단순한 거래가 아닙니다.<br>
-                    <span class="txt-black">이웃과의 신뢰</span>입니다.
-                </h2>
-                <p class="desc-ph">
+    <section class="sec-philosophy">
+        <div class="philosophy-sticky">
+            <div class="frame">
+                <div class="ph-scroll-text">
+                    <span class="ph-word" data-index="0">단순한</span>
+                    <span class="ph-word" data-index="1">거래가</span>
+                    <span class="ph-word" data-index="2">아닙니다.</span>
+                    <br>
+                    <span class="ph-word accent" data-index="3">이웃과의</span>
+                    <span class="ph-word accent" data-index="4">신뢰</span>
+                    <span class="ph-word" data-index="5">입니다.</span>
+                </div>
+                <p class="desc-ph ph-desc-reveal">
                     택배 상자 대신 따뜻한 인사를 나눕니다.<br>
                     바톤은 기술을 통해 단절된 지역 사회를 다시 잇고,<br>
                     가장 안전하고 가까운 로컬 라이프스타일 플랫폼을 만듭니다.
@@ -90,22 +95,46 @@
                     <h2>취미로 하나 되는<br>동네 친구</h2>
                     <p>러닝, 독서, 맛집 탐방까지.<br>우리 동네 크루원들과 웹에서 소통하세요.</p>
                 </div>
+                <div class="step-txt step-4">
+                    <span class="tag">04. Community</span>
+                    <h2>동네 소식을<br>함께 나눠요</h2>
+                    <p>우리 동네 공지, 맛집 추천, 분실물까지.<br>이웃과 자유롭게 소통하는 커뮤니티.</p>
+                </div>
             </div>
             
             <div class="device-area">
                 <div class="device-frame">
                     <div class="notch"></div>
+
                     <div class="screen scr-1 active">
                         <div class="screen-header">Baton Trade</div>
-                        <div class="screen-card">
-                            <div class="img-box"></div>
-                            <div class="info-box"><div class="line l1"></div><div class="line l2"></div></div>
+                        <div class="trade-card">
+                            <div class="trade-img">🛋️</div>
+                            <div class="trade-info">
+                                <div class="trade-name">원목 2인 소파</div>
+                                <div class="trade-price">85,000원</div>
+                                <div class="trade-meta">
+                                    <span class="trade-badge">📍 도보 3분</span>
+                                    <span class="trade-badge safe">🔒 안전결제</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="screen-card">
-                            <div class="img-box"></div>
-                            <div class="info-box"><div class="line l1"></div><div class="line l2"></div></div>
+                        <div class="trade-card">
+                            <div class="trade-img">📷</div>
+                            <div class="trade-info">
+                                <div class="trade-name">미러리스 카메라</div>
+                                <div class="trade-price">320,000원</div>
+                                <div class="trade-meta">
+                                    <span class="trade-badge">📍 도보 7분</span>
+                                    <span class="trade-badge safe">🔒 안전결제</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="trade-trust">
+                            <span class="trust-icon">✅</span> 위치 인증된 이웃과 거래
                         </div>
                     </div>
+
                     <div class="screen scr-2">
                         <div class="screen-header">Baton Alba</div>
                         <div class="job-card">
@@ -119,6 +148,7 @@
                             <div class="pay">건당 20,000원</div>
                         </div>
                     </div>
+
                     <div class="screen scr-3">
                         <div class="screen-header">Baton Crew</div>
                         <div class="crew-card">
@@ -130,6 +160,40 @@
                             <div class="name">심야 책방</div>
                         </div>
                         <div class="chat-bubble">참여하고 싶어요 👋</div>
+                    </div>
+
+                    <div class="screen scr-4">
+                        <div class="screen-header">Baton 커뮤니티</div>
+                        <div class="community-card">
+                            <div class="comm-top">
+                                <span class="comm-category">📢 동네공지</span>
+                                <span class="comm-time">5분 전</span>
+                            </div>
+                            <div class="comm-title">이번 주말 마포구 플리마켓 열려요!</div>
+                            <div class="comm-bottom">
+                                <span>❤️ 24</span><span>💬 8</span>
+                            </div>
+                        </div>
+                        <div class="community-card">
+                            <div class="comm-top">
+                                <span class="comm-category">🍜 맛집추천</span>
+                                <span class="comm-time">12분 전</span>
+                            </div>
+                            <div class="comm-title">성수동 숨은 파스타 맛집 발견했어요</div>
+                            <div class="comm-bottom">
+                                <span>❤️ 51</span><span>💬 17</span>
+                            </div>
+                        </div>
+                        <div class="community-card">
+                            <div class="comm-top">
+                                <span class="comm-category">🐾 분실물</span>
+                                <span class="comm-time">34분 전</span>
+                            </div>
+                            <div class="comm-title">회색 고양이 못 보셨나요?</div>
+                            <div class="comm-bottom">
+                                <span>❤️ 88</span><span>💬 32</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -242,7 +306,7 @@
 
 <jsp:include page="/WEB-INF/views/layout/footer.jsp"/>
 
-<script src="${pageContext.request.contextPath}/dist/js/about_intro.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/about/about_intro.js"></script>
 
 </body>
 </html>
