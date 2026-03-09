@@ -83,10 +83,22 @@
 
             <c:forEach var="dto" items="${list}" varStatus="vs">
                 <a href="${pageContext.request.contextPath}/community/article/${dto.id}?page=${page}" class="cm-item-card" style="animation-delay: ${vs.index * 0.05}s">
-                    <div class="card-visual ${empty dto.imageFiles ? 'no-image' : ''}">
+                    <c:set var="thumbUrl" value="" />
+                    <c:if test="${not empty dto.content}">
+                        <c:set var="imgTag" value='src="' />
+                        <c:set var="startIdx" value="${fn:indexOf(dto.content, imgTag)}" />
+                        <c:if test="${startIdx >= 0}">
+                            <c:set var="afterSrc" value="${fn:substring(dto.content, startIdx + 5, fn:length(dto.content))}" />
+                            <c:set var="endIdx" value="${fn:indexOf(afterSrc, '\"')}" />
+                            <c:if test="${endIdx >= 0}">
+                                <c:set var="thumbUrl" value="${fn:substring(afterSrc, 0, endIdx)}" />
+                            </c:if>
+                        </c:if>
+                    </c:if>
+                    <div class="card-visual ${empty thumbUrl ? 'no-image' : ''}">
                         <c:choose>
-                            <c:when test="${not empty dto.imageFiles}">
-                                <img src="${pageContext.request.contextPath}/uploads/community/${dto.imageFiles[0]}" alt="thumbnail">
+                            <c:when test="${not empty thumbUrl}">
+                                <img src="${thumbUrl}" alt="thumbnail">
                             </c:when>
                             <c:otherwise>
                                 <i class="ri-image-line"></i>
@@ -97,9 +109,16 @@
 
                     <div class="card-body">
                         <h3 class="card-title">${dto.subject}</h3>
-                        <p class="card-text">
-                            <c:out value="${fn:substring(fn:replace(dto.content, '<br>', ' '), 0, 80)}${fn:length(dto.content) > 80 ? '...' : ''}" />
-                        </p>
+                        <p class="card-text" id="cardText_${dto.id}"></p>
+                        <script>
+                        (function(){
+                            var tmp = document.createElement('div');
+                            tmp.innerHTML = `<c:out value="${dto.content}" escapeXml="false"/>`;
+                            var text = (tmp.innerText || tmp.textContent || '').replace(/\s+/g,' ').trim();
+                            var el = document.getElementById('cardText_${dto.id}');
+                            if(el) el.innerText = text.length > 80 ? text.substring(0,80)+'...' : text;
+                        })();
+                        </script>
 
                         <div class="card-meta">
                             <c:if test="${not empty dto.placeName}">

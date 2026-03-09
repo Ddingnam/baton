@@ -26,6 +26,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sp.app.domain.dto.CommunityDto;
 import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.service.CommunityService;
+import com.sp.app.domain.entity.CommunityPoll;
+import com.sp.app.domain.entity.PollOption;
+import com.sp.app.domain.entity.PollVote;
+import com.sp.app.repository.CommunityPollRepository;
+import com.sp.app.repository.PollOptionRepository;
+import com.sp.app.repository.PollVoteRepository;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +44,9 @@ import lombok.extern.slf4j.Slf4j;
 public class CommunityApiController {
 
     private final CommunityService communityService;
+    private final CommunityPollRepository communityPollRepository;
+    private final PollOptionRepository pollOptionRepository;
+    private final PollVoteRepository pollVoteRepository;
 
     @Value("${file.upload-root}/community")
     private String uploadPath;
@@ -181,6 +190,76 @@ public class CommunityApiController {
             map.put("status", "false");
             map.put("message", "삭제 중 오류가 발생했습니다.");
             return ResponseEntity.badRequest().body(map);
+        }
+    }
+
+    // 투표 옵션 조회
+    @GetMapping("/poll")
+    public ResponseEntity<Map<String, Object>> getPoll(
+            @RequestParam("id") Long communityId,
+            HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            CommunityPoll poll = communityPollRepository.findByCommunityId(communityId);
+            if (poll == null) {
+                result.put("error", "투표 없음");
+                return ResponseEntity.ok(result);
+            }
+
+            SessionInfo info = (SessionInfo) session.getAttribute("member");
+            boolean voted = info != null && communityService.hasUserVoted(poll.getPollId(), info.getUserIdx());
+
+            long totalVotes = poll.getOptions().stream()
+                    .mapToLong(opt -> pollVoteRepository.countByOptionOptionId(opt.getOptionId()))
+                    .sum();
+
+            List<Map<String, Object>> options = poll.getOptions().stream().map(opt -> {
+                Map<String, Object> m = new HashMap<>();
+                m.put("optionId", opt.getOptionId());
+                m.put("content", opt.getContent());
+                m.put("voteCount", pollVoteRepository.countByOptionOptionId(opt.getOptionId()));
+                return m;
+            }).collect(java.util.stream.Collectors.toList());
+
+            result.put("pollId", poll.getPollId());
+            result.put("options", options);
+            result.put("totalVotes", totalVotes);
+            result.put("voted", voted);
+            result.put("multiple", poll.isMultipleChoice());
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            log.error("투표 조회 실패", e);
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // 투표 제출
+    @PostMapping("/poll/vote")
+    public ResponseEntity<Map<String, Object>> vote(
+            @RequestParam("pollId") Long pollId,
+            @RequestParam("optionId") Long optionId,
+            HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            SessionInfo info = (SessionInfo) session.getAttribute("member");
+            if (info == null) {
+                result.put("success", false);
+                result.put("message", "로그인이 필요합니다.");
+                return ResponseEntity.ok(result);
+            }
+            if (communityService.hasUserVoted(pollId, info.getUserIdx())) {
+                result.put("success", false);
+                result.put("message", "이미 투표하셨습니다.");
+                return ResponseEntity.ok(result);
+            }
+            communityService.votePoll(pollId, info.getUserIdx(), List.of(optionId));
+            result.put("success", true);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            log.error("투표 실패", e);
+            result.put("success", false);
+            result.put("message", "투표 중 오류가 발생했습니다.");
+            return ResponseEntity.ok(result);
         }
     }
 }

@@ -9,6 +9,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${dto.subject} | BATON</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/community/community-article.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
@@ -77,9 +78,9 @@
                 </div>
             </c:if>
 
-            <div class="content-text">
-                ${dto.content}
-            </div>
+            <div class="content-text ql-editor">
+			    ${dto.content}
+			</div>
 
             <c:if test="${not empty dto.imageFiles}">
                 <div class="image-grid">

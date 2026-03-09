@@ -41,7 +41,6 @@ function initMap() {
         });
         marker.setMap(map);
         
-        // 지도 확대/축소 및 드래그 막기 (필요시 제거)
         map.setDraggable(false);
         map.setZoomable(false);
     });
@@ -74,6 +73,86 @@ function formatPollDate() {
 function initPoll() {
     const pollSection = document.getElementById('pollSection');
     if (!pollSection) return;
+
+    const communityId = pollSection.dataset.pollId;
+
+    fetch(`${contextPath}/api/community/poll?id=${communityId}`)
+        .then(resp => resp.json())
+        .then(data => {
+            const box = document.getElementById('pollOptionsBox');
+            const totalDisplay = document.getElementById('totalVotesDisplay');
+            const submitBtn = document.getElementById('btnVoteSubmit');
+
+            if (!data || !data.options || data.options.length === 0) {
+                box.innerHTML = '<p style="color:var(--text-3);text-align:center;padding:16px;">투표 항목이 없습니다.</p>';
+                return;
+            }
+
+            const total = data.totalVotes || 0;
+            const realPollId = data.pollId; // 실제 poll_id
+            totalDisplay.innerText = total + '명 참여';
+
+            box.innerHTML = '';
+            data.options.forEach(opt => {
+                const pct = total > 0 ? Math.round((opt.voteCount / total) * 100) : 0;
+                const div = document.createElement('div');
+                div.className = 'poll-option-row';
+                div.dataset.optionId = opt.optionId;
+                div.innerHTML = `
+                    <div class="poll-option-label">
+                        <span class="option-text">${opt.content}</span>
+                        <span class="option-pct">${pct}%</span>
+                    </div>
+                    <div class="poll-bar-track">
+                        <div class="poll-bar-fill" style="width:${pct}%"></div>
+                    </div>`;
+                if (!data.voted) {
+                    div.addEventListener('click', () => selectPollOption(div));
+                }
+                box.appendChild(div);
+            });
+
+            if (currentMemberIdx && !data.voted) {
+                submitBtn.style.display = 'inline-block';
+                submitBtn.onclick = () => submitVote(realPollId);
+            } else if (data.voted) {
+                submitBtn.style.display = 'none';
+                totalDisplay.innerText = total + '명 참여 (투표 완료)';
+            }
+        })
+        .catch(() => {
+            const box = document.getElementById('pollOptionsBox');
+            box.innerHTML = '<p style="color:var(--text-3);text-align:center;padding:16px;">투표를 불러올 수 없습니다.</p>';
+        });
+}
+
+function selectPollOption(el) {
+    document.querySelectorAll('.poll-option-row').forEach(row => row.classList.remove('selected'));
+    el.classList.add('selected');
+}
+
+function submitVote(realPollId) {
+    const selected = document.querySelector('.poll-option-row.selected');
+    if (!selected) {
+        showToast('투표 항목을 선택해주세요.');
+        return;
+    }
+    const optionId = selected.dataset.optionId;
+    fetch(`${contextPath}/api/community/poll/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `pollId=${realPollId}&optionId=${optionId}`
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        if (data.success) {
+            showToast('투표가 완료되었습니다!');
+            initPoll(); // 결과 다시 로드
+        } else {
+            showToast(data.message || '투표에 실패했습니다.');
+        }
+    })
+    .catch(() => showToast('오류가 발생했습니다.'));
 }
 
 function toggleLike(id) {
@@ -147,7 +226,6 @@ document.addEventListener('click', (e) => {
 
 function deleteArticle(id) {
     if(confirm('정말 삭제하시겠습니까?')) {
-        // [수정] page 파라미터가 없으면 1로 설정
         const pageParam = currentPage ? currentPage : '1';
         location.href = `${contextPath}/community/delete?id=${id}&page=${pageParam}`;
     }

@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/community/community-write.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoMapKey}&libraries=services&autoload=false"></script>
 </head>
 <body>
@@ -68,21 +69,8 @@
 							placeholder="제목을 입력해주세요" autocomplete="off"
 							value="${dto.subject}">
 						<div class="divider"></div>
-						<textarea id="content" name="content" class="textarea-main"
-							placeholder="오늘 있었던 일을 이웃들과 나눠보세요 :)">${dto.content}</textarea>
-						<div class="char-count">
-							<span id="charCount">0</span>/2000
-						</div>
-					</div>
-
-					<div class="media-group" id="dropZone">
-						<div class="media-scroll" id="previewList">
-							<div class="media-add-btn">
-								<i class="ri-camera-fill"></i> <span><span id="fileCount">0</span>/10</span>
-							</div>
-						</div>
-						<input type="file" id="fileInput" name="uploadFiles" multiple
-							accept="image/*" hidden>
+						<div id="quillEditor" style="min-height: 300px; font-size: 16px;"></div>
+						<input type="hidden" id="content" name="content" value="${dto.content}">
 					</div>
 
 					<div class="tag-group">
@@ -235,6 +223,7 @@
 
 	<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 
+	<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 	<script
 		src="${pageContext.request.contextPath}/dist/js/community/community-write.js"></script>
 	<script>

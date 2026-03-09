@@ -220,6 +220,100 @@ body {
 	color: var(--text-3);
 }
 
+.poll-option-row {
+	padding: 12px 16px;
+	border-radius: 12px;
+	border: 1.5px solid var(--border);
+	margin-bottom: 10px;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.poll-option-row:hover {
+	border-color: var(--primary);
+	background: var(--primary-light);
+}
+
+.poll-option-row.selected {
+	border-color: var(--primary);
+	background: var(--primary-light);
+}
+
+.poll-option-label {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 8px;
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.option-pct {
+	font-size: 13px;
+	color: var(--primary);
+	font-weight: 700;
+}
+
+.poll-bar-track {
+	height: 6px;
+	background: var(--border);
+	border-radius: 100px;
+	overflow: hidden;
+}
+
+.poll-bar-fill {
+	height: 100%;
+	background: var(--primary);
+	border-radius: 100px;
+	transition: width 0.6s ease;
+}
+
+.poll-footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 16px;
+	padding-top: 16px;
+	border-top: 1px solid var(--border);
+}
+
+.btn-vote-submit {
+	background: var(--primary);
+	color: white;
+	border: none;
+	padding: 8px 20px;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 700;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.btn-vote-submit:hover {
+	background: var(--primary-dark);
+}
+
+.total-votes {
+	font-size: 13px;
+	color: var(--text-3);
+	font-weight: 500;
+}
+
+/* Quill 본문 스타일 */
+.content-text.ql-editor {
+	padding: 0 !important;
+	font-size: 16px;
+	line-height: 1.8;
+	color: var(--text-1);
+	margin-bottom: 30px;
+}
+
+.content-text.ql-editor img {
+	max-width: 100%;
+	border-radius: 8px;
+	margin: 8px 0;
+}
+
 .map-card {
 	margin-top: 30px;
 	border-radius: 16px;

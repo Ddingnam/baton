@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,8 +22,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class PollOption {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "poll_option_seq_gen")
+    @SequenceGenerator(name = "poll_option_seq_gen", sequenceName = "poll_option_seq", allocationSize = 1)
     @Column(name = "option_id")
     private Long optionId;
 

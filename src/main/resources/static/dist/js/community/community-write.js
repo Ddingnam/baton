@@ -1,10 +1,9 @@
-let fileList = [];
 let tagList = [];
+let quill = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-	initFileZone();
+	initQuill();
 	initTagInput();
-	initCharCount();
 	initCategoryPills();
 	
 	const datePickerBox = document.querySelector('.date-picker-box');
@@ -79,88 +78,66 @@ function initCategoryPills() {
 	});
 }
 
-function initCharCount() {
-	const textarea = document.querySelector('.textarea-main');
-	const counter = document.getElementById('charCount');
-	if (!textarea || !counter) return;
+function initQuill() {
+	const contextPath = document.querySelector('meta[name="contextPath"]').getAttribute('content');
 
-	textarea.addEventListener('input', () => {
-		const length = textarea.value.length;
-		counter.textContent = length;
-		if (length > 2000) {
-			textarea.value = textarea.value.substring(0, 2000);
-			counter.textContent = 2000;
+	quill = new Quill('#quillEditor', {
+		theme: 'snow',
+		placeholder: '오늘 있었던 일을 이웃들과 나눠보세요 :)',
+		modules: {
+			toolbar: {
+				container: [
+					[{ 'header': [1, 2, 3, false] }],
+					['bold', 'italic', 'underline', 'strike'],
+					[{ 'color': [] }, { 'background': [] }],
+					[{ 'list': 'ordered' }, { 'list': 'bullet' }],
+					[{ 'align': [] }],
+					['link', 'image'],
+					['clean']
+				],
+				handlers: {
+					image: imageUploadHandler
+				}
+			}
 		}
 	});
-}
 
-function initFileZone() {
-	const dropZone = document.getElementById('dropZone');
-	const fileInput = document.getElementById('fileInput');
-	const addBtn = document.querySelector('.media-add-btn');
-
-	if (addBtn) addBtn.addEventListener('click', () => fileInput.click());
-	if (fileInput) fileInput.addEventListener('change', e => handleFiles(e.target.files));
-
-	if (dropZone) {
-		dropZone.addEventListener('dragover', e => {
-			e.preventDefault();
-			dropZone.style.background = '#f0f2f5';
-		});
-		dropZone.addEventListener('dragleave', e => {
-			e.preventDefault();
-			dropZone.style.background = '';
-		});
-		dropZone.addEventListener('drop', e => {
-			e.preventDefault();
-			dropZone.style.background = '';
-			handleFiles(e.dataTransfer.files);
-		});
-	}
-}
-
-function handleFiles(files) {
-	if (fileList.length + files.length > 10) {
-		showToast('사진은 최대 10장까지 첨부할 수 있어요');
-		return;
+	// 수정 모드일 때 기존 content 로드
+	const hiddenContent = document.getElementById('content');
+	if (hiddenContent && hiddenContent.value) {
+		quill.root.innerHTML = hiddenContent.value;
 	}
 
-	Array.from(files).forEach(file => {
-		if (!file.type.startsWith('image/')) return;
-		const reader = new FileReader();
-		reader.onload = e => {
-			fileList.push({ file: file, url: e.target.result });
-			renderFileList();
+	function imageUploadHandler() {
+		const input = document.createElement('input');
+		input.setAttribute('type', 'file');
+		input.setAttribute('accept', 'image/*');
+		input.click();
+
+		input.onchange = async () => {
+			const file = input.files[0];
+			if (!file) return;
+
+			const formData = new FormData();
+			formData.append('imageFile', file);
+
+			try {
+				const resp = await fetch(contextPath + '/editor/upload', {
+					method: 'POST',
+					body: formData
+				});
+				const data = await resp.json();
+				if (data.state === 'true') {
+					const range = quill.getSelection();
+					quill.insertEmbed(range ? range.index : 0, 'image', data.imageUrl);
+				} else {
+					showToast('이미지 업로드에 실패했습니다.');
+				}
+			} catch (e) {
+				showToast('이미지 업로드 중 오류가 발생했습니다.');
+			}
 		};
-		reader.readAsDataURL(file);
-	});
-}
-
-function renderFileList() {
-	const list = document.getElementById('previewList');
-	const items = list.querySelectorAll('.media-item');
-	items.forEach(item => item.remove());
-
-	fileList.forEach((item, index) => {
-		const div = document.createElement('div');
-		div.className = 'media-item';
-		div.innerHTML = `<img src="${item.url}"><button type="button" class="media-del-btn" data-index="${index}"><i class="ri-close-line"></i></button>`;
-		list.appendChild(div);
-	});
-
-	list.querySelectorAll('.media-del-btn').forEach(btn => {
-		btn.addEventListener('click', (e) => {
-			const index = parseInt(e.currentTarget.dataset.index);
-			removeFile(index);
-		});
-	});
-
-	document.getElementById('fileCount').innerText = fileList.length;
-}
-
-function removeFile(index) {
-	fileList.splice(index, 1);
-	renderFileList();
+	}
 }
 
 function initTagInput() {
@@ -264,9 +241,15 @@ function addPollOption() {
 }
 
 function sendOk() {
+    // Quill 내용을 hidden input에 넣기
+    if (quill) {
+        const htmlContent = quill.root.innerHTML;
+        document.getElementById('content').value = htmlContent === '<p><br></p>' ? '' : htmlContent;
+    }
+
     const f = document.communityForm;
     const subject = f.subject.value.trim();
-    const content = f.content.value.trim();
+    const content = document.getElementById('content').value;
     
     const categoryElement = document.querySelector('input[name="category"]:checked');
     if (!categoryElement) {
@@ -280,9 +263,11 @@ function sendOk() {
         return;
     }
     if (!content) {
-        showToast('내용을 입력해주세요');
-        f.content.focus();
-        return;
+        const quillText = quill ? quill.getText().trim() : '';
+        if (!quillText) {
+            showToast('내용을 입력해주세요');
+            return;
+        }
     }
 
     const usePoll = document.getElementById('chkPollToggle');
@@ -311,12 +296,6 @@ function sendOk() {
             inputs.forEach(input => input.disabled = true);
         }
     }
-
-	const dataTransfer = new DataTransfer();
-	fileList.forEach(obj => dataTransfer.items.add(obj.file));
-	    
-	const fileInput = document.querySelector('input[name="uploadFiles"]');
-	fileInput.files = dataTransfer.files;
 
     const oldTags = f.querySelectorAll('input[name="tags"]');
     oldTags.forEach(t => t.remove());
