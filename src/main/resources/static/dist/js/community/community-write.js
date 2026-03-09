@@ -296,6 +296,9 @@ function saveTemp() {
 	}
 	tempInput.value = '1';
 
+	const modeInput = f.querySelector('input[name="mode"]');
+	if (modeInput) modeInput.value = 'write';
+
 	const htmlContent = quill.root.innerHTML;
 	document.getElementById('content').value = htmlContent === '<p><br></p>' ? '' : htmlContent;
 

@@ -287,10 +287,6 @@ public class CommunityServiceImpl implements CommunityService {
 		CommunityPoll poll = communityPollRepository.findById(pollId)
 				.orElseThrow(() -> new RuntimeException("Poll not found"));
 
-		if (hasUserVoted(pollId, memberIdx)) {
-			throw new RuntimeException("User already voted");
-		}
-
 		if (!poll.isMultipleChoice() && optionIds.size() > 1) {
 			throw new RuntimeException("Multiple choice not allowed");
 		}
@@ -299,7 +295,6 @@ public class CommunityServiceImpl implements CommunityService {
 		for (Long optionId : optionIds) {
 			PollOption option = pollOptionRepository.findById(optionId)
 					.orElseThrow(() -> new RuntimeException("Option not found"));
-			
 			votes.add(PollVote.builder()
 					.poll(poll)
 					.memberId(memberIdx)
@@ -307,7 +302,12 @@ public class CommunityServiceImpl implements CommunityService {
 					.build());
 		}
 		pollVoteRepository.saveAll(votes);
-		log.info("투표 시도 - 회원번호: {}", memberIdx); 
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void cancelVote(long pollId, long memberIdx) throws Exception {
+		pollVoteRepository.deleteByPollPollIdAndMemberId(pollId, memberIdx);
 	}
 
 	@Override

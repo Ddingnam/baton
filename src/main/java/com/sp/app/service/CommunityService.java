@@ -27,6 +27,7 @@ public interface CommunityService {
 	public boolean isUserScraped(Map<String, Object> map);
 
 	public void votePoll(long pollId, long memberIdx, List<Long> optionIds) throws Exception;
+	public void cancelVote(long pollId, long memberIdx) throws Exception;
 	public CommunityDto getPollInfo(long communityId);
 	public boolean hasUserVoted(long pollId, long memberIdx);
 }

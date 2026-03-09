@@ -119,12 +119,14 @@ public class CommunityController {
     @PostMapping("write")
     public String writeSubmit(CommunityDto dto,
             @RequestParam(value = "uploadFiles", required = false) List<MultipartFile> uploadFiles,
+            @RequestParam(value = "isTemporary", required = false, defaultValue = "0") int isTemporary,
             HttpSession session) throws Exception {
         SessionInfo info = (SessionInfo) session.getAttribute("member");
 
         dto.setMemberIdx(info.getUserIdx());
         dto.setWriterNickname(info.getName());
         dto.setUploadFiles(uploadFiles);
+        dto.setTemporary(isTemporary == 1);
 
         try {
             service.insertCommunity(dto, uploadPath);
@@ -132,6 +134,9 @@ public class CommunityController {
             log.error("writeSubmit error", e);
         }
 
+        if (isTemporary == 1) {
+            return "redirect:/community/list?tab=temp";
+        }
         return "redirect:/community/list";
     }
 

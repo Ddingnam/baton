@@ -45,4 +45,6 @@ public class CommunityDto {
     private String pollEndDate;
     private Boolean pollMultiple;
     private Boolean pollAnonymous;
+
+    private boolean temporary;
 }
