@@ -8,20 +8,20 @@ const Gallery = (function () {
 })();
 
 const WishModule = (function () {
-    let wished   = false;
-    let albaIdx  = 0;
+    let wished = false;
+    let albaIdx = 0;
 
     function init(initialWished, idx) {
-        wished  = initialWished;
+        wished = initialWished;
         albaIdx = idx;
         updateUI();
     }
 
     function toggle() {
         fetch('/alba/wish', {
-            method:  'POST',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ albaIdx: albaIdx })
+            body: JSON.stringify({ albaIdx: albaIdx })
         })
         .then(res => {
             if (res.status === 401) { Toast.show('로그인이 필요합니다.'); return null; }
@@ -64,11 +64,11 @@ const StatusModule = (function () {
     function update(albaIdx, status) {
         const params = new URLSearchParams();
         params.append('albaIdx', albaIdx);
-        params.append('status',  status);
+        params.append('status', status);
 
         fetch(`${window.location.origin}/alba/updateStatus`, {
             method: 'POST',
-            body:   params
+            body: params
         })
         .then(res => res.json())
         .then(data => {
@@ -93,7 +93,7 @@ const PullUpModule = (function () {
 
         fetch(`${window.location.origin}/alba/pullUp`, {
             method: 'POST',
-            body:   params
+            body: params
         })
         .then(res => res.json())
         .then(data => {
@@ -146,7 +146,7 @@ function confirmDelete(albaIdx) {
 }
 
 function initMap() {
-    const address   = document.getElementById('mapAddress')?.value;
+    const address = document.getElementById('mapAddress')?.value;
     const placeName = document.getElementById('mapPlaceName')?.value || '근무 위치';
     const mapContainer = document.getElementById('map');
 
@@ -156,9 +156,9 @@ function initMap() {
         const geocoder = new kakao.maps.services.Geocoder();
         geocoder.addressSearch(address, function(result, status) {
             if (status === kakao.maps.services.Status.OK) {
-                const coords    = new kakao.maps.LatLng(result[0].y, result[0].x);
-                const map       = new kakao.maps.Map(mapContainer, { center: coords, level: 3 });
-                const marker    = new kakao.maps.Marker({ map, position: coords });
+                const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                const map = new kakao.maps.Map(mapContainer, { center: coords, level: 3 });
+                const marker = new kakao.maps.Marker({ map, position: coords });
                 const infowindow = new kakao.maps.InfoWindow({
                     content: `<div style="padding:5px;font-size:13px;text-align:center;white-space:nowrap;">${placeName}</div>`
                 });
@@ -168,16 +168,14 @@ function initMap() {
     } catch(e) {}
 }
 
-// ✅ DOMContentLoaded 딱 하나만
 window.addEventListener('DOMContentLoaded', function () {
     const articleEl = document.getElementById('articleData');
     if (articleEl) {
-        const wished  = articleEl.dataset.wished === 'true';
+        const wished = articleEl.dataset.wished === 'true';
         const albaIdx = parseInt(articleEl.dataset.albaIdx) || 0;
         WishModule.init(wished, albaIdx);
     }
 
-    // 카카오 SDK 로드 대기 후 지도 초기화
     function tryInitMap(retry) {
         if (typeof kakao !== 'undefined' && kakao.maps && kakao.maps.services) {
             initMap();
@@ -187,6 +185,3 @@ window.addEventListener('DOMContentLoaded', function () {
     }
     tryInitMap(10);
 });
-
-   
-
