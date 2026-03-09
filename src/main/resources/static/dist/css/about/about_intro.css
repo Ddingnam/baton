@@ -217,30 +217,59 @@ body {
 }
 
 .sec-philosophy {
-	padding: 450px 0;
+	height: 300vh;
+	position: relative;
 }
 
-.tit-ph {
+.philosophy-sticky {
+	position: sticky;
+	top: 0;
+	height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.ph-scroll-text {
 	font-size: 72px;
 	font-weight: 800;
-	line-height: 1.4;
-	color: var(--c-gray);
-	margin-bottom: 40px;
+	line-height: 1.5;
+	margin-bottom: 50px;
 }
 
-.txt-black {
+.ph-word {
+	display: inline-block;
+	color: #e0e4ea;
+	transition: color 0.4s ease, transform 0.4s ease;
+	margin-right: 16px;
+}
+
+.ph-word.lit {
 	color: var(--c-black);
+	transform: translateY(-2px);
 }
 
-.desc-ph {
-	font-size: 30px;
+.ph-word.accent.lit {
+	color: var(--c-blue);
+}
+
+.ph-desc-reveal {
+	font-size: 22px;
 	font-weight: 700;
 	color: var(--c-black);
-	line-height: 1.6;
+	line-height: 1.8;
+	opacity: 0;
+	transform: translateY(20px);
+	transition: opacity 0.8s var(--bezier), transform 0.8s var(--bezier);
+}
+
+.ph-desc-reveal.visible {
+	opacity: 1;
+	transform: translateY(0);
 }
 
 .sec-showcase {
-	height: 400vh;
+	height: 500vh;
 	position: relative;
 	background: var(--c-light);
 }
@@ -463,6 +492,129 @@ body {
 .chat-bubble {
 	background: var(--c-blue); color: #fff; padding: 12px 20px; border-radius: 18px; border-bottom-right-radius: 4px; font-size: 14px; font-weight: 600; margin-top: 15px; width: 300px; }
 
+.trade-card {
+	width: 300px;
+	background: #f0f7ff;
+	border-radius: 20px;
+	padding: 16px;
+	margin-bottom: 12px;
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	border: 1px solid #d6eaff;
+}
+
+.trade-img {
+	width: 64px;
+	height: 64px;
+	background: #fff;
+	border-radius: 14px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 28px;
+	flex-shrink: 0;
+}
+
+.trade-info {
+	flex: 1;
+}
+
+.trade-name {
+	font-size: 15px;
+	font-weight: 800;
+	color: var(--c-black);
+	margin-bottom: 4px;
+}
+
+.trade-price {
+	font-size: 18px;
+	font-weight: 900;
+	color: var(--c-blue);
+	margin-bottom: 8px;
+}
+
+.trade-meta {
+	display: flex;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+.trade-badge {
+	font-size: 11px;
+	font-weight: 700;
+	background: #fff;
+	color: var(--c-gray);
+	padding: 3px 8px;
+	border-radius: 20px;
+	border: 1px solid #e0eeff;
+}
+
+.trade-badge.safe {
+	color: #2ecc71;
+	border-color: #c3f0d9;
+}
+
+.trade-trust {
+	width: 300px;
+	text-align: center;
+	font-size: 13px;
+	font-weight: 700;
+	color: #2ecc71;
+	margin-top: 6px;
+	background: #f0fff7;
+	padding: 10px;
+	border-radius: 12px;
+}
+
+.community-card {
+	width: 300px;
+	background: #fff;
+	border-radius: 16px;
+	padding: 14px 16px;
+	margin-bottom: 10px;
+	border: 1px solid #f0f0f0;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.comm-top {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 6px;
+}
+
+.comm-category {
+	font-size: 11px;
+	font-weight: 800;
+	color: var(--c-blue);
+	background: #eef4ff;
+	padding: 3px 8px;
+	border-radius: 20px;
+}
+
+.comm-time {
+	font-size: 11px;
+	color: var(--c-gray);
+	font-weight: 600;
+}
+
+.comm-title {
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--c-black);
+	line-height: 1.4;
+	margin-bottom: 10px;
+}
+
+.comm-bottom {
+	display: flex;
+	gap: 12px;
+	font-size: 12px;
+	color: var(--c-gray);
+	font-weight: 600;
+}
+
 
 .sec-review-box {
 	padding: 250px 0;
@@ -493,6 +645,7 @@ body {
 	width: 0%;
 	overflow: hidden;
 	transition: width 1.5s var(--bezier);
+	z-index: 1;
 }
 
 .active .stars-fill {
@@ -701,6 +854,7 @@ body {
 }
 
 .active.reveal-item, 
+.reveal-item.active,
 .active .item-tech, 
 .active .box-data-item {
     opacity: 1;
@@ -711,17 +865,6 @@ body {
 .active .item-tech:nth-child(2) { transition-delay: 0.2s; }
 .active .item-tech:nth-child(3) { transition-delay: 0.3s; }
 .active .item-tech:nth-child(4) { transition-delay: 0.4s; }
-
-.reveal-item {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.reveal-item.active {
-    opacity: 1; 
-    transform: translateY(0);
-}
 
 .delay-1 { transition-delay: 0.1s; }
 .delay-2 { transition-delay: 0.2s; }
@@ -737,6 +880,15 @@ body {
 }
 
 @keyframes slideUpText { from { transform: translateY(110%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.fade-in {
+	opacity: 0;
+	animation: fadeInAnim 1s var(--bezier) forwards;
+}
+.delay-3.fade-in { animation-delay: 0.6s; }
+.delay-4.fade-in { animation-delay: 0.9s; }
+
+@keyframes fadeInAnim { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 1024px) {
     .tit-hero { font-size: 50px; }

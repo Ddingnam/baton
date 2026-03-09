@@ -115,6 +115,23 @@ body {
 	transform: translateY(-1px);
 }
 
+.btn-temp-save {
+    background: var(--surface-2);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-temp-save:hover {
+    background: var(--border);
+    color: var(--text-1);
+}
+
 .editor-body {
 	padding: 30px;
 	flex: 1;
@@ -436,6 +453,12 @@ body {
 
 .btn-submit-full {
 	display: none;
+}
+
+.footer-btns {
+	display: none;
+	align-items: center;
+	gap: 8px;
 }
 
 .write-sidebar {
@@ -947,7 +970,10 @@ input:checked + .slider:before {
 @media (max-width: 900px) {
     .write-layout { flex-direction: column; padding-top: 100px; }
     .write-sidebar { width: 100%; order: -1; position: relative; top: 0; }
-    .editor-header-right .btn-submit { display: none; }
+    .editor-header-right { display: none; }
+    .footer-btns {
+        display: flex;
+    }
     .editor-footer .btn-submit-full {
         display: block;
         background: var(--primary);
