@@ -329,7 +329,7 @@
 											    </button>
 					                        </c:when>
 					                        <c:when test="${escrowInfo.TRADESTATUS == 'SHIPPING'}">
-											    <button class="pay-btn" style="margin-top: 10px; background-color: #00C471;"
+											    <button class="chat-btn" style="margin-top: 10px;"
 											        onclick="confirmTradePurchase(${trade.productIdx})">
 											        구매 확정하기
 											    </button>
