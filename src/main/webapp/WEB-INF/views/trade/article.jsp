@@ -560,7 +560,7 @@ function cancelTrade(productIdx) {
         console.error('Error:', error);
         alert('취소 처리 중 오류가 발생했습니다.');
     });
-}
+} 
 </script>
 </body>
 </html>
