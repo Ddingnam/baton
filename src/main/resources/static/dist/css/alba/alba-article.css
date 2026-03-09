@@ -201,9 +201,37 @@ body {
 .bottom-right { flex: 1; display: flex; gap: 10px; }
 .btn-action { flex: 1; height: 54px; border: none; border-radius: var(--radius-sm); font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: var(--transition);}
 .btn-call { background: var(--surface); color: var(--primary); border: 1px solid var(--primary); }
-.btn-apply { background: var(--primary); color: #fff; }
-.btn-apply.disabled { background: var(--border-color); color: var(--text-light); cursor: not-allowed; }
+.btn-apply { 
+    background: var(--primary);
+    color: #fff; 
+    gap: 8px; 
+}
+.btn-apply:hover {
+    background: var(--accent);
+}
+.btn-apply.disabled { 
+    background: var(--border-color); 
+    color: var(--text-light); 
+    cursor: not-allowed; 
+}
 
+.chip-dday {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 9px;
+    background-color: #fff;
+    color: var(--primary);  
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.btn-apply.disabled .chip-dday {
+    color: var(--text-light);
+    background-color: #f0f4f8;
+}
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; }
 .modal-overlay.active { display: flex; }
 .modal-content { background: var(--surface); width: 90%; max-width: 320px; border-radius: var(--radius); padding: 24px; }

@@ -3,6 +3,7 @@
 <%@ taglib prefix="c"   uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="fn"  uri="jakarta.tags.functions" %>
 <%@ include file="/WEB-INF/views/layout/headerResources.jsp" %>
 <!DOCTYPE html>
 <html lang="ko">
@@ -66,28 +67,47 @@
                 </div>
 
                 <ul class="summary-list">
-                    <li>
-                        <i class="ri-calendar-check-line"></i>
-                        <div class="summary-text">
-                            <span class="label">근무기간</span>
-                            <span class="value">${dto.workPeriod}</span>
-                        </div>
-                    </li>
-                    <li>
-                        <i class="ri-calendar-event-line"></i>
-                        <div class="summary-text">
-                            <span class="label">근무요일</span>
-                            <span class="value">${dto.workDays}</span>
-                        </div>
-                    </li>
-                    <li>
-                        <i class="ri-time-line"></i>
-                        <div class="summary-text">
-                            <span class="label">근무시간</span>
-                            <span class="value">${dto.workTime} <c:if test="${dto.timeNegotiable == 'Y'}"><span class="nego">(협의가능)</span></c:if></span>
-                        </div>
-                    </li>
-                </ul>
+				    <li>
+				        <i class="ri-calendar-check-line"></i>
+				        <div class="summary-text">
+				            <span class="label">근무기간</span>
+				            <span class="value">
+				                <c:choose>
+				                    <c:when test="${dto.workPeriod == 'ONE_DAY'}">하루</c:when>
+				                    <c:when test="${dto.workPeriod == 'LESS_THAN_A_WEEK'}">1주일 이하</c:when>
+				                    <c:when test="${dto.workPeriod == 'LESS_THAN_A_MONTH'}">1개월 미만</c:when>
+				                    <c:when test="${dto.workPeriod == 'MORE_THAN_A_MONTH'}">1개월 이상</c:when>
+				                    <c:when test="${dto.workPeriod == 'ONE_TO_THREE_MONTHS'}">1~3개월</c:when>
+				                    <c:when test="${dto.workPeriod == 'THREE_TO_SIX_MONTHS'}">3~6개월</c:when>
+				                    <c:when test="${dto.workPeriod == 'SIX_MONTHS_TO_ONE_YEAR'}">6개월~1년</c:when>
+				                    <c:when test="${dto.workPeriod == 'MORE_THAN_A_YEAR'}">1년 이상</c:when>
+				                    <c:otherwise>${dto.workPeriod}</c:otherwise> </c:choose>
+				            </span>
+				        </div>
+				    </li>
+				    <li>
+				        <i class="ri-calendar-event-line"></i>
+				        <div class="summary-text">
+				            <span class="label">근무요일</span>
+				            <c:set var="koreanDays" value="${dto.workDays}" />
+				            <c:set var="koreanDays" value="${fn:replace(koreanDays, 'MON', '월')}" />
+				            <c:set var="koreanDays" value="${fn:replace(koreanDays, 'TUE', '화')}" />
+				            <c:set var="koreanDays" value="${fn:replace(koreanDays, 'WED', '수')}" />
+				            <c:set var="koreanDays" value="${fn:replace(koreanDays, 'THU', '목')}" />
+				            <c:set var="koreanDays" value="${fn:replace(koreanDays, 'FRI', '금')}" />
+				            <c:set var="koreanDays" value="${fn:replace(koreanDays, 'SAT', '토')}" />
+				            <c:set var="koreanDays" value="${fn:replace(koreanDays, 'SUN', '일')}" />
+				            <span class="value">${koreanDays}</span>
+				        </div>
+				    </li>
+				    <li>
+				        <i class="ri-time-line"></i>
+				        <div class="summary-text">
+				            <span class="label">근무시간</span>
+				            <span class="value">${dto.workTime} <c:if test="${dto.timeNegotiable == 'Y'}"><span class="nego">(협의가능)</span></c:if></span>
+				        </div>
+				    </li>
+				</ul>
             </div>
 
             <div class="detail-table-section">
@@ -203,19 +223,32 @@
                 <button class="btn-action btn-call" onclick="location.href='tel:${dto.contact}'">
                     <i class="ri-phone-fill"></i> 전화/문자
                 </button>
-                <button class="btn-action btn-apply" onclick="location.href='${pageContext.request.contextPath}/member/login'">온라인 지원</button>
+                <button class="btn-action btn-apply" onclick="location.href='${pageContext.request.contextPath}/member/login'">
+                    <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
+                    <span>온라인 지원</span>
+                </button>
             </sec:authorize>
+
             <sec:authorize access="isAuthenticated()">
                 <c:choose>
                     <c:when test="${loggedInUserId == dto.userIdx}">
-                        <button class="btn-action btn-apply full-width" onclick="window.open('${pageContext.request.contextPath}/chat/albaList?albaIdx=${dto.postingIdx}', 'chatList', 'width=450,height=850')">지원 내역 보기 (${dto.chatCount})</button>
+                        <button class="btn-action btn-apply full-width" onclick="window.open('${pageContext.request.contextPath}/chat/albaList?albaIdx=${dto.postingIdx}', 'chatList', 'width=450,height=850')">
+                            <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
+                            <span>지원 내역 보기 (${dto.chatCount})</span>
+                        </button>
                     </c:when>
                     <c:when test="${dto.recruitStatus == '모집완료'}">
-                        <button class="btn-action btn-apply disabled full-width" disabled>모집이 완료되었습니다</button>
+                        <button class="btn-action btn-apply disabled full-width" disabled>
+                            <span class="chip-dday">마감</span>
+                            <span>모집이 완료되었습니다</span>
+                        </button>
                     </c:when>
                     <c:otherwise>
                         <button class="btn-action btn-call" onclick="location.href='tel:${dto.contact}'"><i class="ri-phone-fill"></i> 전화/문자</button>
-                        <button class="btn-action btn-apply" onclick="window.open('${pageContext.request.contextPath}/chat/room?albaIdx=${dto.postingIdx}&toUserIdx=${dto.userIdx}', 'chatRoom', 'width=450,height=850')">온라인 지원</button>
+                        <button class="btn-action btn-apply" onclick="window.open('${pageContext.request.contextPath}/chat/room?albaIdx=${dto.postingIdx}&toUserIdx=${dto.userIdx}', 'chatRoom', 'width=450,height=850')">
+                            <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
+                            <span>온라인 지원</span>
+                        </button>
                     </c:otherwise>
                 </c:choose>
             </sec:authorize>

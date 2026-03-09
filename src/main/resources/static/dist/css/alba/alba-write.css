@@ -687,6 +687,25 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
   box-shadow: 0 7px 22px rgba(0,44,95,0.36);
 }
 
+/* ===== D-DAY BADGE ===== */
+.d-day-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ff501b; /* 알바몬 스타일 오렌지/레드 */
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 6px;
+  vertical-align: top;
+  margin-top: 1px;
+}
+.d-day-badge.expired {
+  background-color: var(--text-muted); /* 마감 시 회색 처리 */
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
   .alba-write-inner {

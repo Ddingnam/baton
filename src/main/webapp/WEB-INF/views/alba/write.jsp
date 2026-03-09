@@ -31,7 +31,10 @@
       <div class="preview-section">
         <div class="preview-section-title">썸네일 미리보기</div>
         <div class="preview-thumb-wrap" id="prevThumb">📋</div>
-        <div class="preview-job-title" id="prevTitle">공고 제목이 여기 표시됩니다</div>
+        <div class="preview-job-title">
+		  <span class="d-day-badge" id="prevDday">D-?</span>
+		  <span id="prevTitle">공고 제목이 여기 표시됩니다</span>
+		</div>
         <div class="preview-employer" id="prevEmployer">업체명</div>
         <div class="preview-pay">
           <span class="pay-badge hour" id="prevPayBadge">시급</span>
@@ -54,7 +57,7 @@
           <div class="progress-item" id="pi2">
             <div class="progress-dot">2</div> 급여 설정
           </div>
-          <div class="progress-bar-line"><div class="progress-bar-fill" id="pb2"></div></div>
+          <div class="progress-bar-line"><div class="progress-bar-fill" id="pb2"></div></div> 
           <div class="progress-item" id="pi3">
             <div class="progress-dot">3</div> 근무 요일
           </div>
@@ -83,7 +86,6 @@
 
       <form id="writeForm" action="${pageContext.request.contextPath}/alba/write" method="post" enctype="multipart/form-data">
 
-        <%-- STEP 1: 기본 정보 --%>
         <div class="form-card">
           <div class="form-card-header">
             <div class="form-card-step">1</div>
@@ -119,10 +121,17 @@
               </div>
             </div>
 
+            <div class="form-group">
+              <label>모집 마감일 <span class="req">*</span></label>
+              <input type="date" id="deadline" name="deadline" onchange="updatePreview();">
+              <div class="info-box" style="margin-top: 8px;">
+                💡 마감일이 지나면 공고가 자동으로 마감 처리됩니다.
+              </div>
+            </div>
+
           </div>
         </div>
 
-        <%-- STEP 2: 급여 --%>
         <div class="form-card">
           <div class="form-card-header">
             <div class="form-card-step">2</div>
@@ -157,7 +166,6 @@
           </div>
         </div>
 
-        <%-- STEP 3: 근무 일정 --%>
         <div class="form-card">
           <div class="form-card-header">
             <div class="form-card-step">3</div>
@@ -209,7 +217,6 @@
           </div>
         </div>
 
-        <%-- STEP 4: 근무 위치 --%>
         <div class="form-card">
           <div class="form-card-header">
             <div class="form-card-step">4</div>
@@ -238,7 +245,6 @@
           </div>
         </div>
 
-        <%-- STEP 5: 상세 내용 --%>
         <div class="form-card">
           <div class="form-card-header">
             <div class="form-card-step">5</div>
@@ -268,13 +274,11 @@
 
           </div>
         </div>
-
       </form>
     </div>
   </div>
 </div>
 
-<%-- ===== 하단 제출 바 ===== --%>
 <div class="submit-bar">
   <a href="${pageContext.request.contextPath}/alba" class="btn-ghost">
     <i class="ri-arrow-left-s-line"></i>&nbsp;취소

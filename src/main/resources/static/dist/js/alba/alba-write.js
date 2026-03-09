@@ -128,6 +128,35 @@ function updatePreview() {
     document.getElementById('title').value || '공고 제목이 여기 표시됩니다';
   document.getElementById('prevEmployer').textContent =
     document.getElementById('employer').value || '업체명';
+	
+	// --- 추가된 D-Day 계산 로직 ---
+	  const deadlineVal = document.getElementById('deadline').value;
+	  const dDayBadge = document.getElementById('prevDday');
+	  
+	  if (deadlineVal) {
+	    const today = new Date();
+	    today.setHours(0, 0, 0, 0); // 시간 제외하고 날짜만 비교
+	    
+	    const dDate = new Date(deadlineVal);
+	    dDate.setHours(0, 0, 0, 0);
+	    
+	    const diffTime = dDate - today;
+	    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+	    if (diffDays < 0) {
+	      dDayBadge.textContent = '마감';
+	      dDayBadge.classList.add('expired');
+	    } else if (diffDays === 0) {
+	      dDayBadge.textContent = 'D-Day';
+	      dDayBadge.classList.remove('expired');
+	    } else {
+	      dDayBadge.textContent = 'D-' + diffDays;
+	      dDayBadge.classList.remove('expired');
+	    }
+	  } else {
+	    dDayBadge.textContent = 'D-?';
+	    dDayBadge.classList.remove('expired');
+	  }
 
   const pay = document.getElementById('pay').value;
   document.getElementById('prevPayAmt').textContent =

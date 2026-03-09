@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.JobPostingMapper">
 
-	<insert id="insertPosting" parameterType="com.sp.app.model.JobPosting">
+<insert id="insertPosting" parameterType="com.sp.app.model.JobPosting">
     <selectKey keyProperty="postingIdx" resultType="long" order="BEFORE">
         SELECT seq_job_posting.NEXTVAL FROM dual
     </selectKey>
@@ -10,8 +10,8 @@
     INSERT INTO job_posting (
         posting_idx,  title, employer, description, pay, pay_type,
         work_period, work_days, start_time, end_time, time_negotiable,
-        location, location_detail, location_lat, location_lng, contact, benefits, user_idx, region_idx, category, created_date
-    )
+        location, location_detail, location_lat, location_lng, contact, benefits, user_idx, region_idx, category, 
+        deadline, created_date )
     VALUES (
         #{postingIdx}, #{title},
         #{employer},
@@ -23,13 +23,16 @@
         #{startTime, jdbcType=VARCHAR},
         #{endTime, jdbcType=VARCHAR},
         #{timeNegotiable, jdbcType=VARCHAR},
-         #{location}, #{locationDetail}, #{locationLat}, #{locationLng},
+        #{location, jdbcType=VARCHAR}, 
+        #{locationDetail, jdbcType=VARCHAR}, 
+        #{locationLat, jdbcType=VARCHAR}, 
+        #{locationLng, jdbcType=VARCHAR},
         #{contact, jdbcType=VARCHAR},
         #{benefits, jdbcType=VARCHAR},
         #{userIdx},
         #{regionIdx},
         #{category},
-        SYSDATE
+        #{deadline, jdbcType=VARCHAR}, SYSDATE
     )
 </insert>
 	
@@ -48,23 +51,26 @@
 		)
 	</insert>
 
-	<update id="updatePosting"
-		parameterType="com.sp.app.model.JobPosting">
-		UPDATE job_posting
-		SET title=#{title},
-		description=#{description}, pay=#{pay},
-		pay_type=#{payType},
-		work_period=#{workPeriod}, work_days=#{workDays},
-		start_time=#{startTime},
-		end_time=#{endTime},
-		time_negotiable=#{timeNegotiable}, 
-		location=#{location},
-    	location_detail=#{locationDetail},
-    	location_lat=#{locationLat},
-    	location_lng=#{locationLng},
-		contact=#{contact}, benefits=#{benefits}, category=#{category}
-		WHERE
-		posting_idx = #{postingIdx}
+	<update id="updatePosting" parameterType="com.sp.app.model.JobPosting">
+	    UPDATE job_posting
+	    SET title=#{title},
+	    description=#{description, jdbcType=CLOB}, 
+	    pay=#{pay},
+	    pay_type=#{payType},
+	    work_period=#{workPeriod}, 
+	    work_days=#{workDays},
+	    start_time=#{startTime, jdbcType=VARCHAR},
+	    end_time=#{endTime, jdbcType=VARCHAR},
+	    time_negotiable=#{timeNegotiable, jdbcType=VARCHAR}, 
+	    location=#{location, jdbcType=VARCHAR},
+	    location_detail=#{locationDetail, jdbcType=VARCHAR},
+	    location_lat=#{locationLat, jdbcType=VARCHAR},
+	    location_lng=#{locationLng, jdbcType=VARCHAR},
+	    contact=#{contact, jdbcType=VARCHAR}, 
+	    benefits=#{benefits, jdbcType=VARCHAR}, 
+	    category=#{category}, 
+	    deadline=#{deadline, jdbcType=VARCHAR} WHERE
+	    posting_idx = #{postingIdx}
 	</update>
 
 	<delete id="deletePosting" parameterType="long">
@@ -77,8 +83,7 @@
 		COUNT(*) FROM job_posting
 	</select>
 
-	<select id="listPosting" parameterType="map"
-        resultType="com.sp.app.model.JobPosting">
+	<select id="listPosting" parameterType="map" resultType="com.sp.app.model.JobPosting">
     SELECT * FROM (
         SELECT a.*, ROWNUM rnum FROM (
             SELECT
@@ -93,13 +98,13 @@
                 work_period AS workPeriod,
                 work_days AS workDays,
                 start_time AS startTime,
-                end_time AS endTime
-            FROM
+                end_time AS endTime,
+                deadline FROM
                 job_posting
             ORDER BY posting_idx DESC
         ) a WHERE ROWNUM &lt;= #{offset} + #{size}
     ) WHERE rnum &gt; #{offset}
-</select>
+	</select>
 
 	<select id="findById" resultType="com.sp.app.model.JobPosting">
 		SELECT
@@ -121,7 +126,7 @@
     	location_lat AS locationLat,
     	location_lng AS locationLng,
 		contact, benefits,
-		category, created_date
+		category,deadline,created_date
 		FROM job_posting
 		WHERE posting_idx =
 		#{postingIdx}

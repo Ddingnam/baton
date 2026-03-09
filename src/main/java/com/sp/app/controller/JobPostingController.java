@@ -54,6 +54,9 @@ public class JobPostingController {
     public String writeSubmit(JobPosting dto, 
             @AuthenticationPrincipal CustomUserDetails userDetails) throws Exception {
         try {
+        	// 확인용 하늘이꺼
+        	System.out.println("🚨🚨 화면에서 넘어온 마감일: " + dto.getDeadline() + " 🚨🚨");
+        	
             if (userDetails != null) {
                 dto.setUserIdx(userDetails.getUserIdx());
             }

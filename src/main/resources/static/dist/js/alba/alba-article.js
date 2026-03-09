@@ -185,3 +185,33 @@ window.addEventListener('DOMContentLoaded', function () {
     }
     tryInitMap(10);
 });
+
+document.addEventListener("DOMContentLoaded", function() {
+      const deadlineElements = document.querySelectorAll('.dday-calc');
+      
+      deadlineElements.forEach(el => {
+          const deadlineStr = el.getAttribute('data-deadline');
+          
+          if(deadlineStr) {
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              
+              const dDate = new Date(deadlineStr);
+              dDate.setHours(0, 0, 0, 0);
+              
+              const diffTime = dDate - today;
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              
+              if(diffDays < 0) {
+                  el.textContent = "마감";
+              } else if(diffDays === 0) {
+                  el.textContent = "D-Day";
+              } else {
+                  el.textContent = "D-" + diffDays;
+              }
+          } else {
+			el.textContent = "상시모집"; 
+			el.style.display = 'inline-flex';
+          }
+      });
+  });
