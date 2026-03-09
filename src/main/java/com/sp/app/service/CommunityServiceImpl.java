@@ -329,6 +329,8 @@ public class CommunityServiceImpl implements CommunityService {
 				.regDate(entity.getRegDate())
 				.placeName(entity.getPlaceName())
 				.address(entity.getAddress())
+				.latitude(entity.getLatitude())
+	            .longitude(entity.getLongitude()) 
 				.imageFiles(entity.getImages().stream().map(CommunityImage::getSaveFilename).collect(Collectors.toList()))
 				.tags(entity.getHashTags().stream().map(CommunityHashTag::getTagName).collect(Collectors.toList()))
 				.build();
