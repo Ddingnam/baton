@@ -112,4 +112,30 @@
 	    SET TRADESTATUS = '판매완료'
 	    WHERE PRODUCTIDX = #{productIdx}
 	</update>
+	
+	<update id="cancelTradeTransaction" parameterType="long">
+	    UPDATE TRADETRANSACTION
+	    SET TRADESTATUS = 'CANCELED'
+	    WHERE PRODUCTIDX = #{productIdx} AND TRADESTATUS = 'PAY_COMPLETED'
+	</update>
+
+	<update id="updateArticleStatusToOnSale" parameterType="long">
+	    UPDATE TRADE 
+	    SET TRADESTATUS = '판매중'
+	    WHERE PRODUCTIDX = #{productIdx}
+	</update>
+	
+	<update id="refundBuyerPoint" parameterType="map">
+	    UPDATE USERS
+	    SET BATONPOINT = BATONPOINT + #{refundAmount}
+	    WHERE USERIDX = #{buyerIdx}
+	</update>
+	
+	<insert id="insertPointHistoryForRefund" parameterType="map">
+	    INSERT INTO POINTHISTORY (
+	        HISTORYIDX, TRADEIDX, AMOUNT, HISTORYTYPE, USERIDX, TOTALPOINT, CREATEDAT
+	    ) VALUES (
+	        SEQPOINTHISTORY.NEXTVAL, #{tradeIdx}, #{refundAmount}, 'REFUND_ESCROW', #{buyerIdx}, #{totalPoint}, SYSTIMESTAMP
+	    )
+	</insert>
 </mapper>

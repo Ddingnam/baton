@@ -112,4 +112,44 @@ public class EscrowServiceImpl implements EscrowService {
             throw e;
         }
     }
+    
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void cancelTrade(long productIdx, long userIdx) throws Exception {
+        Map<String, Object> tradeInfo = paymentMapper.getTradeTransactionByProduct(productIdx);
+   
+        if (tradeInfo == null || !"PAY_COMPLETED".equals(tradeInfo.get("TRADESTATUS"))) {
+            throw new RuntimeException("취소할 수 없는 상태이거나 거래가 존재하지 않습니다.");
+        }
+        
+        long buyerIdx = Long.parseLong(tradeInfo.get("BUYERIDX").toString());
+        long sellerIdx = Long.parseLong(tradeInfo.get("SELLERIDX").toString());
+
+        if (userIdx != buyerIdx && userIdx != sellerIdx) {
+            throw new RuntimeException("취소 권한이 없습니다.");
+        }
+    
+        int result = paymentMapper.cancelTradeTransaction(productIdx);
+        if (result == 0) {
+            throw new RuntimeException("거래 취소 처리에 실패했습니다.");
+        }
+
+        paymentMapper.updateArticleStatusToOnSale(productIdx);
+
+        int refundAmount = Integer.parseInt(tradeInfo.get("TOTALUSED_POINT").toString());
+        
+        Map<String, Object> pointMap = new HashMap<>();
+        pointMap.put("buyerIdx", buyerIdx);
+        pointMap.put("refundAmount", refundAmount);
+        paymentMapper.refundBuyerPoint(pointMap);
+ 
+        int currentPoint = paymentMapper.getCurrentPoint(buyerIdx);
+        
+        Map<String, Object> historyMap = new HashMap<>();
+        historyMap.put("tradeIdx", tradeInfo.get("TRADEIDX"));
+        historyMap.put("refundAmount", refundAmount);
+        historyMap.put("buyerIdx", buyerIdx);
+        historyMap.put("totalPoint", currentPoint);
+        paymentMapper.insertPointHistoryForRefund(historyMap);
+    }
 }

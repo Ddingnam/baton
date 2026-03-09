@@ -157,4 +157,31 @@ public class EscrowController {
         
         return model;
     }
+    
+    @PostMapping("/cancel")
+    @ResponseBody
+    public Map<String, Object> cancelTrade(
+            @RequestParam("productIdx") long productIdx,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        
+        Map<String, Object> model = new HashMap<>();
+        
+        if (userDetails == null) {
+            model.put("state", "false");
+            model.put("message", "로그인이 필요합니다.");
+            return model;
+        }
+        
+        try {
+            escrowService.cancelTrade(productIdx, userDetails.getUserIdx());
+            model.put("state", "true");
+            model.put("message", "거래가 성공적으로 취소되었으며 포인트가 환불되었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.put("state", "false");
+            model.put("message", e.getMessage());
+        }
+        
+        return model;
+    }
 }

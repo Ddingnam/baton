@@ -280,6 +280,9 @@
 					                <button class="pay-btn" style="margin-top: 10px;" onclick="openShippingModal()">
 					                    운송장 입력하기
 					                </button>
+					                <button class="pay-btn" style="margin-top: 10px; background-color: #FF4D4F; border-color: #FF4D4F;" onclick="cancelTrade(${trade.productIdx})">
+								        주문 취소 (구매자에게 환불)
+								    </button>
 					            </c:when>
 					            <c:when test="${not empty escrowInfo and escrowInfo.TRADESTATUS == 'SHIPPING'}">
 					                <button class="pay-btn" style="margin-top: 10px;" disabled>
@@ -319,6 +322,9 @@
 					                            <button class="pay-btn" style="margin-top: 10px;" disabled>
 					                                판매자의 발송을 대기 중입니다
 					                            </button>
+					                            <button class="pay-btn" style="margin-top: 10px; background-color: #FF4D4F; border-color: #FF4D4F;" onclick="cancelTrade(${trade.productIdx})">
+											        결제 취소 (포인트 환불)
+											    </button>
 					                        </c:when>
 					                        <c:when test="${escrowInfo.TRADESTATUS == 'SHIPPING'}">
 					                            <button class="pay-btn" style="margin-top: 10px; background-color: #00C471;"
@@ -527,6 +533,32 @@ function confirmTradePurchase(productIdx) {
     })
     .catch(error => {
         console.error('Error:', error);
+    });
+}
+
+function cancelTrade(productIdx) {
+    if(!confirm("정말 거래를 취소하시겠습니까?\n취소 시 구매자에게 포인트가 즉시 전액 환불됩니다.")) return;
+
+    const params = new URLSearchParams();
+    params.append('productIdx', productIdx);
+
+    fetch('${pageContext.request.contextPath}/escrow/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.state === 'true') {
+            alert(data.message);
+            location.reload(); 
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('취소 처리 중 오류가 발생했습니다.');
     });
 }
 </script>
