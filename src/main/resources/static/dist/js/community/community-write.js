@@ -1,18 +1,20 @@
 let tagList = [];
 let quill = null;
 
+let globalUploadFiles = [];
+
 document.addEventListener('DOMContentLoaded', () => {
 	initQuill();
 	initTagInput();
 	initCategoryPills();
 	
 	const datePickerBox = document.querySelector('.date-picker-box');
-		if (datePickerBox) {
-	        datePickerBox.addEventListener('click', () => {
-	            document.getElementById('pollEndDate').showPicker();
-	        });
-	    }
-		
+	if (datePickerBox) {
+        datePickerBox.addEventListener('click', () => {
+            document.getElementById('pollEndDate').showPicker();
+        });
+    }
+	
 	const submitBtn = document.querySelector('.btn-submit');
 	const submitFullBtn = document.querySelector('.btn-submit-full');
 	if (submitBtn) submitBtn.addEventListener('click', sendOk);
@@ -79,8 +81,6 @@ function initCategoryPills() {
 }
 
 function initQuill() {
-	const contextPath = document.querySelector('meta[name="contextPath"]').getAttribute('content');
-
 	quill = new Quill('#quillEditor', {
 		theme: 'snow',
 		placeholder: '오늘 있었던 일을 이웃들과 나눠보세요 :)',
@@ -96,47 +96,50 @@ function initQuill() {
 					['clean']
 				],
 				handlers: {
-					image: imageUploadHandler
+					image: imageHandler
 				}
 			}
 		}
 	});
 
 	const hiddenContent = document.getElementById('content');
-	if (hiddenContent && hiddenContent.value) {
-		quill.root.innerHTML = hiddenContent.value;
-	}
+	// update 모드의 content 로딩은 write.jsp 인라인 스크립트에서 처리
+}
 
-	function imageUploadHandler() {
-		const input = document.createElement('input');
-		input.setAttribute('type', 'file');
-		input.setAttribute('accept', 'image/*');
-		input.click();
+function imageHandler() {
+	const input = document.createElement('input');
+	input.setAttribute('type', 'file');
+	input.setAttribute('accept', 'image/*');
+	input.click();
 
-		input.onchange = async () => {
-			const file = input.files[0];
-			if (!file) return;
+	input.onchange = () => {
+		const file = input.files[0];
+		if (!file) return;
 
-			const formData = new FormData();
-			formData.append('imageFile', file);
+		if (/^image\//.test(file.type)) {
+			const ext = file.name.substring(file.name.lastIndexOf('.')) || ('.' + file.type.split('/')[1]);
+			const uniqueId = 'img_' + Date.now() + '_' + Math.floor(Math.random() * 1000) + ext;
+			
+			file.tempId = uniqueId;
+			globalUploadFiles.push(file);
 
-			try {
-				const resp = await fetch(contextPath + '/editor/upload', {
-					method: 'POST',
-					body: formData
-				});
-				const data = await resp.json();
-				if (data.state === 'true') {
-					const range = quill.getSelection();
-					quill.insertEmbed(range ? range.index : 0, 'image', data.imageUrl);
-				} else {
-					showToast('이미지 업로드에 실패했습니다.');
-				}
-			} catch (e) {
-				showToast('이미지 업로드 중 오류가 발생했습니다.');
-			}
-		};
-	}
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				const range = quill.getSelection();
+				quill.insertEmbed(range.index, 'image', e.target.result);
+				
+				setTimeout(() => {
+					const img = quill.root.querySelector(`img[src="${e.target.result}"]`);
+					if(img) {
+						img.setAttribute('data-temp-id', uniqueId);
+					}
+				}, 10);
+			};
+			reader.readAsDataURL(file);
+		} else {
+			showToast('이미지 파일만 선택 가능합니다.');
+		}
+	};
 }
 
 function initTagInput() {
@@ -240,12 +243,30 @@ function addPollOption() {
 }
 
 function sendOk() {
-    if (quill) {
-        const htmlContent = quill.root.innerHTML;
-        document.getElementById('content').value = htmlContent === '<p><br></p>' ? '' : htmlContent;
-    }
-
     const f = document.communityForm;
+    
+    const activeImages = quill.root.querySelectorAll('img[data-temp-id]');
+    const activeIds = Array.from(activeImages).map(img => img.getAttribute('data-temp-id'));
+    
+    const dataTransfer = new DataTransfer();
+    
+    globalUploadFiles.forEach(file => {
+        if (activeIds.includes(file.tempId)) {
+            const renamedFile = new File([file], file.tempId, { type: file.type });
+            dataTransfer.items.add(renamedFile);
+            
+            const img = quill.root.querySelector(`img[data-temp-id="${file.tempId}"]`);
+            if(img) {
+                img.setAttribute('src', file.tempId);
+            }
+        }
+    });
+    
+    document.getElementById('hiddenFileInput').files = dataTransfer.files;
+
+    const htmlContent = quill.root.innerHTML;
+    document.getElementById('content').value = htmlContent === '<p><br></p>' ? '' : htmlContent;
+
     const subject = f.subject.value.trim();
     const content = document.getElementById('content').value;
     
@@ -261,11 +282,8 @@ function sendOk() {
         return;
     }
     if (!content) {
-        const quillText = quill ? quill.getText().trim() : '';
-        if (!quillText) {
-            showToast('내용을 입력해주세요');
-            return;
-        }
+        showToast('내용을 입력해주세요');
+        return;
     }
 
     const usePoll = document.getElementById('chkPollToggle');
@@ -286,7 +304,6 @@ function sendOk() {
             showToast('투표 항목은 최소 2개 이상 입력해야 합니다.');
             return;
         }
-        
     } else {
         const pollArea = document.getElementById('pollForm');
         if(pollArea) {
@@ -305,7 +322,6 @@ function sendOk() {
         input.value = tag;
         f.appendChild(input);
     });
-
     
     const contextPath = document.querySelector('meta[name="contextPath"]').getAttribute('content');
     const mode = f.mode.value;

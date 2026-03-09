@@ -22,7 +22,16 @@
 <div class="article-layout">
     <div class="article-container">
         <div class="article-header">
-            <div class="category-badge">${dto.category}</div>
+            <div class="category-badge">
+                <c:choose>
+                    <c:when test="${dto.category == 1}">일상</c:when>
+                    <c:when test="${dto.category == 2}">동네질문</c:when>
+                    <c:when test="${dto.category == 3}">동네맛집</c:when>
+                    <c:when test="${dto.category == 4}">동네소식</c:when>
+                    <c:when test="${dto.category == 5}">분실/실종</c:when>
+                    <c:otherwise>${dto.category}</c:otherwise>
+                </c:choose>
+            </div>
             <h1 class="article-subject">${dto.subject}</h1>
             
             <div class="profile-box">
@@ -82,15 +91,6 @@
 			    ${dto.content}
 			</div>
 
-            <c:if test="${not empty dto.imageFiles}">
-                <div class="image-grid">
-                    <c:forEach var="img" items="${dto.imageFiles}">
-                        <div class="img-wrapper">
-                            <img src="${pageContext.request.contextPath}/uploads/community/${img}" alt="첨부 이미지" onclick="window.open(this.src)">
-                        </div>
-                    </c:forEach>
-                </div>
-            </c:if>
 
             <c:if test="${dto.latitude != null && dto.latitude != 0}">
                 <div class="map-card">

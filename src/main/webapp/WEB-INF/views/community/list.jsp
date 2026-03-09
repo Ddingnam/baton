@@ -104,7 +104,16 @@
                                 <i class="ri-image-line"></i>
                             </c:otherwise>
                         </c:choose>
-                        <span class="card-badge">${dto.category}</span>
+                        <span class="card-badge">
+                            <c:choose>
+                                <c:when test="${dto.category == '1' || dto.category == '일상'}">일상</c:when>
+                                <c:when test="${dto.category == '2' || dto.category == '동네질문'}">동네질문</c:when>
+                                <c:when test="${dto.category == '3' || dto.category == '동네맛집'}">동네맛집</c:when>
+                                <c:when test="${dto.category == '4' || dto.category == '동네소식'}">동네소식</c:when>
+                                <c:when test="${dto.category == '5' || dto.category == '분실/실종'}">분실/실종</c:when>
+                                <c:otherwise>${dto.category}</c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
 
                     <div class="card-body">

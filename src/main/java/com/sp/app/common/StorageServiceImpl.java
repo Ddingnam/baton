@@ -65,12 +65,17 @@ public class StorageServiceImpl implements StorageService {
 				return null;
 			}
 			
+			int dotIndex = originalFilename.lastIndexOf(".");
+			if (dotIndex < 0) {
+				return null;
+			}
+			
 			if(! fileManager.isDirectoryExist(directoryPath)) {
 				fileManager.createAllDirectories(directoryPath);
 			}
 			
 			// 확장자
-			String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+			String extension = originalFilename.substring(dotIndex);
 			// 서버에 저장할 새로운 파일명
 			String saveFilename = fileManager.generateUniqueFileName(directoryPath, extension);
 			

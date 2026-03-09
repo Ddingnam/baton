@@ -70,15 +70,26 @@ public class CommunityServiceImpl implements CommunityService {
 			}
 
 			List<MultipartFile> files = dto.getUploadFiles();
+			String content = community.getContent();
+			
 			if (files != null && !files.isEmpty()) {
 				for (MultipartFile mf : files) {
 					if(mf.isEmpty()) continue;
+					
+					String tempId = mf.getOriginalFilename();
 					String saveFilename = storageService.uploadFileToServer(mf, uploadPath);
+					
+					String webPath = "/uploads/community/" + saveFilename;
+					
+					content = content.replace("src=\"" + tempId + "\"", "src=\"" + webPath + "\"");
+
 					community.addImage(CommunityImage.builder()
 							.originalFilename(mf.getOriginalFilename())
 							.saveFilename(saveFilename)
 							.build());
 				}
+				
+				community.setContent(content);
 			}
 
 			Community savedCommunity = communityRepository.save(community);
@@ -156,25 +167,34 @@ public class CommunityServiceImpl implements CommunityService {
 	public void updateCommunity(CommunityDto dto, String uploadPath) throws Exception {
 		try {
 			Community community = communityRepository.findById(dto.getId()).orElseThrow();
-			community.setSubject(dto.getSubject());
-			community.setContent(dto.getContent());
-			community.setCategory(dto.getCategory());
-			community.setPlaceName(dto.getPlaceName());
-			community.setAddress(dto.getAddress());
-			community.setLatitude(dto.getLatitude());
-			community.setLongitude(dto.getLongitude());
-
+			
+			String content = dto.getContent();
 			List<MultipartFile> files = dto.getUploadFiles();
+			
 			if (files != null && !files.isEmpty()) {
 				for (MultipartFile mf : files) {
 					if(mf.isEmpty()) continue;
+					String tempId = mf.getOriginalFilename();
 					String saveFilename = storageService.uploadFileToServer(mf, uploadPath);
+					String webPath = "/uploads/community/" + saveFilename;
+					
+					content = content.replace("src=\"" + tempId + "\"", "src=\"" + webPath + "\"");
+					
 					community.addImage(CommunityImage.builder()
 							.originalFilename(mf.getOriginalFilename())
 							.saveFilename(saveFilename)
 							.build());
 				}
 			}
+			
+			community.setSubject(dto.getSubject());
+			community.setContent(content); // 수정된 내용 저장
+			community.setCategory(dto.getCategory());
+			community.setPlaceName(dto.getPlaceName());
+			community.setAddress(dto.getAddress());
+			community.setLatitude(dto.getLatitude());
+			community.setLongitude(dto.getLongitude());
+
 		} catch (Exception e) {
 			log.error("updateCommunity error", e);
 			throw e;
@@ -228,7 +248,6 @@ public class CommunityServiceImpl implements CommunityService {
 	public int getLikeCount(long id) {
 		return communityRepository.findById(id).map(Community::getLikeCount).orElse(0);
 	}
-	
 	
 	@Override
 	public boolean isUserLiked(Map<String, Object> map) {
@@ -288,7 +307,7 @@ public class CommunityServiceImpl implements CommunityService {
 					.build());
 		}
 		pollVoteRepository.saveAll(votes);
-		log.info("투표 시도 - 회원번호: {}", memberIdx); // 이 번호가 DB MEMBER 테이블에 진짜 있는지 확인
+		log.info("투표 시도 - 회원번호: {}", memberIdx); 
 	}
 
 	@Override

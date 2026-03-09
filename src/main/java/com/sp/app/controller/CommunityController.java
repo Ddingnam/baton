@@ -1,6 +1,6 @@
 package com.sp.app.controller;
 
-import java.io.File;
+import java.util.List;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.sp.app.common.PaginateUtil;
 import com.sp.app.common.RequestUtils;
@@ -55,6 +56,8 @@ public class CommunityController {
             @RequestParam(name = "page", defaultValue = "1") int current_page,
             @RequestParam(name = "schType", defaultValue = "all") String schType,
             @RequestParam(name = "kwd", defaultValue = "") String kwd,
+            @RequestParam(name = "category", defaultValue = "") String category,
+            @RequestParam(name = "sort", defaultValue = "latest") String sort,
             HttpServletRequest req,
             Model model) throws Exception {
 
@@ -64,7 +67,10 @@ public class CommunityController {
             }
 
             int size = 9;
-            Pageable pageable = PageRequest.of(current_page - 1, size, Sort.by("id").descending());
+            Sort sortOrder = "hit".equals(sort) ? Sort.by("hitCount").descending()
+                           : "like".equals(sort) ? Sort.by("likeCount").descending()
+                           : Sort.by("id").descending();
+            Pageable pageable = PageRequest.of(current_page - 1, size, sortOrder);
             Page<CommunityDto> pages = service.getCommunityList(pageable, schType, kwd);
 
             int total_page = pages.getTotalPages();
@@ -74,10 +80,14 @@ public class CommunityController {
             String listUrl = cp + "/community/list";
             String query = "page=" + current_page;
 
-            if (!kwd.isBlank()) {
-                String searchParams = "schType=" + schType + "&kwd=" + URLEncoder.encode(kwd, "UTF-8");
-                listUrl += "?" + searchParams;
-                query += "&" + searchParams;
+            StringBuilder params = new StringBuilder();
+            if (!category.isBlank()) params.append("&category=").append(URLEncoder.encode(category, "UTF-8"));
+            if (!"latest".equals(sort)) params.append("&sort=").append(sort);
+            if (!kwd.isBlank()) params.append("&schType=").append(schType).append("&kwd=").append(URLEncoder.encode(kwd, "UTF-8"));
+
+            if (params.length() > 0) {
+                listUrl += "?" + params.substring(1);
+                query += params.toString();
             }
 
             String paging = paginateUtil.paging(current_page, total_page, listUrl);
@@ -90,6 +100,8 @@ public class CommunityController {
             model.addAttribute("query", query);
             model.addAttribute("schType", schType);
             model.addAttribute("kwd", kwd);
+            model.addAttribute("category", category);
+            model.addAttribute("sort", sort);
 
         } catch (Exception e) {
             log.info("list : ", e);
@@ -105,11 +117,14 @@ public class CommunityController {
     }
 
     @PostMapping("write")
-    public String writeSubmit(CommunityDto dto, HttpSession session) throws Exception {
+    public String writeSubmit(CommunityDto dto,
+            @RequestParam(value = "uploadFiles", required = false) List<MultipartFile> uploadFiles,
+            HttpSession session) throws Exception {
         SessionInfo info = (SessionInfo) session.getAttribute("member");
 
         dto.setMemberIdx(info.getUserIdx());
         dto.setWriterNickname(info.getName());
+        dto.setUploadFiles(uploadFiles);
 
         try {
             service.insertCommunity(dto, uploadPath);
@@ -122,7 +137,7 @@ public class CommunityController {
 
     @GetMapping("article/{id}")
     public String article(@PathVariable("id") long id,
-            @RequestParam(name = "page") String page,
+            @RequestParam(name = "page", defaultValue = "1") String page,
             @RequestParam(name = "schType", defaultValue = "all") String schType,
             @RequestParam(name = "kwd", defaultValue = "") String kwd,
             @SessionAttribute("member") SessionInfo info,
@@ -159,54 +174,55 @@ public class CommunityController {
         }
     }
     
- 	@GetMapping("update")
- 	public String updateForm(@RequestParam("id") long id,
- 			@RequestParam("page") String page,
- 			@SessionAttribute("member") SessionInfo info,
- 			Model model) throws Exception {
- 		
- 		CommunityDto dto = service.getCommunity(id);
- 		if (dto == null || !dto.getMemberIdx().equals(info.getUserIdx())) {
- 			return "redirect:/community/list?page=" + page;
- 		}
+    @GetMapping("update")
+    public String updateForm(@RequestParam("id") long id,
+            @RequestParam("page") String page,
+            @SessionAttribute("member") SessionInfo info,
+            Model model) throws Exception {
+        
+        CommunityDto dto = service.getCommunity(id);
+        if (dto == null || !dto.getMemberIdx().equals(info.getUserIdx())) {
+            return "redirect:/community/list?page=" + page;
+        }
 
- 		model.addAttribute("mode", "update");
- 		model.addAttribute("page", page);
- 		model.addAttribute("dto", dto);
- 		
- 		model.addAttribute("kakaoMapKey", kakaoMapKey); 
+        model.addAttribute("mode", "update");
+        model.addAttribute("page", page);
+        model.addAttribute("dto", dto);
+        model.addAttribute("kakaoMapKey", kakaoMapKey); 
 
- 		return "community/write";
- 	}
+        return "community/write";
+    }
 
- 	@PostMapping("update")
- 	public String updateSubmit(CommunityDto dto,
- 			@RequestParam("page") String page,
- 			@SessionAttribute("member") SessionInfo info) throws Exception {
+    @PostMapping("update")
+    public String updateSubmit(CommunityDto dto,
+            @RequestParam(value = "uploadFiles", required = false) List<MultipartFile> uploadFiles,
+            @RequestParam("page") String page,
+            @SessionAttribute("member") SessionInfo info) throws Exception {
 
- 		try {
- 			dto.setMemberIdx(info.getUserIdx());
- 			service.updateCommunity(dto, uploadPath);
- 		} catch (Exception e) {
- 			e.printStackTrace();
- 		}
+        try {
+            dto.setMemberIdx(info.getUserIdx());
+            dto.setUploadFiles(uploadFiles);
+            service.updateCommunity(dto, uploadPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
- 		return "redirect:/community/article/" + dto.getId() + "?page=" + page;
- 	}
+        return "redirect:/community/article/" + dto.getId() + "?page=" + page;
+    }
 
- 	@GetMapping("delete")
- 	public String delete(@RequestParam("id") long id,
- 			@RequestParam("page") String page,
- 			@SessionAttribute("member") SessionInfo info) throws Exception {
+    @GetMapping("delete")
+    public String delete(@RequestParam("id") long id,
+            @RequestParam("page") String page,
+            @SessionAttribute("member") SessionInfo info) throws Exception {
 
- 		try {
- 			service.deleteCommunity(id, uploadPath);
- 		} catch (Exception e) {
- 			e.printStackTrace();
- 		}
+        try {
+            service.deleteCommunity(id, uploadPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
- 		return "redirect:/community/list?page=" + page;
- 	}
+        return "redirect:/community/list?page=" + page;
+    }
     
     @PostMapping("like")
     public ResponseEntity<?> like(@RequestParam("id") long id, @SessionAttribute("member") SessionInfo info) {
