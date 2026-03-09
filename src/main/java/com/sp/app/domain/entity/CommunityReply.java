@@ -1,6 +1,7 @@
 package com.sp.app.domain.entity;
 
 import java.time.LocalDateTime;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
@@ -18,7 +19,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 
 @Entity
 @Getter
@@ -50,6 +50,10 @@ public class CommunityReply {
     @CreationTimestamp
     @Column(name = "reg_date", updatable = false)
     private LocalDateTime regDate;
+
+    @Column(name = "is_deleted")
+    @ColumnDefault("false") 
+    private boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id")

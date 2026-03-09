@@ -102,7 +102,6 @@ function initQuill() {
 		}
 	});
 
-	// 수정 모드일 때 기존 content 로드
 	const hiddenContent = document.getElementById('content');
 	if (hiddenContent && hiddenContent.value) {
 		quill.root.innerHTML = hiddenContent.value;
@@ -241,7 +240,6 @@ function addPollOption() {
 }
 
 function sendOk() {
-    // Quill 내용을 hidden input에 넣기
     if (quill) {
         const htmlContent = quill.root.innerHTML;
         document.getElementById('content').value = htmlContent === '<p><br></p>' ? '' : htmlContent;

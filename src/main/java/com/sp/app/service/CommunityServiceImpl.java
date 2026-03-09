@@ -288,6 +288,7 @@ public class CommunityServiceImpl implements CommunityService {
 					.build());
 		}
 		pollVoteRepository.saveAll(votes);
+		log.info("투표 시도 - 회원번호: {}", memberIdx); // 이 번호가 DB MEMBER 테이블에 진짜 있는지 확인
 	}
 
 	@Override

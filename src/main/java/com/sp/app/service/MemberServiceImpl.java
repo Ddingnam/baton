@@ -24,8 +24,6 @@ public class MemberServiceImpl implements MemberService {
 	private final MemberMapper mapper;
 	private final StorageService storageService;
 	private final PasswordEncoder bcryptEncoder;
-	
-	// private final MailSender mailSender;
 
 	@Override
 	public UserDto loginSnsUser(Map<String, Object> map) {
@@ -55,7 +53,6 @@ public class MemberServiceImpl implements MemberService {
 			dto.setUserIdx(seq);
 			
 			mapper.insertUser(dto);
-			// mapper.insertRegion(dto);
 			
 			dto.setAuthority("USER");
 			mapper.insertAuthority(dto);
