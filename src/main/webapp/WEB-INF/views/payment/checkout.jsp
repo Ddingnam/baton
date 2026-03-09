@@ -7,27 +7,85 @@
 <meta charset="UTF-8">
 <title>안전결제 | BATON</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+
 <style>
-    .checkout-container { max-width: 600px; margin: 50px auto; padding: 30px; background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-    .checkout-title { font-size: 24px; font-weight: 700; margin-bottom: 25px; color: #333; }
+    * { box-sizing: border-box; }
+    body { 
+        font-family: 'Noto Sans KR', sans-serif; 
+        background: #f7f8fa; 
+        color: #1a1a1a; 
+        margin: 0; padding: 0; 
+    }
+
+    .checkout-container { 
+        max-width: 600px; 
+        margin: 120px auto 60px; 
+        padding: 40px; 
+        background: #fff; 
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06); 
+    }
+
+    .checkout-title { 
+        font-size: 24px; font-weight: 800; color: #111; 
+        margin: 0 0 30px 0; padding-bottom: 15px; border-bottom: 2px solid #111; 
+    }
+    .section-title {
+        font-size: 18px; font-weight: 700; color: #111; 
+        margin: 35px 0 15px 0;
+    }
     
-    .product-summary { display: flex; align-items: center; padding: 20px; background: #f8f9fa; border-radius: 12px; margin-bottom: 30px; }
-    .product-summary img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; margin-right: 15px; }
-    .product-info h4 { margin: 0 0 5px 0; font-size: 16px; color: #333; }
-    .product-info p { margin: 0; font-weight: bold; font-size: 18px; color: #3182F6; }
+    .product-summary { 
+        display: flex; align-items: center; padding: 20px; 
+        background: #f8f9fa; border-radius: 12px; margin-bottom: 30px; 
+        border: 1px solid #eee;
+    }
+    .product-summary img { 
+        width: 70px; height: 70px; border-radius: 8px; object-fit: cover; 
+        margin-right: 15px; border: 1px solid #e0e0e0;
+    }
+    .product-info h4 { margin: 0 0 5px 0; font-size: 16px; color: #333; font-weight: 600;}
+    .product-info p { margin: 0; font-weight: 800; font-size: 18px; color: #3182F6; }
 
-    .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; font-size: 14px; font-weight: 600; color: #555; margin-bottom: 8px; }
-    .form-group input { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; }
-    .form-group input:focus { border-color: #3182F6; outline: none; }
+    .shipping-options { display: flex; gap: 12px; margin-bottom: 10px; }
+    .radio-box { flex: 1; position: relative; }
+    .radio-box input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .radio-text {
+        display: flex; align-items: center; justify-content: center;
+        width: 100%; padding: 16px 10px;
+        border: 1.5px solid #ddd; border-radius: 10px; cursor: pointer;
+        font-weight: 600; font-size: 15px; color: #666; background: #fff;
+        transition: all 0.2s ease; text-align: center;
+    }
 
-    .payment-summary { margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
-    .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 15px; color: #555; }
-    .summary-row.total { font-size: 18px; font-weight: 700; color: #333; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ddd; }
-    .summary-row.total .price { color: #3182F6; }
+    .radio-box input[type="radio"]:checked + .radio-text {
+        border-color: #3182F6; background: #F0F6FF; color: #3182F6;
+    }
 
-    .btn-pay { width: 100%; padding: 15px; background: #3182F6; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.2s; }
-    .btn-pay:hover { background: #1b64da; }
+    .form-group { margin-bottom: 24px; }
+    .form-group label { display: block; font-size: 14px; font-weight: 600; color: #444; margin-bottom: 8px; }
+    .form-group input { 
+        width: 100%; padding: 14px 16px; border: 1px solid #ddd; 
+        border-radius: 10px; font-size: 15px; font-family: inherit; transition: border-color 0.2s;
+    }
+    .form-group input:focus { border-color: #3182F6; outline: none; background: #fafcff;}
+    .form-group input::placeholder { color: #bbb; }
+
+    .payment-summary { margin-top: 35px; border-top: 2px solid #eee; padding-top: 25px; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: #555; font-weight: 500;}
+    .summary-row.total { font-size: 18px; font-weight: 800; color: #111; margin-top: 20px; padding-top: 20px; border-top: 1px dashed #ddd; align-items: center;}
+    .summary-row.total .price { color: #3182F6; font-size: 22px; }
+
+    .btn-pay { 
+        width: 100%; padding: 18px; background: #3182F6; color: white; 
+        border: none; border-radius: 10px; font-size: 17px; font-weight: 700; 
+        cursor: pointer; margin-top: 25px; transition: 0.2s; font-family: inherit;
+    }
+    .btn-pay:hover { background: #256bd6; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(49,130,246,0.3);}
+    .btn-pay:disabled { background: #b0cbf7; cursor: not-allowed; transform: none; box-shadow: none;}
 </style>
 </head>
 <body>
@@ -53,20 +111,21 @@
         <input type="hidden" name="totalUsedPoint" value="${product.price + product.shippingFee}">
 
         <c:if test="${product.shippingFee > 0}">
-            <h3>배송/결제 방식</h3>
-            <div class="form-group" style="display: flex; gap: 20px;">
-                <label style="display: flex; align-items: center; gap: 5px;">
+            <h3 class="section-title">배송/결제 방식</h3>
+            <div class="shipping-options">
+                <label class="radio-box">
                     <input type="radio" name="shippingType" value="prepaid" onchange="updateTotal()" checked>
-                    선불 (배송비 포함 결제)
+                    <span class="radio-text">선불 (배송비 포함)</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 5px;">
+                <label class="radio-box">
                     <input type="radio" name="shippingType" value="cod" onchange="updateTotal()">
-                    착불 (배송비는 수령 시 지불)
+                    <span class="radio-text">착불 (수령 시 지불)</span>
                 </label>
             </div>
         </c:if>
 
-        <h3>배송지 정보</h3>
+        <h3 class="section-title">배송지 정보</h3>
+    
         <div class="form-group">
             <label>수령인 이름</label>
             <input type="text" name="recipientName" id="recipientName" placeholder="이름을 입력하세요">
@@ -76,7 +135,7 @@
             <label>연락처</label>
             <input type="text" name="recipientPhone" id="recipientPhone" placeholder="010-0000-0000">
         </div>
-        
+    
         <div class="form-group">
             <label>배송지 주소</label>
             <input type="text" name="shippingAddress" id="shippingAddress" placeholder="상세 주소를 입력하세요">
@@ -93,7 +152,7 @@
 		    </div>
 		    <div class="summary-row">
 		        <span>안전결제 수수료</span>
-		        <span style="color: #3182F6; font-weight: bold;">무료</span>
+		        <span style="color: #3182F6; font-weight: 700;">무료</span>
 		    </div>
 		    <div class="summary-row total">
 		        <span>총 결제 포인트</span>
@@ -135,14 +194,20 @@
     }
 
     function requestEscrowPayment() {
-        if(!document.getElementById('recipientName').value) {
-            alert('수령인 이름을 입력해주세요.'); return;
+        if(!document.getElementById('recipientName').value.trim()) {
+            alert('수령인 이름을 입력해주세요.');
+            document.getElementById('recipientName').focus();
+            return;
         }
-        if(!document.getElementById('recipientPhone').value) {
-            alert('연락처를 입력해주세요.'); return;
+        if(!document.getElementById('recipientPhone').value.trim()) {
+            alert('연락처를 입력해주세요.');
+            document.getElementById('recipientPhone').focus();
+            return;
         }
-        if(!document.getElementById('shippingAddress').value) {
-            alert('배송지 주소를 입력해주세요.'); return;
+        if(!document.getElementById('shippingAddress').value.trim()) {
+            alert('배송지 주소를 입력해주세요.');
+            document.getElementById('shippingAddress').focus();
+            return;
         }
 
         const form = document.getElementById('escrowForm');
