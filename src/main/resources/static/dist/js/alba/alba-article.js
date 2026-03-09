@@ -139,13 +139,36 @@ function copyAddress(address) {
     }
 }
 
-// 버그 수정: 기존 코드에서 CONTEXT_PATH 와 idx 변수가 섞여있던 문제 수정
 function confirmDelete(albaIdx) {
     if (confirm('이 공고를 정말 삭제하시겠습니까?\n삭제된 공고는 복구할 수 없습니다.')) {
         location.href = CONTEXT_PATH + '/alba/delete?postingIdx=' + albaIdx;
     }
 }
 
+function initMap() {
+    const address   = document.getElementById('mapAddress')?.value;
+    const placeName = document.getElementById('mapPlaceName')?.value || '근무 위치';
+    const mapContainer = document.getElementById('map');
+
+    if (!address || !mapContainer) return;
+
+    try {
+        const geocoder = new kakao.maps.services.Geocoder();
+        geocoder.addressSearch(address, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                const coords    = new kakao.maps.LatLng(result[0].y, result[0].x);
+                const map       = new kakao.maps.Map(mapContainer, { center: coords, level: 3 });
+                const marker    = new kakao.maps.Marker({ map, position: coords });
+                const infowindow = new kakao.maps.InfoWindow({
+                    content: `<div style="padding:5px;font-size:13px;text-align:center;white-space:nowrap;">${placeName}</div>`
+                });
+                infowindow.open(map, marker);
+            }
+        });
+    } catch(e) {}
+}
+
+// ✅ DOMContentLoaded 딱 하나만
 window.addEventListener('DOMContentLoaded', function () {
     const articleEl = document.getElementById('articleData');
     if (articleEl) {
@@ -153,4 +176,17 @@ window.addEventListener('DOMContentLoaded', function () {
         const albaIdx = parseInt(articleEl.dataset.albaIdx) || 0;
         WishModule.init(wished, albaIdx);
     }
+
+    // 카카오 SDK 로드 대기 후 지도 초기화
+    function tryInitMap(retry) {
+        if (typeof kakao !== 'undefined' && kakao.maps && kakao.maps.services) {
+            initMap();
+        } else if (retry > 0) {
+            setTimeout(() => tryInitMap(retry - 1), 300);
+        }
+    }
+    tryInitMap(10);
 });
+
+   
+

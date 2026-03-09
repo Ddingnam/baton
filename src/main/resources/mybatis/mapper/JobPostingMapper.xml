@@ -10,7 +10,7 @@
     INSERT INTO job_posting (
         posting_idx,  title, employer, description, pay, pay_type,
         work_period, work_days, start_time, end_time, time_negotiable,
-        location, contact, benefits, user_idx, region_idx, category, created_date
+        location, location_detail, location_lat, location_lng, contact, benefits, user_idx, region_idx, category, created_date
     )
     VALUES (
         #{postingIdx}, #{title},
@@ -23,7 +23,7 @@
         #{startTime, jdbcType=VARCHAR},
         #{endTime, jdbcType=VARCHAR},
         #{timeNegotiable, jdbcType=VARCHAR},
-        #{location},
+         #{location}, #{locationDetail}, #{locationLat}, #{locationLng},
         #{contact, jdbcType=VARCHAR},
         #{benefits, jdbcType=VARCHAR},
         #{userIdx},
@@ -57,7 +57,11 @@
 		work_period=#{workPeriod}, work_days=#{workDays},
 		start_time=#{startTime},
 		end_time=#{endTime},
-		time_negotiable=#{timeNegotiable}, location=#{location},
+		time_negotiable=#{timeNegotiable}, 
+		location=#{location},
+    	location_detail=#{locationDetail},
+    	location_lat=#{locationLat},
+    	location_lng=#{locationLng},
 		contact=#{contact}, benefits=#{benefits}, category=#{category}
 		WHERE
 		posting_idx = #{postingIdx}
@@ -112,7 +116,11 @@
 		end_time AS endTime,
 		time_negotiable AS timeNegotiable,
 		title, employer, description, pay,
-		location, contact, benefits,
+		location, 
+		location_detail AS locationDetail,
+    	location_lat AS locationLat,
+    	location_lng AS locationLng,
+		contact, benefits,
 		category, created_date
 		FROM job_posting
 		WHERE posting_idx =

@@ -13,6 +13,9 @@
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/alba/alba-article.css">
+
+<jsp:include page="/WEB-INF/views/api/api.jsp"/>
+
 <style>
   html { scroll-behavior: smooth; }
 </style>
@@ -100,14 +103,19 @@
                             <td>${dto.recruitStatus}</td>
                         </tr>
                         <c:if test="${not empty dto.location}">
-                        <tr>
-                            <th>근무지역</th>
-                            <td>
-                                ${dto.location} ${dto.locationDetail}
-                                <button type="button" class="btn-copy-mini" onclick="copyAddress('${dto.location} ${dto.locationDetail}')">주소복사</button>
-                            </td>
-                        </tr>
-                        </c:if>
+							<tr>
+							    <th>근무지역</th>
+							    <td>
+							        ${dto.location} ${dto.locationDetail}
+							        <button type="button" class="btn-copy-mini" onclick="copyAddress('${dto.location} ${dto.locationDetail}')">주소복사</button>
+							        
+							        <div id="map" style="width:100%; height:300px; margin-top:15px; border-radius:8px; border:1px solid #eee;"></div>
+							        
+							        <input type="hidden" id="mapAddress" value="${dto.location}">
+							        <input type="hidden" id="mapPlaceName" value="${dto.employer}">
+							    </td>
+							</tr>
+						</c:if>
                     </tbody>
                 </table>
             </div>
@@ -237,7 +245,6 @@
           const headerOffset = 110;
           const elementPosition = el.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-          
           window.scrollTo({ top: offsetPosition, behavior: "smooth" });
           
           document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
@@ -245,6 +252,7 @@
       }
   }
 </script>
+
 <script src="${pageContext.request.contextPath}/dist/js/alba/alba-article.js"></script>
 </body>
 </html>

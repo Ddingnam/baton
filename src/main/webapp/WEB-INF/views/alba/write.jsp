@@ -21,7 +21,6 @@
 <div class="alba-write-container">
   <div class="alba-write-inner">
 
-    <%-- ===== 사이드바 ===== --%>
     <aside class="alba-write-sidebar">
 
       <div class="sidebar-header">

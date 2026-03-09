@@ -34,6 +34,7 @@ public class JobPosting {
     private String locationDetail;
     private String locationLat;
     private String locationLng;
+    
     private String deadline;
     private String contact;
     private String benefits;
