@@ -67,12 +67,15 @@ public class MemberServiceImpl implements MemberService {
 	public void insertSnsUser(UserDto dto) throws Exception {
 		try {
 			Long seq = mapper.userSeq();
-			dto.setUserIdx(seq);
 			
+			dto.setUserIdx(seq);
 			mapper.insertSnsUser(dto);
 			
+			dto.setAuthority("USER");
+			mapper.insertAuthority(dto);
+			
 		} catch (Exception e) {
-			log.info("insertSnsMember : ", e);
+			log.info("insertSnsUser : ", e);
 			throw e;
 		}
 	}

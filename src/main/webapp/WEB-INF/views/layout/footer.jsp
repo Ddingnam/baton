@@ -79,4 +79,14 @@
     <button id="btn-top" title="위로 가기"><i class="ri-arrow-up-line"></i></button>
 </footer>
 
+
 <script src="${pageContext.request.contextPath}/dist/js/layout/footer.js"></script>
+<jsp:include page="/WEB-INF/views/api/api.jsp"/>
+<script type="text/javascript">
+function loginWithKakao() {
+	const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=\${KAKAO_API_KEY}&redirect_uri=\${KAKAO_REDIRECT_URI}&prompt=login`;
+	const setting = 'width=500,height=700,menubar=no,location=no,status=no,scrollbars=yes,resizable=no';
+	
+	const popup = window.open(kakaoAuthUrl, 'kakaoLogin', setting);
+}
+</script>

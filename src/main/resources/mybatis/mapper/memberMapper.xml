@@ -6,7 +6,7 @@
 		SELECT userIdx, oauthId, provider, name, email,  
 			createdDate, lastLoginDate, status
 		FROM users
-		WHERE provider = #{provider} AND oauthId = #{oauthId}
+		WHERE provider = #{provider, jdbcType=VARCHAR} AND oauthId = #{oauthId, jdbcType=VARCHAR}
 	</select>
 	
 	<select id="userSeq" resultType="Long">
@@ -18,7 +18,6 @@
 	    INSERT INTO users (
 	        userIdx, 
 	        userId, 
-	        oauthId, 
 	        pwd, 
 	        name, 
 	        nickname, 
@@ -36,7 +35,6 @@
 	    ) VALUES (
 	    	#{userIdx}, 
 	        #{userId}, 
-	        #{oauthId, jdbcType=VARCHAR}, 
 	        #{pwd}, 
 	        #{name}, 
 	        #{nickname}, 
@@ -71,7 +69,7 @@
 	        #{userIdx},
 	        #{userId}, 
 	        #{oauthId, jdbcType=VARCHAR}, 
-	        #{pwd},
+	        #{pwd, jdbcType=VARCHAR},
 	        #{name}, 
 	        #{nickname}, 
 	        #{email}, 
@@ -188,7 +186,7 @@
 			status, createdDate, updatedDate, lastLoginDate,
 			TO_CHAR(birth, 'YYYY-MM-DD') birth, 
 			profile_photo, score, userLevel, pwdFailCount,
-			m2.authority, batonpoint, provider
+			m2.authority, batonpoint
 		FROM users m1
 		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
 		WHERE m1.userIdx = #{member_id}
@@ -199,7 +197,7 @@
 			status, createdDate, updatedDate, lastLoginDate,
 			TO_CHAR(birth, 'YYYY-MM-DD') birth, 
 			profile_photo, score, userLevel, pwdFailCount,
-			m2.authority, batonpoint, provider
+			m2.authority, batonpoint
 		FROM users m1
 		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
 		WHERE m1.userId = #{login_id}
