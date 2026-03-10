@@ -2,6 +2,25 @@ let tagList = [];
 let quill = null;
 let globalUploadFiles = [];
 
+// 커스텀 confirm (브라우저 기본 alert/confirm 대체)
+function batonConfirm(message, onConfirm, onCancel) {
+	const overlay = document.createElement('div');
+	overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:999999;display:flex;align-items:center;justify-content:center;';
+	overlay.innerHTML = `
+		<div style="background:#fff;border-radius:20px;padding:28px 32px;min-width:300px;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.15);text-align:center;">
+			<p style="font-size:15px;font-weight:600;color:#191F28;margin:0 0 24px;line-height:1.6;">${message}</p>
+			<div style="display:flex;gap:10px;justify-content:center;">
+				<button id="batonConfirmCancel" style="flex:1;padding:12px;border:1px solid #E5E8EB;background:#fff;border-radius:12px;font-size:14px;font-weight:600;color:#4E5968;cursor:pointer;">취소</button>
+				<button id="batonConfirmOk" style="flex:1;padding:12px;border:none;background:#8A63FF;border-radius:12px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;">확인</button>
+			</div>
+		</div>`;
+	document.body.appendChild(overlay);
+	const close = () => document.body.removeChild(overlay);
+	overlay.querySelector('#batonConfirmOk').onclick = () => { close(); if (onConfirm) onConfirm(); };
+	overlay.querySelector('#batonConfirmCancel').onclick = () => { close(); if (onCancel) onCancel(); };
+	overlay.onclick = (e) => { if (e.target === overlay) { close(); if (onCancel) onCancel(); } };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 	initQuill();
 	initTagInput();
@@ -122,7 +141,7 @@ function imageHandler() {
 			};
 			reader.readAsDataURL(file);
 		} else {
-			showToast('이미지 파일만 선택 가능합니다.');
+			showBatonToast('이미지 파일만 선택 가능합니다.');
 		}
 	};
 }
@@ -143,7 +162,7 @@ function addTag(text) {
 	text = text.trim().replace(/^#/, '');
 	if (!text || tagList.includes(text)) return;
 	if (tagList.length >= 5) {
-		showToast('태그는 최대 5개까지 가능해요');
+		showBatonToast('태그는 최대 5개까지 가능해요');
 		return;
 	}
 	tagList.push(text);
@@ -183,9 +202,9 @@ window.setLocation = function (name, address, lat, lng) {
 
 	card.style.cursor = 'pointer';
 	card.onclick = function () {
-		if (confirm('카카오맵에서 이동 경로를 확인하시겠습니까?')) {
+		batonConfirm('카카오맵에서 이동 경로를 확인하시겠습니까?', () => {
 			window.open(`https://map.kakao.com/link/map/${encodeURIComponent(name)},${lat},${lng}`, '_blank');
-		}
+		});
 	};
 
 	document.querySelector('.btn-del-loc')?.addEventListener('click', removeLocation);
@@ -205,7 +224,7 @@ function addPollOption() {
 	const container = document.getElementById('pollOptionContainer');
 	const count = container.querySelectorAll('.poll-option-item').length + 1;
 	if (count > 10) {
-		showToast('투표 항목은 최대 10개까지 가능해요.');
+		showBatonToast('투표 항목은 최대 10개까지 가능해요.');
 		return;
 	}
 	const div = document.createElement('div');
@@ -248,18 +267,18 @@ function sendOk() {
 	const content = document.getElementById('content').value;
 	const categoryElement = document.querySelector('input[name="category"]:checked');
 
-	if (!categoryElement) { showToast('카테고리를 선택해주세요'); return; }
-	if (!subject) { showToast('제목을 입력해주세요'); f.subject.focus(); return; }
-	if (!content) { showToast('내용을 입력해주세요'); return; }
+	if (!categoryElement) { showBatonToast('카테고리를 선택해주세요'); return; }
+	if (!subject) { showBatonToast('제목을 입력해주세요'); f.subject.focus(); return; }
+	if (!content) { showBatonToast('내용을 입력해주세요'); return; }
 
 	const usePoll = document.getElementById('chkPollToggle');
 	if (usePoll && usePoll.checked) {
 		const pollTitle = document.getElementById('pollTitle').value.trim();
-		if (!pollTitle) { showToast('투표 제목을 입력해주세요.'); return; }
+		if (!pollTitle) { showBatonToast('투표 제목을 입력해주세요.'); return; }
 		const pollInputs = document.querySelectorAll('input[name="pollOptions"]');
 		let validOptionCount = 0;
 		pollInputs.forEach(input => { if (input.value.trim() !== '') validOptionCount++; });
-		if (validOptionCount < 2) { showToast('투표 항목은 최소 2개 이상 입력해야 합니다.'); return; }
+		if (validOptionCount < 2) { showBatonToast('투표 항목은 최소 2개 이상 입력해야 합니다.'); return; }
 	} else {
 		const pollArea = document.getElementById('pollForm');
 		if (pollArea) pollArea.querySelectorAll('input').forEach(input => input.disabled = true);
@@ -283,19 +302,17 @@ function saveTemp() {
 	const f = document.communityForm;
 	const subject = f.subject.value.trim();
 	if (!subject) {
-		alert('제목을 입력해야 임시저장이 가능해요.');
+		showBatonToast('제목을 입력해야 임시저장이 가능해요.');
 		f.subject.focus();
 		return;
 	}
 
 	const htmlContent = quill.root.innerHTML;
 	const content = htmlContent === '<p><br></p>' ? '' : htmlContent;
-
 	const activeImages = quill.root.querySelectorAll('img[data-temp-id]');
 	const activeIds = Array.from(activeImages).map(img => img.getAttribute('data-temp-id'));
 
 	const formData = new FormData();
-
 	const dto = {
 		subject: subject,
 		content: content,
@@ -310,13 +327,11 @@ function saveTemp() {
 
 	globalUploadFiles.forEach(file => {
 		if (activeIds.includes(file.tempId)) {
-			const renamedFile = new File([file], file.tempId, { type: file.type });
-			formData.append('uploadFiles', renamedFile);
+			formData.append('uploadFiles', new File([file], file.tempId, { type: file.type }));
 		}
 	});
 
 	const contextPath = document.querySelector('meta[name="contextPath"]').getAttribute('content');
-
 	fetch(`${contextPath}/api/community/temp`, {
 		method: 'POST',
 		body: formData
@@ -324,27 +339,16 @@ function saveTemp() {
 	.then(r => r.json())
 	.then(data => {
 		if (data.status === 'true') {
-			showToast('임시저장되었습니다 ✓');
+			showBatonToast('임시저장되었습니다 ✓');
 			loadTempCount();
 		} else {
-			showToast(data.message || '임시저장에 실패했습니다.');
+			showBatonToast(data.message || '임시저장에 실패했습니다.');
 		}
 	})
-	.catch(() => showToast('오류가 발생했습니다.'));
-}
-
-function showToast(message) {
-	const container = document.getElementById('toastContainer');
-	const div = document.createElement('div');
-	div.className = 'toast';
-	div.innerHTML = `<i class="ri-notification-badge-fill"></i> ${message}`;
-	container.appendChild(div);
-	setTimeout(() => div.remove(), 3000);
+	.catch(() => showBatonToast('오류가 발생했습니다.'));
 }
 
 // ===== 임시저장 목록 모달 =====
-let tempEditQuillInstance = null;
-let tempEditCurrentId = null;
 
 function loadTempCount() {
 	const contextPath = document.querySelector('meta[name="contextPath"]').getAttribute('content');
@@ -362,7 +366,7 @@ function loadTempCount() {
 
 function openTempListModal() {
 	document.getElementById('tempListModal').style.display = 'flex';
-	backToTempList();
+	loadTempList();
 }
 
 function closeTempListModal() {
@@ -412,19 +416,25 @@ function loadTempList() {
 				const preview = (tempDiv.textContent || tempDiv.innerText || '').trim().substring(0, 50);
 
 				return `
-				<li class="place-item" style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; padding:14px 16px; cursor:pointer;" onclick="openTempEdit(${item.id})">
+				<li class="place-item" style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:14px 16px;">
 					<div style="flex:1; min-width:0;">
-						<div style="display:flex; align-items:center; gap:6px; margin-bottom:5px;">
+						<div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
 							${cat ? `<span style="font-size:11px; background:#f0ecff; color:#8A63FF; border-radius:4px; padding:2px 7px; flex-shrink:0;">${cat}</span>` : ''}
 							<span style="font-weight:600; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(item.subject || '(제목 없음)')}</span>
 						</div>
-						${preview ? `<p style="font-size:12px; color:#888; margin:0 0 5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(preview)}</p>` : ''}
-						<span style="font-size:11px; color:#bbb;">${dateStr}</span>
+						${preview ? `<p style="font-size:12px; color:#aaa; margin:0 0 4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(preview)}</p>` : ''}
+						<span style="font-size:11px; color:#ccc;">${dateStr}</span>
 					</div>
-					<button type="button" onclick="event.stopPropagation(); deleteTempItem(${item.id}, this)"
-						style="flex-shrink:0; background:none; border:none; color:#ccc; cursor:pointer; padding:4px 6px; border-radius:6px; font-size:18px; line-height:1;" title="삭제">
-						<i class="ri-delete-bin-line"></i>
-					</button>
+					<div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+						<button type="button" onclick="loadTempItem(${item.id})"
+							style="background:#f0ecff; color:#8A63FF; border:none; border-radius:8px; padding:6px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">
+							가져오기
+						</button>
+						<button type="button" onclick="deleteTempItem(${item.id}, this)"
+							style="background:none; border:none; padding:6px 8px; font-size:16px; color:#ddd; cursor:pointer; line-height:1;" title="삭제">
+							<i class="ri-delete-bin-line"></i>
+						</button>
+					</div>
 				</li>`;
 			}).join('');
 		})
@@ -433,100 +443,22 @@ function loadTempList() {
 		});
 }
 
-function openTempEdit(id) {
+function loadTempItem(id) {
 	const contextPath = document.querySelector('meta[name="contextPath"]').getAttribute('content');
-	fetch(`${contextPath}/community/temp/list`)
-		.then(r => r.json())
-		.then(data => {
-			const item = data.find(d => d.id === id);
-			if (!item) return;
-			tempEditCurrentId = id;
+	const subject = document.communityForm?.subject?.value?.trim() || '';
+	const content = quill?.root?.innerHTML || '';
+	const hasContent = subject || (content && content !== '<p><br></p>');
 
-			document.getElementById('tempEditId').value = id;
-			document.getElementById('tempEditSubject').value = item.subject || '';
-			document.getElementById('tempModalTitle').innerText = '임시저장 수정';
+	const doLoad = () => {
+		closeTempListModal();
+		location.href = `${contextPath}/community/temp/load?id=${id}`;
+	};
 
-			// 카테고리 선택
-			document.querySelectorAll('input[name="tempCat"]').forEach(r => {
-				r.checked = (r.value === String(item.category));
-			});
-
-			// 수정용 Quill 초기화 (최초 1회)
-			if (!tempEditQuillInstance) {
-				tempEditQuillInstance = new Quill('#tempEditQuill', {
-					theme: 'snow',
-					modules: { toolbar: [['bold','italic','underline'], [{'list':'ordered'},{'list':'bullet'}], ['link'], ['clean']] }
-				});
-			}
-			tempEditQuillInstance.root.innerHTML = item.content || '';
-
-			// 뷰 전환
-			document.getElementById('tempListView').style.display = 'none';
-			const editView = document.getElementById('tempEditView');
-			editView.style.display = 'flex';
-		})
-		.catch(() => showToast('불러오기에 실패했습니다.'));
-}
-
-function backToTempList() {
-	document.getElementById('tempListView').style.display = 'flex';
-	document.getElementById('tempEditView').style.display = 'none';
-	document.getElementById('tempModalTitle').innerText = '임시저장 목록';
-	tempEditCurrentId = null;
-	loadTempList();
-}
-
-function submitTempEdit() {
-	if (!tempEditCurrentId) return;
-	const contextPath = document.querySelector('meta[name="contextPath"]').getAttribute('content');
-	const subject = document.getElementById('tempEditSubject').value.trim();
-	const catEl = document.querySelector('input[name="tempCat"]:checked');
-	const content = tempEditQuillInstance ? tempEditQuillInstance.root.innerHTML : '';
-
-	if (!subject) { showToast('제목을 입력해주세요.'); return; }
-	if (!catEl) { showToast('카테고리를 선택해주세요.'); return; }
-	if (!content || content === '<p><br></p>') { showToast('내용을 입력해주세요.'); return; }
-
-	// FormData로 multipart 전송 (파일 없이 DTO만)
-	const dto = { id: tempEditCurrentId, subject, category: catEl.value, content, temporary: false };
-
-	fetch(`${contextPath}/api/community/${tempEditCurrentId}`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(dto)
-	})
-	.then(r => r.json())
-	.then(data => {
-		if (data.status === 'true') {
-			showToast('등록되었습니다!');
-			closeTempListModal();
-			setTimeout(() => location.href = `${contextPath}/community/list`, 800);
-		} else {
-			// API 방식이 안되면 폼 방식으로 fallback
-			submitTempEditByForm(subject, catEl.value, content);
-		}
-	})
-	.catch(() => submitTempEditByForm(subject, catEl.value, content));
-}
-
-function submitTempEditByForm(subject, category, content) {
-	const contextPath = document.querySelector('meta[name="contextPath"]').getAttribute('content');
-	const form = document.createElement('form');
-	form.method = 'POST';
-	form.action = `${contextPath}/community/update`;
-	const fields = { id: tempEditCurrentId, subject, category, content, page: '1', isTemporary: '0' };
-	Object.entries(fields).forEach(([k, v]) => {
-		const inp = document.createElement('input');
-		inp.type = 'hidden'; inp.name = k; inp.value = v;
-		form.appendChild(inp);
-	});
-	document.body.appendChild(form);
-	form.submit();
-}
-
-function deleteTempFromEdit() {
-	if (!tempEditCurrentId) return;
-	deleteTempItemById(tempEditCurrentId, () => backToTempList());
+	if (hasContent) {
+		batonConfirm('현재 작성 중인 내용이 사라져요. 계속 가져올까요?', doLoad);
+	} else {
+		doLoad();
+	}
 }
 
 function deleteTempItem(id, btn) {
@@ -539,23 +471,24 @@ function deleteTempItem(id, btn) {
 }
 
 function deleteTempItemById(id, onSuccess) {
-	if (!confirm('임시저장된 글을 삭제하시겠습니까?')) return;
-	const contextPath = document.querySelector('meta[name="contextPath"]').getAttribute('content');
-	fetch(`${contextPath}/community/temp/delete`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-		body: `id=${id}`
-	})
-	.then(r => r.json())
-	.then(data => {
-		if (data.state === 'true') {
-			showToast('삭제되었습니다.');
-			if (onSuccess) onSuccess();
-		} else {
-			showToast('삭제에 실패했습니다.');
-		}
-	})
-	.catch(() => showToast('오류가 발생했습니다.'));
+	batonConfirm('임시저장된 글을 삭제하시겠습니까?', () => {
+		const contextPath = document.querySelector('meta[name="contextPath"]').getAttribute('content');
+		fetch(`${contextPath}/community/temp/delete`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: `id=${id}`
+		})
+		.then(r => r.json())
+		.then(data => {
+			if (data.state === 'true') {
+				showBatonToast('삭제되었습니다.');
+				if (onSuccess) onSuccess();
+			} else {
+				showBatonToast('삭제에 실패했습니다.');
+			}
+		})
+		.catch(() => showBatonToast('오류가 발생했습니다.'));
+	});
 }
 
 function escapeHtml(text) {

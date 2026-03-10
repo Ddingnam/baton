@@ -1,3 +1,22 @@
+// 커스텀 confirm
+function batonConfirm(message, onConfirm, onCancel) {
+	const overlay = document.createElement('div');
+	overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:999999;display:flex;align-items:center;justify-content:center;';
+	overlay.innerHTML = `
+		<div style="background:#fff;border-radius:20px;padding:28px 32px;min-width:300px;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.15);text-align:center;">
+			<p style="font-size:15px;font-weight:600;color:#191F28;margin:0 0 24px;line-height:1.6;">${message}</p>
+			<div style="display:flex;gap:10px;justify-content:center;">
+				<button id="batonConfirmCancel" style="flex:1;padding:12px;border:1px solid #E5E8EB;background:#fff;border-radius:12px;font-size:14px;font-weight:600;color:#4E5968;cursor:pointer;">취소</button>
+				<button id="batonConfirmOk" style="flex:1;padding:12px;border:none;background:#8A63FF;border-radius:12px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;">확인</button>
+			</div>
+		</div>`;
+	document.body.appendChild(overlay);
+	const close = () => document.body.removeChild(overlay);
+	overlay.querySelector('#batonConfirmOk').onclick = () => { close(); if (onConfirm) onConfirm(); };
+	overlay.querySelector('#batonConfirmCancel').onclick = () => { close(); if (onCancel) onCancel(); };
+	overlay.onclick = (e) => { if (e.target === overlay) { close(); if (onCancel) onCancel(); } };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     try {
         initMap();
@@ -8,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initPoll();
     loadReplies();
     formatPollDate();
-    formatArticleDate();
 });
 
 function initMap() {
@@ -35,6 +53,7 @@ function initMap() {
         map.setDraggable(false);
         map.setZoomable(true);
 
+        // 클릭 시 카카오맵으로 이동
         mapContainer.style.cursor = 'pointer';
         kakao.maps.event.addListener(map, 'click', () => {
             const placeName = mapContainer.closest('.map-card').querySelector('strong')?.innerText || '';
@@ -63,25 +82,6 @@ function formatPollDate() {
         el.innerText = days + '일 남음';
         el.style.color = '#8A63FF';
     }
-}
-
-function formatArticleDate() {
-    const el = document.getElementById('articleRegDate');
-    if (!el) return;
-    const dateStr = el.dataset.date;
-    if (!dateStr) return;
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) {
-        const clean = dateStr.replace('T', ' ').substring(0, 16);
-        el.innerText = clean.replace('-', '.').replace('-', '.');
-        return;
-    }
-    const year  = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day   = String(d.getDate()).padStart(2, '0');
-    const hour  = String(d.getHours()).padStart(2, '0');
-    const min   = String(d.getMinutes()).padStart(2, '0');
-    el.innerText = `${year}.${month}.${day} ${hour}:${min}`;
 }
 
 function initPoll() {
@@ -134,7 +134,7 @@ function initPoll() {
                 submitBtn.style.display = 'none';
                 totalDisplay.innerText = total + '명 참여 (투표 완료)';
             } else {
-                submitBtn.style.display = 'none';
+                submitBtn.style.display = 'none'; // 비로그인
             }
         })
         .catch(() => {
@@ -219,10 +219,10 @@ document.addEventListener('click', (e) => {
 });
 
 function deleteArticle(id) {
-    if (confirm('정말 삭제하시겠습니까?')) {
+    batonConfirm('정말 삭제하시겠습니까?', () => {
         const pageParam = currentPage ? currentPage : '1';
         location.href = `${contextPath}/community/delete?id=${id}&page=${pageParam}`;
-    }
+    });
 }
 
 function loadReplies() {
@@ -343,32 +343,23 @@ function sendSubReply(parentId) {
 }
 
 function deleteReply(replyId) {
-    if (!confirm('댓글을 삭제하시겠습니까?')) return;
-    fetch(`${contextPath}/community/reply/delete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `id=${replyId}`
-    })
-    .then(resp => resp.json())
-    .then(data => {
-        if (data.state === 'true') {
-            loadReplies();
-        } else {
-            showToast('삭제에 실패했습니다.');
-        }
-    })
-    .catch(() => showToast('오류가 발생했습니다.'));
+    batonConfirm('댓글을 삭제하시겠습니까?', () => {
+        fetch(`${contextPath}/community/reply/delete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `id=${replyId}`
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.state === 'true') {
+                loadReplies();
+            } else {
+                showBatonToast('삭제에 실패했습니다.');
+            }
+        })
+        .catch(() => showBatonToast('오류가 발생했습니다.'));
+    });
 }
-
-function showToast(msg) {
-    const container = document.getElementById('toastContainer');
-    const div = document.createElement('div');
-    div.className = 'toast';
-    div.innerHTML = `<i class="ri-notification-badge-fill"></i> ${msg}`;
-    container.appendChild(div);
-    setTimeout(() => div.remove(), 3000);
-}
-
 function escapeHtml(text) {
     if (!text) return '';
     return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
