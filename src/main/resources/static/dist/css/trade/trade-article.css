@@ -71,6 +71,21 @@ background: var(--primary-light); }
 
 .gallery-card { padding: 0; overflow: hidden; }
 
+.article-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.sticky-side {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 100px; 
+    width: 340px;
+    flex-shrink: 0;
+    z-index: 10;
+}
+
 .main-image-wrap {
     position: relative; width: 100%;
     aspect-ratio: 1 / 1; overflow: hidden;
@@ -179,7 +194,7 @@ background: var(--primary-light); }
 }
 .seller-profile-btn:hover { border-color: var(--primary); color: var(--primary); }
 
-.action-card { position: sticky; top: calc(76px + 64px + 20px); }
+.action-card { position: sticky; }
 
 .stats-row {
     display: flex; gap: 0;

@@ -90,13 +90,13 @@
 
                     <c:choose>
                         <c:when test="${trade.tradeType == '직거래'}">
-                            <span class="badge badge-trade-direct">🤝 직거래</span>
+                            <span class="badge badge-trade-direct">직거래</span>
                         </c:when>
                         <c:when test="${trade.tradeType == '택배'}">
-                            <span class="badge badge-trade-parcel">📦 택배</span>
+                            <span class="badge badge-trade-parcel">택배</span>
                         </c:when>
                         <c:when test="${trade.tradeType == '둘다가능'}">
-                            <span class="badge badge-trade-both">✅ 직거래·택배</span>
+                            <span class="badge badge-trade-both">직거래·택배</span>
                         </c:when>
                     </c:choose>
                 </div>
@@ -105,7 +105,7 @@
 
                 <p class="product-price ${trade.price == 0 ? 'free' : ''}">
                     <c:choose>
-                        <c:when test="${trade.price == 0}">나눔 🎁</c:when>
+                        <c:when test="${trade.price == 0}">나눔</c:when>
                         <c:otherwise>
                             <fmt:formatNumber value="${trade.price}" pattern="#,###"/>
                             <span class="product-price-won">원</span>
@@ -140,7 +140,13 @@
                 
                     <div class="info-item">
                         <p class="info-label">거래 방식</p>
-                        <p class="info-value">${trade.tradeType}</p>
+                        <p class="info-value">
+                        	<c:choose>
+                        		<c:when test="${trade.tradeType == '둘다가능'}">직거래·택배</c:when>
+                        		<c:when test="${trade.tradeType == '택배'}">택배</c:when>
+                        		<c:when test="${trade.tradeType == '직거래'}">직거래</c:when>
+                        	</c:choose>
+                        </p>
                     </div>
 
                     <div class="info-item">
@@ -158,7 +164,7 @@
                     <c:if test="${trade.tradeType != '택배' && not empty trade.tradePlace}">
                         <div class="info-item full-width">
                             <p class="info-label">거래 희망 장소</p>
-                            <p class="info-value">📍 ${trade.tradePlace}</p>
+                            <p class="info-value">${trade.tradePlace}</p>
                             <div id="map"></div>
                         </div>
                     </c:if>
@@ -215,7 +221,7 @@
                     <div class="seller-info">
                         <p class="seller-name">${trade.nickName}</p>
                         <p class="seller-region">
-                            📍 <c:choose>
+                            <c:choose>
                                 <c:when test="${not empty trade.coreAddress}">${trade.coreAddress}</c:when>
                                 <c:otherwise>동네 정보 없음</c:otherwise>
                             </c:choose>
@@ -252,7 +258,7 @@
 			            <c:otherwise>
 			                <button class="chat-btn"
 			                    onclick="location.href='${pageContext.request.contextPath}/member/login'">
-			                    💬 로그인하고 채팅하기
+			                    로그인하고 채팅하기
 			                </button>
 			            </c:otherwise>
 			        </c:choose>
@@ -260,9 +266,9 @@
 			        <div class="secondary-actions">
 			            <button class="wish-btn-large"
 			                onclick="location.href='${pageContext.request.contextPath}/member/login'">
-			                🤍 찜하기
+			                찜하기
 			            </button>
-			            <button class="share-btn" onclick="ShareModule.share()">🔗 공유</button>
+			            <button class="share-btn" onclick="ShareModule.share()">공유</button>
 			        </div>
 			    </sec:authorize>
 			
@@ -359,9 +365,9 @@
 			        <div class="secondary-actions">
 			            <button class="wish-btn-large ${isLiked ? 'active' : ''}"
 						    id="wishBtnLarge" onclick="WishModule.toggle()">
-						    ${isLiked ? '❤️' : '🤍'} 찜 ${trade.likeCount}
+						    찜 ${trade.likeCount}
 						</button>
-			            <button class="share-btn" onclick="ShareModule.share()">🔗 공유</button>
+			            <button class="share-btn" onclick="ShareModule.share()">공유</button>
 			        </div>
 			
 			        <c:if test="${loggedInUserId == trade.userIdx}">

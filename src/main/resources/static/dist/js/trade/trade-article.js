@@ -135,7 +135,7 @@ const WishModule = {
                 
                 if(btn) {
                     btn.classList.toggle('active', data.isLiked);
-                    btn.innerHTML = (data.isLiked ? '❤️' : '🤍') + ' 찜 ' + data.likeCount;
+                    btn.innerHTML = ' 찜 ' + data.likeCount;
                 }
                 
                 if(statWish) statWish.innerText = data.likeCount;
