@@ -34,6 +34,10 @@
     
     .empty-msg { text-align: center; color: #888; padding: 120px 0; font-size: 16px; background: #f8f9fa; border-radius: 16px; border: 1px dashed #eaeaea;}
     .empty-msg i { font-size: 50px; color: #ddd; display: block; margin-bottom: 15px; }
+
+    .custom-context-menu { position: absolute; background: white; border: 1px solid #ddd; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; padding: 8px 0; z-index: 1000; width: 160px; font-size: 14px; display: none; }
+    .custom-context-menu .menu-item { padding: 10px 15px; cursor: pointer; color: #333; transition: background 0.2s; }
+    .custom-context-menu .menu-item:hover { background: #f4f6f8; }
 </style>
 </head>
 <body>
@@ -74,7 +78,9 @@
             </c:if>
 
             <c:forEach var="room" items="${list}">
-                <div class="room-item" id="room-${room.roomIdx}" onclick="openChatRoom(${room.tradeIdx}, ${room.userIdx})">
+                <div class="room-item" id="room-${room.roomIdx}" 
+                     data-room-idx="${room.roomIdx}" data-trade-idx="${room.tradeIdx}" data-user-idx="${room.userIdx}"
+                     onclick="openChatRoom(${room.tradeIdx}, ${room.userIdx})">
                     <div class="profile-area">
                         <img src="${empty room.profilePhoto ? pageContext.request.contextPath += '/dist/images/person.png' : pageContext.request.contextPath += '/uploads/profile/' += room.profilePhoto}" class="profile" onerror="this.src='${pageContext.request.contextPath}/dist/images/person.png'">
                         <img src="${empty room.tradeSaveName ? pageContext.request.contextPath += '/dist/images/noimage.png' : pageContext.request.contextPath += '/uploads/trade/' += room.tradeSaveName}" class="trade-thumb" onerror="this.src='${pageContext.request.contextPath}/dist/images/noimage.png'">
@@ -96,6 +102,11 @@
                 </div>
             </c:forEach>
         </div>
+    </div>
+
+    <div id="contextMenu" class="custom-context-menu">
+        <div class="menu-item" onclick="menuAction('open')">채팅방 열기</div>
+        <div class="menu-item" style="color:#e74c3c;" onclick="menuAction('leave')">삭제하기</div>
     </div>
 
     <c:if test="${param.mode != 'popup'}">
@@ -141,6 +152,22 @@
                         }
                     });
                 </c:forEach>
+
+                stompClient.subscribe('/topic/alarms/' + myUserIdx, function(msg) {
+                    let data = msg.body;
+                    if(data.startsWith('room_deleted:')) {
+                        let deletedRoomIdx = data.split(':')[1];
+                        let roomEl = document.getElementById('room-' + deletedRoomIdx);
+                        if(roomEl) {
+                            roomEl.remove();
+                        }
+                        
+                        let listContainer = document.getElementById('listContainer');
+                        if(listContainer.children.length === 0) {
+                            listContainer.innerHTML = '<div class="empty-msg"><i class="ri-chat-3-line"></i>진행 중인 대화가 없습니다.</div>';
+                        }
+                    }
+                });
             });
         }
 
@@ -168,6 +195,51 @@
 
             let container = document.getElementById('listContainer');
             container.insertBefore(roomEl, container.firstChild);
+        }
+
+        let selectedTradeIdx = null, selectedUserIdx = null, selectedRoomIdx = null;
+
+        document.querySelectorAll('.room-item').forEach(item => {
+            item.addEventListener('contextmenu', function(e) {
+                e.preventDefault(); 
+                
+                selectedTradeIdx = this.dataset.tradeIdx;
+                selectedUserIdx = this.dataset.userIdx;
+                selectedRoomIdx = this.dataset.roomIdx;
+                
+                let menu = document.getElementById('contextMenu');
+                menu.style.display = 'block';
+                menu.style.left = e.pageX + 'px';
+                menu.style.top = e.pageY + 'px';
+            });
+        });
+
+        document.addEventListener('click', function(e) {
+            let menu = document.getElementById('contextMenu');
+            if(menu) menu.style.display = 'none';
+        });
+
+        function menuAction(action) {
+            if(action === 'open') {
+                openChatRoom(selectedTradeIdx, selectedUserIdx);
+            } else if(action === 'leave') {
+                if(!confirm('채팅방을 삭제하시겠습니까?')) return;
+                
+                const params = new URLSearchParams();
+                params.append('roomIdx', selectedRoomIdx);
+                
+                fetch('${pageContext.request.contextPath}/chat/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.state === 'true') {
+                        location.reload();
+                    }
+                });
+            }
         }
 
         window.onload = function() { 

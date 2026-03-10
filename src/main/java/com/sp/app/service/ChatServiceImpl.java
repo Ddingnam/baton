@@ -22,6 +22,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public void insertMessage(ChatMessage message) {
         mapper.insertMessage(message);
+        mapper.updateRoomVisibleTrue(message.getRoomIdx());
     }
 
     @Override
@@ -46,7 +47,6 @@ public class ChatServiceImpl implements ChatService {
 
         Long roomIdx = mapper.findChatRoom(map);
         if(roomIdx == null) {
-       
             mapper.insertChatRoom(map);
             roomIdx = (Long) map.get("roomIdx");
 
@@ -94,5 +94,13 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public List<Long> getRoomMembers(Long roomIdx) {
         return mapper.getRoomMembers(roomIdx);
+    }
+
+    @Override
+    public void deleteChatRoom(Long roomIdx, Long userIdx) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("roomIdx", roomIdx);
+        map.put("userIdx", userIdx);
+        mapper.hideChatRoom(map);
     }
 }

@@ -17,4 +17,5 @@ public interface ChatService {
     List<ChatRoom> listAllChatRoom(Long myUserIdx);
     int getUnreadTotalCount(Long myUserIdx);
     List<Long> getRoomMembers(Long roomIdx);
+    void deleteChatRoom(Long roomIdx, Long userIdx);
 }

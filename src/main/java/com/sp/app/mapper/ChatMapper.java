@@ -21,4 +21,6 @@ public interface ChatMapper {
     List<ChatRoom> listAllChatRoom(Long myUserIdx);
     int getUnreadTotalCount(Long myUserIdx);
     List<Long> getRoomMembers(Long roomIdx);
+    void hideChatRoom(Map<String, Object> map);
+    void updateRoomVisibleTrue(Long roomIdx);
 }

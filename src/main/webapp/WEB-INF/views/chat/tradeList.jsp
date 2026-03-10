@@ -60,9 +60,7 @@
 
     <div id="contextMenu" class="custom-context-menu">
         <div class="menu-item" onclick="menuAction('open')">채팅방 열기</div>
-        <div class="menu-item" onclick="menuAction('mute')">알림 끄기</div>
-        <div class="menu-item" onclick="menuAction('pin')">상단 고정</div>
-        <div class="menu-item" style="color:#e74c3c;" onclick="menuAction('leave')">나가기</div>
+        <div class="menu-item" style="color:#e74c3c;" onclick="menuAction('leave')">삭제하기</div>
     </div>
 
 <script>
@@ -75,16 +73,38 @@
         stompClient.debug = null; 
 
         stompClient.connect({}, function (frame) {
-
             <c:forEach var="room" items="${list}">
                 stompClient.subscribe('/topic/room/${room.roomIdx}', function (chat) {
                     let message = JSON.parse(chat.body);
-            
                     if(message.msgType !== 4) {
                         updateRoomListUI(${room.roomIdx}, message);
+                    } else {
+                        if(message.userIdx === myUserIdx) {
+                            let badge = document.getElementById('badge-${room.roomIdx}');
+                            if(badge) {
+                                badge.innerText = '0';
+                                badge.style.display = 'none';
+                            }
+                        }
                     }
                 });
             </c:forEach>
+
+            stompClient.subscribe('/topic/alarms/' + myUserIdx, function(msg) {
+                let data = msg.body;
+                if(data.startsWith('room_deleted:')) {
+                    let deletedRoomIdx = data.split(':')[1];
+                    let roomEl = document.getElementById('room-' + deletedRoomIdx);
+                    if(roomEl) {
+                        roomEl.remove();
+                    }
+                    
+                    let listContainer = document.getElementById('listContainer');
+                    if(listContainer.children.length === 0) {
+                        listContainer.innerHTML = '<div class="empty-msg"><i class="ri-chat-3-line"></i>진행 중인 대화가 없습니다.</div>';
+                    }
+                }
+            });
         });
     }
 
@@ -109,7 +129,7 @@
         container.insertBefore(roomEl, container.firstChild);
     }
 
-    let selectedTradeIdx = null, selectedUserIdx = null;
+    let selectedTradeIdx = null, selectedUserIdx = null, selectedRoomIdx = null;
 
     document.querySelectorAll('.room-item').forEach(item => {
         item.addEventListener('contextmenu', function(e) {
@@ -117,6 +137,7 @@
             
             selectedTradeIdx = this.dataset.tradeIdx;
             selectedUserIdx = this.dataset.userIdx;
+            selectedRoomIdx = this.dataset.roomIdx;
             
             let menu = document.getElementById('contextMenu');
             menu.style.display = 'block';
@@ -126,14 +147,30 @@
     });
 
     document.addEventListener('click', function(e) {
-        document.getElementById('contextMenu').style.display = 'none';
+        let menu = document.getElementById('contextMenu');
+        if(menu) menu.style.display = 'none';
     });
 
     function menuAction(action) {
         if(action === 'open') {
             location.href = '${pageContext.request.contextPath}/chat/room?tradeIdx=' + selectedTradeIdx + '&toUserIdx=' + selectedUserIdx;
-        } else {
-            alert('준비 중인 기능입니다.');
+        } else if(action === 'leave') {
+            if(!confirm('채팅방을 삭제하시겠습니까?')) return;
+            
+            const params = new URLSearchParams();
+            params.append('roomIdx', selectedRoomIdx);
+            
+            fetch('${pageContext.request.contextPath}/chat/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.state === 'true') {
+                    location.reload();
+                }
+            });
         }
     }
 

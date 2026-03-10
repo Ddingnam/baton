@@ -12,41 +12,31 @@
 
 <style>
     body, html { margin: 0; padding: 0; height: 100%; background: #fff; font-family: 'Noto Sans KR', sans-serif; }
-    
     .chat-container { width: 100%; height: 100vh; display: flex; flex-direction: column; background: #fff; }
-
     .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; font-size: 16px; background: #fff; position: relative; z-index: 10; border-bottom: 1px solid #f0f0f0;}
     .header-left i { font-size: 24px; cursor: pointer; color: #333; }
     .header-center { flex: 1; text-align: center; font-weight: 700; color: #333; }
     .header-right { width: 24px; } 
-
     .trade-banner { display: flex; padding: 12px 20px; background: #fafafa; border-bottom: 1px solid #eee; align-items: center; }
     .trade-thumb { width: 45px; height: 45px; border-radius: 8px; background: #ddd; margin-right: 12px; object-fit: cover; border: 1px solid #eee;}
     .trade-info { flex: 1; display: flex; flex-direction: column; }
     .trade-title { font-size: 14px; font-weight: bold; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;}
     .trade-date { font-size: 12px; color: #888; margin-top: 3px; }
-
     .chat-messages { flex: 1; overflow-y: auto; padding: 20px; background: #fff; } 
-    
     .date-divider { text-align: center; margin: 20px 0; }
     .date-divider span { background: #f0f0f0; color: #666; font-size: 12px; padding: 5px 15px; border-radius: 15px; }
     .system-msg { text-align: center; margin-bottom: 20px; color: #888; font-size: 13px; }
-
     .msg-row { margin-bottom: 15px; display: flex; align-items: flex-end; }
     .msg-me { justify-content: flex-end; }
     .msg-other { justify-content: flex-start; }
-    
     .msg-bubble { padding: 10px 14px; border-radius: 14px; max-width: 75%; word-break: break-all; font-size: 14px; line-height: 1.4; }
     .msg-me .msg-bubble { background: #00B050; color: #fff; border-bottom-right-radius: 4px; }
     .msg-other .msg-bubble { background: #f4f6f8; color: #333; border-bottom-left-radius: 4px; } 
-    
     .msg-info { display: flex; flex-direction: column; justify-content: flex-end; margin: 0 6px; padding-bottom: 2px; }
     .msg-time { font-size: 11px; color: #999; }
     .unread-count { color: #00B050; font-weight: bold; font-size: 11px; text-align: right; margin-bottom: 2px; }
-    
     .profile-img { width: 36px; height: 36px; border-radius: 50%; margin-right: 10px; object-fit: cover; border: 1px solid #eaeaea; }
     .nickname { font-size: 12px; margin-bottom: 4px; color: #555; }
-
     .chat-input-box { display: flex; padding: 15px; background: #fff; border-top: 1px solid #eee; align-items: center; }
     .chat-input-box textarea { flex: 1; padding: 12px 15px; border: 1px solid #f0f0f0; background: #f8f9fa; border-radius: 20px; outline: none; resize: none; overflow: hidden; height: 44px; line-height: 20px; font-family: inherit; font-size: 14px;}
     .chat-input-box textarea:focus { border-color: #00B050; background: #fff; }
@@ -60,7 +50,12 @@
                 <i class="ri-arrow-left-s-line"></i>
             </div>
             <div class="header-center">${counterpartName}</div>
-            <div class="header-right"></div>
+            <div class="header-right" style="position:relative;">
+                <i class="ri-more-2-fill" style="font-size: 24px; cursor: pointer; color: #333;" onclick="toggleMenu()"></i>
+                <div id="roomMenu" style="display:none; position:absolute; right:0; top:35px; background:#fff; border:1px solid #ddd; box-shadow:0 2px 10px rgba(0,0,0,0.1); border-radius:8px; z-index:100; width:120px;">
+                    <div onclick="leaveRoom()" style="padding:12px 15px; color:#e74c3c; cursor:pointer; font-size:14px; text-align:center;">삭제하기</div>
+                </div>
+            </div>
         </div>
         
         <c:if test="${not empty tradeInfo}">
@@ -73,7 +68,6 @@
                         <img src="${pageContext.request.contextPath}/dist/images/noimage.png" class="trade-thumb">
                     </c:otherwise>
                 </c:choose>
-                
                 <div class="trade-info">
                     <span class="trade-title">${tradeInfo.TITLE}</span>
                     <span class="trade-date">작성일: ${tradeInfo.CREATEDDATE}</span>
@@ -131,7 +125,7 @@
     const currentRoomIdx = ${roomIdx};
     const myUserIdx = ${userIdx};
     let stompClient = null;
-    let currentDisplayDate = "${lastDate}"; 
+    let currentDisplayDate = "${lastDate}";
 
     function connect() {
         let socket = new SockJS('${pageContext.request.contextPath}/ws/chat');
@@ -155,7 +149,7 @@
 
     function handleEnter(e) {
         if(e.keyCode === 13 && !e.shiftKey) {
-            e.preventDefault(); 
+            e.preventDefault();
             sendMessage();
         }
     }
@@ -191,7 +185,6 @@
         }
 
         let html = '<div class="msg-row ' + (isMe ? 'msg-me' : 'msg-other') + '">';
-        
         if(!isMe) {
             let photoPath = message.profilePhoto ? '${pageContext.request.contextPath}/uploads/profile/' + message.profilePhoto : '${pageContext.request.contextPath}/dist/images/person.png';
             html += '<img src="' + photoPath + '" class="profile-img" onerror="this.src=\'${pageContext.request.contextPath}/dist/images/person.png\'">';
@@ -219,8 +212,6 @@
         let chatArea = document.getElementById("chatArea");
         chatArea.scrollTop = chatArea.scrollHeight;
     }
-
-    window.onload = function() { connect(); };
     
     function goBack() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -233,6 +224,32 @@
             location.href = '${pageContext.request.contextPath}/chat/list?mode=popup';
         }
     }
+    
+    function toggleMenu() {
+        let menu = document.getElementById('roomMenu');
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function leaveRoom() {
+        if(!confirm('채팅방을 삭제하시겠습니까?')) return;
+        
+        const params = new URLSearchParams();
+        params.append('roomIdx', currentRoomIdx);
+        
+        fetch('${pageContext.request.contextPath}/chat/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.state === 'true') {
+                goBack();
+            }
+        });
+    }
+
+    window.onload = function() { connect(); };
 </script>
 </body>
 </html>

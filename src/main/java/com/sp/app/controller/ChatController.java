@@ -2,12 +2,19 @@ package com.sp.app.controller;
 
 import com.sp.app.model.ChatMessage;
 import com.sp.app.service.ChatService;
+import com.sp.app.security.CustomUserDetails;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class ChatController {
@@ -22,7 +29,6 @@ public class ChatController {
 
     @MessageMapping("/chat/send")
     public void sendMessage(ChatMessage message) {
-
         chatService.insertMessage(message);
         chatService.updateLastReadDate(message.getRoomIdx(), message.getUserIdx());
 
@@ -46,5 +52,19 @@ public class ChatController {
         messagingTemplate.convertAndSend("/topic/alarms/" + message.getUserIdx(), "read_chat");
     }
     
-   
+    @PostMapping("/chat/delete")
+    @ResponseBody
+    public Map<String, Object> deleteChatRoom(@RequestParam("roomIdx") Long roomIdx,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Map<String, Object> model = new HashMap<>();
+        try {
+            chatService.deleteChatRoom(roomIdx, userDetails.getUserIdx());
+            model.put("state", "true");
+            
+            messagingTemplate.convertAndSend("/topic/alarms/" + userDetails.getUserIdx(), "room_deleted:" + roomIdx);
+        } catch (Exception e) {
+            model.put("state", "false");
+        }
+        return model;
+    }
 }
