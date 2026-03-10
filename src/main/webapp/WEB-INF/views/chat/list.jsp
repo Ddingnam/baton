@@ -6,7 +6,8 @@
 <meta charset="UTF-8">
 <title>내 채팅방 | BATON</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
-
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
@@ -36,7 +37,30 @@
 </style>
 </head>
 <body>
-    <jsp:include page="/WEB-INF/views/layout/header.jsp" />
+    <c:choose>
+        <c:when test="${param.mode == 'popup'}">
+            <style>
+                body { background: #f4f6f8 !important; }
+                .chat-list-wrapper { margin: 0 !important; max-width: none !important; min-height: auto !important; padding: 0 !important; }
+                .page-title { display: none !important; }
+                .popup-header { background: #fff; padding: 15px 20px; font-weight: bold; font-size: 16px; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 100; }
+                .list-container { padding: 10px !important; display: flex !important; flex-direction: column !important; }
+                .room-item { box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important; padding: 15px !important; border: none !important; margin-bottom: 10px !important; border-radius: 12px !important; }
+                .profile-area { width: 50px !important; height: 50px !important; margin-right: 15px !important; }
+                .trade-thumb { display: none !important; }
+                .top-row { margin-bottom: 5px !important; }
+                .nickname { font-size: 15px !important; }
+                .trade-title { display: none !important; }
+                .date { font-size: 12px !important; }
+                .recent-msg { font-size: 13px !important; }
+                .badge { padding: 2px 8px !important; font-size: 11px !important; border-radius: 10px !important; }
+            </style>
+            <div class="popup-header">내 채팅방 목록</div>
+        </c:when>
+        <c:otherwise>
+            <jsp:include page="/WEB-INF/views/layout/header.jsp" />
+        </c:otherwise>
+    </c:choose>
 
     <div class="container chat-list-wrapper">
         <h2 class="page-title">내 채팅방 목록</h2>
@@ -74,7 +98,9 @@
         </div>
     </div>
 
-    <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
+    <c:if test="${param.mode != 'popup'}">
+        <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
+    </c:if>
 
     <script>
         const myUserIdx = ${myUserIdx};
@@ -82,7 +108,15 @@
 
         function openChatRoom(tradeIdx, userIdx) {
             let url = '${pageContext.request.contextPath}/chat/room?tradeIdx=' + tradeIdx + '&toUserIdx=' + userIdx;
-            window.open(url, 'chatRoom', 'width=450, height=700, left=200, top=100, scrollbars=yes, resizable=yes');
+            
+            <c:choose>
+                <c:when test="${param.mode == 'popup'}">
+                    location.href = url;
+                </c:when>
+                <c:otherwise>
+                    window.open(url, 'chatRoom', 'width=450, height=700, left=200, top=100, scrollbars=yes, resizable=yes');
+                </c:otherwise>
+            </c:choose>
         }
 
         function connectList() {
@@ -91,11 +125,9 @@
             stompClient.debug = null; 
 
             stompClient.connect({}, function (frame) {
-
                 <c:forEach var="room" items="${list}">
                     stompClient.subscribe('/topic/room/${room.roomIdx}', function (chat) {
                         let message = JSON.parse(chat.body);
-
                         if(message.msgType !== 4) {
                             updateRoomListUI(${room.roomIdx}, message);
                         } else {
@@ -121,6 +153,7 @@
 
             let now = new Date();
             let timeStr = String(now.getMonth()+1).padStart(2,'0') + "-" + String(now.getDate()).padStart(2,'0') + " " + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+            
             let dateEl = document.getElementById('date-' + roomIdx);
             if(dateEl) dateEl.innerText = timeStr;
 
@@ -138,7 +171,7 @@
         }
 
         window.onload = function() { 
-            connectList(); 
+            connectList();
         };
     </script>
 </body>

@@ -56,7 +56,7 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <div class="header-left" onclick="history.back()">
+            <div class="header-left" onclick="goBack()">
                 <i class="ri-arrow-left-s-line"></i>
             </div>
             <div class="header-center">${counterpartName}</div>
@@ -221,6 +221,18 @@
     }
 
     window.onload = function() { connect(); };
+    
+    function goBack() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tradeIdx = urlParams.get('tradeIdx');
+        let ref = document.referrer;
+        
+        if (ref.indexOf('/chat/tradeList') !== -1) {
+            location.href = '${pageContext.request.contextPath}/chat/tradeList?tradeIdx=' + tradeIdx;
+        } else {
+            location.href = '${pageContext.request.contextPath}/chat/list?mode=popup';
+        }
+    }
 </script>
 </body>
 </html>
