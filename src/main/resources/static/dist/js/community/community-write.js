@@ -108,9 +108,66 @@ function initQuill() {
 					['link', 'image'],
 					['clean']
 				],
-				handlers: { image: imageHandler }
+				handlers: { image: imageHandler, link: linkHandler }
 			}
 		}
+	});
+}
+
+function linkHandler() {
+	// 기존 모달 있으면 제거
+	const existing = document.getElementById('quillLinkModal');
+	if (existing) existing.remove();
+
+	const selection = quill.getSelection();
+	const selectedText = selection && selection.length > 0 ? quill.getText(selection.index, selection.length) : '';
+
+	const modal = document.createElement('div');
+	modal.id = 'quillLinkModal';
+	modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:999999;display:flex;align-items:center;justify-content:center;';
+	modal.innerHTML = `
+		<div style="background:#fff;border-radius:20px;padding:28px 32px;min-width:340px;max-width:440px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.15);">
+			<p style="font-size:15px;font-weight:700;color:#191F28;margin:0 0 18px;">링크 삽입</p>
+			<input id="quillLinkText" type="text" placeholder="링크 텍스트" value="${selectedText}"
+				style="width:100%;box-sizing:border-box;padding:10px 14px;border:1px solid #E5E8EB;border-radius:10px;font-size:14px;margin-bottom:10px;outline:none;">
+			<input id="quillLinkUrl" type="text" placeholder="https://example.com"
+				style="width:100%;box-sizing:border-box;padding:10px 14px;border:1px solid #E5E8EB;border-radius:10px;font-size:14px;margin-bottom:20px;outline:none;">
+			<div style="display:flex;gap:10px;">
+				<button id="quillLinkCancel" style="flex:1;padding:12px;border:1px solid #E5E8EB;background:#fff;border-radius:12px;font-size:14px;font-weight:600;color:#4E5968;cursor:pointer;">취소</button>
+				<button id="quillLinkOk" style="flex:1;padding:12px;border:none;background:#8A63FF;border-radius:12px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;">삽입</button>
+			</div>
+		</div>`;
+	document.body.appendChild(modal);
+
+	const urlInput = modal.querySelector('#quillLinkUrl');
+	urlInput.focus();
+
+	const close = () => modal.remove();
+
+	modal.querySelector('#quillLinkCancel').onclick = close;
+	modal.onclick = (e) => { if (e.target === modal) close(); };
+
+	modal.querySelector('#quillLinkOk').onclick = () => {
+		const text = modal.querySelector('#quillLinkText').value.trim();
+		const url = urlInput.value.trim();
+		if (!url) { close(); return; }
+
+		const fullUrl = /^https?:\/\//i.test(url) ? url : 'https://' + url;
+
+		if (selection && selection.length > 0) {
+			quill.format('link', fullUrl);
+		} else {
+			const insertText = text || fullUrl;
+			const index = selection ? selection.index : quill.getLength();
+			quill.insertText(index, insertText, 'link', fullUrl);
+			quill.setSelection(index + insertText.length);
+		}
+		close();
+	};
+
+	urlInput.addEventListener('keydown', (e) => {
+		if (e.key === 'Enter') modal.querySelector('#quillLinkOk').click();
+		if (e.key === 'Escape') close();
 	});
 }
 
@@ -313,9 +370,7 @@ function saveTemp() {
 	const activeIds = Array.from(activeImages).map(img => img.getAttribute('data-temp-id'));
 
 	const formData = new FormData();
-	const currentId = document.querySelector('input[name="id"]')?.value;
 	const dto = {
-		id: (currentId && currentId > 0) ? Number(currentId) : null,
 		subject: subject,
 		content: content,
 		category: document.querySelector('input[name="category"]:checked')?.value || '1',
@@ -343,10 +398,6 @@ function saveTemp() {
 		if (data.status === 'true') {
 			showBatonToast('임시저장되었습니다 ✓');
 			loadTempCount();
-			if (data.id) {
-				const idInput = document.querySelector('input[name="id"]');
-				if (idInput) idInput.value = data.id;
-			}
 		} else {
 			showBatonToast(data.message || '임시저장에 실패했습니다.');
 		}

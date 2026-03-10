@@ -3,17 +3,35 @@
 :root {
     --primary: #8A63FF;
     --primary-dark: #7048E8;
-    --primary-light: #F2F4F6;
+    --primary-light: #F2EEFF;
+    --primary-glow: rgba(138, 99, 255, 0.10);
     --bg-color: #F9FAFB;
     --text-main: #191F28;
     --text-sub: #4E5968;
     --text-light: #8B95A1;
     --border-color: #E5E8EB;
+    --bezier: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes fadeInUp {
     0% { opacity: 0; transform: translateY(30px); }
     100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cardReveal {
+    from { opacity: 0; transform: translateY(28px) scale(0.987); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes badgePop {
+    0%   { transform: scale(0.6); opacity: 0; }
+    65%  { transform: scale(1.12); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shimmerSweep {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
 }
 
 body {
@@ -74,13 +92,14 @@ a { text-decoration: none; color: inherit; }
     width: 100%;
     max-width: 560px;
     margin: 30px auto 0;
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1.5px solid var(--border-color);
     box-sizing: border-box;
+    transition: border-color 0.25s, box-shadow 0.25s;
 }
 
 .hero-search-box:focus-within {
     border-color: var(--primary);
-    box-shadow: 0 4px 12px rgba(138, 99, 255, 0.12);
+    box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
 .hero-search-box input {
@@ -159,7 +178,7 @@ a { text-decoration: none; color: inherit; }
     color: #fff;
     border-color: var(--primary);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(138, 99, 255, 0.2);
+    box-shadow: 0 4px 10px rgba(138, 99, 255, 0.15);
 }
 
 .btn-create-cm {
@@ -252,60 +271,89 @@ a { text-decoration: none; color: inherit; }
     border-radius: 20px;
     border: 1px solid var(--border-color);
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: transform 0.35s var(--bezier), box-shadow 0.35s var(--bezier), border-color 0.35s;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     opacity: 0;
-    animation: fadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    animation: cardReveal 0.65s var(--bezier) forwards;
     text-decoration: none;
     color: inherit;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02);
+    will-change: transform;
 }
 
-.cm-item-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-    border-color: rgba(138, 99, 255, 0.3);
+/* 호버 시 상단 하이라이트 — 빛 반사 느낌 */
+.cm-item-card::before {
+    content: '';
+    position: absolute; top: 0; left: 16px; right: 16px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+    opacity: 0; transition: opacity 0.3s; z-index: 4; pointer-events: none;
 }
+.cm-item-card:hover::before { opacity: 1; }
+
+.cm-item-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(0, 0, 0, 0.10);
+    box-shadow:
+        0 2px 4px rgba(0,0,0,0.04),
+        0 12px 32px rgba(0, 0, 0, 0.08);
+}
+.cm-item-card:active { transform: translateY(-3px); }
 
 .card-visual {
     position: relative;
     height: 180px;
     overflow: hidden;
     background: var(--primary-light);
+    flex-shrink: 0;
 }
 
 .card-visual img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s;
+    transition: transform 0.5s var(--bezier);
 }
 
 .cm-item-card:hover .card-visual img {
-    transform: scale(1.05);
+    transform: scale(1.06);
 }
 
+/* 이미지 위 그라데이션 — 배지 가독성 */
+.card-visual::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 45%);
+    pointer-events: none; z-index: 1;
+}
+
+/* 이미지 없는 카드 — 차분한 회색 */
 .card-visual.no-image {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--primary);
-    font-size: 40px;
-    background: var(--primary-light);
+    background: #F2F4F6;
+}
+.card-visual.no-image::after { display: none; }
+.card-visual.no-image i {
+    font-size: 32px;
+    color: #C5CAD2;
+    opacity: 1;
 }
 
 .card-badge {
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: 12px; left: 12px;
     background: var(--primary);
     color: #fff;
     padding: 4px 10px;
     border-radius: 6px;
-    font-size: 11px;
-    font-weight: 800;
-    z-index: 2;
+    font-size: 11px; font-weight: 800;
+    z-index: 3;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 6px rgba(0,0,0,0.15);
+    animation: badgePop 0.4s var(--bezier) 0.2s both;
 }
 
 .card-body {
@@ -322,11 +370,14 @@ a { text-decoration: none; color: inherit; }
     color: var(--text-main);
     margin: 0 0 8px 0;
     line-height: 1.4;
+    letter-spacing: -0.2px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    transition: color 0.2s;
 }
+.cm-item-card:hover .card-title { color: var(--text-main); }
 
 .card-text {
     font-size: 14px;
@@ -340,16 +391,15 @@ a { text-decoration: none; color: inherit; }
 }
 
 .card-meta {
-    background: var(--bg-color);
-    padding: 10px 12px;
-    border-radius: 8px;
     margin-bottom: 16px;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     font-size: 13px;
-    color: var(--text-sub);
+    color: var(--text-light);
     font-weight: 500;
+    background: none;
+    padding: 0;
 }
 
 .meta-item {
@@ -388,7 +438,10 @@ a { text-decoration: none; color: inherit; }
     justify-content: center;
     color: var(--primary);
     font-size: 14px;
+    flex-shrink: 0;
+    transition: background 0.2s, color 0.2s;
 }
+.cm-item-card:hover .user-avatar { background: #E5E8EB; color: var(--text-sub); }
 
 .user-nick {
     font-size: 13px;
@@ -431,6 +484,15 @@ a { text-decoration: none; color: inherit; }
     height: 76px;
     border-radius: 12px;
     flex-shrink: 0;
+}
+.cm-content-area.list-mode .card-visual::after { display: none; }
+.cm-content-area.list-mode .card-visual.no-image {
+    width: 100px;
+    height: 76px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .cm-content-area.list-mode .card-body {
@@ -525,6 +587,7 @@ a { text-decoration: none; color: inherit; }
     justify-content: center;
     font-size: 14px;
     font-weight: 700;
+    box-shadow: 0 4px 12px rgba(138,99,255,0.25);
 }
 
 .cm-fab {

@@ -24,6 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Map initialization failed:", e);
     }
 
+    // 작성일 표시
+    const regDateEl = document.getElementById('articleRegDate');
+    if (regDateEl) {
+        const dateStr = regDateEl.getAttribute('data-date');
+        regDateEl.textContent = formatDate(dateStr);
+    }
+
     initPoll();
     loadReplies();
     formatPollDate();

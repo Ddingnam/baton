@@ -313,6 +313,17 @@ body {
 	margin: 8px 0;
 }
 
+.content-text.ql-editor a {
+	color: var(--primary);
+	text-decoration: underline;
+	font-weight: 600;
+	word-break: break-all;
+}
+
+.content-text.ql-editor a:hover {
+	color: var(--primary-dark);
+}
+
 .map-card {
 	margin-top: 30px;
 	border-radius: 16px;
