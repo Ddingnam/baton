@@ -15,6 +15,8 @@ public interface JobPostingService {
     JobPosting findById(@Param("postingIdx") long postingIdx);
     
     void updateHitCount(long postingIdx) throws Exception;
+   
+    public List<JobPosting> listPostingByArea(Map<String,Object> map);
     
     
     

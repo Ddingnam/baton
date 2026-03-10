@@ -88,23 +88,30 @@
         SELECT a.*, ROWNUM rnum FROM (
             SELECT
                 posting_idx AS postingIdx,
-                title,
-                employer,
-                pay,
+                title, employer, pay,
                 pay_type AS payType,
-                location,
-                created_date AS createdDate,
-                category,
-                work_period AS workPeriod,
+                location, created_date AS createdDate,
+                category, work_period AS workPeriod,
                 work_days AS workDays,
                 start_time AS startTime,
                 end_time AS endTime,
-                deadline FROM
-                job_posting
+                deadline 
+            FROM job_posting
+            <where>
+                <if test="sido != null and sido != ''">
+                    AND location LIKE '%' || #{sido} || '%'
+                </if>
+                <if test="gugun != null and gugun != '' and !gugun.contains('전체')">
+                    AND location LIKE '%' || #{gugun} || '%'
+                </if>
+                <if test="dong != null and dong != '' and !dong.contains('전체')">
+                    AND location LIKE '%' || #{dong} || '%'
+                </if>
+            </where>
             ORDER BY posting_idx DESC
         ) a WHERE ROWNUM &lt;= #{offset} + #{size}
     ) WHERE rnum &gt; #{offset}
-	</select>
+</select>
 
 	<select id="findById" resultType="com.sp.app.model.JobPosting">
 		SELECT
@@ -143,6 +150,32 @@
     SELECT img_url
     FROM job_posting_image
     WHERE posting_idx = #{postingIdx}
+	</select>
+	
+		<select id="listPostingByArea" parameterType="map" resultType="com.sp.app.model.JobPosting">
+		    SELECT
+		        posting_idx AS postingIdx,
+		        title, employer, pay,
+		        pay_type AS payType,
+		        location, created_date AS createdDate,
+		        category, work_period AS workPeriod,
+		        work_days AS workDays,
+		        start_time AS startTime,
+		        end_time AS endTime,
+		        deadline
+		    FROM job_posting
+	    <where>
+	        <if test="sido != null and sido != ''">
+	            AND location LIKE '%' || #{sido} || '%'
+	        </if>
+	        <if test="gugun != null and gugun != '' and !gugun.contains('전체')">
+	            AND location LIKE '%' || #{gugun} || '%'
+	        </if>
+	        <if test="dong != null and dong != '' and !dong.contains('전체')">
+	            AND location LIKE '%' || #{dong} || '%'
+	        </if>
+	    </where>
+	    ORDER BY created_date DESC
 	</select>
 
 </mapper>

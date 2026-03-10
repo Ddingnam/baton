@@ -1,5 +1,4 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ include file="/WEB-INF/views/layout/headerResources.jsp" %>
 <!DOCTYPE html>
@@ -20,7 +19,6 @@
 
 <main class="alba-main-container">
 
-    <%-- ===== HERO ===== --%>
     <section class="alba-hero-section">
         <div class="container hero-inner">
             <div class="hero-text-box">
@@ -40,7 +38,6 @@
 
     <div class="content-wrapper">
 
-        <%-- ===== TOOLBAR ===== --%>
         <div class="alba-toolbar">
             <div class="toolbar-top">
                 <div class="filter-group alba-filter-list filter-section" data-filter-type="category">
@@ -56,27 +53,103 @@
                     <i class="ri-add-line"></i> 공고 등록하기
                 </button>
             </div>
+		            
+		            <div class="advanced-filter-wrap">
+					    <div class="filter-tab-group">
+					        <label class="filter-tab active">
+					            <input type="radio" name="filterTab" value="area" checked>
+					            <span>지역 <i class="ri-arrow-down-s-line"></i></span>
+					        </label>
+					        <label class="filter-tab">
+					            <input type="radio" name="filterTab" value="category">
+					            <span>업직종 <i class="ri-arrow-down-s-line"></i></span>
+					        </label>
+					        <label class="filter-tab">
+					            <input type="radio" name="filterTab" value="period">
+					            <span>근무기간 <i class="ri-arrow-down-s-line"></i></span>
+					        </label>
+					        <label class="filter-tab">
+					            <input type="radio" name="filterTab" value="detail">
+					            <span>상세조건 <i class="ri-arrow-down-s-line"></i></span>
+					        </label>
+		    		</div>
 
-            <div class="toolbar-bottom">
-                <div class="price-select-group">
-                    <input type="number" class="tl-price-input" id="minPayInput"
-                           placeholder="최소 시급" value="${param.minPay}">
-                    <button class="tl-price-apply" onclick="applyFilters()">적용</button>
-                </div>
-                <div class="action-group">
-                    <select class="detail-select sort-select" id="sortSelect" onchange="applyFilters()">
-                        <option value="latest"   ${param.sort == 'latest'   ? 'selected' : ''}>최신순</option>
-                        <option value="pay_high" ${param.sort == 'pay_high' ? 'selected' : ''}>시급 높은순</option>
-                    </select>
-                </div>
-            </div>
-        </div>
+				    <div class="filter-body" id="filterAreaPanel">
+				        <div class="filter-body-header">
+				            <div class="filter-search-box">
+				                <i class="ri-search-line"></i>
+				                <input type="text" placeholder="지역명 검색 예) 서울, 서초구">
+				            </div>
+				            <div class="filter-options">
+				                <label class="filter-checkbox">
+				                    <input type="checkbox" name="groupSimilar">
+				                    <span>유사동 묶기</span>
+				                </label>
+				                <div class="filter-counter"><span id="filterCount">0</span>/5</div>
+				            </div>
+				        </div>
+				
+				        <div class="filter-columns">
+				            <div class="filter-col">
+				                <div class="col-title">시·도</div>
+				                <ul id="col-sido" class="col-list">
+									<li>서울</li>
+									<li>경기</li>
+									<li>인천</li>
+									<li>강원</li>
+									<li>대전</li>
+									<li>세종</li>
+									<li>충남</li>
+									<li>충북</li>
+									<li>부산</li>
+									<li>울산</li>
+									<li>경남</li>
+									<li>경북</li>
+									<li>대구</li>
+									<li>광주</li>
+									<li>전남</li>
+									<li>전북</li>
+									<li>제주</li>
+									<li>전국</li>
+									</ul>
+				            </div>
+				            <div class="filter-col">
+				                <div class="col-title">시·구·군</div>
+				                <ul class="col-list" id="col-gugun"></ul>
+				            </div>
+				            <div class="filter-col">
+				                <div class="col-title">동·읍·면</div>
+				                <ul class="col-list empty" id="col-dong">
+				                    </ul>
+				            </div>
+				        </div>
+				
+				        <div class="filter-footer">
+				            <button type="button" class="btn-reset" onclick="resetFilters()">
+				                <i class="ri-refresh-line"></i> 초기화
+				            </button>
+				        </div>
+				    </div>
+				</div>
+				
+				            <div class="toolbar-bottom">
+				                <div class="price-select-group">
+				                    <input type="number" class="tl-price-input" id="minPayInput"
+				                           placeholder="최소 시급" value="${param.minPay}">
+				                    <button class="tl-price-apply" onclick="applyFilters()">적용</button>
+				                </div>
+				                <div class="action-group">
+				                    <select class="detail-select sort-select" id="sortSelect" onchange="applyFilters()">
+				                        <option value="latest"   ${param.sort == 'latest'   ? 'selected' : ''}>최신순</option>
+				                        <option value="pay_high" ${param.sort == 'pay_high' ? 'selected' : ''}>시급 높은순</option>
+				                    </select>
+				                </div>
+				            </div>
+				        </div>
 
-        <%-- ===== LAYOUT ===== --%>
         <div id="alba-layout-container">
             <div class="baton-page">
 
-                <%-- 사이드바 --%>
                 <aside class="baton-sidebar">
                     <div class="sidebar-header">
                         <div class="location-label">
@@ -94,7 +167,6 @@
                     </div>
                 </aside>
 
-                <%-- 메인 콘텐츠 --%>
                 <div class="content">
                     <div class="content-header">
                         <div class="result-count">

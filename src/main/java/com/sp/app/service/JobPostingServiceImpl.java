@@ -134,4 +134,10 @@ public class JobPostingServiceImpl implements JobPostingService {
             throw e;
         }
     }
+    
+    @Override
+    public List<JobPosting> listPostingByArea(Map<String, Object> map) {
+        return mapper.listPostingByArea(map);
+    }
+    
 }

@@ -25,7 +25,10 @@ public class JobPostingController {
 
     @GetMapping("list")
     public String list(
-            @RequestParam(value = "page", defaultValue = "1") int current_page,
+            @RequestParam(value="page", defaultValue="1") int current_page,
+            @RequestParam(value="sido", required=false) String sido,
+            @RequestParam(value="gugun", required=false) String gugun,
+            @RequestParam(value="dong", required=false) String dong,
             Model model) {
         
         int size = 10;
@@ -34,6 +37,10 @@ public class JobPostingController {
         Map<String, Object> map = new HashMap<>();
         map.put("offset", offset);
         map.put("size", size);
+        
+        map.put("sido", (sido != null && !sido.contains("전체")) ? sido : null);
+        map.put("gugun", (gugun != null && !gugun.contains("전체")) ? gugun : null);
+        map.put("dong", (dong != null && !dong.contains("전체")) ? dong : null);
         
         int dataCount = postingService.dataCount(map);
         List<JobPosting> list = postingService.listPosting(map);
@@ -121,5 +128,21 @@ public class JobPostingController {
     public String delete(@RequestParam("postingIdx") long postingIdx) throws Exception {
         postingService.deletePosting(postingIdx);
         return "redirect:/alba/list";
+    }
+    
+    @GetMapping("filter")
+    @ResponseBody
+    public List<JobPosting> filter(
+            @RequestParam("sido") String sido, 
+            @RequestParam("gugun") String gugun,
+            @RequestParam("dong") String dong) {
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("sido", (sido != null && !sido.contains("전체")) ? sido : null);
+        map.put("gugun", (gugun != null && !gugun.contains("전체")) ? gugun : null);
+        map.put("dong", (dong != null && !dong.contains("전체")) ? dong : null);
+        
+        return postingService.listPostingByArea(map);
     }
 }
