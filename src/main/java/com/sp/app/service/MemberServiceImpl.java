@@ -9,8 +9,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sp.app.common.MyUtil;
 import com.sp.app.common.StorageService;
 import com.sp.app.domain.dto.MemberDto;
+import com.sp.app.domain.dto.SnsUserDto;
 import com.sp.app.domain.dto.UserDto;
 import com.sp.app.mapper.MemberMapper;
 
@@ -21,13 +23,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class MemberServiceImpl implements MemberService {
+
 	private final MemberMapper mapper;
 	private final StorageService storageService;
 	private final PasswordEncoder bcryptEncoder;
 
 	@Override
-	public UserDto loginSnsUser(Map<String, Object> map) {
-		UserDto dto = null;
+	public SnsUserDto loginSnsUser(Map<String, Object> map) {
+		SnsUserDto dto = null;
 		try {
 			dto = mapper.loginSnsUser(map);
 		} catch (Exception e) {
@@ -36,47 +39,71 @@ public class MemberServiceImpl implements MemberService {
 		}
 		return dto;
 	}
+	
+	@Override
+	public UserDto loginUser(Map<String, Object> map) {
+		UserDto dto = null;
+		try {
+			String pwd = (String)map.get("pwd");
+			
+			dto = mapper.loginUser(map);
+			if(!bcryptEncoder.matches(pwd, dto.getPwd())) {
+				return dto;
+			}
+			
+		} catch (Exception e) {
+			log.info("loginUser : ", e);
+		}
+		return dto;
+	}
+	
+	@Override
+	public void insertUser(UserDto dto, String uploadPath) throws Exception {
+	    this.insertUser(dto, null, uploadPath);
+	}
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public void insertUser(UserDto dto, String uploadPath) throws Exception {
+	public void insertUser(UserDto userDto, SnsUserDto snsUserDto, String uploadPath) throws Exception {
 		try {
-			if (dto.getSelectFile() != null && !dto.getSelectFile().isEmpty()) {
-	            String saveFilename = storageService.uploadFileToServer(dto.getSelectFile(), uploadPath);
-	            dto.setProfile_photo(saveFilename);
+			if (userDto.getSelectFile() != null && !userDto.getSelectFile().isEmpty()) {
+	            String saveFilename = storageService.uploadFileToServer(userDto.getSelectFile(), uploadPath);
+	            userDto.setProfile_photo(saveFilename);
 	        }		
 			
-			String encPassword = bcryptEncoder.encode(dto.getPwd());
-			dto.setPwd(encPassword);
+			String rawPwd = userDto.getPwd();
+			if(rawPwd == null || rawPwd.isEmpty()) {
+				rawPwd = MyUtil.generateUUID();
+			}
+			
+			String encPassword = bcryptEncoder.encode(rawPwd);
+			userDto.setPwd(encPassword);
 						
 			Long seq = mapper.userSeq();
-			dto.setUserIdx(seq);
+			userDto.setUserIdx(seq);
 			
-			mapper.insertUser(dto);
+			mapper.insertUser(userDto);
 			
-			dto.setAuthority("USER");
-			mapper.insertAuthority(dto);
+			userDto.setAuthority("USER");
+			mapper.insertAuthority(userDto);
+			
+			if(snsUserDto != null) {
+				snsUserDto.setUserIdx(seq);
+				mapper.insertSnsUser(snsUserDto);
+			}
 			
 		} catch (Exception e) {
 			log.info("insertUser : ", e);
 			throw e;
 		}
 	}
-
+	
 	@Override
-	public void insertSnsUser(UserDto dto) throws Exception {
+	public void insertSnsUser(SnsUserDto snsUserDto) {
 		try {
-			Long seq = mapper.userSeq();
-			
-			dto.setUserIdx(seq);
-			mapper.insertSnsUser(dto);
-			
-			dto.setAuthority("USER");
-			mapper.insertAuthority(dto);
-			
+			mapper.insertSnsUser(snsUserDto);
 		} catch (Exception e) {
 			log.info("insertSnsUser : ", e);
-			throw e;
 		}
 	}
 
@@ -137,7 +164,7 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public UserDto findById(String login_id) {
+	public UserDto findByLoginId(String login_id) {
 		UserDto dto = null;
 
 		try {
@@ -145,6 +172,20 @@ public class MemberServiceImpl implements MemberService {
 		} catch (NullPointerException e) {
 		} catch (Exception e) {
 			log.info("findById : ", e);
+		}
+
+		return dto;
+	}
+	
+	@Override
+	public UserDto findByEmail(String email) {
+		UserDto dto = null;
+
+		try {
+			dto = Objects.requireNonNull(mapper.findByEmail(email));
+		} catch (NullPointerException e) {
+		} catch (Exception e) {
+			log.info("findByEmail : ", e);
 		}
 
 		return dto;

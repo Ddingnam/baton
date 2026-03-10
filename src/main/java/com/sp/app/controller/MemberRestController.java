@@ -18,9 +18,11 @@ import org.springframework.web.bind.support.SessionStatus;
 
 import com.sp.app.common.MyUtil;
 import com.sp.app.domain.dto.GuestSessionInfo;
+import com.sp.app.domain.dto.SnsUserDto;
 import com.sp.app.domain.dto.UserDto;
 import com.sp.app.mail.Mail;
 import com.sp.app.mail.MailSender;
+import com.sp.app.security.LoginSnsSuccessHandler;
 import com.sp.app.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberRestController {
 	private final MemberService service;
 	private final MailSender mailSender;
+	
+	private final LoginSnsSuccessHandler successHandler;
 	
 	@Value("${file.upload-root}/trade")
     private String uploadPath;
@@ -382,6 +386,41 @@ public class MemberRestController {
             model.put("state", "serverError");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
         }
+    }
+    
+    @PostMapping("linkAccount")
+    public ResponseEntity<?> linkAccount(
+    		@RequestParam("pwd") String pwd,
+    		@ModelAttribute("guestInfo") GuestSessionInfo guestInfo) {
+    	Map<String, Object> model = new HashMap<>();
+    	
+		try {
+			Map<String, Object> map = new HashMap<>();
+			map.put("userId", guestInfo.getLinkedUserId());
+			map.put("pwd", pwd);
+			
+			UserDto userDto = service.loginUser(map);
+			
+			if(userDto == null) {
+				model.put("state", "fail");
+				return ResponseEntity.ok(model);
+			}
+			
+			SnsUserDto snsUserDto = guestInfo.getSnsUserDto();
+			snsUserDto.setUserIdx(userDto.getUserIdx());
+			service.insertSnsUser(snsUserDto);
+			
+			userDto.setProvider(snsUserDto.getProvider());
+			successHandler.forceLogin(userDto);
+			
+			model.put("state", "success");
+        	return ResponseEntity.ok(model);
+        	
+		} catch (Exception e) {
+			log.info("findId error: ", e);
+            model.put("state", "serverError");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
+		}
     }
     
     

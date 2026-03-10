@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -252,5 +253,16 @@ public class MyUtil {
         int num = random.nextInt(1000000);
         
         return String.format("%06d", num);
+    }
+	
+	/**
+	 * SNS 로그인 계정 userId 생성
+	 * @return UUID 32자리
+	 */
+	public static String generateUUID() {
+        String uuid = UUID.randomUUID().toString();
+        String cleanUuid = uuid.replace("-", "");
+        
+        return cleanUuid;
     }
 }

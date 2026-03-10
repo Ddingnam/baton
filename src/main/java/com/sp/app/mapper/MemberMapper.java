@@ -7,15 +7,17 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.sp.app.domain.dto.MemberDto;
+import com.sp.app.domain.dto.SnsUserDto;
 import com.sp.app.domain.dto.UserDto;
 
 @Mapper
 public interface MemberMapper {
-	public UserDto loginSnsUser(Map<String, Object> map);
+	public SnsUserDto loginSnsUser(Map<String, Object> map);
+	public UserDto loginUser(Map<String, Object> map);
 
 	public Long userSeq();	
 	public void insertUser(UserDto dto) throws SQLException;
-	public void insertSnsUser(UserDto dto) throws SQLException;
+	public void insertSnsUser(SnsUserDto dto) throws SQLException;
 	public void insertRegion(UserDto dto) throws SQLException;
 	
 	public void insertMember12(MemberDto dto) throws SQLException;
@@ -33,6 +35,7 @@ public interface MemberMapper {
 	
 	public UserDto findById(Long member_id);
 	public UserDto findByLoginId(String login_id);
+	public UserDto findByEmail(String email);
 	public Long getMemberId(String login_id);
 	
 	public int checkFailureCount(String login_id);

@@ -23,7 +23,7 @@ public class LoginSnsSuccessHandler {
 		try {
 			SessionInfo info = SessionInfo.builder()
 					.userIdx(dto.getUserIdx())
-					.userId(dto.getOauthId())
+					.userId(dto.getUserId())
 					.name(dto.getName())
 					.email(dto.getEmail())
 					.userLevel(NumericRoleGranted.getUserLevel("USER"))					

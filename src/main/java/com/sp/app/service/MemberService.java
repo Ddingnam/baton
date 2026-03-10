@@ -5,13 +5,17 @@ import java.util.List;
 import java.util.Map;
 
 import com.sp.app.domain.dto.MemberDto;
+import com.sp.app.domain.dto.SnsUserDto;
 import com.sp.app.domain.dto.UserDto;
 
 public interface MemberService {
-	public UserDto loginSnsUser(Map<String, Object> map);
+	public SnsUserDto loginSnsUser(Map<String, Object> map);
+	public UserDto loginUser(Map<String, Object> map);
 	
 	public void insertUser(UserDto dto, String uploadPath) throws Exception;
-	public void insertSnsUser(UserDto dto) throws Exception;
+	public void insertUser(UserDto userDto, SnsUserDto snsUserDto, String uploadPath) throws Exception;
+	public void insertSnsUser(SnsUserDto dto) throws Exception;
+	
 	public void insertMemberStatus(MemberDto dto) throws Exception;
 	
 	public void updatePassword(MemberDto dto) throws Exception;
@@ -22,7 +26,8 @@ public interface MemberService {
 	public void updateLastLogin(String login_id) throws Exception;
 	
 	public UserDto findById(Long member_id);
-	public UserDto findById(String login_id);
+	public UserDto findByLoginId(String login_id);
+	public UserDto findByEmail(String email);
 	public Long getMemberId(String login_id);
 	
 	public int checkFailureCount(String login_id);

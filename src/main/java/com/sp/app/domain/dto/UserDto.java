@@ -1,5 +1,7 @@
 package com.sp.app.domain.dto;
 
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.Getter;
@@ -13,7 +15,6 @@ public class UserDto {
 	private long userIdx;
 	
 	private String userId;
-	private String oauthId;
 	private String pwd;
 	
 	private String name;
@@ -33,11 +34,12 @@ public class UserDto {
 	private String lastLoginDate;
 	
 	private int batonpoint;
+	private String authority;
+	
 	private String provider;
+	private List<SnsUserDto> snsUserList;
 	
 	private MultipartFile selectFile;		
-	
-	private String authority;
 	
 	private String regionCode;
     private String fullAddress;

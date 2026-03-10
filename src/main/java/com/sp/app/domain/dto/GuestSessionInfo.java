@@ -22,6 +22,11 @@ public class GuestSessionInfo {
 
     private Long findUserIdx;
     
+    private String linkedUserId;
+    private String linkedUserEmail;
+    
+    private SnsUserDto snsUserDto;
+    
     public void resetEmailAuth(String email, String code) {
         this.targetEmail = email;
         this.authCode = code;
@@ -39,5 +44,8 @@ public class GuestSessionInfo {
         this.completeUserId = null;
         this.completeNickname = null;
         this.findUserIdx = null;
+        this.linkedUserId = null;
+        this.linkedUserEmail = null;
+        this.snsUserDto = null;
     }
 }

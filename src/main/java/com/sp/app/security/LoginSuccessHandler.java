@@ -41,7 +41,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler{
 			memberService.updateLastLogin(authentication.getName());
 			memberService.updateFailureCountReset(authentication.getName());
 			
-			UserDto dto = memberService.findById(authentication.getName());
+			UserDto dto = memberService.findByLoginId(authentication.getName());
 			
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 			LocalDateTime curDate = LocalDateTime.now();
@@ -67,7 +67,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler{
 		request.getSession().setAttribute("msg", authentication.getName() + "님, 환영합니다!");
 		
 		try {
-		    UserDto dto2 = memberService.findById(authentication.getName());
+		    UserDto dto2 = memberService.findByLoginId(authentication.getName());
 		    SessionInfo info = new SessionInfo();
 		    info.setUserIdx(dto2.getUserIdx());
 		    info.setUserId(dto2.getUserId());

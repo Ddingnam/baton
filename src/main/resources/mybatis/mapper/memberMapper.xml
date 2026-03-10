@@ -2,11 +2,21 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.MemberMapper">
-	<select id="loginSnsUser" parameterType="map" resultType="com.sp.app.domain.dto.UserDto">
-		SELECT userIdx, oauthId, provider, name, email,  
-			createdDate, lastLoginDate, status
-		FROM users
+	<select id="loginSnsUser" parameterType="map" resultType="com.sp.app.domain.dto.SnsUserDto">
+		SELECT authIdx, userIdx, provider, oauthId, linkedDate
+		FROM sns_users
 		WHERE provider = #{provider, jdbcType=VARCHAR} AND oauthId = #{oauthId, jdbcType=VARCHAR}
+	</select>
+	
+	<select id="loginUser" parameterType="map" resultType="com.sp.app.domain.dto.UserDto">
+		SELECT m1.userIdx, m1.userId, pwd, name, nickname, email, tel,
+			status, createdDate, updatedDate, lastLoginDate,
+			TO_CHAR(birth, 'YYYY-MM-DD') birth, 
+			profile_photo, score, userLevel, pwdFailCount,
+			m2.authority, batonpoint
+		FROM users m1
+		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
+		WHERE m1.userId = #{userId}
 	</select>
 	
 	<select id="userSeq" resultType="Long">
@@ -45,39 +55,27 @@
 	        0, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 1)
 	</insert>
 	
-	<insert id="insertSnsUser" parameterType="com.sp.app.domain.dto.UserDto">
-	    INSERT INTO users (
+	<insert id="insertSnsUser" parameterType="com.sp.app.domain.dto.SnsUserDto">
+	    INSERT INTO sns_users (
+	        authIdx, 
 	        userIdx, 
-	        userId, 
+	        provider,
 	        oauthId, 
-	        pwd,
-	        name, 
-	        nickname, 
-	        email, 
-	        tel, 
-	        birth, 
-	        profile_photo, 
-	        score, 
-	        userLevel, 
-	        createdDate, 
-	        updatedDate, 
-	        lastLoginDate, 
-	        pwdFailCount, 
-	        status,
-	        provider
+	        linkedDate
 	    ) VALUES (
-	        #{userIdx},
-	        #{userId}, 
-	        #{oauthId, jdbcType=VARCHAR}, 
-	        #{pwd, jdbcType=VARCHAR},
-	        #{name}, 
-	        #{nickname}, 
-	        #{email}, 
-	        #{tel}, 
-	        #{birth}, 
-	        #{profile_photo, jdbcType=VARCHAR}, 
-	        0, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 1, #{provider})
+	        sns_user_seq.NEXTVAL,
+	        #{userIdx}, 
+	        #{provider}, 
+	        #{oauthId},
+	        CURRENT_TIMESTAMP
+	    ) 
 	</insert>
+	
+	<select id="isLinkedSnsUser" parameterType="map" resultType="com.sp.app.domain.dto.SnsUserDto">
+		SELECT authIdx, userIdx, provider, oauthId, linkedDate
+		FROM sns_users
+		WHERE provider = #{provider, jdbcType=VARCHAR} AND oauthId = #{oauthId, jdbcType=VARCHAR}
+	</select>
 	
 	<insert id="insertRegion" parameterType="com.sp.app.domain.dto.UserDto">
 	    INSERT INTO region (
@@ -189,7 +187,7 @@
 			m2.authority, batonpoint
 		FROM users m1
 		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
-		WHERE m1.userIdx = #{member_id}
+		WHERE m1.userIdx = #{userIdx}
 	</select>
 
 	<select id="findByLoginId" parameterType="String" resultType="com.sp.app.domain.dto.UserDto">
@@ -201,6 +199,17 @@
 		FROM users m1
 		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
 		WHERE m1.userId = #{login_id}
+	</select>
+	
+	<select id="findByEmail" parameterType="String" resultType="com.sp.app.domain.dto.UserDto">
+		SELECT m1.userIdx, m1.userId, pwd, name, nickname, email, tel,
+			status, createdDate, updatedDate, lastLoginDate,
+			TO_CHAR(birth, 'YYYY-MM-DD') birth, 
+			profile_photo, score, userLevel, pwdFailCount,
+			m2.authority, batonpoint
+		FROM users m1
+		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
+		WHERE m1.email = #{email}
 	</select>
 
 	<select id="getMemberId" parameterType="String" resultType="Long">

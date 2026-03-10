@@ -42,7 +42,7 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 				}
 				
 				if(cnt >= 4) {
-					UserDto dto = memberService.findById(login_id);
+					UserDto dto = memberService.findByLoginId(login_id);
 					
 					Map<String, Object> map = new HashMap<>();
 					map.put("status", 0);
