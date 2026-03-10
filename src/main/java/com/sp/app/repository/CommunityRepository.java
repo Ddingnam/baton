@@ -17,4 +17,5 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     public Page<Community> findByTemporaryFalseAndContentContaining(String keyword, Pageable pageable);
     public Page<Community> findByTemporaryFalseAndSubjectContainingOrTemporaryFalseAndContentContaining(String subject, String content, Pageable pageable);
     public List<Community> findByMemberIdxAndTemporaryTrueOrderByRegDateDesc(Long memberIdx);
+    public List<Community> findByMemberIdxAndTemporaryTrue(Long memberIdx);
 }

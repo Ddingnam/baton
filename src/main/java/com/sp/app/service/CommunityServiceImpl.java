@@ -61,7 +61,8 @@ public class CommunityServiceImpl implements CommunityService {
 					.longitude(dto.getLongitude())
 					.hitCount(0)
 					.likeCount(0)
-					.temporary(dto.isTemporary()) 
+					.temporary(dto.isTemporary())
+					.regDate(java.time.LocalDateTime.now())
 					.build();
 
 			if (dto.getTags() != null) {
@@ -199,6 +200,54 @@ public class CommunityServiceImpl implements CommunityService {
 
 		} catch (Exception e) {
 			log.error("updateCommunity error", e);
+			throw e;
+		}
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void updateTempCommunity(CommunityDto dto, String uploadPath) throws Exception {
+		try {
+			Community community = communityRepository.findById(dto.getId()).orElseThrow();
+			if (!community.getMemberIdx().equals(dto.getMemberIdx()) || !community.isTemporary()) {
+				throw new RuntimeException("수정 권한이 없습니다.");
+			}
+
+			String content = dto.getContent();
+			List<MultipartFile> files = dto.getUploadFiles();
+
+			if (files != null && !files.isEmpty()) {
+				for (MultipartFile mf : files) {
+					if (mf.isEmpty()) continue;
+					String tempId = mf.getOriginalFilename();
+					String saveFilename = storageService.uploadFileToServer(mf, uploadPath);
+					String webPath = "/uploads/community/" + saveFilename;
+					content = content.replace("src=\"" + tempId + "\"", "src=\"" + webPath + "\"");
+					community.addImage(CommunityImage.builder()
+							.originalFilename(mf.getOriginalFilename())
+							.saveFilename(saveFilename)
+							.build());
+				}
+			}
+
+			community.setSubject(dto.getSubject());
+			community.setContent(content);
+			community.setCategory(dto.getCategory());
+			community.setTemporary(true);
+			community.setRegDate(java.time.LocalDateTime.now());
+			community.setPlaceName(dto.getPlaceName());
+			community.setAddress(dto.getAddress());
+			community.setLatitude(dto.getLatitude());
+			community.setLongitude(dto.getLongitude());
+
+			if (dto.getTags() != null) {
+				community.getHashTags().clear();
+				for (String tagName : dto.getTags()) {
+					community.addHashTag(CommunityHashTag.builder().tagName(tagName).build());
+				}
+			}
+		} catch (Exception e) {
+			log.error("updateTempCommunity error", e);
 			throw e;
 		}
 	}

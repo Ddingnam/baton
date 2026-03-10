@@ -312,10 +312,15 @@ public class CommunityApiController {
             String root = session.getServletContext().getRealPath("/");
             String path = root + "uploads" + java.io.File.separator + "community";
 
-            communityService.insertCommunity(dto, path);
+            if (dto.getId() != null && dto.getId() > 0) {
+                communityService.updateTempCommunity(dto, path);
+            } else {
+                communityService.insertCommunity(dto, path);
+            }
 
             result.put("status", "true");
             result.put("message", "임시저장되었습니다.");
+            result.put("id", dto.getId());
         } catch (Exception e) {
             log.error("임시저장 실패", e);
             result.put("status", "false");

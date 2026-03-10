@@ -33,4 +33,5 @@ public interface CommunityService {
 
 	public List<CommunityDto> getTempList(long memberIdx);
 	public void deleteTempCommunity(long id, long memberIdx, String uploadPath) throws Exception;
+	public void updateTempCommunity(CommunityDto dto, String uploadPath) throws Exception;
 }

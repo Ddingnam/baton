@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -63,8 +62,7 @@ public class Community {
     @ColumnDefault("false")
     private boolean temporary;
 
-    @CreationTimestamp
-    @Column(updatable = false)
+    @Column
     private LocalDateTime regDate;
 
     private String placeName;

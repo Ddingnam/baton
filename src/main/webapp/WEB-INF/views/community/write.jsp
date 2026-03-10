@@ -308,7 +308,7 @@
         } else {
             itemHtml += '    <span>' + place.address_name + '</span>';
         }
-        itemHtml += '</div>';
+        itemHtml += '</div>';  
 
         element.innerHTML = itemHtml;
         element.onclick = function () {

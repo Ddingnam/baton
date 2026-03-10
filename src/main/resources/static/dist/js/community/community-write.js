@@ -313,7 +313,9 @@ function saveTemp() {
 	const activeIds = Array.from(activeImages).map(img => img.getAttribute('data-temp-id'));
 
 	const formData = new FormData();
+	const currentId = document.querySelector('input[name="id"]')?.value;
 	const dto = {
+		id: (currentId && currentId > 0) ? Number(currentId) : null,
 		subject: subject,
 		content: content,
 		category: document.querySelector('input[name="category"]:checked')?.value || '1',
@@ -341,6 +343,10 @@ function saveTemp() {
 		if (data.status === 'true') {
 			showBatonToast('임시저장되었습니다 ✓');
 			loadTempCount();
+			if (data.id) {
+				const idInput = document.querySelector('input[name="id"]');
+				if (idInput) idInput.value = data.id;
+			}
 		} else {
 			showBatonToast(data.message || '임시저장에 실패했습니다.');
 		}
