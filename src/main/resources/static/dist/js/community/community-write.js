@@ -283,38 +283,54 @@ function saveTemp() {
 	const f = document.communityForm;
 	const subject = f.subject.value.trim();
 	if (!subject) {
-		alert('제목을 입력해야 임시 저장이 가능해요.');
+		alert('제목을 입력해야 임시저장이 가능해요.');
 		f.subject.focus();
 		return;
 	}
 
-	let tempInput = f.querySelector('input[name="isTemporary"]');
-	if (!tempInput) {
-		tempInput = document.createElement('input');
-		tempInput.type = 'hidden';
-		tempInput.name = 'isTemporary';
-		f.appendChild(tempInput);
-	}
-	tempInput.value = '1';
-
-	const modeInput = f.querySelector('input[name="mode"]');
-	if (modeInput) modeInput.value = 'write';
-
 	const htmlContent = quill.root.innerHTML;
-	document.getElementById('content').value = htmlContent === '<p><br></p>' ? '' : htmlContent;
+	const content = htmlContent === '<p><br></p>' ? '' : htmlContent;
 
-	f.querySelectorAll('input[name="tags"]').forEach(t => t.remove());
-	tagList.forEach(tag => {
-		const input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'tags';
-		input.value = tag;
-		f.appendChild(input);
+	const activeImages = quill.root.querySelectorAll('img[data-temp-id]');
+	const activeIds = Array.from(activeImages).map(img => img.getAttribute('data-temp-id'));
+
+	const formData = new FormData();
+
+	const dto = {
+		subject: subject,
+		content: content,
+		category: document.querySelector('input[name="category"]:checked')?.value || '1',
+		placeName: document.getElementById('placeName')?.value || '',
+		address: document.getElementById('address')?.value || '',
+		latitude: document.getElementById('latitude')?.value || null,
+		longitude: document.getElementById('longitude')?.value || null,
+		tags: tagList
+	};
+	formData.append('dto', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
+
+	globalUploadFiles.forEach(file => {
+		if (activeIds.includes(file.tempId)) {
+			const renamedFile = new File([file], file.tempId, { type: file.type });
+			formData.append('uploadFiles', renamedFile);
+		}
 	});
 
 	const contextPath = document.querySelector('meta[name="contextPath"]').getAttribute('content');
-	f.action = contextPath + '/community/write';
-	f.submit();
+
+	fetch(`${contextPath}/api/community/temp`, {
+		method: 'POST',
+		body: formData
+	})
+	.then(r => r.json())
+	.then(data => {
+		if (data.status === 'true') {
+			showToast('임시저장되었습니다 ✓');
+			loadTempCount();
+		} else {
+			showToast(data.message || '임시저장에 실패했습니다.');
+		}
+	})
+	.catch(() => showToast('오류가 발생했습니다.'));
 }
 
 function showToast(message) {

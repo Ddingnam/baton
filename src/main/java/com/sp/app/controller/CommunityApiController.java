@@ -289,4 +289,38 @@ public class CommunityApiController {
             return ResponseEntity.ok(result);
         }
     }
+
+    @PostMapping("/temp")
+    public ResponseEntity<Map<String, Object>> saveTemp(
+            @RequestPart(value = "dto") CommunityDto dto,
+            @RequestPart(value = "uploadFiles", required = false) List<MultipartFile> uploadFiles,
+            HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            SessionInfo info = (SessionInfo) session.getAttribute("member");
+            if (info == null) {
+                result.put("status", "false");
+                result.put("message", "로그인이 필요합니다.");
+                return ResponseEntity.ok(result);
+            }
+
+            dto.setMemberIdx(info.getUserIdx());
+            dto.setWriterNickname(info.getName());
+            dto.setUploadFiles(uploadFiles);
+            dto.setTemporary(true);
+
+            String root = session.getServletContext().getRealPath("/");
+            String path = root + "uploads" + java.io.File.separator + "community";
+
+            communityService.insertCommunity(dto, path);
+
+            result.put("status", "true");
+            result.put("message", "임시저장되었습니다.");
+        } catch (Exception e) {
+            log.error("임시저장 실패", e);
+            result.put("status", "false");
+            result.put("message", "임시저장 중 오류가 발생했습니다.");
+        }
+        return ResponseEntity.ok(result);
+    }
 }

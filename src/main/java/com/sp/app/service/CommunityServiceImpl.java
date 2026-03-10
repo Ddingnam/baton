@@ -61,6 +61,7 @@ public class CommunityServiceImpl implements CommunityService {
 					.longitude(dto.getLongitude())
 					.hitCount(0)
 					.likeCount(0)
+					.temporary(dto.isTemporary()) 
 					.build();
 
 			if (dto.getTags() != null) {
@@ -131,19 +132,19 @@ public class CommunityServiceImpl implements CommunityService {
 	@Override
 	@Transactional(readOnly = true)
 	public Page<CommunityDto> getCommunityList(Pageable pageable, String schType, String kwd) {
-		Page<Community> entities;
-		if (kwd == null || kwd.isBlank()) {
-			entities = communityRepository.findAll(pageable);
-		} else {
-			if ("subject".equals(schType)) {
-				entities = communityRepository.findBySubjectContaining(kwd, pageable);
-			} else if ("content".equals(schType)) {
-				entities = communityRepository.findByContentContaining(kwd, pageable);
-			} else {
-				entities = communityRepository.findBySubjectContainingOrContentContaining(kwd, kwd, pageable);
-			}
-		}
-		return entities.map(this::toDto);
+	    Page<Community> entities;
+	    if (kwd == null || kwd.isBlank()) {
+	        entities = communityRepository.findByTemporaryFalse(pageable);
+	    } else {
+	        if ("subject".equals(schType)) {
+	            entities = communityRepository.findByTemporaryFalseAndSubjectContaining(kwd, pageable);
+	        } else if ("content".equals(schType)) {
+	            entities = communityRepository.findByTemporaryFalseAndContentContaining(kwd, pageable);
+	        } else {
+	            entities = communityRepository.findByTemporaryFalseAndSubjectContainingOrTemporaryFalseAndContentContaining(kwd, kwd, pageable);
+	        }
+	    }
+	    return entities.map(this::toDto);
 	}
 
 	@Override
@@ -188,9 +189,9 @@ public class CommunityServiceImpl implements CommunityService {
 			}
 			
 			community.setSubject(dto.getSubject());
-			community.setContent(content); // 수정된 내용 저장
+			community.setContent(content);
 			community.setCategory(dto.getCategory());
-			community.setTemporary(false); // 수정 등록 시 임시저장 해제
+			community.setTemporary(false);
 			community.setPlaceName(dto.getPlaceName());
 			community.setAddress(dto.getAddress());
 			community.setLatitude(dto.getLatitude());
