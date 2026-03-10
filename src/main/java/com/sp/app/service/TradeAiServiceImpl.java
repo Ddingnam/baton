@@ -1,5 +1,6 @@
 package com.sp.app.service;
 
+import java.net.URI;
 import java.util.Base64;
 
 import org.json.JSONArray;
@@ -27,12 +28,16 @@ public class TradeAiServiceImpl implements TradeAiService{
 	
 	@Override
 	public TradeAiResponse analyzeProductImage(MultipartFile imageFile) throws Exception {
-		String modelName = "gemini-1.5-flash"; 
+		String modelName = "gemini-2.5-flash";
+		
 	    String apiKey = geminiConfig.getApiKey();
+	    System.out.println(">>>> [DEBUG] 불러온 API KEY: [" + apiKey + "]");
 
-	    String url = "https://generativelanguage.googleapis.com/v1/models/" + modelName + ":generateContent?key=" + apiKey;
+	    String urlStr = "https://generativelanguage.googleapis.com/v1/models/" 
+	              + modelName + ":generateContent?key=" + apiKey;
+	    URI uri = new URI(urlStr);
 
-	    System.out.println(">>> 최종 요청 URL: " + url);
+	    System.out.println(">>> 최종 요청 URL: " + uri);
 
 	    if (imageFile == null || imageFile.isEmpty()) {
 	        throw new IllegalArgumentException("이미지 파일이 비어있습니다.");
@@ -48,9 +53,13 @@ public class TradeAiServiceImpl implements TradeAiService{
         JSONArray contents = new JSONArray();
         JSONArray partsArray = new JSONArray();
         
+        String mimeType = imageFile.getContentType() != null 
+                ? imageFile.getContentType() 
+                : "image/jpeg";
+        
         partsArray.put(new JSONObject().put("text", prompt));
         partsArray.put(new JSONObject().put("inline_data", new JSONObject()
-                .put("mime_type", "image/jpeg")
+                .put("mime_type", mimeType)
                 .put("data", base64Image)));
 
         contents.put(new JSONObject().put("parts", partsArray));
@@ -60,7 +69,7 @@ public class TradeAiServiceImpl implements TradeAiService{
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(requestJson.toString(), headers);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(uri, entity, String.class);
         
         return parseGeminiResponse(response.getBody());
 	}
