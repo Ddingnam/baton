@@ -46,11 +46,11 @@
 	    	#{userIdx}, 
 	        #{userId}, 
 	        #{pwd}, 
-	        #{name}, 
+	        #{name, jdbcType=VARCHAR}, 
 	        #{nickname}, 
 	        #{email}, 
-	        #{tel}, 
-	        #{birth}, 
+	        #{tel, jdbcType=VARCHAR}, 
+	        #{birth, jdbcType=VARCHAR}, 
 	        #{profile_photo, jdbcType=VARCHAR}, 
 	        0, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 1)
 	</insert>

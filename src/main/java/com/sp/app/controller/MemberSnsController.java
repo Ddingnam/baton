@@ -88,16 +88,13 @@ public class MemberSnsController {
 			
 			newUserDto.setUserId(sns_provider + "_" + MyUtil.generateUUID());
 			newUserDto.setNickname(kakaoUser.getNickname());
-			newUserDto.setName(kakaoUser.getName());
-			newUserDto.setBirth(kakaoUser.getBirth());
-			newUserDto.setTel(kakaoUser.getTel());
 			newUserDto.setEmail(kakaoUser.getEmail());
 			
 			memberService.insertUser(newUserDto, newSnsUserDto, uploadPath);
 			successHandler.forceLogin(newUserDto);
 			
-			guestInfo.setCompleteNickname(newUserDto.getNickname());
 			guestInfo.setCompleteUserId(newUserDto.getUserId());
+			guestInfo.setCompleteNickname(newUserDto.getNickname());
 			session.setAttribute("guestInfo", guestInfo);
 			
 			return getScriptResponse(cp + "/member/complete");
