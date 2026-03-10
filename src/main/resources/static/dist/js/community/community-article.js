@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initPoll();
     loadReplies();
     formatPollDate();
+    formatArticleDate();
 });
 
 function initMap() {
@@ -34,7 +35,6 @@ function initMap() {
         map.setDraggable(false);
         map.setZoomable(true);
 
-        // 클릭 시 카카오맵으로 이동
         mapContainer.style.cursor = 'pointer';
         kakao.maps.event.addListener(map, 'click', () => {
             const placeName = mapContainer.closest('.map-card').querySelector('strong')?.innerText || '';
@@ -63,6 +63,25 @@ function formatPollDate() {
         el.innerText = days + '일 남음';
         el.style.color = '#8A63FF';
     }
+}
+
+function formatArticleDate() {
+    const el = document.getElementById('articleRegDate');
+    if (!el) return;
+    const dateStr = el.dataset.date;
+    if (!dateStr) return;
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) {
+        const clean = dateStr.replace('T', ' ').substring(0, 16);
+        el.innerText = clean.replace('-', '.').replace('-', '.');
+        return;
+    }
+    const year  = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day   = String(d.getDate()).padStart(2, '0');
+    const hour  = String(d.getHours()).padStart(2, '0');
+    const min   = String(d.getMinutes()).padStart(2, '0');
+    el.innerText = `${year}.${month}.${day} ${hour}:${min}`;
 }
 
 function initPoll() {
@@ -115,7 +134,7 @@ function initPoll() {
                 submitBtn.style.display = 'none';
                 totalDisplay.innerText = total + '명 참여 (투표 완료)';
             } else {
-                submitBtn.style.display = 'none'; // 비로그인
+                submitBtn.style.display = 'none';
             }
         })
         .catch(() => {

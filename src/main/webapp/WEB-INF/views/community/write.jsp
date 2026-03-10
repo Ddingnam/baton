@@ -45,6 +45,7 @@
 				    </div>
 				    
 				    <div class="editor-header-right" style="display: flex; gap: 8px;">
+				        <button type="button" class="btn-temp-save" onclick="openTempListModal();">임시저장 목록 <span id="tempCountBadge" style="display:none; background:var(--primary,#8A63FF); color:#fff; border-radius:10px; font-size:11px; padding:1px 6px; margin-left:4px;"></span></button>
 				        <button type="button" class="btn-temp-save" onclick="saveTemp();">임시저장</button>
 				        <button type="button" class="btn-submit" onclick="sendOk();">${mode=='update'?'수정':'등록'}</button>
 				    </div>
@@ -172,6 +173,45 @@
 		</div>
 	</div>
 
+	<%-- 임시저장 목록 모달 --%>
+	<div id="tempListModal" class="place-modal-overlay" style="display:none;" onclick="onTempModalOverlayClick(event)">
+		<div class="place-modal-content" id="tempModalContent" style="max-width:600px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
+			<div class="place-modal-header" style="flex-shrink:0;">
+				<h3 id="tempModalTitle">임시저장 목록</h3>
+				<button type="button" class="btn-close-modal" onclick="closeTempListModal()">
+					<i class="ri-close-line"></i>
+				</button>
+			</div>
+
+			<%-- 목록 뷰 --%>
+			<div id="tempListView" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
+				<ul id="tempListContent" class="place-result-list" style="flex:1; overflow-y:auto; padding:8px 0; margin:0;">
+					<li style="text-align:center; padding:32px; color:#aaa;"><i class="ri-loader-4-line ri-spin"></i> 불러오는 중...</li>
+				</ul>
+			</div>
+
+			<%-- 수정 뷰 (숨김) --%>
+			<div id="tempEditView" style="display:none; flex-direction:column; flex:1; overflow:hidden; padding:16px; gap:12px;">
+				<button type="button" onclick="backToTempList()" style="align-self:flex-start; background:none; border:none; color:#8A63FF; cursor:pointer; font-size:13px; padding:0; display:flex; align-items:center; gap:4px;">
+					<i class="ri-arrow-left-line"></i> 목록으로
+				</button>
+				<input type="hidden" id="tempEditId">
+				<div style="display:flex; gap:8px; flex-wrap:wrap;" id="tempEditCatPills">
+					<label style="cursor:pointer;"><input type="radio" name="tempCat" value="1"> <span style="font-size:13px;">일상</span></label>
+					<label style="cursor:pointer;"><input type="radio" name="tempCat" value="2"> <span style="font-size:13px;">동네질문</span></label>
+					<label style="cursor:pointer;"><input type="radio" name="tempCat" value="3"> <span style="font-size:13px;">동네맛집</span></label>
+					<label style="cursor:pointer;"><input type="radio" name="tempCat" value="4"> <span style="font-size:13px;">동네소식</span></label>
+					<label style="cursor:pointer;"><input type="radio" name="tempCat" value="5"> <span style="font-size:13px;">분실/실종</span></label>
+				</div>
+				<input type="text" id="tempEditSubject" placeholder="제목" style="border:1px solid #e0e0e0; border-radius:8px; padding:10px 14px; font-size:15px; outline:none; width:100%; box-sizing:border-box;">
+				<div id="tempEditQuill" style="height:220px; border-radius:8px; overflow:hidden;"></div>
+				<div style="display:flex; gap:8px; justify-content:flex-end; flex-shrink:0; padding-top:4px;">
+					<button type="button" onclick="submitTempEdit()" style="background:#8A63FF; color:#fff; border:none; border-radius:8px; padding:10px 24px; font-size:14px; font-weight:600; cursor:pointer;">등록하기</button>
+					<button type="button" onclick="deleteTempFromEdit()" style="background:#fff; color:#F04452; border:1px solid #F04452; border-radius:8px; padding:10px 18px; font-size:14px; cursor:pointer;">삭제</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div id="placeSearchModal" class="place-modal-overlay" style="display: none;">
 		<div class="place-modal-content">
 			<div class="place-modal-header">

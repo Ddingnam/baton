@@ -265,4 +265,52 @@ public class CommunityController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
+    // 임시저장 목록 조회
+    @GetMapping("temp/list")
+    public ResponseEntity<?> tempList(@SessionAttribute("member") SessionInfo info) {
+        try {
+            List<CommunityDto> list = service.getTempList(info.getUserIdx());
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            log.error("임시저장 목록 조회 실패", e);
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // 임시저장 글 삭제
+    @PostMapping("temp/delete")
+    public ResponseEntity<?> tempDelete(@RequestParam("id") long id,
+            @SessionAttribute("member") SessionInfo info) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            service.deleteTempCommunity(id, info.getUserIdx(), uploadPath);
+            result.put("state", "true");
+        } catch (Exception e) {
+            log.error("임시저장 삭제 실패", e);
+            result.put("state", "false");
+            result.put("message", e.getMessage());
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    // 임시저장 글 불러오기 (글쓰기 페이지로 이동)
+    @GetMapping("temp/load")
+    public String tempLoad(@RequestParam("id") long id,
+            @SessionAttribute("member") SessionInfo info,
+            Model model) {
+        try {
+            CommunityDto dto = service.getCommunity(id);
+            if (dto == null || !dto.getMemberIdx().equals(info.getUserIdx())) {
+                return "redirect:/community/write";
+            }
+            model.addAttribute("mode", "update");
+            model.addAttribute("page", "1");
+            model.addAttribute("dto", dto);
+            model.addAttribute("kakaoMapKey", kakaoMapKey);
+            return "community/write";
+        } catch (Exception e) {
+            return "redirect:/community/write";
+        }
+    }
 }

@@ -60,6 +60,9 @@ public class Community {
     @ColumnDefault("0")
     private int likeCount;
 
+    @ColumnDefault("false")
+    private boolean temporary;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime regDate;

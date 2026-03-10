@@ -190,6 +190,7 @@ public class CommunityServiceImpl implements CommunityService {
 			community.setSubject(dto.getSubject());
 			community.setContent(content); // 수정된 내용 저장
 			community.setCategory(dto.getCategory());
+			community.setTemporary(false); // 수정 등록 시 임시저장 해제
 			community.setPlaceName(dto.getPlaceName());
 			community.setAddress(dto.getAddress());
 			community.setLatitude(dto.getLatitude());
@@ -334,6 +335,28 @@ public class CommunityServiceImpl implements CommunityService {
 	@Override
 	public boolean hasUserVoted(long pollId, long memberIdx) {
 		return pollVoteRepository.existsByPollPollIdAndMemberId(pollId, memberIdx);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<CommunityDto> getTempList(long memberIdx) {
+		return communityRepository.findByMemberIdxAndTemporaryTrueOrderByRegDateDesc(memberIdx)
+				.stream().map(this::toDto).collect(Collectors.toList());
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void deleteTempCommunity(long id, long memberIdx, String uploadPath) throws Exception {
+		Community community = communityRepository.findById(id).orElseThrow();
+		if (!community.getMemberIdx().equals(memberIdx) || !community.isTemporary()) {
+			throw new RuntimeException("삭제 권한이 없습니다.");
+		}
+		if (community.getImages() != null) {
+			for (CommunityImage img : community.getImages()) {
+				storageService.deleteFile(uploadPath, img.getSaveFilename());
+			}
+		}
+		communityRepository.delete(community);
 	}
 
 	private CommunityDto toDto(Community entity) {

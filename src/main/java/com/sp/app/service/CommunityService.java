@@ -30,4 +30,7 @@ public interface CommunityService {
 	public void cancelVote(long pollId, long memberIdx) throws Exception;
 	public CommunityDto getPollInfo(long communityId);
 	public boolean hasUserVoted(long pollId, long memberIdx);
+
+	public List<CommunityDto> getTempList(long memberIdx);
+	public void deleteTempCommunity(long id, long memberIdx, String uploadPath) throws Exception;
 }

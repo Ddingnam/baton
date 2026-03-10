@@ -41,7 +41,7 @@
                 <div class="profile-info">
                     <div class="nickname">${dto.writerNickname}</div>
                     <div class="meta">
-                        <span>${dto.regDate}</span>
+                        <span id="articleRegDate" data-date="${dto.regDate}"></span>
                         <span class="dot">·</span>
                         <span>조회 ${dto.hitCount}</span>
                     </div>
@@ -94,12 +94,16 @@
 
             <c:if test="${dto.latitude != null && dto.latitude != 0}">
                 <div class="map-card">
-                    <div class="map-header">
+                    <div class="map-header" 
+                         style="cursor:pointer;" 
+                         onclick="window.open('https://map.kakao.com/link/map/${dto.placeName},${dto.latitude},${dto.longitude}', '_blank')"
+                         title="카카오맵에서 보기">
                         <i class="ri-map-pin-fill"></i>
                         <div class="place-info">
                             <strong>${dto.placeName}</strong>
                             <span>${dto.address}</span>
                         </div>
+                        <i class="ri-external-link-line" style="margin-left:auto; color:var(--text-3); font-size:14px;"></i>
                     </div>
                     <div id="map" class="map-view" 
                          style="width:100%; height:320px; background-color:#f0f0f0; border-radius:12px; margin-top:10px;" 
