@@ -152,4 +152,13 @@ public class EscrowServiceImpl implements EscrowService {
         historyMap.put("totalPoint", currentPoint);
         paymentMapper.insertPointHistoryForRefund(historyMap);
     }
+    
+    @Override
+    public String getUserAddress(long userIdx) throws Exception {
+        try {
+            return paymentMapper.getUserAddress(userIdx);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 }

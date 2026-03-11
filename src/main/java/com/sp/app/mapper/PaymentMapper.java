@@ -8,7 +8,6 @@ import com.sp.app.model.PointHistory;
 
 @Mapper
 public interface PaymentMapper {
-   
     public void insertPayment(Payment payment);  
     public void insertPointHistory(PointHistory pointHistory);
     public void updateUserPoint(Map<String, Object> map);
@@ -27,4 +26,5 @@ public interface PaymentMapper {
     public void updateArticleStatusToOnSale(long productIdx) throws Exception;
     public void refundBuyerPoint(Map<String, Object> map) throws Exception;
     public void insertPointHistoryForRefund(Map<String, Object> map) throws Exception;
+    public String getUserAddress(long userIdx) throws Exception;
 }

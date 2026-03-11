@@ -9,4 +9,5 @@ public interface EscrowService {
 	public int checkTradeExist(long productIdx) throws Exception;
 	public Map<String, Object> getTradeTransaction(long productIdx) throws Exception;
 	public void cancelTrade(long productIdx, long userIdx) throws Exception;
+	public String getUserAddress(long userIdx) throws Exception;
 }

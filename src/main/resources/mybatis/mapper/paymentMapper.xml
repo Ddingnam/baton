@@ -141,4 +141,14 @@
 	        SEQPOINTHISTORY.NEXTVAL, #{tradeIdx}, #{refundAmount}, 'REFUND_ESCROW', #{buyerIdx}, #{totalPoint}, SYSTIMESTAMP
 	    )
 	</insert>
+
+    <select id="getUserAddress" parameterType="long" resultType="String">
+        SELECT FULLADDRESS FROM (
+            SELECT FULLADDRESS
+            FROM REGION
+            WHERE USERIDX = #{userIdx} AND IS_ACTIVE = 1
+            ORDER BY CREATEDAT DESC
+        ) WHERE ROWNUM = 1
+    </select>
+    
 </mapper>

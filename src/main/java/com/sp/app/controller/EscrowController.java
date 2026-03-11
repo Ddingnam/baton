@@ -10,10 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.model.Trade;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.EscrowService;
@@ -86,10 +84,13 @@ public class EscrowController {
             int price = trade.getPrice();
             int safetyFee = 0;
             int totalPrice = price;
+            
+            String userAddress = escrowService.getUserAddress(userDetails.getUserIdx());
 
             mav.addObject("product", trade); 
             mav.addObject("safetyFee", safetyFee);
             mav.addObject("totalPrice", totalPrice);
+            mav.addObject("userAddress", userAddress);
 
             mav.setViewName("payment/checkout"); 
 
