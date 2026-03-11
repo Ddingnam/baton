@@ -119,6 +119,7 @@ public class CommunityController {
     @PostMapping("write")
     public String writeSubmit(CommunityDto dto,
             @RequestParam(value = "uploadFiles", required = false) List<MultipartFile> uploadFiles,
+            @RequestParam(value = "attachFiles", required = false) List<MultipartFile> attachFiles,
             @RequestParam(value = "isTemporary", required = false, defaultValue = "0") int isTemporary,
             HttpSession session) throws Exception {
         SessionInfo info = (SessionInfo) session.getAttribute("member");
@@ -126,6 +127,7 @@ public class CommunityController {
         dto.setMemberIdx(info.getUserIdx());
         dto.setWriterNickname(info.getName());
         dto.setUploadFiles(uploadFiles);
+        dto.setAttachFiles(attachFiles);
         dto.setTemporary(isTemporary == 1);
 
         try {
@@ -203,6 +205,8 @@ public class CommunityController {
     @PostMapping("update")
     public String updateSubmit(CommunityDto dto,
             @RequestParam(value = "uploadFiles", required = false) List<MultipartFile> uploadFiles,
+            @RequestParam(value = "attachFiles", required = false) List<MultipartFile> attachFiles,
+            @RequestParam(value = "removedFiles", required = false) List<String> removedFiles,
             @RequestParam("page") String page,
             @SessionAttribute("member") SessionInfo info,
             HttpSession session) throws Exception {
@@ -210,12 +214,15 @@ public class CommunityController {
         try {
             dto.setMemberIdx(info.getUserIdx());
             dto.setUploadFiles(uploadFiles);
+            dto.setAttachFiles(attachFiles);
+            dto.setRemoveFiles(removedFiles);
             service.updateCommunity(dto, uploadPath);
+            session.setAttribute("msg", "게시글이 수정되었습니다.");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("updateSubmit error: {}", e.getMessage(), e);
+            session.setAttribute("msg", "수정 중 오류가 발생했습니다: " + e.getMessage());
         }
 
-        session.setAttribute("msg", "게시글이 수정되었습니다.");
         return "redirect:/community/article/" + dto.getId() + "?page=" + page;
     }
 

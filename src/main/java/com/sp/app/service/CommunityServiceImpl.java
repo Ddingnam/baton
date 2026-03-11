@@ -96,6 +96,24 @@ public class CommunityServiceImpl implements CommunityService {
 
 			Community savedCommunity = communityRepository.save(community);
 
+			// 일반 첨부파일 저장
+			try {
+				List<MultipartFile> attachFiles = dto.getAttachFiles();
+				if (attachFiles != null && !attachFiles.isEmpty()) {
+					for (MultipartFile af : attachFiles) {
+						if (af == null || af.isEmpty()) continue;
+						String saveFilename = storageService.uploadFileToServer(af, uploadPath);
+						community.addAttachFile(com.sp.app.domain.entity.CommunityAttachFile.builder()
+								.originalFilename(af.getOriginalFilename())
+								.saveFilename(saveFilename)
+								.fileSize(af.getSize())
+								.build());
+					}
+				}
+			} catch (Exception attachEx) {
+				log.warn("첨부파일 저장 중 오류 (테이블 미생성 가능성): {}", attachEx.getMessage());
+			}
+
 			if (dto.getPollTitle() != null && !dto.getPollTitle().isEmpty() && dto.getPollOptions() != null) {
 				LocalDateTime endDate = null;
 				if (dto.getPollEndDate() != null && !dto.getPollEndDate().isEmpty()) {
@@ -197,6 +215,45 @@ public class CommunityServiceImpl implements CommunityService {
 			community.setAddress(dto.getAddress());
 			community.setLatitude(dto.getLatitude());
 			community.setLongitude(dto.getLongitude());
+
+			// 태그 업데이트
+			community.getHashTags().clear();
+			if (dto.getTags() != null) {
+				for (String tagName : dto.getTags()) {
+					if (tagName != null && !tagName.trim().isEmpty()) {
+						community.addHashTag(CommunityHashTag.builder().tagName(tagName.trim()).build());
+					}
+				}
+			}
+
+			// 첨부파일 업데이트 (테이블 없을 경우 대비 try-catch)
+			try {
+				List<String> removedFiles = dto.getRemoveFiles();
+				if (removedFiles != null && !removedFiles.isEmpty()) {
+					community.getAttachFiles().removeIf(af -> {
+						if (removedFiles.contains(af.getSaveFilename())) {
+							storageService.deleteFile(uploadPath, af.getSaveFilename());
+							return true;
+						}
+						return false;
+					});
+				}
+
+				List<MultipartFile> attachFiles = dto.getAttachFiles();
+				if (attachFiles != null && !attachFiles.isEmpty()) {
+					for (MultipartFile af : attachFiles) {
+						if (af == null || af.isEmpty()) continue;
+						String saveFilename = storageService.uploadFileToServer(af, uploadPath);
+						community.addAttachFile(com.sp.app.domain.entity.CommunityAttachFile.builder()
+								.originalFilename(af.getOriginalFilename())
+								.saveFilename(saveFilename)
+								.fileSize(af.getSize())
+								.build());
+					}
+				}
+			} catch (Exception attachEx) {
+				log.warn("첨부파일 처리 중 오류 (테이블 미생성 가능성): {}", attachEx.getMessage());
+			}
 
 		} catch (Exception e) {
 			log.error("updateCommunity error", e);
@@ -334,27 +391,27 @@ public class CommunityServiceImpl implements CommunityService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void votePoll(long pollId, long memberIdx, List<Long> optionIds) throws Exception {
-	    CommunityPoll poll = communityPollRepository.findById(pollId)
-	            .orElseThrow(() -> new RuntimeException("Poll not found"));
+		CommunityPoll poll = communityPollRepository.findById(pollId)
+				.orElseThrow(() -> new RuntimeException("Poll not found"));
 
-	    if (!poll.isMultipleChoice() && optionIds.size() > 1) {
-	        throw new RuntimeException("Multiple choice not allowed");
-	    }
+		if (!poll.isMultipleChoice() && optionIds.size() > 1) {
+			throw new RuntimeException("Multiple choice not allowed");
+		}
 
-	    pollVoteRepository.deleteByPollPollIdAndMemberId(pollId, memberIdx);
-	    pollVoteRepository.flush();
+		pollVoteRepository.deleteByPollPollIdAndMemberId(pollId, memberIdx);
+		pollVoteRepository.flush();
 
-	    List<PollVote> votes = new ArrayList<>();
-	    for (Long optionId : optionIds) {
-	        PollOption option = pollOptionRepository.findById(optionId)
-	                .orElseThrow(() -> new RuntimeException("Option not found"));
-	        votes.add(PollVote.builder()
-	                .poll(poll)
-	                .memberId(memberIdx)
-	                .option(option)
-	                .build());
-	    }
-	    pollVoteRepository.saveAll(votes);
+		List<PollVote> votes = new ArrayList<>();
+		for (Long optionId : optionIds) {
+			PollOption option = pollOptionRepository.findById(optionId)
+					.orElseThrow(() -> new RuntimeException("Option not found"));
+			votes.add(PollVote.builder()
+					.poll(poll)
+					.memberId(memberIdx)
+					.option(option)
+					.build());
+		}
+		pollVoteRepository.saveAll(votes);
 	}
 
 	@Override
@@ -411,6 +468,13 @@ public class CommunityServiceImpl implements CommunityService {
 	}
 
 	private CommunityDto toDto(Community entity) {
+		List<CommunityDto.AttachFileInfo> attachFileInfos = entity.getAttachFiles().stream()
+				.map(af -> new CommunityDto.AttachFileInfo(
+						af.getOriginalFilename(),
+						af.getSaveFilename(),
+						af.getFileSize()))
+				.collect(Collectors.toList());
+
 		CommunityDto dto = CommunityDto.builder()
 				.id(entity.getId())
 				.memberIdx(entity.getMemberIdx())
@@ -427,6 +491,7 @@ public class CommunityServiceImpl implements CommunityService {
 	            .longitude(entity.getLongitude()) 
 				.imageFiles(entity.getImages().stream().map(CommunityImage::getSaveFilename).collect(Collectors.toList()))
 				.tags(entity.getHashTags().stream().map(CommunityHashTag::getTagName).collect(Collectors.toList()))
+				.attachFileInfos(attachFileInfos)
 				.build();
 
 		CommunityPoll poll = communityPollRepository.findByCommunityId(entity.getId());
@@ -442,5 +507,11 @@ public class CommunityServiceImpl implements CommunityService {
 		}
 		
 		return dto;
+	}
+
+	@Override
+	public long getPollTotalVotes(long communityId) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

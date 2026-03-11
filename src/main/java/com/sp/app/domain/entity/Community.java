@@ -87,6 +87,10 @@ public class Community {
     @Builder.Default
     private List<CommunityScrap> scraps = new ArrayList<>();
 
+    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<CommunityAttachFile> attachFiles = new ArrayList<>();
+
     public void addImage(CommunityImage image) {
         this.images.add(image);
         image.setCommunity(this);
@@ -105,5 +109,10 @@ public class Community {
     public void addScrap(CommunityScrap scrap) {
         this.scraps.add(scrap);
         scrap.setCommunity(this);
+    }
+
+    public void addAttachFile(CommunityAttachFile attachFile) {
+        this.attachFiles.add(attachFile);
+        attachFile.setCommunity(this);
     }
 }

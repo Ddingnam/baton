@@ -28,30 +28,36 @@
 					<input type="hidden" name="id" value="${dto.id}">
 					<input type="hidden" name="page" value="${page}">
 				</c:if>
-
-				<input type="file" id="hiddenFileInput" name="uploadFiles" multiple style="display: none;">
-
-				<input type="hidden" id="address" name="address" value="${dto.address}">
-				<input type="hidden" id="latitude" name="latitude" value="${dto.latitude}">
+				<input type="file" id="hiddenFileInput" name="uploadFiles" multiple style="display:none;">
+				<input type="file" id="attachFileInput" name="attachFiles" multiple style="display:none;">
+				<input type="hidden" id="address"   name="address"   value="${dto.address}">
+				<input type="hidden" id="latitude"  name="latitude"  value="${dto.latitude}">
 				<input type="hidden" id="longitude" name="longitude" value="${dto.longitude}">
 				<input type="hidden" id="placeName" name="placeName" value="${dto.placeName}">
 
 				<div class="editor-header">
-				    <div class="editor-header-left">
-				        <button type="button" class="back-btn" onclick="history.back()">
-				            <i class="ri-arrow-left-line"></i>
-				        </button>
-				        <h1 class="page-title">글쓰기</h1>
-				    </div>
-				    
-				    <div class="editor-header-right" style="display: flex; gap: 8px;">
-				        <button type="button" class="btn-temp-save" onclick="openTempListModal();">임시저장 목록 <span id="tempCountBadge" style="display:none; background:var(--primary,#8A63FF); color:#fff; border-radius:10px; font-size:11px; padding:1px 6px; margin-left:4px;"></span></button>
-				        <button type="button" class="btn-temp-save" onclick="saveTemp();">임시저장</button>
-				        <button type="button" class="btn-submit" onclick="sendOk();">${mode=='update'?'수정':'등록'}</button>
-				    </div>
+					<div class="editor-header-left">
+						<button type="button" class="back-btn" onclick="history.back()">
+							<i class="ri-arrow-left-line"></i>
+						</button>
+						<h1 class="page-title">${mode=='update' ? '글 수정' : '글쓰기'}</h1>
+					</div>
+					<div class="editor-header-right">
+						<button type="button" class="btn-temp-list" onclick="openTempListModal()" title="임시저장 목록">
+							<i class="ri-draft-line"></i>
+							<span>임시저장함</span>
+							<span id="tempCountBadge" class="temp-badge" style="display:none;"></span>
+						</button>
+						<button type="button" class="btn-temp-save-sm" onclick="saveTemp()" title="임시저장">
+							<i class="ri-save-3-line"></i>
+							<span>임시저장</span>
+						</button>
+						<button type="button" class="btn-submit" onclick="sendOk();">${mode=='update' ? '수정' : '등록'}</button>
+					</div>
 				</div>
 
 				<div class="editor-body">
+
 					<div class="category-pills">
 						<label class="cat-pill"><input type="radio" name="category" value="1" ${mode=='write' || dto.category == 1 ? 'checked' : ''}><span>일상</span></label>
 						<label class="cat-pill"><input type="radio" name="category" value="2" ${dto.category == 2 ? 'checked' : ''}><span>동네질문</span></label>
@@ -61,32 +67,63 @@
 					</div>
 
 					<div class="content-group">
-						<input type="text" id="subject" name="subject" class="input-title" placeholder="제목을 입력해주세요" autocomplete="off" value="${dto.subject}">
+						<input type="text" id="subject" name="subject" class="input-title"
+							placeholder="제목을 입력해주세요" autocomplete="off" value="${dto.subject}">
 						<div class="divider"></div>
-						<div id="quillEditor" style="min-height: 300px; font-size: 16px;"></div>
+						<div id="quillEditor" style="min-height:300px; font-size:16px;"></div>
 						<input type="hidden" id="content" name="content" value="">
 					</div>
 
-					<div class="tag-group">
-						<div class="tag-input-wrapper">
-							<span class="hash-symbol">#</span> <input type="text" id="tagInput" class="input-tag" placeholder="태그 입력 (스페이스바 및 엔터)" autocomplete="off">
+					<div class="location-card" id="locationCard"
+						style="display:${not empty dto.placeName ? 'flex' : 'none'};">
+						<div class="loc-icon"><i class="ri-map-pin-fill"></i></div>
+						<div class="loc-info">
+							<strong id="displayPlaceName">${not empty dto.placeName ? dto.placeName : '장소명'}</strong>
+							<span id="displayAddress">${not empty dto.address ? dto.address : '주소 정보'}</span>
 						</div>
-						<div id="tagContainer" class="tag-list"></div>
+						<button type="button" class="btn-del-loc" onclick="removeLocation()">
+							<i class="ri-close-line"></i>
+						</button>
 					</div>
 
-					<div class="poll-wrapper" ${mode=='update' ? 'style="display:none;"' : ''}>
+					<div id="attachListWrapper" style="display:${not empty dto.attachFileInfos ? 'block' : 'none'}">
+					<ul class="attach-file-list" id="attachFileList">
+						<c:if test="${mode=='update' && not empty dto.attachFileInfos}">
+							<c:forEach var="af" items="${dto.attachFileInfos}">
+								<li class="attach-file-item" data-filename="${af.saveFilename}">
+									<i class="ri-file-line"></i>
+									<span class="attach-file-name">${af.originalFilename}</span>
+									<button type="button" class="btn-remove-attach"
+										onclick="removeExistingAttach('${af.saveFilename}', this)">
+										<i class="ri-close-line"></i>
+									</button>
+									<input type="hidden" name="existingFiles" value="${af.saveFilename}">
+								</li>
+							</c:forEach>
+						</c:if>
+					</ul>
+					</div>
+
+					<input type="hidden" id="pollVotedLocked" value="${pollVotedLocked == true ? 'true' : 'false'}">
+					<div class="poll-wrapper">
 						<div class="poll-toggle-header">
 							<div class="toggle-label">
-								<i class="ri-bar-chart-horizontal-fill"></i> <span>투표 만들기</span>
+								<i class="ri-bar-chart-horizontal-fill"></i>
+								<span>투표 만들기</span>
 							</div>
-							<label class="switch"> <input type="checkbox" id="chkPollToggle" ${not empty dto.pollTitle ? 'checked' : ''}>
+							<label class="switch">
+								<input type="checkbox" id="chkPollToggle" ${not empty dto.pollTitle ? 'checked' : ''}>
 								<span class="slider round"></span>
 							</label>
 						</div>
-
+						<div id="pollVotedNotice" class="poll-disabled-notice" style="display:none; margin: 0 24px 0;">
+							<i class="ri-lock-2-line"></i>
+							<span>이미 투표한 이웃이 있어 투표 항목을 수정할 수 없어요.</span>
+						</div>
 						<div id="pollForm" class="poll-card">
 							<div class="poll-input-group">
-								<input type="text" name="pollTitle" id="pollTitle" class="input-poll-title" placeholder="무엇을 투표해볼까요?" autocomplete="off" value="${dto.pollTitle}">
+								<input type="text" name="pollTitle" id="pollTitle" class="input-poll-title"
+									placeholder="무엇을 투표해볼까요?" autocomplete="off" value="${dto.pollTitle}">
 							</div>
 							<div class="poll-options-list" id="pollOptionContainer">
 								<c:choose>
@@ -112,51 +149,56 @@
 									</c:otherwise>
 								</c:choose>
 							</div>
-
 							<button type="button" class="btn-add-option-dashed" onclick="addPollOption()">
 								<i class="ri-add-line"></i> 항목 추가하기
 							</button>
-
 							<div class="poll-settings-bar">
 								<div class="setting-group">
 									<div class="date-picker-box">
-										<i class="ri-calendar-event-line"></i> <input type="date" name="pollEndDate" id="pollEndDate" class="input-date-hidden" value="${dto.pollEndDate}"> <span id="dateDisplay">종료일 선택</span>
+										<i class="ri-calendar-event-line"></i>
+										<input type="date" name="pollEndDate" id="pollEndDate"
+											class="input-date-hidden" value="${dto.pollEndDate}">
+										<span id="dateDisplay">종료일 선택</span>
 									</div>
 								</div>
-
 								<div class="setting-toggles">
-									<label class="mini-check" title="복수 선택 허용"> <input type="checkbox" name="pollMultiple" id="pollMultiple" ${dto.pollMultiple ? 'checked' : ''}> <span class="check-btn">복수선택</span>
+									<label class="mini-check" title="복수 선택 허용">
+										<input type="checkbox" name="pollMultiple" id="pollMultiple" ${dto.pollMultiple ? 'checked' : ''}>
+										<span class="check-btn">복수선택</span>
 									</label>
 								</div>
 							</div>
 						</div>
 					</div>
-
-					<div class="location-card" id="locationCard" style="display: ${not empty dto.placeName ? 'flex' : 'none'};">
-						<div class="loc-icon">
-							<i class="ri-map-pin-fill"></i>
+					<div class="tag-group">
+						<div class="tag-input-wrapper">
+							<span class="hash-symbol">#</span>
+							<input type="text" id="tagInput" class="input-tag"
+								placeholder="태그 입력 (스페이스바 및 엔터)" autocomplete="off">
 						</div>
-						<div class="loc-info">
-							<strong id="displayPlaceName">${not empty dto.placeName ? dto.placeName : '장소명'}</strong>
-							<span id="displayAddress">${not empty dto.address ? dto.address : '주소 정보'}</span>
-						</div>
-						<button type="button" class="btn-del-loc" onclick="removeLocation()">
-							<i class="ri-close-line"></i>
-						</button>
+						<div id="tagContainer" class="tag-list"></div>
 					</div>
-				</div>
 
+				</div>
+				
 				<div class="editor-footer">
 					<div class="toolbar">
-						<button type="button" class="tool-btn" id="btnLocation">
-							<i class="ri-map-pin-line"></i> <span>위치</span>
+						<button type="button" class="tool-btn" id="btnLocation" title="위치 추가">
+							<i class="ri-map-pin-line"></i><span>위치</span>
+						</button>
+						<button type="button" class="tool-btn" id="btnAttach" title="파일 첨부"
+							onclick="document.getElementById('attachFileInput').click()">
+							<i class="ri-attachment-2"></i><span>파일</span>
 						</button>
 					</div>
-					<div class="footer-btns">
-						<button type="button" class="btn-temp-save" onclick="saveTemp();">임시저장</button>
-						<button type="button" class="btn-submit-full" onclick="sendOk();">${mode=='update'?'수정하기':'등록하기'}</button>
+					<div class="footer-right">
+						<span class="attach-count-label" id="attachCountLabel" style="display:none;"></span>
+						<button type="button" class="btn-submit-full" onclick="sendOk();">
+							${mode=='update' ? '수정하기' : '등록하기'}
+						</button>
 					</div>
 				</div>
+
 			</form>
 		</div>
 
@@ -172,25 +214,28 @@
 		</div>
 	</div>
 
-	<%-- 임시저장 목록 모달 --%>
-	<div id="tempListModal" class="place-modal-overlay" style="display:none;" onclick="onTempModalOverlayClick(event)">
-		<div class="place-modal-content" id="tempModalContent" style="max-width:600px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
+	<div id="tempListModal" class="place-modal-overlay" style="display:none;"
+		onclick="onTempModalOverlayClick(event)">
+		<div class="place-modal-content" id="tempModalContent"
+			style="max-width:600px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
 			<div class="place-modal-header" style="flex-shrink:0;">
-				<h3 id="tempModalTitle">임시저장 목록</h3>
+				<h3>임시저장 목록</h3>
 				<button type="button" class="btn-close-modal" onclick="closeTempListModal()">
 					<i class="ri-close-line"></i>
 				</button>
 			</div>
-
-			<%-- 목록 뷰 --%>
 			<div id="tempListView" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
-				<ul id="tempListContent" class="place-result-list" style="flex:1; overflow-y:auto; padding:8px 0; margin:0;">
-					<li style="text-align:center; padding:32px; color:#aaa;"><i class="ri-loader-4-line ri-spin"></i> 불러오는 중...</li>
+				<ul id="tempListContent" class="place-result-list"
+					style="flex:1; overflow-y:auto; padding:8px 0; margin:0;">
+					<li style="text-align:center; padding:32px; color:#aaa;">
+						<i class="ri-loader-4-line ri-spin"></i> 불러오는 중...
+					</li>
 				</ul>
 			</div>
 		</div>
 	</div>
-	<div id="placeSearchModal" class="place-modal-overlay" style="display: none;">
+
+	<div id="placeSearchModal" class="place-modal-overlay" style="display:none;">
 		<div class="place-modal-content">
 			<div class="place-modal-header">
 				<h3>장소 검색</h3>
@@ -199,10 +244,9 @@
 				</button>
 			</div>
 			<div class="place-search-box">
-				<input type="text" id="keyword" placeholder="장소명을 입력하세요 (예: 강남역)" onkeydown="if(event.keyCode==13) searchPlaces()">
-				<button type="button" onclick="searchPlaces()">
-					<i class="ri-search-line"></i>
-				</button>
+				<input type="text" id="keyword" placeholder="장소명을 입력하세요 (예: 강남역)"
+					onkeydown="if(event.keyCode==13) searchPlaces()">
+				<button type="button" onclick="searchPlaces()"><i class="ri-search-line"></i></button>
 			</div>
 			<ul id="placesList" class="place-result-list"></ul>
 		</div>
@@ -218,29 +262,31 @@
     let placesService = null;
     document.addEventListener('DOMContentLoaded', () => {
         kakao.maps.load(() => {
-            if (window.kakao && window.kakao.maps && window.kakao.maps.services) {
+            if (window.kakao && window.kakao.maps && window.kakao.maps.services)
                 placesService = new kakao.maps.services.Places();
-            }
-		});
+        });
+
         const btnLocation = document.getElementById('btnLocation');
-        if(btnLocation) {
-            btnLocation.addEventListener('click', openPlaceModal);
+        if (btnLocation) btnLocation.addEventListener('click', openPlaceModal);
+
+        const attachInput = document.getElementById('attachFileInput');
+        if (attachInput) {
+            attachInput.addEventListener('change', function() {
+                if (typeof handleAttachFiles === 'function') handleAttachFiles(this.files);
+                this.value = '';
+            });
         }
 
         <c:if test="${mode=='update' && not empty dto.tags}">
-             <c:forEach var="tag" items="${dto.tags}">
-                 tagList.push("${tag}");
-             </c:forEach>
-             renderTags();
+            <c:forEach var="tag" items="${dto.tags}">tagList.push("${tag}");</c:forEach>
+            renderTags();
         </c:if>
-        
+
         <c:if test="${mode=='update' && not empty dto.content}">
         (function() {
-            const rawContent = document.createElement('div');
-            rawContent.innerHTML = `<c:out value="${dto.content}" escapeXml="false"/>`;
-            if (quill) {
-                quill.root.innerHTML = rawContent.innerHTML;
-            }
+            const d = document.createElement('div');
+            d.innerHTML = `<c:out value="${dto.content}" escapeXml="false"/>`;
+            if (quill) quill.root.innerHTML = d.innerHTML;
         })();
         </c:if>
     });
@@ -248,75 +294,59 @@
     function openPlaceModal() {
         const card = document.getElementById('locationCard');
         if (card.style.display !== 'none') {
-            if(confirm("설정된 위치를 변경하시겠습니까?")) {
+            batonConfirm("설정된 위치를 변경하시겠습니까?", () => {
                 removeLocation();
-            } else {
-                return;
-            }
+                const modal = document.getElementById('placeSearchModal');
+                modal.style.display = 'flex';
+                requestAnimationFrame(() => modal.classList.add('show'));
+                setTimeout(() => document.getElementById('keyword').focus(), 100);
+            });
+            return;
         }
-        document.getElementById('placeSearchModal').style.display = 'flex';
+        const modal = document.getElementById('placeSearchModal');
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => modal.classList.add('show'));
         setTimeout(() => document.getElementById('keyword').focus(), 100);
     }
 
     function closePlaceSearch() {
-        document.getElementById('placeSearchModal').style.display = 'none';
-        document.getElementById('keyword').value = '';
-        document.getElementById('placesList').innerHTML = '';
+        const modal = document.getElementById('placeSearchModal');
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.getElementById('keyword').value = '';
+            document.getElementById('placesList').innerHTML = '';
+        }, 220);
     }
-
     function searchPlaces() {
-        const keyword = document.getElementById('keyword').value.trim();
-        if (!keyword) {
-            alert('검색어를 입력해주세요!');
-            return;
-        }
-        if(!placesService) {
-            alert('지도 서비스를 사용할 수 없습니다.');
-            return;
-        }
-        placesService.keywordSearch(keyword, placesSearchCallback);
+        var kwd = document.getElementById('keyword').value.trim();
+        if (!kwd) { showBatonToast('검색어를 입력해주세요!'); return; }
+        if (!placesService) { showBatonToast('지도 서비스를 사용할 수 없습니다.'); return; }
+        placesService.keywordSearch(kwd, function(data, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var list = document.getElementById('placesList');
+                list.innerHTML = '';
+                data.forEach(function(place) {
+                    var el = document.createElement('li');
+                    el.className = 'place-item';
+                    var addrHtml = place.road_address_name
+                        ? '<span class="road-addr">' + place.road_address_name + '</span>'
+                          + '<span class="jibun-addr">(지번) ' + place.address_name + '</span>'
+                        : '<span>' + place.address_name + '</span>';
+                    el.innerHTML = '<div class="info"><h5>' + place.place_name + '</h5>' + addrHtml + '</div>';
+                    el.onclick = (function(p) {
+                        return function() {
+                            setLocation(p.place_name, p.address_name, p.y, p.x);
+                            closePlaceSearch();
+                        };
+                    })(place);
+                    list.appendChild(el);
+                });
+            } else {
+                showBatonToast('검색 결과가 없습니다.');
+            }
+        });
     }
-
-    function placesSearchCallback(data, status, pagination) {
-        if (status === kakao.maps.services.Status.OK) {
-            displayPlaces(data);
-        } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
-            alert('검색 결과가 존재하지 않습니다.');
-        } else if (status === kakao.maps.services.Status.ERROR) {
-            alert('검색 중 오류가 발생했습니다.');
-        }
-    }
-
-    function displayPlaces(places) {
-        const listElement = document.getElementById('placesList');
-        listElement.innerHTML = '';
-        for (let i = 0; i < places.length; i++) {
-            const item = getListItem(places[i]);
-            listElement.appendChild(item);
-        }
-    }
-
-    function getListItem(place) {
-        const element = document.createElement('li');
-        element.className = 'place-item';
-        let itemHtml = '<div class="info">' +
-                      '   <h5>' + place.place_name + '</h5>';
-        if (place.road_address_name) {
-            itemHtml += '    <span class="road-addr">' + place.road_address_name + '</span>' +
-                       '    <span class="jibun-addr">(지번) ' + place.address_name + '</span>';
-        } else {
-            itemHtml += '    <span>' + place.address_name + '</span>';
-        }
-        itemHtml += '</div>';  
-
-        element.innerHTML = itemHtml;
-        element.onclick = function () {
-            setLocation(place.place_name, place.address_name, place.y, place.x);
-            closePlaceSearch();
-        };
-        return element;
-    }
-</script>
-
+	</script>
 </body>
 </html>

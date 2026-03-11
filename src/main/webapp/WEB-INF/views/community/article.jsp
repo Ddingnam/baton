@@ -2,6 +2,7 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -79,7 +80,10 @@
                         <div class="loading-spinner"><i class="ri-loader-4-line ri-spin"></i> 투표 로딩중...</div>
                     </div>
                     <div class="poll-footer">
-                        <button type="button" class="btn-vote-submit" id="btnVoteSubmit" style="display:none;">투표하기</button>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <button type="button" class="btn-vote-submit" id="btnVoteSubmit" style="display:none;">투표하기</button>
+                            <button type="button" class="btn-vote-cancel" id="btnVoteCancel" style="display:none;">투표 취소</button>
+                        </div>
                         <span class="total-votes" id="totalVotesDisplay">0명 참여</span>
                     </div>
                 </div>
@@ -103,10 +107,30 @@
                         </div>
                         <i class="ri-external-link-line" style="margin-left:auto; color:var(--text-3); font-size:14px;"></i>
                     </div>
-                    <div id="map" class="map-view" 
-                         style="width:100%; height:320px; background-color:#f0f0f0; border-radius:12px; margin-top:10px;" 
+                    <div id="map" class="map-view"
                          data-lat="${dto.latitude}" data-lng="${dto.longitude}">
                     </div>
+                </div>
+            </c:if>
+
+            <%-- 첨부파일 목록 --%>
+            <c:if test="${not empty dto.attachFileInfos}">
+                <div class="attach-section">
+                    <div class="attach-section-title">
+                        <i class="ri-attachment-2"></i>
+                        <span>첨부파일 <em>${fn:length(dto.attachFileInfos)}개</em></span>
+                    </div>
+                    <ul class="attach-download-list">
+                        <c:forEach var="af" items="${dto.attachFileInfos}">
+                            <li>
+                                <a href="${pageContext.request.contextPath}/community/download?filename=${af.saveFilename}&originalFilename=${af.originalFilename}" class="attach-download-item" download>
+                                    <i class="ri-file-download-line attach-dl-icon"></i>
+                                    <span class="attach-dl-name">${af.originalFilename}</span>
+                                    <span class="attach-dl-size"><fmt:formatNumber value="${af.fileSize / 1024}" maxFractionDigits="1"/>KB</span>
+                                </a>
+                            </li>
+                        </c:forEach>
+                    </ul>
                 </div>
             </c:if>
 

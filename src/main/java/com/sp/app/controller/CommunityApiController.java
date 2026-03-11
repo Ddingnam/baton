@@ -213,9 +213,8 @@ public class CommunityApiController {
                 }
             }
 
-            long totalVotes = poll.getOptions().stream()
-                    .mapToLong(opt -> pollVoteRepository.countByOptionOptionId(opt.getOptionId()))
-                    .sum();
+            // 참여 인원 수 = 이 투표에 투표한 유니크 유저 수
+            long totalVotes = pollVoteRepository.countDistinctMemberByPollPollId(poll.getPollId());
 
             List<Map<String, Object>> options = poll.getOptions().stream().map(opt -> {
                 Map<String, Object> m = new HashMap<>();
@@ -251,7 +250,7 @@ public class CommunityApiController {
                 result.put("message", "로그인이 필요합니다.");
                 return ResponseEntity.ok(result);
             }
-            
+            communityService.cancelVote(pollId, info.getUserIdx());
             communityService.votePoll(pollId, info.getUserIdx(), optionIds);
             result.put("success", true);
             return ResponseEntity.ok(result);

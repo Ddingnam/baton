@@ -1,19 +1,26 @@
+// 토스트는 header.js의 전역 showBatonToast() 사용
+// header.jsp에 id="baton-toast-container" 컨테이너가 항상 존재함
+
 function batonConfirm(message, onConfirm, onCancel) {
-	const overlay = document.createElement('div');
-	overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:999999;display:flex;align-items:center;justify-content:center;';
-	overlay.innerHTML = `
-		<div style="background:#fff;border-radius:20px;padding:28px 32px;min-width:300px;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.15);text-align:center;">
-			<p style="font-size:15px;font-weight:600;color:#191F28;margin:0 0 24px;line-height:1.6;">${message}</p>
-			<div style="display:flex;gap:10px;justify-content:center;">
-				<button id="batonConfirmCancel" style="flex:1;padding:12px;border:1px solid #E5E8EB;background:#fff;border-radius:12px;font-size:14px;font-weight:600;color:#4E5968;cursor:pointer;">취소</button>
-				<button id="batonConfirmOk" style="flex:1;padding:12px;border:none;background:#8A63FF;border-radius:12px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;">확인</button>
-			</div>
-		</div>`;
+	var overlay = document.createElement('div');
+	overlay.className = 'baton-modal-overlay';
+	overlay.innerHTML =
+		'<div class="baton-modal-box">' +
+			'<p class="baton-modal-msg">' + message + '</p>' +
+			'<div class="baton-modal-btns">' +
+				'<button id="batonConfirmCancel" class="baton-btn-cancel">취소</button>' +
+				'<button id="batonConfirmOk" class="baton-btn-ok">확인</button>' +
+			'</div>' +
+		'</div>';
 	document.body.appendChild(overlay);
-	const close = () => document.body.removeChild(overlay);
-	overlay.querySelector('#batonConfirmOk').onclick = () => { close(); if (onConfirm) onConfirm(); };
-	overlay.querySelector('#batonConfirmCancel').onclick = () => { close(); if (onCancel) onCancel(); };
-	overlay.onclick = (e) => { if (e.target === overlay) { close(); if (onCancel) onCancel(); } };
+	requestAnimationFrame(function() { overlay.classList.add('show'); });
+	var close = function() {
+		overlay.classList.remove('show');
+		setTimeout(function() { if (overlay.parentNode) document.body.removeChild(overlay); }, 220);
+	};
+	overlay.querySelector('#batonConfirmOk').onclick = function() { close(); if (onConfirm) onConfirm(); };
+	overlay.querySelector('#batonConfirmCancel').onclick = function() { close(); if (onCancel) onCancel(); };
+	overlay.onclick = function(e) { if (e.target === overlay) { close(); if (onCancel) onCancel(); } };
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -50,11 +57,20 @@ function initMap() {
         const map = new kakao.maps.Map(mapContainer, options);
         const marker = new kakao.maps.Marker({ position: new kakao.maps.LatLng(lat, lng) });
         marker.setMap(map);
-        map.setDraggable(false);
+        map.setDraggable(true);
         map.setZoomable(true);
 
-        mapContainer.style.cursor = 'pointer';
-        kakao.maps.event.addListener(map, 'click', () => {
+        // 드래그와 클릭 구분: mousedown ~ mouseup 이동거리로 판단
+        let dragStartX, dragStartY;
+        mapContainer.addEventListener('mousedown', e => {
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+        });
+
+        kakao.maps.event.addListener(map, 'click', (mouseEvent) => {
+            const dx = Math.abs((window.event?.clientX || dragStartX) - dragStartX);
+            const dy = Math.abs((window.event?.clientY || dragStartY) - dragStartY);
+            if (dx > 5 || dy > 5) return; // 드래그 중이면 무시
             const placeName = mapContainer.closest('.map-card').querySelector('strong')?.innerText || '';
             window.open(`https://map.kakao.com/link/map/${encodeURIComponent(placeName)},${lat},${lng}`, '_blank');
         });
@@ -92,125 +108,180 @@ function formatArticleDate() {
 }
 
 function initPoll() {
-    const pollSection = document.getElementById('pollSection');
+    var pollSection = document.getElementById('pollSection');
     if (!pollSection) return;
 
-    const pollCommunityId = pollSection.dataset.pollId;
+    var pollCommunityId = pollSection.dataset.pollId;
+    var box = document.getElementById('pollOptionsBox');
 
-    fetch(`${contextPath}/api/community/poll?id=${pollCommunityId}`)
-        .then(resp => resp.json())
-        .then(data => {
-            const box          = document.getElementById('pollOptionsBox');
-            const totalDisplay = document.getElementById('totalVotesDisplay');
-            const submitBtn    = document.getElementById('btnVoteSubmit');
+    fetch(contextPath + '/api/community/poll?id=' + pollCommunityId)
+        .then(function(resp) {
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            return resp.json();
+        })
+        .then(function(data) {
+            var totalDisplay = document.getElementById('totalVotesDisplay');
+            var submitBtn    = document.getElementById('btnVoteSubmit');
 
-            if (!data || !data.options || data.options.length === 0) {
-                box.innerHTML = '<p style="color:var(--text-3);text-align:center;padding:16px;">투표 항목이 없습니다.</p>';
+            // error 필드나 options 없으면 투표 없음 처리
+            if (!data || data.error || !data.options || data.options.length === 0) {
+                box.innerHTML = '<p style="color:var(--text-3);text-align:center;padding:20px 16px;font-size:13px;">투표 항목이 없습니다.</p>';
                 return;
             }
 
-            const total      = data.totalVotes || 0;
-            const realPollId = data.pollId;
-            const isMultiple = data.multiple;
-            const myOptionIds = data.myOptionIds || [];
+            var total       = data.totalVotes || 0;
+            var realPollId  = data.pollId;
+            var isMultiple  = data.multiple;
+            var myOptionIds = data.myOptionIds || [];
+            var isLoggedIn  = parseInt(currentMemberIdx, 10) > 0;
 
             totalDisplay.innerText = total + '명 참여';
-
             box.innerHTML = '';
-            data.options.forEach(opt => {
-                const pct       = total > 0 ? Math.round((opt.voteCount / total) * 100) : 0;
-                const isMyVote  = myOptionIds.includes(opt.optionId);
-                const div       = document.createElement('div');
-                div.className   = 'poll-option-row' + (isMyVote ? ' selected' : '');
-                div.dataset.optionId = opt.optionId;
-                div.innerHTML = `
-                    <div class="poll-option-label">
-                        <span class="poll-option-check"><i class="${isMultiple
-                            ? (isMyVote ? 'ri-checkbox-fill' : 'ri-checkbox-blank-line')
-                            : (isMyVote ? 'ri-radio-button-fill' : 'ri-radio-button-line')}"></i></span>
-                        <span class="option-text">${opt.content}</span>
-                        <span class="option-pct">${pct}%</span>
-                    </div>
-                    <div class="poll-bar-track">
-                        <div class="poll-bar-fill" style="width:${pct}%"></div>
-                    </div>`;
 
-                const isLoggedIn = parseInt(currentMemberIdx, 10) > 0;
+            data.options.forEach(function(opt) {
+                var pct      = total > 0 ? Math.round((opt.voteCount / total) * 100) : 0;
+                var isMyVote = myOptionIds.indexOf(opt.optionId) !== -1;
+                var div      = document.createElement('div');
+                div.className = 'poll-option-row' + (isMyVote ? ' selected' : '');
+                div.dataset.optionId = opt.optionId;
+
+                var checkIcon = isMultiple
+                    ? (isMyVote ? 'ri-checkbox-fill' : 'ri-checkbox-blank-line')
+                    : (isMyVote ? 'ri-radio-button-fill' : 'ri-radio-button-line');
+
+                div.innerHTML =
+                    '<div class="poll-option-label">' +
+                        '<span class="poll-option-check"><i class="' + checkIcon + '"></i></span>' +
+                        '<span class="option-text">' + escapeHtml(opt.content) + '</span>' +
+                        '<span class="option-pct">' + pct + '%</span>' +
+                    '</div>' +
+                    '<div class="poll-bar-track">' +
+                        '<div class="poll-bar-fill" style="width:' + pct + '%"></div>' +
+                    '</div>';
+
                 if (isLoggedIn) {
-                    div.addEventListener('click', () => selectPollOption(div, isMultiple));
+                    (function(el, multiple) {
+                        el.addEventListener('click', function() { selectPollOption(el, multiple); });
+                    })(div, isMultiple);
                 }
                 box.appendChild(div);
             });
 
-            const isLoggedIn = parseInt(currentMemberIdx, 10) > 0;
             if (isLoggedIn) {
                 submitBtn.style.display = 'inline-block';
                 submitBtn.textContent   = data.voted ? '투표 변경' : '투표하기';
-				submitBtn.onclick = null;
-				submitBtn.onclick = () => submitVote(realPollId);
-				
+                submitBtn.onclick       = null;
+                submitBtn.onclick       = function() { submitVote(realPollId); };
+
+                var cancelBtn = document.getElementById('btnVoteCancel');
+                if (cancelBtn) {
+                    if (data.voted) {
+                        cancelBtn.style.display = 'inline-block';
+                        cancelBtn.onclick = null;
+                        cancelBtn.onclick = function() { cancelVote(realPollId); };
+                    } else {
+                        cancelBtn.style.display = 'none';
+                    }
+                }
             } else {
                 submitBtn.style.display = 'none';
-                if (!data.voted) totalDisplay.innerText = total + '명 참여 (로그인 후 투표 가능)';
             }
 
             if (data.voted) {
                 totalDisplay.innerText = total + '명 참여 · 내 선택 표시됨';
             }
         })
-        .catch(() => {
-            const box = document.getElementById('pollOptionsBox');
-            box.innerHTML = '<p style="color:var(--text-3);text-align:center;padding:16px;">투표를 불러올 수 없습니다.</p>';
+        .catch(function(err) {
+            console.error('투표 로드 실패:', err);
+            if (box) box.innerHTML = '<p style="color:var(--text-3);text-align:center;padding:20px 16px;font-size:13px;">투표를 불러올 수 없습니다.</p>';
         });
 }
 
+
 function selectPollOption(el, isMultiple) {
     if (isMultiple) {
+        // 복수선택: 토글
+        var wasSelected = el.classList.contains('selected');
         el.classList.toggle('selected');
-        const icon = el.querySelector('.poll-option-check i');
-        if (icon) {
-            icon.className = el.classList.contains('selected')
-                ? 'ri-checkbox-fill'
-                : 'ri-checkbox-blank-line';
-        }
+        var icon = el.querySelector('.poll-option-check i');
+        if (icon) icon.className = wasSelected ? 'ri-checkbox-blank-line' : 'ri-checkbox-fill';
     } else {
-        document.querySelectorAll('.poll-option-row').forEach(row => {
+        // 단일선택: 이미 선택됐으면 해제, 아니면 전체 해제 후 선택
+        var wasSelected = el.classList.contains('selected');
+        document.querySelectorAll('.poll-option-row').forEach(function(row) {
             row.classList.remove('selected');
-            const icon = row.querySelector('.poll-option-check i');
+            var icon = row.querySelector('.poll-option-check i');
             if (icon) icon.className = 'ri-radio-button-line';
         });
-        el.classList.add('selected');
-        const icon = el.querySelector('.poll-option-check i');
-        if (icon) icon.className = 'ri-radio-button-fill';
+        if (!wasSelected) {
+            el.classList.add('selected');
+            var icon = el.querySelector('.poll-option-check i');
+            if (icon) icon.className = 'ri-radio-button-fill';
+        }
     }
 }
+
+
+
 
 function submitVote(realPollId) {
     const selected = document.querySelectorAll('.poll-option-row.selected');
     if (selected.length === 0) {
-        showToast('투표 항목을 선택해주세요.');
+        showBatonToast('투표 항목을 선택해주세요.');
         return;
     }
-    const optionIds = Array.from(selected).map(el => el.dataset.optionId);
-    const params = new URLSearchParams();
-    params.append('pollId', realPollId);
-    optionIds.forEach(id => params.append('optionIds', id));
 
-    fetch(`${contextPath}/api/community/poll/vote`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params.toString()
-    })
-    .then(resp => resp.json())
-    .then(data => {
-        if (data.success) {
-            showToast('투표가 완료되었습니다!');
-            initPoll();
-        } else {
-            showToast(data.message || '투표에 실패했습니다.');
-        }
-    })
-    .catch(() => showToast('오류가 발생했습니다.'));
+    // 이미 투표했는지 여부로 메시지 분기
+    const submitBtn = document.getElementById('btnVoteSubmit');
+    const isChange = submitBtn && submitBtn.textContent.trim() === '투표 변경';
+    const confirmMsg = isChange
+        ? '투표를 변경하시겠습니까?<br><span style="font-size:13px;color:var(--text-3);font-weight:400;">이전 투표는 취소되고 새로 반영돼요.</span>'
+        : '투표하시겠습니까?';
+
+    batonConfirm(confirmMsg, function() {
+        const optionIds = Array.from(selected).map(el => el.dataset.optionId);
+        const params = new URLSearchParams();
+        params.append('pollId', realPollId);
+        optionIds.forEach(id => params.append('optionIds', id));
+
+        fetch(`${contextPath}/api/community/poll/vote`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.success) {
+                showBatonToast(isChange ? '투표가 변경되었습니다!' : '투표가 완료되었습니다!');
+                initPoll();
+            } else {
+                showBatonToast(data.message || '투표에 실패했습니다.');
+            }
+        })
+        .catch(() => showBatonToast('오류가 발생했습니다.'));
+    });
+}
+
+function cancelVote(realPollId) {
+    batonConfirm('투표를 취소하시겠습니까?', function() {
+        var params = new URLSearchParams();
+        params.append('pollId', realPollId);
+        fetch(contextPath + '/api/community/poll/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
+        })
+        .then(function(resp) { return resp.json(); })
+        .then(function(data) {
+            if (data.success) {
+                showBatonToast('투표가 취소되었습니다.');
+                initPoll();
+            } else {
+                showBatonToast(data.message || '투표 취소에 실패했습니다.');
+            }
+        })
+        .catch(function() { showBatonToast('오류가 발생했습니다.'); });
+    });
 }
 
 function toggleLike(id) {
@@ -242,8 +313,8 @@ function toggleScrap(id) {
     .then(data => {
         const btn  = document.getElementById('btnScrap');
         const icon = btn.querySelector('i');
-        if (data.scraped) { btn.classList.add('active');    icon.className = 'ri-bookmark-fill';  showToast('게시글을 스크랩했습니다.'); }
-        else               { btn.classList.remove('active'); icon.className = 'ri-bookmark-line';  showToast('스크랩을 취소했습니다.'); }
+        if (data.scraped) { btn.classList.add('active');    icon.className = 'ri-bookmark-fill';  showBatonToast('게시글을 스크랩했습니다.'); }
+        else               { btn.classList.remove('active'); icon.className = 'ri-bookmark-line';  showBatonToast('스크랩을 취소했습니다.'); }
     });
 }
 
@@ -268,15 +339,20 @@ function checkAndEdit(id, page) {
     }
 
     fetch(`${contextPath}/api/community/poll?id=${id}`)
-        .then(resp => resp.json())
+        .then(resp => {
+            if (!resp.ok) throw new Error('network');
+            return resp.json();
+        })
         .then(data => {
-            if (data && data.totalVotes > 0) {
-                showBatonToast('투표에 참여한 이웃이 있어 수정할 수 없어요.');
+            const votes = (data && typeof data.totalVotes === 'number') ? data.totalVotes : 0;
+            if (votes > 0) {
+                showBatonToast('투표에 참여한 이웃이 있어 수정할 수 없어요 🔒');
             } else {
                 location.href = `${contextPath}/community/update?id=${id}&page=${page}`;
             }
         })
         .catch(() => {
+            // API 오류 시 안전하게 수정 페이지로
             location.href = `${contextPath}/community/update?id=${id}&page=${page}`;
         });
 }
@@ -349,7 +425,7 @@ function sendReply(id) {
     if (!parseInt(currentMemberIdx, 10)) { alert('로그인이 필요합니다.'); return; }
 
     const content = document.getElementById('replyContent').value.trim();
-    if (!content) { showToast('내용을 입력해주세요.'); return; }
+    if (!content) { showBatonToast('내용을 입력해주세요.'); return; }
 
     fetch(`${contextPath}/community/reply/write`, {
         method: 'POST',
@@ -362,10 +438,10 @@ function sendReply(id) {
             document.getElementById('replyContent').value = '';
             loadReplies();
         } else {
-            showToast('댓글 등록에 실패했습니다.');
+            showBatonToast('댓글 등록에 실패했습니다.');
         }
     })
-    .catch(() => showToast('오류가 발생했습니다.'));
+    .catch(() => showBatonToast('오류가 발생했습니다.'));
 }
 
 function openReplyBox(parentId) {
@@ -385,7 +461,7 @@ function sendSubReply(parentId) {
     const box = document.getElementById(`replyBox_${parentId}`);
     const textarea = box.querySelector('textarea');
     const content = textarea.value.trim();
-    if (!content) { showToast('내용을 입력해주세요.'); return; }
+    if (!content) { showBatonToast('내용을 입력해주세요.'); return; }
 
     fetch(`${contextPath}/community/reply/write`, {
         method: 'POST',
@@ -399,10 +475,10 @@ function sendSubReply(parentId) {
             closeReplyBox(parentId);
             loadReplies();
         } else {
-            showToast('답글 등록에 실패했습니다.');
+            showBatonToast('답글 등록에 실패했습니다.');
         }
     })
-    .catch(() => showToast('오류가 발생했습니다.'));
+    .catch(() => showBatonToast('오류가 발생했습니다.'));
 }
 
 function deleteReply(replyId) {
@@ -417,28 +493,15 @@ function deleteReply(replyId) {
             if (data.state === 'true') {
                 loadReplies();
             } else {
-                showToast('삭제에 실패했습니다.');
+                showBatonToast('삭제에 실패했습니다.');
             }
         })
-        .catch(() => showToast('오류가 발생했습니다.'));
+        .catch(() => showBatonToast('오류가 발생했습니다.'));
     });
 }
 function escapeHtml(text) {
     if (!text) return '';
     return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-function showToast(message) {
-    const container = document.getElementById('toastContainer');
-    if (!container) return;
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.innerHTML = `<i class="ri-checkbox-circle-line"></i> ${message}`;
-    container.appendChild(toast);
-    setTimeout(() => {
-        toast.style.animation = 'fadeUp 0.3s reverse forwards';
-        setTimeout(() => toast.remove(), 300);
-    }, 2500);
 }
 
 function formatDate(dateStr) {

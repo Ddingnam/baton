@@ -2,23 +2,27 @@ let tagList = [];
 let quill = null;
 let globalUploadFiles = [];
 
-// 커스텀 confirm (브라우저 기본 alert/confirm 대체)
+// 커스텀 confirm
 function batonConfirm(message, onConfirm, onCancel) {
-	const overlay = document.createElement('div');
-	overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:999999;display:flex;align-items:center;justify-content:center;';
-	overlay.innerHTML = `
-		<div style="background:#fff;border-radius:20px;padding:28px 32px;min-width:300px;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.15);text-align:center;">
-			<p style="font-size:15px;font-weight:600;color:#191F28;margin:0 0 24px;line-height:1.6;">${message}</p>
-			<div style="display:flex;gap:10px;justify-content:center;">
-				<button id="batonConfirmCancel" style="flex:1;padding:12px;border:1px solid #E5E8EB;background:#fff;border-radius:12px;font-size:14px;font-weight:600;color:#4E5968;cursor:pointer;">취소</button>
-				<button id="batonConfirmOk" style="flex:1;padding:12px;border:none;background:#8A63FF;border-radius:12px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;">확인</button>
-			</div>
-		</div>`;
+	var overlay = document.createElement('div');
+	overlay.className = 'baton-modal-overlay';
+	overlay.innerHTML =
+		'<div class="baton-modal-box">' +
+			'<p class="baton-modal-msg">' + message + '</p>' +
+			'<div class="baton-modal-btns">' +
+				'<button id="batonConfirmCancel" class="baton-btn-cancel">취소</button>' +
+				'<button id="batonConfirmOk" class="baton-btn-ok">확인</button>' +
+			'</div>' +
+		'</div>';
 	document.body.appendChild(overlay);
-	const close = () => document.body.removeChild(overlay);
-	overlay.querySelector('#batonConfirmOk').onclick = () => { close(); if (onConfirm) onConfirm(); };
-	overlay.querySelector('#batonConfirmCancel').onclick = () => { close(); if (onCancel) onCancel(); };
-	overlay.onclick = (e) => { if (e.target === overlay) { close(); if (onCancel) onCancel(); } };
+	requestAnimationFrame(function() { overlay.classList.add('show'); });
+	var close = function() {
+		overlay.classList.remove('show');
+		setTimeout(function() { if (overlay.parentNode) document.body.removeChild(overlay); }, 220);
+	};
+	overlay.querySelector('#batonConfirmOk').onclick = function() { close(); if (onConfirm) onConfirm(); };
+	overlay.querySelector('#batonConfirmCancel').onclick = function() { close(); if (onCancel) onCancel(); };
+	overlay.onclick = function(e) { if (e.target === overlay) { close(); if (onCancel) onCancel(); } };
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -42,14 +46,44 @@ document.addEventListener('DOMContentLoaded', () => {
 	const chkPoll = document.getElementById('chkPollToggle');
 	const pollForm = document.getElementById('pollForm');
 	if (chkPoll && pollForm) {
-		chkPoll.addEventListener('change', (e) => {
-			if (e.target.checked) {
-				setTimeout(() => pollForm.classList.add('active'), 10);
-			} else {
-				pollForm.classList.remove('active');
+		// 투표에 참여자가 있으면 수정 불가 처리
+		const pollVotedLocked = document.getElementById('pollVotedLocked');
+		if (pollVotedLocked && pollVotedLocked.value === 'true') {
+			// 스위치 비활성화
+			chkPoll.disabled = true;
+			chkPoll.closest('label')?.style && (chkPoll.closest('label').style.opacity = '0.5');
+			chkPoll.closest('label')?.style && (chkPoll.closest('label').style.cursor = 'not-allowed');
+			
+			// 투표 폼 내 모든 입력 비활성화
+			pollForm.querySelectorAll('input, button, textarea').forEach(el => el.disabled = true);
+			pollForm.style.opacity = '0.55';
+			pollForm.style.pointerEvents = 'none';
+
+			// 안내 notice 표시
+			const notice = document.getElementById('pollVotedNotice');
+			if (notice) notice.style.display = 'flex';
+
+			// 스위치 클릭 시 토스트 안내
+			const switchLabel = chkPoll.closest('label') || chkPoll.parentElement;
+			const pollHeader = document.querySelector('.poll-toggle-header');
+			if (pollHeader) {
+				pollHeader.style.cursor = 'default';
+				pollHeader.addEventListener('click', (e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					showBatonToast('이미 투표한 이웃이 있어 수정이 불가능해요 🔒', 'ri-lock-line');
+				});
 			}
-		});
-		if (chkPoll.checked) pollForm.classList.add('active');
+		} else {
+			chkPoll.addEventListener('change', (e) => {
+				if (e.target.checked) {
+					setTimeout(() => pollForm.classList.add('active'), 10);
+				} else {
+					pollForm.classList.remove('active');
+				}
+			});
+			if (chkPoll.checked) pollForm.classList.add('active');
+		}
 	}
 
 	const dateInput = document.getElementById('pollEndDate');
@@ -124,25 +158,27 @@ function linkHandler() {
 
 	const modal = document.createElement('div');
 	modal.id = 'quillLinkModal';
-	modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:999999;display:flex;align-items:center;justify-content:center;';
-	modal.innerHTML = `
-		<div style="background:#fff;border-radius:20px;padding:28px 32px;min-width:340px;max-width:440px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.15);">
-			<p style="font-size:15px;font-weight:700;color:#191F28;margin:0 0 18px;">링크 삽입</p>
-			<input id="quillLinkText" type="text" placeholder="링크 텍스트" value="${selectedText}"
-				style="width:100%;box-sizing:border-box;padding:10px 14px;border:1px solid #E5E8EB;border-radius:10px;font-size:14px;margin-bottom:10px;outline:none;">
-			<input id="quillLinkUrl" type="text" placeholder="https://example.com"
-				style="width:100%;box-sizing:border-box;padding:10px 14px;border:1px solid #E5E8EB;border-radius:10px;font-size:14px;margin-bottom:20px;outline:none;">
-			<div style="display:flex;gap:10px;">
-				<button id="quillLinkCancel" style="flex:1;padding:12px;border:1px solid #E5E8EB;background:#fff;border-radius:12px;font-size:14px;font-weight:600;color:#4E5968;cursor:pointer;">취소</button>
-				<button id="quillLinkOk" style="flex:1;padding:12px;border:none;background:#8A63FF;border-radius:12px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;">삽입</button>
-			</div>
-		</div>`;
+	modal.className = 'baton-modal-overlay';
+	modal.innerHTML =
+		'<div class="baton-modal-box baton-modal-form">' +
+			'<p class="baton-modal-title">링크 삽입</p>' +
+			'<input id="quillLinkText" type="text" class="baton-modal-input" placeholder="링크 텍스트" value="' + selectedText + '">' +
+			'<input id="quillLinkUrl" type="text" class="baton-modal-input" placeholder="https://example.com">' +
+			'<div class="baton-modal-btns">' +
+				'<button id="quillLinkCancel" class="baton-btn-cancel">취소</button>' +
+				'<button id="quillLinkOk" class="baton-btn-ok">삽입</button>' +
+			'</div>' +
+		'</div>';
 	document.body.appendChild(modal);
+	requestAnimationFrame(function() { modal.classList.add('show'); });
 
-	const urlInput = modal.querySelector('#quillLinkUrl');
+	var urlInput = modal.querySelector('#quillLinkUrl');
 	urlInput.focus();
 
-	const close = () => modal.remove();
+	var close = function() {
+		modal.classList.remove('show');
+		setTimeout(function() { if (modal.parentNode) modal.remove(); }, 220);
+	};
 
 	modal.querySelector('#quillLinkCancel').onclick = close;
 	modal.onclick = (e) => { if (e.target === modal) close(); };
@@ -422,12 +458,16 @@ function loadTempCount() {
 }
 
 function openTempListModal() {
-	document.getElementById('tempListModal').style.display = 'flex';
+	const modal = document.getElementById('tempListModal');
+	modal.style.display = 'flex';
+	requestAnimationFrame(() => modal.classList.add('show'));
 	loadTempList();
 }
 
 function closeTempListModal() {
-	document.getElementById('tempListModal').style.display = 'none';
+	const modal = document.getElementById('tempListModal');
+	modal.classList.remove('show');
+	setTimeout(() => { modal.style.display = 'none'; }, 220);
 }
 
 function onTempModalOverlayClick(e) {
@@ -460,40 +500,39 @@ function loadTempList() {
 
 			const catMap = { '1': '일상', '2': '동네질문', '3': '동네맛집', '4': '동네소식', '5': '분실/실종' };
 
-			listEl.innerHTML = data.map(item => {
+			listEl.innerHTML = '';
+
+			data.forEach((item, idx) => {
 				const date = item.regDate ? new Date(item.regDate) : null;
 				const dateStr = date
 					? `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`
 					: '';
 				const cat = catMap[String(item.category)] || '';
 
-				// HTML 태그 제거해서 텍스트 미리보기 50자
 				const tempDiv = document.createElement('div');
 				tempDiv.innerHTML = item.content || '';
 				const preview = (tempDiv.textContent || tempDiv.innerText || '').trim().substring(0, 50);
 
-				return `
-				<li class="place-item" style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:14px 16px;">
-					<div style="flex:1; min-width:0;">
-						<div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
-							${cat ? `<span style="font-size:11px; background:#f0ecff; color:#8A63FF; border-radius:4px; padding:2px 7px; flex-shrink:0;">${cat}</span>` : ''}
-							<span style="font-weight:600; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(item.subject || '(제목 없음)')}</span>
+				const li = document.createElement('li');
+				li.className = 'temp-list-item temp-list-animated';
+				li.style.animationDelay = `${idx * 60}ms`;
+				li.innerHTML = `
+					<div class="temp-list-item-info">
+						<div class="temp-list-title-row">
+							${cat ? `<span class="temp-cat-badge">${cat}</span>` : ''}
+							<span class="temp-list-title">${escapeHtml(item.subject || '(제목 없음)')}</span>
 						</div>
-						${preview ? `<p style="font-size:12px; color:#aaa; margin:0 0 4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(preview)}</p>` : ''}
-						<span style="font-size:11px; color:#ccc;">${dateStr}</span>
+						${preview ? `<p class="temp-list-preview">${escapeHtml(preview)}</p>` : ''}
+						<span class="temp-list-date">${dateStr}</span>
 					</div>
-					<div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
-						<button type="button" onclick="loadTempItem(${item.id})"
-							style="background:#f0ecff; color:#8A63FF; border:none; border-radius:8px; padding:6px 14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;">
-							가져오기
+					<div class="temp-list-item-btns">
+						<button type="button" class="btn-temp-load" onclick="loadTempItem(${item.id})">가져오기</button>
+						<button type="button" class="btn-temp-delete" onclick="deleteTempItem(${item.id}, this)" title="삭제">
+							<i class="ri-delete-bin-2-line"></i>
 						</button>
-						<button type="button" onclick="deleteTempItem(${item.id}, this)"
-							style="background:none; border:none; padding:6px 8px; font-size:16px; color:#ddd; cursor:pointer; line-height:1;" title="삭제">
-							<i class="ri-delete-bin-line"></i>
-						</button>
-					</div>
-				</li>`;
-			}).join('');
+					</div>`;
+				listEl.appendChild(li);
+			});
 		})
 		.catch(() => {
 			listEl.innerHTML = '<li style="text-align:center; padding:32px; color:#f44;">목록을 불러올 수 없습니다.</li>';
@@ -502,28 +541,22 @@ function loadTempList() {
 
 function loadTempItem(id) {
 	const contextPath = document.querySelector('meta[name="contextPath"]').getAttribute('content');
-	const subject = document.communityForm?.subject?.value?.trim() || '';
-	const content = quill?.root?.innerHTML || '';
-	const hasContent = subject || (content && content !== '<p><br></p>');
 
-	const doLoad = () => {
+	batonConfirm('임시저장된 글을 불러올까요?<br><span style="font-size:13px;color:var(--text-3);font-weight:400;">현재 작성 중인 내용은 사라져요.</span>', () => {
 		closeTempListModal();
 		location.href = `${contextPath}/community/temp/load?id=${id}`;
-	};
-
-	if (hasContent) {
-		batonConfirm('현재 작성 중인 내용이 사라져요. 계속 가져올까요?', doLoad);
-	} else {
-		doLoad();
-	}
+	});
 }
 
 function deleteTempItem(id, btn) {
 	deleteTempItemById(id, () => {
-		const li = btn.closest('li');
-		li.style.transition = 'opacity 0.3s';
-		li.style.opacity = '0';
-		setTimeout(() => { li.remove(); loadTempList(); }, 300);
+		const li = btn.closest('.temp-list-item');
+		if (li) {
+			li.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+			li.style.opacity = '0';
+			li.style.transform = 'translateX(12px)';
+			setTimeout(() => { li.remove(); loadTempList(); }, 260);
+		}
 	});
 }
 
@@ -552,3 +585,120 @@ function escapeHtml(text) {
 	if (!text) return '';
 	return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+// 토스트 메시지
+function showBatonToast(message, icon) {
+	var container = document.getElementById('toastContainer');
+	if (!container) return;
+	var toast = document.createElement('div');
+	toast.className = 'toast';
+	toast.innerHTML = (icon ? '<i class="' + icon + '"></i> ' : '') + message;
+	container.appendChild(toast);
+	setTimeout(function() { if (toast.parentNode) toast.remove(); }, 3000);
+}
+
+// ===== 파일 첨부 =====
+var _attachNewFiles = [];        // 새로 추가할 File 객체 배열 (null = 삭제됨)
+var _attachRemovedSaves = [];    // 기존 파일 중 삭제할 saveFilename 목록
+var MAX_ATTACH = 5;
+var MAX_SIZE   = 10 * 1024 * 1024; // 10MB
+
+window.handleAttachFiles = function(fileList) {
+    var files = Array.from(fileList);
+    var currentCount = _attachNewFiles.filter(function(f) { return f !== null; }).length
+        + document.querySelectorAll('.attach-file-item[data-filename]').length;
+
+    var added = 0;
+    for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        if (currentCount + added >= MAX_ATTACH) {
+            showBatonToast('첨부파일은 최대 ' + MAX_ATTACH + '개까지 가능해요.');
+            break;
+        }
+        if (file.size > MAX_SIZE) {
+            showBatonToast('"' + file.name + '" 파일이 10MB를 초과해요.');
+            continue;
+        }
+        _attachNewFiles.push(file);
+        _renderNewAttachItem(file, _attachNewFiles.length - 1);
+        added++;
+    }
+    _updateAttachCount();
+    _syncAttachInput();
+};
+
+function _renderNewAttachItem(file, idx) {
+    var list = document.getElementById('attachFileList');
+    if (!list) return;
+
+    // 리스트 컨테이너 표시
+    var wrapper = document.getElementById('attachListWrapper');
+    if (wrapper) wrapper.style.display = 'block';
+
+    var li = document.createElement('li');
+    li.className = 'attach-file-item';
+    li.dataset.newIdx = idx;
+    li.innerHTML =
+        '<i class="ri-file-line"></i>' +
+        '<span class="attach-file-name">' + escapeHtml(file.name) + '</span>' +
+        '<span class="attach-file-size">(' + (file.size / 1024).toFixed(1) + 'KB)</span>' +
+        '<button type="button" class="btn-remove-attach" onclick="removeNewAttach(' + idx + ', this)"><i class="ri-close-line"></i></button>';
+    list.appendChild(li);
+}
+
+window.removeNewAttach = function(idx, btn) {
+    _attachNewFiles[idx] = null;
+    var li = btn.closest('.attach-file-item');
+    if (li) li.remove();
+    _updateAttachCount();
+    _syncAttachInput();
+};
+
+window.removeExistingAttach = function(saveFilename, btn) {
+    _attachRemovedSaves.push(saveFilename);
+    var li = btn.closest('.attach-file-item');
+    if (li) li.remove();
+    _updateAttachCount();
+};
+
+function _updateAttachCount() {
+    var newCount  = _attachNewFiles.filter(function(f) { return f !== null; }).length;
+    var oldCount  = document.querySelectorAll('.attach-file-item[data-filename]').length;
+    var total     = newCount + oldCount;
+    var label     = document.getElementById('attachCountLabel');
+    var wrapper   = document.getElementById('attachListWrapper');
+    if (label) {
+        if (total > 0) {
+            label.style.display = 'inline';
+            label.innerText = '파일 ' + total + '개';
+        } else {
+            label.style.display = 'none';
+        }
+    }
+    if (wrapper) wrapper.style.display = total > 0 ? 'block' : 'none';
+}
+
+function _syncAttachInput() {
+    var input = document.getElementById('attachFileInput');
+    if (!input) return;
+    try {
+        var dt = new DataTransfer();
+        _attachNewFiles.forEach(function(f) { if (f !== null) dt.items.add(f); });
+        input.files = dt.files;
+    } catch(e) { console.warn('DataTransfer not supported', e); }
+}
+
+// sendOk 패치: 제출 전 removedFiles hidden input 동기화
+var _origSendOk = window.sendOk;
+window.sendOk = function() {
+    // removedFiles
+    var f = document.communityForm;
+    f.querySelectorAll('input[name="removedFiles"]').forEach(function(el) { el.remove(); });
+    _attachRemovedSaves.forEach(function(name) {
+        var inp = document.createElement('input');
+        inp.type = 'hidden'; inp.name = 'removedFiles'; inp.value = name;
+        f.appendChild(inp);
+    });
+    // attachFiles input 동기화
+    _syncAttachInput();
+    if (_origSendOk) _origSendOk();
+};

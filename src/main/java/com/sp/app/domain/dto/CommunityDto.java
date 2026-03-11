@@ -33,9 +33,21 @@ public class CommunityDto {
     private Double longitude;
     
     private List<MultipartFile> uploadFiles;
+    private List<MultipartFile> attachFiles;
+    private List<String> removeFiles;
     
     private List<String> imageFiles;
     private List<String> tags;
+    
+    private List<AttachFileInfo> attachFileInfos;
+    
+    @Getter @Setter
+    @NoArgsConstructor @AllArgsConstructor
+    public static class AttachFileInfo {
+        private String originalFilename;
+        private String saveFilename;
+        private long fileSize;
+    }
     
     private boolean userLiked;
     private boolean userScraped;
