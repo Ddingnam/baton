@@ -135,8 +135,10 @@ public class CommunityController {
         }
 
         if (isTemporary == 1) {
+            session.setAttribute("msg", "임시저장되었습니다.");
             return "redirect:/community/list?tab=temp";
         }
+        session.setAttribute("msg", "게시글이 등록되었습니다.");
         return "redirect:/community/list";
     }
 
@@ -202,7 +204,8 @@ public class CommunityController {
     public String updateSubmit(CommunityDto dto,
             @RequestParam(value = "uploadFiles", required = false) List<MultipartFile> uploadFiles,
             @RequestParam("page") String page,
-            @SessionAttribute("member") SessionInfo info) throws Exception {
+            @SessionAttribute("member") SessionInfo info,
+            HttpSession session) throws Exception {
 
         try {
             dto.setMemberIdx(info.getUserIdx());
@@ -212,13 +215,15 @@ public class CommunityController {
             e.printStackTrace();
         }
 
+        session.setAttribute("msg", "게시글이 수정되었습니다.");
         return "redirect:/community/article/" + dto.getId() + "?page=" + page;
     }
 
     @GetMapping("delete")
     public String delete(@RequestParam("id") long id,
             @RequestParam("page") String page,
-            @SessionAttribute("member") SessionInfo info) throws Exception {
+            @SessionAttribute("member") SessionInfo info,
+            HttpSession session) throws Exception {
 
         try {
             service.deleteCommunity(id, uploadPath);
@@ -226,6 +231,7 @@ public class CommunityController {
             e.printStackTrace();
         }
 
+        session.setAttribute("msg", "게시글이 삭제되었습니다.");
         return "redirect:/community/list?page=" + page;
     }
     

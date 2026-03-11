@@ -61,7 +61,7 @@ public class CommunityServiceImpl implements CommunityService {
 					.longitude(dto.getLongitude())
 					.hitCount(0)
 					.likeCount(0)
-					.temporary(dto.isTemporary())
+					.temporary(dto.isTemporary()) 
 					.regDate(java.time.LocalDateTime.now())
 					.build();
 
@@ -106,7 +106,6 @@ public class CommunityServiceImpl implements CommunityService {
 						.community(savedCommunity)
 						.title(dto.getPollTitle())
 						.multipleChoice(dto.getPollMultiple() != null && dto.getPollMultiple())
-						.isAnonymous(dto.getPollAnonymous() != null && dto.getPollAnonymous())
 						.endDate(endDate)
 						.build();
 
@@ -193,6 +192,7 @@ public class CommunityServiceImpl implements CommunityService {
 			community.setContent(content);
 			community.setCategory(dto.getCategory());
 			community.setTemporary(false);
+			if (community.getRegDate() == null) community.setRegDate(java.time.LocalDateTime.now());
 			community.setPlaceName(dto.getPlaceName());
 			community.setAddress(dto.getAddress());
 			community.setLatitude(dto.getLatitude());
@@ -234,7 +234,6 @@ public class CommunityServiceImpl implements CommunityService {
 			community.setContent(content);
 			community.setCategory(dto.getCategory());
 			community.setTemporary(true);
-			community.setRegDate(java.time.LocalDateTime.now());
 			community.setPlaceName(dto.getPlaceName());
 			community.setAddress(dto.getAddress());
 			community.setLatitude(dto.getLatitude());
@@ -377,7 +376,6 @@ public class CommunityServiceImpl implements CommunityService {
 				.pollTitle(poll.getTitle())
 				.pollOptions(options)
 				.pollMultiple(poll.isMultipleChoice())
-				.pollAnonymous(poll.isAnonymous())
 				.pollEndDate(poll.getEndDate() != null ? poll.getEndDate().toString() : null)
 				.build();
 	}
@@ -432,7 +430,6 @@ public class CommunityServiceImpl implements CommunityService {
 		if (poll != null) {
 			dto.setPollTitle(poll.getTitle());
 			dto.setPollMultiple(poll.isMultipleChoice());
-			dto.setPollAnonymous(poll.isAnonymous());
 			dto.setPollEndDate(poll.getEndDate() != null ? poll.getEndDate().toString() : null);
 			
 			List<String> options = poll.getOptions().stream()

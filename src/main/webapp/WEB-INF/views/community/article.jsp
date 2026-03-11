@@ -53,7 +53,7 @@
                              <i class="ri-more-fill"></i>
                         </button>
                         <div class="dropdown-menu" id="dropdownMenu">
-                            <button type="button" onclick="location.href='${pageContext.request.contextPath}/community/update?id=${dto.id}&page=${page}'">수정</button>
+                            <button type="button" onclick="checkAndEdit('${dto.id}', '${page}')">수정</button>
                             <button type="button" class="danger" onclick="deleteArticle('${dto.id}')">삭제</button>
                         </div>
                     </div>
@@ -71,8 +71,6 @@
                         <h3 class="poll-title">${dto.pollTitle}</h3>
                         <div class="poll-meta">
                             <span id="pollEndDate" data-date="${dto.pollEndDate}"></span>
-                            <span class="dot">·</span>
-                            <span>${dto.pollAnonymous ? '익명' : '공개'}</span>
                             <span class="dot">·</span>
                             <span>${dto.pollMultiple ? '복수선택' : '단일선택'}</span>
                         </div>

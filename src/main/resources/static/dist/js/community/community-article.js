@@ -24,16 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Map initialization failed:", e);
     }
 
-    // 작성일 표시
-    const regDateEl = document.getElementById('articleRegDate');
-    if (regDateEl) {
-        const dateStr = regDateEl.getAttribute('data-date');
-        regDateEl.textContent = formatDate(dateStr);
-    }
-
     initPoll();
     loadReplies();
     formatPollDate();
+    formatArticleDate();
 });
 
 function initMap() {
@@ -91,6 +85,14 @@ function formatPollDate() {
     }
 }
 
+function formatArticleDate() {
+    const el = document.getElementById('articleRegDate');
+    if (!el) return;
+    const dateStr = el.dataset.date;
+    if (!dateStr) return;
+    el.innerText = formatDate(dateStr);
+}
+
 function initPoll() {
     const pollSection = document.getElementById('pollSection');
     if (!pollSection) return;
@@ -100,48 +102,62 @@ function initPoll() {
     fetch(`${contextPath}/api/community/poll?id=${pollCommunityId}`)
         .then(resp => resp.json())
         .then(data => {
-            const box         = document.getElementById('pollOptionsBox');
+            const box          = document.getElementById('pollOptionsBox');
             const totalDisplay = document.getElementById('totalVotesDisplay');
-            const submitBtn   = document.getElementById('btnVoteSubmit');
+            const submitBtn    = document.getElementById('btnVoteSubmit');
 
             if (!data || !data.options || data.options.length === 0) {
                 box.innerHTML = '<p style="color:var(--text-3);text-align:center;padding:16px;">투표 항목이 없습니다.</p>';
                 return;
             }
 
-            const total     = data.totalVotes || 0;
+            const total      = data.totalVotes || 0;
             const realPollId = data.pollId;
+            const isMultiple = data.multiple;
+            const myOptionIds = data.myOptionIds || [];
+
             totalDisplay.innerText = total + '명 참여';
 
             box.innerHTML = '';
             data.options.forEach(opt => {
-                const pct = total > 0 ? Math.round((opt.voteCount / total) * 100) : 0;
-                const div = document.createElement('div');
-                div.className = 'poll-option-row';
+                const pct       = total > 0 ? Math.round((opt.voteCount / total) * 100) : 0;
+                const isMyVote  = myOptionIds.includes(opt.optionId);
+                const div       = document.createElement('div');
+                div.className   = 'poll-option-row' + (isMyVote ? ' selected' : '');
                 div.dataset.optionId = opt.optionId;
                 div.innerHTML = `
                     <div class="poll-option-label">
+                        <span class="poll-option-check"><i class="${isMultiple
+                            ? (isMyVote ? 'ri-checkbox-fill' : 'ri-checkbox-blank-line')
+                            : (isMyVote ? 'ri-radio-button-fill' : 'ri-radio-button-line')}"></i></span>
                         <span class="option-text">${opt.content}</span>
                         <span class="option-pct">${pct}%</span>
                     </div>
                     <div class="poll-bar-track">
                         <div class="poll-bar-fill" style="width:${pct}%"></div>
                     </div>`;
-                if (!data.voted) {
-                    div.addEventListener('click', () => selectPollOption(div));
+
+                // 아직 투표 안 했거나, 재투표 허용 (이미 투표해도 선택 변경 가능)
+                const isLoggedIn = parseInt(currentMemberIdx, 10) > 0;
+                if (isLoggedIn) {
+                    div.addEventListener('click', () => selectPollOption(div, isMultiple));
                 }
                 box.appendChild(div);
             });
 
             const isLoggedIn = parseInt(currentMemberIdx, 10) > 0;
-            if (isLoggedIn && !data.voted) {
+            if (isLoggedIn) {
+                // 이미 투표한 경우 선택 항목 표시 후 버튼 텍스트 변경
                 submitBtn.style.display = 'inline-block';
-                submitBtn.onclick = () => submitVote(realPollId);
-            } else if (data.voted) {
-                submitBtn.style.display = 'none';
-                totalDisplay.innerText = total + '명 참여 (투표 완료)';
+                submitBtn.textContent   = data.voted ? '투표 변경' : '투표하기';
+                submitBtn.onclick       = () => submitVote(realPollId);
             } else {
-                submitBtn.style.display = 'none'; // 비로그인
+                submitBtn.style.display = 'none';
+                if (!data.voted) totalDisplay.innerText = total + '명 참여 (로그인 후 투표 가능)';
+            }
+
+            if (data.voted) {
+                totalDisplay.innerText = total + '명 참여 · 내 선택 표시됨';
             }
         })
         .catch(() => {
@@ -150,22 +166,43 @@ function initPoll() {
         });
 }
 
-function selectPollOption(el) {
-    document.querySelectorAll('.poll-option-row').forEach(row => row.classList.remove('selected'));
-    el.classList.add('selected');
+function selectPollOption(el, isMultiple) {
+    if (isMultiple) {
+        el.classList.toggle('selected');
+        const icon = el.querySelector('.poll-option-check i');
+        if (icon) {
+            icon.className = el.classList.contains('selected')
+                ? 'ri-checkbox-fill'
+                : 'ri-checkbox-blank-line';
+        }
+    } else {
+        document.querySelectorAll('.poll-option-row').forEach(row => {
+            row.classList.remove('selected');
+            const icon = row.querySelector('.poll-option-check i');
+            if (icon) icon.className = 'ri-radio-button-line';
+        });
+        el.classList.add('selected');
+        const icon = el.querySelector('.poll-option-check i');
+        if (icon) icon.className = 'ri-radio-button-fill';
+    }
 }
 
 function submitVote(realPollId) {
-    const selected = document.querySelector('.poll-option-row.selected');
-    if (!selected) {
+    const selected = document.querySelectorAll('.poll-option-row.selected');
+    if (selected.length === 0) {
         showToast('투표 항목을 선택해주세요.');
         return;
     }
-    const optionId = selected.dataset.optionId;
+    const optionIds = Array.from(selected).map(el => el.dataset.optionId);
+    // 쿼리 스트링으로 optionIds 배열 전송 (Spring @RequestParam List<Long> 수신)
+    const params = new URLSearchParams();
+    params.append('pollId', realPollId);
+    optionIds.forEach(id => params.append('optionIds', id));
+
     fetch(`${contextPath}/api/community/poll/vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `pollId=${realPollId}&optionId=${optionId}`
+        body: params.toString()
     })
     .then(resp => resp.json())
     .then(data => {
@@ -224,6 +261,31 @@ document.addEventListener('click', (e) => {
         document.getElementById('dropdownMenu')?.classList.remove('show');
     }
 });
+
+function checkAndEdit(id, page) {
+    const pollSection = document.getElementById('pollSection');
+
+    // 투표가 없는 글이면 바로 수정 페이지로
+    if (!pollSection) {
+        location.href = `${contextPath}/community/update?id=${id}&page=${page}`;
+        return;
+    }
+
+    // 투표가 있는 글이면 참여 인원 확인
+    fetch(`${contextPath}/api/community/poll?id=${id}`)
+        .then(resp => resp.json())
+        .then(data => {
+            if (data && data.totalVotes > 0) {
+                showBatonToast('투표에 참여한 이웃이 있어 수정할 수 없어요.');
+            } else {
+                location.href = `${contextPath}/community/update?id=${id}&page=${page}`;
+            }
+        })
+        .catch(() => {
+            // 오류 시 일단 이동 허용
+            location.href = `${contextPath}/community/update?id=${id}&page=${page}`;
+        });
+}
 
 function deleteArticle(id) {
     batonConfirm('정말 삭제하시겠습니까?', () => {
@@ -361,15 +423,28 @@ function deleteReply(replyId) {
             if (data.state === 'true') {
                 loadReplies();
             } else {
-                showBatonToast('삭제에 실패했습니다.');
+                showToast('삭제에 실패했습니다.');
             }
         })
-        .catch(() => showBatonToast('오류가 발생했습니다.'));
+        .catch(() => showToast('오류가 발생했습니다.'));
     });
 }
 function escapeHtml(text) {
     if (!text) return '';
     return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function showToast(message) {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `<i class="ri-checkbox-circle-line"></i> ${message}`;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.animation = 'fadeUp 0.3s reverse forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
 }
 
 function formatDate(dateStr) {

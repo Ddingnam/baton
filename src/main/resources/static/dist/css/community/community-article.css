@@ -241,17 +241,33 @@ body {
 
 .poll-option-label {
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
+	gap: 10px;
 	margin-bottom: 8px;
 	font-size: 15px;
 	font-weight: 600;
+}
+
+.poll-option-check {
+	flex-shrink: 0;
+	font-size: 18px;
+	color: var(--text-3);
+	line-height: 1;
+}
+
+.poll-option-row.selected .poll-option-check {
+	color: var(--primary);
+}
+
+.option-text {
+	flex: 1;
 }
 
 .option-pct {
 	font-size: 13px;
 	color: var(--primary);
 	font-weight: 700;
+	margin-left: auto;
 }
 
 .poll-bar-track {
@@ -291,6 +307,25 @@ body {
 
 .btn-vote-submit:hover {
 	background: var(--primary-dark);
+}
+
+.btn-vote-cancel {
+	background: transparent;
+	color: var(--text-3);
+	border: 1px solid var(--border);
+	padding: 8px 16px;
+	border-radius: 8px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: 0.2s;
+	margin-left: 8px;
+}
+
+.btn-vote-cancel:hover {
+	border-color: var(--danger);
+	color: var(--danger);
+	background: #FFF5F5;
 }
 
 .total-votes {

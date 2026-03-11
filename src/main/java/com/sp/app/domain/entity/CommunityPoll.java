@@ -46,9 +46,6 @@ public class CommunityPoll {
     @Column(name = "multiple_choice")
     private boolean multipleChoice;
 
-    @Column(name = "is_anonymous")
-    private boolean isAnonymous;
-
     @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PollOption> options;
 }

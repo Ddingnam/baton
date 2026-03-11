@@ -74,7 +74,7 @@
 						<div id="tagContainer" class="tag-list"></div>
 					</div>
 
-					<div class="poll-wrapper">
+					<div class="poll-wrapper" ${mode=='update' ? 'style="display:none;"' : ''}>
 						<div class="poll-toggle-header">
 							<div class="toggle-label">
 								<i class="ri-bar-chart-horizontal-fill"></i> <span>투표 만들기</span>
@@ -126,7 +126,6 @@
 
 								<div class="setting-toggles">
 									<label class="mini-check" title="복수 선택 허용"> <input type="checkbox" name="pollMultiple" id="pollMultiple" ${dto.pollMultiple ? 'checked' : ''}> <span class="check-btn">복수선택</span>
-									</label> <label class="mini-check" title="익명 투표"> <input type="checkbox" name="pollAnonymous" id="pollAnonymous" ${dto.pollAnonymous ? 'checked' : ''}> <span class="check-btn">익명</span>
 									</label>
 								</div>
 							</div>

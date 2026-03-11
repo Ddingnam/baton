@@ -26,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sp.app.domain.dto.CommunityDto;
 import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.domain.entity.CommunityPoll;
-import com.sp.app.domain.entity.PollVote;
 import com.sp.app.repository.CommunityPollRepository;
 import com.sp.app.repository.PollVoteRepository;
 import com.sp.app.service.CommunityService;
@@ -204,13 +203,13 @@ public class CommunityApiController {
 
             SessionInfo info = (SessionInfo) session.getAttribute("member");
             boolean voted = false;
-            Long myOptionId = null;
+            List<Long> myOptionIds = new java.util.ArrayList<>();
 
             if (info != null) {
                 voted = communityService.hasUserVoted(poll.getPollId(), info.getUserIdx());
                 if (voted) {
-                    PollVote myVote = pollVoteRepository.findByPollPollIdAndMemberId(poll.getPollId(), info.getUserIdx());
-                    if (myVote != null) myOptionId = myVote.getOption().getOptionId();
+                    pollVoteRepository.findAllByPollPollIdAndMemberId(poll.getPollId(), info.getUserIdx())
+                            .forEach(v -> myOptionIds.add(v.getOption().getOptionId()));
                 }
             }
 
@@ -230,7 +229,7 @@ public class CommunityApiController {
             result.put("options", options);
             result.put("totalVotes", totalVotes);
             result.put("voted", voted);
-            result.put("myOptionId", myOptionId);
+            result.put("myOptionIds", myOptionIds);
             result.put("multiple", poll.isMultipleChoice());
             return ResponseEntity.ok(result);
         } catch (Exception e) {
@@ -242,7 +241,7 @@ public class CommunityApiController {
     @PostMapping("/poll/vote")
     public ResponseEntity<Map<String, Object>> vote(
             @RequestParam("pollId") Long pollId,
-            @RequestParam("optionId") Long optionId,
+            @RequestParam("optionIds") List<Long> optionIds,
             HttpSession session) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -252,11 +251,9 @@ public class CommunityApiController {
                 result.put("message", "로그인이 필요합니다.");
                 return ResponseEntity.ok(result);
             }
-            
-            if (communityService.hasUserVoted(pollId, info.getUserIdx())) {
-                communityService.cancelVote(pollId, info.getUserIdx());
-            }
-            communityService.votePoll(pollId, info.getUserIdx(), List.of(optionId));
+            // 기존 투표 취소 후 새로 저장 (재투표 허용)
+            communityService.cancelVote(pollId, info.getUserIdx());
+            communityService.votePoll(pollId, info.getUserIdx(), optionIds);
             result.put("success", true);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
@@ -320,7 +317,6 @@ public class CommunityApiController {
 
             result.put("status", "true");
             result.put("message", "임시저장되었습니다.");
-            result.put("id", dto.getId());
         } catch (Exception e) {
             log.error("임시저장 실패", e);
             result.put("status", "false");

@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "poll_vote", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"poll_id", "member_id"})
+    @UniqueConstraint(columnNames = {"poll_id", "member_id", "option_id"})
 })
 @Getter 
 @NoArgsConstructor
