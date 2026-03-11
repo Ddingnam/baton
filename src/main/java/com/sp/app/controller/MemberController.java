@@ -13,6 +13,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.sp.app.domain.dto.GuestSessionInfo;
+import com.sp.app.domain.dto.SnsUserDto;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.MemberService;
 
@@ -150,9 +151,16 @@ public class MemberController {
 	
 	@GetMapping("complete")
     public String complete(
-    		HttpSession session,
-    		SessionStatus status,
-    		Model model) {
+			@AuthenticationPrincipal CustomUserDetails userDetails,
+			RedirectAttributes rattr,
+			HttpSession session,
+			SessionStatus status,
+			Model model) {
+		
+		if(userDetails != null) {
+			rattr.addFlashAttribute("msg", "이미 로그인된 상태입니다.");
+			return "redirect:/";
+		}
 		
 		GuestSessionInfo guestInfo = (GuestSessionInfo) session.getAttribute("guestInfo");
 		if (guestInfo == null) {
@@ -173,5 +181,42 @@ public class MemberController {
 
         return "member/complete";
     }
+	
+	@GetMapping("linkComplete")
+    public String linkComplete(
+			@AuthenticationPrincipal CustomUserDetails userDetails,
+			RedirectAttributes rattr,
+			HttpSession session,
+			SessionStatus status,
+			Model model) {
+		
+		if(userDetails == null) {
+			rattr.addFlashAttribute("msg", "비정상적인 접근입니다.");
+			return "redirect:/";
+		}
+		
+		GuestSessionInfo guestInfo = (GuestSessionInfo) session.getAttribute("guestInfo");
+	    
+	    if (guestInfo == null || guestInfo.getSnsUserDto() == null || guestInfo.getLinkedUserId() == null) {
+	        rattr.addFlashAttribute("msg", "비정상적인 접근입니다.");
+	        return "redirect:/member/login";
+	    }
+		
+	    SnsUserDto snsUserDto = guestInfo.getSnsUserDto();
+	    String provider = switch(snsUserDto.getProvider()) {
+	    		case "K" -> "Kakao";
+	    		case "N" -> "Naver";
+	    		case "G" -> "Google";
+	    		default -> "unknown";
+	    };
+	    
+	    model.addAttribute("userId", guestInfo.getLinkedUserId());
+	    model.addAttribute("nickname", guestInfo.getLinkedUserNickname());
+	    model.addAttribute("provider", provider);
+	    
+	    status.setComplete();
+	    
+		return "member/linkComplete";
+	}
 
 }

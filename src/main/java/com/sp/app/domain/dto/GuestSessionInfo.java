@@ -24,6 +24,7 @@ public class GuestSessionInfo {
     
     private String linkedUserId;
     private String linkedUserEmail;
+    private String linkedUserNickname;
     
     private SnsUserDto snsUserDto;
     
@@ -46,6 +47,7 @@ public class GuestSessionInfo {
         this.findUserIdx = null;
         this.linkedUserId = null;
         this.linkedUserEmail = null;
+        this.linkedUserNickname = null;
         this.snsUserDto = null;
     }
 }

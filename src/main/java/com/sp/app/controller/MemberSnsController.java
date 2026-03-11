@@ -78,6 +78,7 @@ public class MemberSnsController {
 				guestInfo.setSnsUserDto(newSnsUserDto);
 				guestInfo.setLinkedUserId(userDto.getUserId());
 				guestInfo.setLinkedUserEmail(userDto.getEmail());
+				guestInfo.setLinkedUserNickname(userDto.getNickname());
 				
 				session.setAttribute("guestInfo", guestInfo);
 				return getScriptResponse(cp + "/member/linkAccount");

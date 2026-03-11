@@ -223,7 +223,7 @@ async function processAccountLink() {
         console.log(result.state);
 
         if(result.state === "success") {
-            location.replace('${pageContext.request.contextPath}/');
+            location.replace('${pageContext.request.contextPath}/member/linkComplete');
         } else if(result.state === "fail") {
         	handleAuthError(pwdInput, pwdWrapper, "비밀번호가 일치하지 않습니다.");       	
         } else {
