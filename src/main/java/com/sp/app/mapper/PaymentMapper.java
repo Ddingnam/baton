@@ -1,5 +1,6 @@
 package com.sp.app.mapper;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -27,4 +28,5 @@ public interface PaymentMapper {
     public void refundBuyerPoint(Map<String, Object> map) throws Exception;
     public void insertPointHistoryForRefund(Map<String, Object> map) throws Exception;
     public String getUserAddress(long userIdx) throws Exception;
+    public List<Map<String, Object>> getExpiredShippingTransactions() throws Exception;
 }

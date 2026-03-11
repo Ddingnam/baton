@@ -151,4 +151,11 @@
         ) WHERE ROWNUM = 1
     </select>
     
+    <select id="getExpiredShippingTransactions" resultType="map">
+	    SELECT PRODUCTIDX, BUYERIDX 
+	    FROM TRADETRANSACTION 
+	    WHERE TRADESTATUS = 'SHIPPING' 
+	    AND SHIPPINGDATE <![CDATA[ <= ]]> SYSDATE - 3
+	</select>
+    
 </mapper>

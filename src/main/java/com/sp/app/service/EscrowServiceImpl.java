@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sp.app.mapper.PaymentMapper;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -159,6 +160,17 @@ public class EscrowServiceImpl implements EscrowService {
             return paymentMapper.getUserAddress(userIdx);
         } catch (Exception e) {
             throw e;
+        }
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void autoConfirmPurchases() throws Exception {
+        List<Map<String, Object>> list = paymentMapper.getExpiredShippingTransactions();
+        for (Map<String, Object> map : list) {
+            long productIdx = Long.parseLong(map.get("PRODUCTIDX").toString());
+            long buyerIdx = Long.parseLong(map.get("BUYERIDX").toString());
+            confirmPurchase(productIdx, buyerIdx);
         }
     }
 }
