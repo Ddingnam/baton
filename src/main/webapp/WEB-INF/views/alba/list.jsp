@@ -199,20 +199,17 @@ const CONTEXT_PATH = "${pageContext.request.contextPath}";
 const serverData = [
 <c:forEach var="dto" items="${list}" varStatus="status">
 {
-  id:         "${dto.postingIdx}",
-  title:      `${dto.title}`,
-  employer:   `${empty dto.employer ? '업체명' : dto.employer}`,
-  payType:    `${dto.payType}`,
-  payTypeKey: `${dto.payType == '시급' ? 'hour' : (dto.payType == '월급' ? 'month' : (dto.payType == '일급' ? 'day' : 'case'))}`,
-  payNum:     ${empty dto.pay ? 0 : dto.pay},
-  payFmt:     new Intl.NumberFormat('ko-KR').format(${empty dto.pay ? 0 : dto.pay}),
-  days:       `${dto.workDays}`,
-  time:       `${empty dto.workTime ? '시간협의' : dto.workTime}`,
-  area:       `${dto.location}`,
-  date:       `${dto.createdDate}`,
-  img:        `${empty dto.thumbUrl ? '' : dto.thumbUrl}`,
-  period:     `${dto.workPeriod}`,
-  cat:        `${dto.category}`
+  postingIdx:  "${dto.postingIdx}",
+  title:       `${dto.title}`,
+  employer:    `${empty dto.employer ? '업체명' : dto.employer}`,
+  payType:     `${dto.payType}`,
+  pay:         ${empty dto.pay ? 0 : dto.pay},
+  location:    `${dto.location}`,
+  createdDate: `${dto.createdDate}`,
+  workPeriod:  `${dto.workPeriod}`,
+  category:    `${dto.category}`,
+  startTime:   `${dto.startTime}`,
+  endTime:     `${dto.endTime}`
 }${!status.last ? ',' : ''}
 </c:forEach>
 ];

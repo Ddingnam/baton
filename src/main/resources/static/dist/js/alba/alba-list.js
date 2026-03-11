@@ -40,32 +40,33 @@ function applyFilters() {
   let jobs = [...serverData];
 
   if (keyword) {
-    jobs = jobs.filter(j =>
-      (j.title || '').toLowerCase().includes(keyword) ||
-      (j.employer || '').toLowerCase().includes(keyword) ||
-      (j.area || '').toLowerCase().includes(keyword)
-    );
-  }
+      jobs = jobs.filter(j =>
+        (j.title || '').toLowerCase().includes(keyword) ||
+        (j.employer || '').toLowerCase().includes(keyword) ||
+        (j.location || '').toLowerCase().includes(keyword)
+      );
+    }
 
-  if (period !== '전체') {
-    jobs = jobs.filter(j =>
-      j.period === period ||
-      (period === '1개월 이상' && j.period === 'MORE_THAN_A_MONTH') ||
-      (period === '단기' && j.period === 'LESS_THAN_A_MONTH')
-    );
-  }
+	if (period !== '전체') {
+	    jobs = jobs.filter(j =>
+	      (period === '1개월 이상' && j.workPeriod === 'MORE_THAN_A_MONTH') ||
+	      (period === '단기' && j.workPeriod === 'LESS_THAN_A_MONTH')
+	    );
+	  }
 
-  if (cat !== '전체') {
-    jobs = jobs.filter(j => j.cat === cat || j.cat === CAT_MAP[cat]);
-  }
+	if (cat !== '전체') {
+	     jobs = jobs.filter(j => j.category === cat || j.category === CAT_MAP[cat]);
+	}
 
   if (minPay > 0) {
-    jobs = jobs.filter(j => j.payTypeKey !== 'hour' || j.payNum >= minPay);
+    jobs = jobs.filter(j => j.payTypeKey !== 'hour' || j.pay >= minPay);
   }
 
   if (sort === 'pay_high') {
-    jobs.sort((a, b) => b.payNum - a.payNum);
-  }
+      jobs.sort((a, b) => b.pay - a.pay);
+    }else {
+		jobs.sort((a, b) => b.postringIdx - a.postingIdx) ;
+	}
 
   filteredJobs = jobs;
   currentPage = 1;
