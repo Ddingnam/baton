@@ -88,40 +88,30 @@ function renderList(jobs) {
   if (!container) return;
 
   if (!jobs || !jobs.length) {
-    container.innerHTML = `
-      <div class="no-result">
-        <span class="no-result-icon">🔍</span>
-        <strong>검색 결과가 없어요</strong>
-        <span>조건을 바꿔보거나 검색어를 다시 입력해보세요.</span>
-      </div>`;
+    container.innerHTML = `<div class="no-result"><strong>검색 결과가 없어요</strong></div>`;
     return;
   }
 
   container.innerHTML = jobs.map((job, idx) => {
+    // 필드명이 location, employer, title, pay 등으로 되어있어야 합니다.
     const relTime = getRelativeTime(job.createdDate); 
-    const isRecent = relTime.includes('분전') || relTime.includes('시간전') || relTime === '방금전';
-    
-    const periodLabel = job.workPeriod === 'MORE_THAN_A_MONTH' ? '장기'
-      : job.workPeriod === 'LESS_THAN_A_MONTH' ? '단기' : '';
-
     const workTime = (job.startTime && job.endTime) ? `${job.startTime}~${job.endTime}` : '-';
 
     return `
-      <div class="job-list-item" style="animation-delay:${idx * 0.04}s"
-           onclick="location.href='${CONTEXT_PATH}/alba/article/${job.postingIdx}'">
+      <div class="job-list-item" onclick="location.href='${CONTEXT_PATH}/alba/article/${job.postingIdx}'">
         <div class="job-area-col">
-          <span class="job-area-text">${job.location || '지역미정'}</span> ${periodLabel ? `<span class="job-period-badge">${periodLabel}</span>` : ''}
+          <span class="job-area-text">${job.location || '지역미정'}</span>
         </div>
         <div class="job-article-col">
-          <div class="job-employer">${job.employer || '업체명없음'}</div>
+          <div class="job-employer">${job.employer}</div>
           <div class="job-title">${job.title}</div>
         </div>
         <div class="job-salary-col">
-          <span class="pay-badge">${job.payType || '시급'}</span> 
-          <div class="pay-amount">${(job.pay || 0).toLocaleString()}원</div> 
+          <span class="pay-badge">${job.payType}</span> 
+          <div class="pay-amount">${Number(job.pay).toLocaleString()}원</div> 
         </div>
         <div class="job-time-col">${workTime}</div> 
-        <div class="job-date-col ${isRecent ? 'recent' : ''}">${relTime}</div>
+        <div class="job-date-col">${relTime}</div>
       </div>`;
   }).join('');
 }
@@ -262,25 +252,37 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-function applyAreaFilter(){
+// src/main/resources/static/dist/js/alba/alba-list.js
 
+function applyAreaFilter(){
   const sido = document.querySelector('#col-sido li.active')?.textContent || '';
   const gugun = document.querySelector('#col-gugun li.active')?.textContent || '';
   const dong = document.querySelector('#col-dong li.active')?.textContent || '';
 
-  fetch(`/alba/filter?sido=${sido}&gugun=${gugun}&dong=${dong}`)
+  fetch(`${CONTEXT_PATH}/alba/filter?sido=${sido}&gugun=${gugun}&dong=${dong}`)
     .then(res => res.json())
     .then(data => {
+        // 서버에서 온 데이터(JobPosting 객체들)를 변수명에 맞춰 매핑
+        filteredJobs = data.map(job => ({
+            postingIdx: job.postingIdx,
+            title:      job.title,
+            employer:   job.employer || '업체명',
+            payType:    job.payType,
+            pay:         job.pay || 0,
+            location:    job.location,
+            createdDate: job.createdDate,
+            workPeriod:  job.workPeriod,
+            category:    job.category,
+            startTime:   job.startTime,
+            endTime:     job.endTime
+        }));
 
-        filteredJobs = data;
         currentPage = 1;
-
         const rc = document.getElementById('resultCount');
-        if(rc) rc.textContent = data.length;
+        if(rc) rc.textContent = filteredJobs.length;
 
         renderCurrentPage();
         renderPagination();
-
     })
     .catch(err => console.error(err));
 }
