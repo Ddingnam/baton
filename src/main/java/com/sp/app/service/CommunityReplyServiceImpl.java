@@ -25,8 +25,8 @@ public class CommunityReplyServiceImpl implements CommunityReplyService {
         List<CommunityReply> entities = replyRepository.findByCommunityIdOrderByRegDateAsc(communityId);
         
         List<CommunityReplyDto> result = new ArrayList<>();
-        Map<Long, List<CommunityReply>> childrenMap = new HashMap<>(); // 부모ID -> 자식리스트
-        List<CommunityReply> roots = new ArrayList<>(); // 최상위 댓글 리스트
+        Map<Long, List<CommunityReply>> childrenMap = new HashMap<>();
+        List<CommunityReply> roots = new ArrayList<>();
 
         for (CommunityReply entity : entities) {
             if (entity.getParentId() == null) {

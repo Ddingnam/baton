@@ -1,6 +1,3 @@
-// 토스트는 header.js의 전역 showBatonToast() 사용
-// header.jsp에 id="baton-toast-container" 컨테이너가 항상 존재함
-
 function batonConfirm(message, onConfirm, onCancel) {
 	var overlay = document.createElement('div');
 	overlay.className = 'baton-modal-overlay';
@@ -60,7 +57,6 @@ function initMap() {
         map.setDraggable(true);
         map.setZoomable(true);
 
-        // 드래그와 클릭 구분: mousedown ~ mouseup 이동거리로 판단
         let dragStartX, dragStartY;
         mapContainer.addEventListener('mousedown', e => {
             dragStartX = e.clientX;
@@ -70,7 +66,7 @@ function initMap() {
         kakao.maps.event.addListener(map, 'click', (mouseEvent) => {
             const dx = Math.abs((window.event?.clientX || dragStartX) - dragStartX);
             const dy = Math.abs((window.event?.clientY || dragStartY) - dragStartY);
-            if (dx > 5 || dy > 5) return; // 드래그 중이면 무시
+            if (dx > 5 || dy > 5) return;
             const placeName = mapContainer.closest('.map-card').querySelector('strong')?.innerText || '';
             window.open(`https://map.kakao.com/link/map/${encodeURIComponent(placeName)},${lat},${lng}`, '_blank');
         });
@@ -123,7 +119,6 @@ function initPoll() {
             var totalDisplay = document.getElementById('totalVotesDisplay');
             var submitBtn    = document.getElementById('btnVoteSubmit');
 
-            // error 필드나 options 없으면 투표 없음 처리
             if (!data || data.error || !data.options || data.options.length === 0) {
                 box.innerHTML = '<p style="color:var(--text-3);text-align:center;padding:20px 16px;font-size:13px;">투표 항목이 없습니다.</p>';
                 return;
@@ -200,13 +195,11 @@ function initPoll() {
 
 function selectPollOption(el, isMultiple) {
     if (isMultiple) {
-        // 복수선택: 토글
         var wasSelected = el.classList.contains('selected');
         el.classList.toggle('selected');
         var icon = el.querySelector('.poll-option-check i');
         if (icon) icon.className = wasSelected ? 'ri-checkbox-blank-line' : 'ri-checkbox-fill';
     } else {
-        // 단일선택: 이미 선택됐으면 해제, 아니면 전체 해제 후 선택
         var wasSelected = el.classList.contains('selected');
         document.querySelectorAll('.poll-option-row').forEach(function(row) {
             row.classList.remove('selected');
@@ -231,7 +224,6 @@ function submitVote(realPollId) {
         return;
     }
 
-    // 이미 투표했는지 여부로 메시지 분기
     const submitBtn = document.getElementById('btnVoteSubmit');
     const isChange = submitBtn && submitBtn.textContent.trim() === '투표 변경';
     const confirmMsg = isChange
@@ -352,7 +344,6 @@ function checkAndEdit(id, page) {
             }
         })
         .catch(() => {
-            // API 오류 시 안전하게 수정 페이지로
             location.href = `${contextPath}/community/update?id=${id}&page=${page}`;
         });
 }

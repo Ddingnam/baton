@@ -113,7 +113,6 @@
                 </div>
             </c:if>
 
-            <%-- 첨부파일 목록 --%>
             <c:if test="${not empty dto.attachFileInfos}">
                 <div class="attach-section">
                     <div class="attach-section-title">

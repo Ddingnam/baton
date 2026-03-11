@@ -290,7 +290,6 @@ public class CommunityController {
         }
     }
 
-    // 임시저장 글 삭제
     @PostMapping("temp/delete")
     public ResponseEntity<?> tempDelete(@RequestParam("id") long id,
             @SessionAttribute("member") SessionInfo info) {

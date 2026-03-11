@@ -99,7 +99,6 @@ body {
 	gap: 6px;
 }
 
-/* 임시저장함 버튼 (아이콘 + 텍스트) */
 .btn-temp-list {
 	position: relative;
 	display: flex;
@@ -127,7 +126,6 @@ body {
 	color: #7c5cbf;
 }
 
-/* 임시저장 버튼 */
 .btn-temp-save-sm {
 	display: flex;
 	align-items: center;
@@ -190,7 +188,6 @@ body {
 	transform: translateY(-1px);
 }
 
-/* legacy */
 .btn-temp-save {
     background: var(--surface-2);
     color: var(--text-2);
@@ -208,7 +205,6 @@ body {
     color: var(--text-1);
 }
 
-/* 아이콘 전용 버튼 (혹시 남아있을 경우 대비) */
 .btn-icon-temp {
 	position: relative;
 	width: 36px;
@@ -288,7 +284,6 @@ body {
 	margin: 10px 0 20px;
 }
 
-/* Quill 에디터 스타일 */
 .ql-toolbar.ql-snow {
 	border: none !important;
 	border-bottom: 1px solid var(--border) !important;
@@ -581,7 +576,6 @@ body {
 	transform: translateY(-1px);
 }
 
-/* 모바일 footer 버튼 래퍼 */
 .footer-btns {
 	display: none;
 	align-items: center;
@@ -625,7 +619,6 @@ body {
 	margin-bottom: 8px;
 }
 
-/* ===== batonConfirm / 링크모달 ===== */
 .baton-modal-overlay {
 	position: fixed;
 	top: 0; left: 0; width: 100%; height: 100%;
@@ -742,7 +735,6 @@ body {
 	transform: translateY(-1px);
 }
 
-/* ===== 장소/임시저장 모달 ===== */
 .place-modal-overlay {
 	position: fixed;
 	top: 0; left: 0; width: 100%; height: 100%;
@@ -1234,7 +1226,6 @@ input:checked + .slider:before {
 @keyframes toastOut { to { opacity: 0; transform: translateY(-20px); } }
 
 
-/* ===== 첨부파일 목록 ===== */
 .attach-file-list {
 	list-style: none;
 	padding: 0;
@@ -1299,7 +1290,6 @@ input:checked + .slider:before {
 	transform: scale(1.2);
 }
 
-/* ===== 임시저장 모달 버튼 향상 ===== */
 .temp-list-item-btns {
 	display: flex;
 	align-items: center;
@@ -1359,7 +1349,6 @@ input:checked + .slider:before {
 	color: #c4323e;
 }
 
-/* ===== 임시저장 모달 리스트 애니메이션 ===== */
 @keyframes tempItemSlideIn {
 	0%   { opacity: 0; transform: translateY(12px); }
 	100% { opacity: 1; transform: translateY(0); }
@@ -1369,7 +1358,6 @@ input:checked + .slider:before {
 	animation: tempItemSlideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) both;
 }
 
-/* 모달 헤더 포인트 라인 */
 .place-modal-header {
 	display: flex;
 	justify-content: space-between;
@@ -1390,7 +1378,6 @@ input:checked + .slider:before {
 	border-radius: 2px;
 }
 
-/* 임시저장 아이템 카테고리 뱃지 */
 .temp-cat-badge {
 	font-size: 10px;
 	background: #f0ecff;
@@ -1402,7 +1389,6 @@ input:checked + .slider:before {
 	letter-spacing: 0.02em;
 }
 
-/* 임시저장 아이템 호버 */
 .temp-list-item {
 	display: flex;
 	justify-content: space-between;
@@ -1457,7 +1443,6 @@ input:checked + .slider:before {
 	color: #C8CDD4;
 }
 
-/* 투표 비활성화 오버레이 */
 .poll-disabled-notice {
 	display: none;
 	align-items: center;
@@ -1484,7 +1469,6 @@ input:checked + .slider:before {
 	cursor: not-allowed;
 }
 
-/* 파일 첨부 wrapper 정렬 통일 */
 #attachListWrapper {
 	border: 1px solid var(--border);
 	border-radius: 16px;

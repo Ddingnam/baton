@@ -213,7 +213,6 @@ public class CommunityApiController {
                 }
             }
 
-            // 참여 인원 수 = 이 투표에 투표한 유니크 유저 수
             long totalVotes = pollVoteRepository.countDistinctMemberByPollPollId(poll.getPollId());
 
             List<Map<String, Object>> options = poll.getOptions().stream().map(opt -> {

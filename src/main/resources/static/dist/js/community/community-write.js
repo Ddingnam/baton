@@ -2,7 +2,6 @@ let tagList = [];
 let quill = null;
 let globalUploadFiles = [];
 
-// 커스텀 confirm
 function batonConfirm(message, onConfirm, onCancel) {
 	var overlay = document.createElement('div');
 	overlay.className = 'baton-modal-overlay';
@@ -46,24 +45,19 @@ document.addEventListener('DOMContentLoaded', () => {
 	const chkPoll = document.getElementById('chkPollToggle');
 	const pollForm = document.getElementById('pollForm');
 	if (chkPoll && pollForm) {
-		// 투표에 참여자가 있으면 수정 불가 처리
 		const pollVotedLocked = document.getElementById('pollVotedLocked');
 		if (pollVotedLocked && pollVotedLocked.value === 'true') {
-			// 스위치 비활성화
 			chkPoll.disabled = true;
 			chkPoll.closest('label')?.style && (chkPoll.closest('label').style.opacity = '0.5');
 			chkPoll.closest('label')?.style && (chkPoll.closest('label').style.cursor = 'not-allowed');
 			
-			// 투표 폼 내 모든 입력 비활성화
 			pollForm.querySelectorAll('input, button, textarea').forEach(el => el.disabled = true);
 			pollForm.style.opacity = '0.55';
 			pollForm.style.pointerEvents = 'none';
 
-			// 안내 notice 표시
 			const notice = document.getElementById('pollVotedNotice');
 			if (notice) notice.style.display = 'flex';
 
-			// 스위치 클릭 시 토스트 안내
 			const switchLabel = chkPoll.closest('label') || chkPoll.parentElement;
 			const pollHeader = document.querySelector('.poll-toggle-header');
 			if (pollHeader) {
@@ -149,7 +143,6 @@ function initQuill() {
 }
 
 function linkHandler() {
-	// 기존 모달 있으면 제거
 	const existing = document.getElementById('quillLinkModal');
 	if (existing) existing.remove();
 
@@ -441,8 +434,6 @@ function saveTemp() {
 	.catch(() => showBatonToast('오류가 발생했습니다.'));
 }
 
-// ===== 임시저장 목록 모달 =====
-
 function loadTempCount() {
 	const contextPath = document.querySelector('meta[name="contextPath"]').getAttribute('content');
 	fetch(`${contextPath}/community/temp/list`)
@@ -585,7 +576,7 @@ function escapeHtml(text) {
 	if (!text) return '';
 	return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
-// 토스트 메시지
+
 function showBatonToast(message, icon) {
 	var container = document.getElementById('toastContainer');
 	if (!container) return;
@@ -596,11 +587,10 @@ function showBatonToast(message, icon) {
 	setTimeout(function() { if (toast.parentNode) toast.remove(); }, 3000);
 }
 
-// ===== 파일 첨부 =====
-var _attachNewFiles = [];        // 새로 추가할 File 객체 배열 (null = 삭제됨)
-var _attachRemovedSaves = [];    // 기존 파일 중 삭제할 saveFilename 목록
+var _attachNewFiles = [];
+var _attachRemovedSaves = [];
 var MAX_ATTACH = 5;
-var MAX_SIZE   = 10 * 1024 * 1024; // 10MB
+var MAX_SIZE   = 10 * 1024 * 1024;
 
 window.handleAttachFiles = function(fileList) {
     var files = Array.from(fileList);
@@ -630,7 +620,6 @@ function _renderNewAttachItem(file, idx) {
     var list = document.getElementById('attachFileList');
     if (!list) return;
 
-    // 리스트 컨테이너 표시
     var wrapper = document.getElementById('attachListWrapper');
     if (wrapper) wrapper.style.display = 'block';
 
@@ -687,10 +676,8 @@ function _syncAttachInput() {
     } catch(e) { console.warn('DataTransfer not supported', e); }
 }
 
-// sendOk 패치: 제출 전 removedFiles hidden input 동기화
 var _origSendOk = window.sendOk;
 window.sendOk = function() {
-    // removedFiles
     var f = document.communityForm;
     f.querySelectorAll('input[name="removedFiles"]').forEach(function(el) { el.remove(); });
     _attachRemovedSaves.forEach(function(name) {
@@ -698,7 +685,6 @@ window.sendOk = function() {
         inp.type = 'hidden'; inp.name = 'removedFiles'; inp.value = name;
         f.appendChild(inp);
     });
-    // attachFiles input 동기화
     _syncAttachInput();
     if (_origSendOk) _origSendOk();
 };

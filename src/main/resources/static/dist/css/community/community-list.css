@@ -284,7 +284,6 @@ a { text-decoration: none; color: inherit; }
     will-change: transform;
 }
 
-/* 호버 시 상단 하이라이트 — 빛 반사 느낌 */
 .cm-item-card::before {
     content: '';
     position: absolute; top: 0; left: 16px; right: 16px; height: 1px;
@@ -321,7 +320,6 @@ a { text-decoration: none; color: inherit; }
     transform: scale(1.06);
 }
 
-/* 이미지 위 그라데이션 — 배지 가독성 */
 .card-visual::after {
     content: '';
     position: absolute; inset: 0;
@@ -329,7 +327,6 @@ a { text-decoration: none; color: inherit; }
     pointer-events: none; z-index: 1;
 }
 
-/* 이미지 없는 카드 — 차분한 회색 */
 .card-visual.no-image {
     display: flex;
     align-items: center;

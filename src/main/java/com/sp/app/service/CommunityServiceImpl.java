@@ -96,7 +96,6 @@ public class CommunityServiceImpl implements CommunityService {
 
 			Community savedCommunity = communityRepository.save(community);
 
-			// 일반 첨부파일 저장
 			try {
 				List<MultipartFile> attachFiles = dto.getAttachFiles();
 				if (attachFiles != null && !attachFiles.isEmpty()) {
@@ -216,7 +215,6 @@ public class CommunityServiceImpl implements CommunityService {
 			community.setLatitude(dto.getLatitude());
 			community.setLongitude(dto.getLongitude());
 
-			// 태그 업데이트
 			community.getHashTags().clear();
 			if (dto.getTags() != null) {
 				for (String tagName : dto.getTags()) {
@@ -226,7 +224,6 @@ public class CommunityServiceImpl implements CommunityService {
 				}
 			}
 
-			// 첨부파일 업데이트 (테이블 없을 경우 대비 try-catch)
 			try {
 				List<String> removedFiles = dto.getRemoveFiles();
 				if (removedFiles != null && !removedFiles.isEmpty()) {
