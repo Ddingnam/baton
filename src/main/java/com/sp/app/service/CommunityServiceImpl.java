@@ -334,24 +334,27 @@ public class CommunityServiceImpl implements CommunityService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void votePoll(long pollId, long memberIdx, List<Long> optionIds) throws Exception {
-		CommunityPoll poll = communityPollRepository.findById(pollId)
-				.orElseThrow(() -> new RuntimeException("Poll not found"));
+	    CommunityPoll poll = communityPollRepository.findById(pollId)
+	            .orElseThrow(() -> new RuntimeException("Poll not found"));
 
-		if (!poll.isMultipleChoice() && optionIds.size() > 1) {
-			throw new RuntimeException("Multiple choice not allowed");
-		}
+	    if (!poll.isMultipleChoice() && optionIds.size() > 1) {
+	        throw new RuntimeException("Multiple choice not allowed");
+	    }
 
-		List<PollVote> votes = new ArrayList<>();
-		for (Long optionId : optionIds) {
-			PollOption option = pollOptionRepository.findById(optionId)
-					.orElseThrow(() -> new RuntimeException("Option not found"));
-			votes.add(PollVote.builder()
-					.poll(poll)
-					.memberId(memberIdx)
-					.option(option)
-					.build());
-		}
-		pollVoteRepository.saveAll(votes);
+	    pollVoteRepository.deleteByPollPollIdAndMemberId(pollId, memberIdx);
+	    pollVoteRepository.flush();
+
+	    List<PollVote> votes = new ArrayList<>();
+	    for (Long optionId : optionIds) {
+	        PollOption option = pollOptionRepository.findById(optionId)
+	                .orElseThrow(() -> new RuntimeException("Option not found"));
+	        votes.add(PollVote.builder()
+	                .poll(poll)
+	                .memberId(memberIdx)
+	                .option(option)
+	                .build());
+	    }
+	    pollVoteRepository.saveAll(votes);
 	}
 
 	@Override

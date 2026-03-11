@@ -146,7 +146,9 @@ function initPoll() {
             if (isLoggedIn) {
                 submitBtn.style.display = 'inline-block';
                 submitBtn.textContent   = data.voted ? '투표 변경' : '투표하기';
-                submitBtn.onclick       = () => submitVote(realPollId);
+				submitBtn.onclick = null;
+				submitBtn.onclick = () => submitVote(realPollId);
+				
             } else {
                 submitBtn.style.display = 'none';
                 if (!data.voted) totalDisplay.innerText = total + '명 참여 (로그인 후 투표 가능)';

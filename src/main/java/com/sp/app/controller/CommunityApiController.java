@@ -251,7 +251,7 @@ public class CommunityApiController {
                 result.put("message", "로그인이 필요합니다.");
                 return ResponseEntity.ok(result);
             }
-            communityService.cancelVote(pollId, info.getUserIdx());
+            
             communityService.votePoll(pollId, info.getUserIdx(), optionIds);
             result.put("success", true);
             return ResponseEntity.ok(result);
