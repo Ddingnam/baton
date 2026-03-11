@@ -315,6 +315,11 @@ public class CommunityServiceImpl implements CommunityService {
 					storageService.deleteFile(uploadPath, img.getSaveFilename());
 				}
 			}
+			if (community.getAttachFiles() != null) {
+				for (com.sp.app.domain.entity.CommunityAttachFile af : community.getAttachFiles()) {
+					storageService.deleteFile(uploadPath, af.getSaveFilename());
+				}
+			}
 			communityRepository.delete(community);
 		} catch (Exception e) {
 			log.error("deleteCommunity error", e);
@@ -390,6 +395,10 @@ public class CommunityServiceImpl implements CommunityService {
 	public void votePoll(long pollId, long memberIdx, List<Long> optionIds) throws Exception {
 		CommunityPoll poll = communityPollRepository.findById(pollId)
 				.orElseThrow(() -> new RuntimeException("Poll not found"));
+
+		if (poll.getEndDate() != null && java.time.LocalDateTime.now().isAfter(poll.getEndDate())) {
+			throw new RuntimeException("투표가 마감되었습니다.");
+		}
 
 		if (!poll.isMultipleChoice() && optionIds.size() > 1) {
 			throw new RuntimeException("Multiple choice not allowed");
@@ -508,7 +517,8 @@ public class CommunityServiceImpl implements CommunityService {
 
 	@Override
 	public long getPollTotalVotes(long communityId) {
-		// TODO Auto-generated method stub
-		return 0;
+		CommunityPoll poll = communityPollRepository.findByCommunityId(communityId);
+		if (poll == null) return 0;
+		return pollVoteRepository.countDistinctMemberByPollPollId(poll.getPollId());
 	}
 }

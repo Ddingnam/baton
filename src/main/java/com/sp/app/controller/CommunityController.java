@@ -1,7 +1,6 @@
 package com.sp.app.controller;
 
 import java.util.List;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,10 +61,6 @@ public class CommunityController {
             Model model) throws Exception {
 
         try {
-            if (req.getMethod().equalsIgnoreCase("GET")) {
-                kwd = URLDecoder.decode(kwd, "UTF-8");
-            }
-
             int size = 9;
             Sort sortOrder = "hit".equals(sort) ? Sort.by("hitCount").descending()
                            : "like".equals(sort) ? Sort.by("likeCount").descending()
@@ -150,16 +145,37 @@ public class CommunityController {
             @RequestParam(name = "schType", defaultValue = "all") String schType,
             @RequestParam(name = "kwd", defaultValue = "") String kwd,
             @SessionAttribute("member") SessionInfo info,
+            HttpServletRequest req,
+            jakarta.servlet.http.HttpServletResponse res,
             Model model) throws Exception {
 
         String query = "page=" + page;
         try {
-            kwd = URLDecoder.decode(kwd, "UTF-8");
             if (!kwd.isBlank()) {
                 query += "&schType=" + schType + "&kwd=" + URLEncoder.encode(kwd, "UTF-8");
             }
 
-            service.updateHitCount(id);
+            String cookieName = "community_viewed";
+            String cookieValue = "";
+            jakarta.servlet.http.Cookie[] cookies = req.getCookies();
+            if (cookies != null) {
+                for (jakarta.servlet.http.Cookie c : cookies) {
+                    if (cookieName.equals(c.getName())) {
+                        cookieValue = c.getValue();
+                        break;
+                    }
+                }
+            }
+            String marker = "_" + id + "_";
+            if (!cookieValue.contains(marker)) {
+                service.updateHitCount(id);
+                cookieValue += marker;
+                jakarta.servlet.http.Cookie newCookie = new jakarta.servlet.http.Cookie(cookieName, cookieValue);
+                newCookie.setMaxAge(60 * 60 * 24);
+                newCookie.setPath("/");
+                newCookie.setHttpOnly(true);
+                res.addCookie(newCookie);
+            }
             CommunityDto dto = service.getCommunity(id);
 
             boolean isWriter = dto.getMemberIdx().equals(info.getUserIdx());
