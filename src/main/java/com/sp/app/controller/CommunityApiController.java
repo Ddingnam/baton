@@ -251,7 +251,6 @@ public class CommunityApiController {
                 result.put("message", "로그인이 필요합니다.");
                 return ResponseEntity.ok(result);
             }
-            // 기존 투표 취소 후 새로 저장 (재투표 허용)
             communityService.cancelVote(pollId, info.getUserIdx());
             communityService.votePoll(pollId, info.getUserIdx(), optionIds);
             result.put("success", true);

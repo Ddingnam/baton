@@ -272,7 +272,6 @@ public class CommunityController {
         }
     }
 
-    // 임시저장 목록 조회
     @GetMapping("temp/list")
     public ResponseEntity<?> tempList(@SessionAttribute("member") SessionInfo info) {
         try {
@@ -300,7 +299,6 @@ public class CommunityController {
         return ResponseEntity.ok(result);
     }
 
-    // 임시저장 글 불러오기 (글쓰기 페이지로 이동)
     @GetMapping("temp/load")
     public String tempLoad(@RequestParam("id") long id,
             @SessionAttribute("member") SessionInfo info,

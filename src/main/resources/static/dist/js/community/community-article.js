@@ -1,4 +1,3 @@
-// 커스텀 confirm
 function batonConfirm(message, onConfirm, onCancel) {
 	const overlay = document.createElement('div');
 	overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:999999;display:flex;align-items:center;justify-content:center;';
@@ -54,7 +53,6 @@ function initMap() {
         map.setDraggable(false);
         map.setZoomable(true);
 
-        // 클릭 시 카카오맵으로 이동
         mapContainer.style.cursor = 'pointer';
         kakao.maps.event.addListener(map, 'click', () => {
             const placeName = mapContainer.closest('.map-card').querySelector('strong')?.innerText || '';
@@ -137,7 +135,6 @@ function initPoll() {
                         <div class="poll-bar-fill" style="width:${pct}%"></div>
                     </div>`;
 
-                // 아직 투표 안 했거나, 재투표 허용 (이미 투표해도 선택 변경 가능)
                 const isLoggedIn = parseInt(currentMemberIdx, 10) > 0;
                 if (isLoggedIn) {
                     div.addEventListener('click', () => selectPollOption(div, isMultiple));
@@ -147,7 +144,6 @@ function initPoll() {
 
             const isLoggedIn = parseInt(currentMemberIdx, 10) > 0;
             if (isLoggedIn) {
-                // 이미 투표한 경우 선택 항목 표시 후 버튼 텍스트 변경
                 submitBtn.style.display = 'inline-block';
                 submitBtn.textContent   = data.voted ? '투표 변경' : '투표하기';
                 submitBtn.onclick       = () => submitVote(realPollId);
@@ -194,7 +190,6 @@ function submitVote(realPollId) {
         return;
     }
     const optionIds = Array.from(selected).map(el => el.dataset.optionId);
-    // 쿼리 스트링으로 optionIds 배열 전송 (Spring @RequestParam List<Long> 수신)
     const params = new URLSearchParams();
     params.append('pollId', realPollId);
     optionIds.forEach(id => params.append('optionIds', id));
@@ -265,13 +260,11 @@ document.addEventListener('click', (e) => {
 function checkAndEdit(id, page) {
     const pollSection = document.getElementById('pollSection');
 
-    // 투표가 없는 글이면 바로 수정 페이지로
     if (!pollSection) {
         location.href = `${contextPath}/community/update?id=${id}&page=${page}`;
         return;
     }
 
-    // 투표가 있는 글이면 참여 인원 확인
     fetch(`${contextPath}/api/community/poll?id=${id}`)
         .then(resp => resp.json())
         .then(data => {
@@ -282,7 +275,6 @@ function checkAndEdit(id, page) {
             }
         })
         .catch(() => {
-            // 오류 시 일단 이동 허용
             location.href = `${contextPath}/community/update?id=${id}&page=${page}`;
         });
 }
