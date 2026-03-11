@@ -1,91 +1,508 @@
+:root {
+  --primary: #002C5F;
+  --primary-mid: #1a4a8a;
+  --primary-light: #EEF3FA;
+  --primary-border: #C5D5EC;
+  --accent: #1565C0;
+  --bg-color: #F7F9FC;
+  --surface: #ffffff;
+  --text-main: #111827;
+  --text-sub: #4A5568;
+  --text-light: #8B95A1;
+  --border-color: #E2E8F0;
+  --border-light: #F0F4F8;
+  --shadow: 0 2px 16px rgba(0, 44, 95, 0.07);
+  --site-header-height: 60px;
+}
+
 /* ===================== */
-/* ALBAMON UI UPGRADE */
+/* ALBAMON UI UPGRADE    */
 /* ===================== */
 
-.summary-section{
-  padding:28px 24px 20px;
-  background:#fff;
+:root {
+  --site-header-height: 60px;
 }
 
-.pay-highlight-container{
-  margin-bottom:26px;
-  padding-bottom:20px;
-  border-bottom:1px solid var(--border-light);
+/* ── 레이아웃 ── */
+.albamon-layout {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: var(--site-header-height) 0 100px;
+  background: var(--surface);
+  min-height: 100vh;
 }
 
-.pay-top{
-  display:flex;
-  align-items:center;
-  gap:14px;
+/* ── 공고 헤더 ── */
+.detail-recruit-header {
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.pay-badge{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  border:1px solid #FF5A5F;
-  color:#FF5A5F;
-  font-weight:700;
-  font-size:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+.recruit-title {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.4;
+  color: var(--text-main);
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.pay-amount{
-  font-size:34px;
-  font-weight:800;
-  letter-spacing:-0.5px;
+.status-text {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.status-text.open  { background: var(--primary-light); color: var(--primary); }
+.status-text.closed{ background: #FDECEA; color: #C62828; }
+
+.recruit-company {
+  font-size: 14px;
+  color: var(--text-sub);
+  margin-bottom: 12px;
 }
 
-.pay-info-tags{
-  display:flex;
-  gap:6px;
-  margin-top:10px;
+.recruit-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
-.info-tag{
-  font-size:12px;
-  padding:4px 9px;
-  border-radius:6px;
+.chip {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--border-light);
+  color: var(--text-sub);
 }
 
-.info-tag.light{
-  background:#F1F3F5;
-  color:#868E96;
+/* ── 탭 메뉴 ── */
+.tabs-header-wrap {
+  position: sticky;
+  top: var(--site-header-height);
+  z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-color);
 }
 
-.info-tag.blue{
-  background:#E7F2FF;
-  color:#1565C0;
+.tabs-header-container {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
 }
 
-.min-wage-info{
-  margin-top:10px;
-  font-size:13px;
-  color:#9AA1A9;
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 14px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-light);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all .2s;
 }
 
-/* summary card effect */
-
-.summary-list{
-  margin-top:18px;
-  border-radius:14px;
-  box-shadow:0 2px 10px rgba(0,0,0,0.04);
+.tab-item.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 700;
 }
 
-.summary-list li{
-  transition:all .2s;
+/* ── scroll sections ── */
+.scroll-section {
+  padding: 24px 20px;
 }
 
-.summary-list li:hover{
-  background:#FAFBFD;
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-/* description */
+.divider {
+  height: 8px;
+  background: var(--bg-color);
+}
 
-.article-text{
-  font-size:16px;
-  line-height:1.85;
-  color:#222;
+/* ── 급여 하이라이트 ── */
+.summary-section {
+  padding: 28px 20px 20px;
+  background: var(--surface);
+}
+
+.pay-highlight-container {
+  margin-bottom: 26px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.pay-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pay-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pay-amount {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text-main);
+}
+
+.pay-info-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.info-tag {
+  font-size: 12px;
+  padding: 4px 9px;
+  border-radius: 6px;
+}
+.info-tag.light { background: var(--border-light); color: var(--text-light); }
+.info-tag.blue  { background: var(--primary-light); color: var(--primary); }
+
+.min-wage-info {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-calc-mini {
+  font-size: 12px;
+  padding: 3px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text-sub);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* ── 근무조건 리스트 ── */
+.summary-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.summary-list li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-light);
+  transition: background .2s;
+}
+
+.summary-list li:last-child { border-bottom: none; }
+.summary-list li:hover { background: var(--primary-light); }
+
+.summary-list li > i {
+  font-size: 20px;
+  color: var(--text-light);
+  flex-shrink: 0;
+}
+
+.summary-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.summary-text .label {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.summary-text .value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* ── 갤러리 ── */
+.gallery-section-inner {
+  margin-bottom: 20px;
+}
+
+.main-image-wrap img {
+  width: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.image-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border-color);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background .2s;
+}
+
+.indicator-dot.active { background: var(--primary); }
+
+/* ── 본문 ── */
+.article-text {
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--text-sub);
+  margin-bottom: 20px;
+}
+
+.article-stats {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text-light);
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.article-stats span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── 안전 경고 ── */
+.safety-warning {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: var(--primary-light);
+  border-radius: 12px;
+  align-items: flex-start;
+}
+
+.warning-icon { font-size: 22px; color: var(--primary); flex-shrink: 0; }
+.warning-text strong { font-size: 14px; color: var(--text-main); display: block; margin-bottom: 4px; }
+.warning-text p { font-size: 13px; color: var(--text-sub); line-height: 1.6; margin: 0; }
+
+/* ── 공고 관리 ── */
+.owner-manage-section {
+  padding: 20px;
+  background: var(--bg-color);
+  border-top: 1px solid var(--border-color);
+}
+
+.manage-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.btn-manage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 12px;
+  color: var(--text-sub);
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.btn-manage i { font-size: 18px; }
+.btn-manage:hover { background: var(--bg-color); border-color: var(--primary-border); }
+.btn-manage.danger { color: #C62828; border-color: #C5D5EC; background: var(--primary-light); }
+.btn-manage.danger:hover { background: #C5D5EC; }
+
+/* ── 하단 고정 바 ── */
+.bottom-fixed-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: var(--surface);
+  border-top: 1px solid var(--border-color);
+  padding: 10px 16px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.bottom-inner {
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bottom-left { flex-shrink: 0; }
+.bottom-right { flex: 1; display: flex; gap: 8px; }
+
+.btn-wish {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-color);
+  background: var(--surface);
+  font-size: 20px;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.btn-wish.active { border-color: var(--primary); color: var(--primary); }
+
+.btn-action {
+  flex: 1;
+  height: 46px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all .2s;
+}
+
+.btn-call  { background: var(--border-light); color: var(--text-sub); }
+.btn-apply { background: var(--primary); color: #fff; }
+.btn-apply.disabled { background: var(--border-color); color: var(--text-light); cursor: not-allowed; }
+.btn-apply.full-width { flex: 1; }
+.btn-call:hover  { background: var(--border-color); }
+.btn-apply:not(.disabled):hover { background: var(--primary-mid); }
+
+.chip-dday {
+  font-size: 11px;
+  background: rgba(255,255,255,0.25);
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+/* ── 모달 ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 300;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal-content {
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 680px;
+  padding: 20px;
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.modal-header h3 { font-size: 16px; font-weight: 700; margin: 0; }
+
+.close-modal {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--text-light);
+  cursor: pointer;
+}
+
+.status-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.status-opt {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border-color);
+  background: var(--surface);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-sub);
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.status-opt.active,
+.status-opt:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+
+/* ── 토스트 ── */
+.toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all .3s;
+  white-space: nowrap;
+  z-index: 400;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
