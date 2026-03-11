@@ -61,9 +61,7 @@ public class JobPostingController {
     public String writeSubmit(JobPosting dto, 
             @AuthenticationPrincipal CustomUserDetails userDetails) throws Exception {
         try {
-        	// 확인용 하늘이꺼
-        	System.out.println("🚨🚨 화면에서 넘어온 마감일: " + dto.getDeadline() + " 🚨🚨");
-        	
+
             if (userDetails != null) {
                 dto.setUserIdx(userDetails.getUserIdx());
             }
@@ -102,26 +100,42 @@ public class JobPostingController {
 
     @GetMapping("update")
     public String updateForm(
-            @RequestParam(value = "postingIdx", required = false) Long postingIdx, 
-            @RequestParam(value = "albaIdx", required = false) Long albaIdx,
+            @RequestParam(value = "postingIdx") long postingIdx,
+            @RequestParam(value = "page") String page,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             Model model) {
-        
-        long id = (postingIdx != null) ? postingIdx : (albaIdx != null ? albaIdx : 0L);
-        
-        if(id == 0) return "redirect:/alba/list";
 
-        JobPosting dto = postingService.findById(id);
-        if(dto == null) return "redirect:/alba/list";
-        
-        model.addAttribute("dto", dto);
-        model.addAttribute("mode", "update");
-        return "alba/write";
+        try {
+            JobPosting dto = postingService.findById(postingIdx);
+
+            // 1. 데이터가 존재하지 않는 경우
+            if (dto == null) {
+                return "redirect:/alba/list?page=" + page;
+            }
+
+            // 2. 작성자 본인 확인 (long 타입이므로 == 사용)
+            // userDetails가 null이거나 작성자 userIdx와 로그인한 유저의 userIdx가 다를 때
+            if (userDetails == null || dto.getUserIdx() != userDetails.getUserIdx()) {
+                return "redirect:/alba/list?page=" + page;
+            }
+
+            model.addAttribute("dto", dto);
+            model.addAttribute("page", page);
+            model.addAttribute("mode", "update");
+
+            return "alba/write";
+            
+        } catch (Exception e) {
+            log.error("updateForm 에러 발생: ", e);
+            return "redirect:/alba/list?page=" + page;
+        }
     }
 
     @PostMapping("update")
-    public String updateSubmit(JobPosting dto) throws Exception {
+    public String updateSubmit(JobPosting dto, 
+                               @RequestParam(value = "page") String page) throws Exception {
         postingService.updatePosting(dto);
-        return "redirect:/alba/article/" + dto.getPostingIdx();
+        return "redirect:/alba/article/" + dto.getPostingIdx() + "?page=" + page;
     }
 
     @GetMapping("delete")

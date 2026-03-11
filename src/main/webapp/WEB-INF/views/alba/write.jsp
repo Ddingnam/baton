@@ -71,7 +71,6 @@
 
     </aside>
 
-    <%-- ===== 메인 폼 ===== --%>
     <div class="alba-write-content">
 
       <div class="content-header">
@@ -79,12 +78,20 @@
           <i class="ri-arrow-left-s-line"></i>
         </a>
         <div class="header-text">
-          <div class="page-title">알바 공고 등록</div>
+          <div class="page-title">알바 공고 ${mode=='update' ? '수정' : '등록'}</div>
           <div class="page-subtitle">정확한 정보를 입력하면 더 빠르게 매칭돼요</div>
         </div>
       </div>
 
-      <form id="writeForm" action="${pageContext.request.contextPath}/alba/write" method="post" enctype="multipart/form-data">
+      <form id="writeForm"
+            action="${pageContext.request.contextPath}/alba/${mode=='update' ? 'update' : 'write'}"
+            method="post"
+            enctype="multipart/form-data">
+
+        <c:if test="${mode=='update'}">
+          <input type="hidden" name="postingIdx" value="${dto.postingIdx}">
+          <input type="hidden" name="page" value="${page}">
+        </c:if>
 
         <div class="form-card">
           <div class="form-card-header">
@@ -97,6 +104,7 @@
               <label>공고 제목 <span class="req">*</span></label>
               <input type="text" id="title" name="title" maxlength="40"
                      placeholder="예) 주말 서빙 알바 구합니다"
+                     value="${dto.title}"
                      oninput="updateCharCount('title','titleCount',40); updatePreview();">
               <div class="char-count"><span id="titleCount">0</span> / 40</div>
             </div>
@@ -105,6 +113,7 @@
               <label>업체명</label>
               <input type="text" id="employer" name="employer" maxlength="30"
                      placeholder="업체명을 입력해주세요"
+                     value="${dto.employer}"
                      oninput="updatePreview();">
             </div>
 
@@ -112,18 +121,20 @@
               <label>카테고리</label>
               <div class="chip-group">
                 <select name="category" style="max-width:220px;">
-                  <option value="서빙">서빙</option>
-                  <option value="주방보조">주방보조</option>
-                  <option value="매장관리">매장관리</option>
-                  <option value="음료제조">음료제조</option>
-                  <option value="기타">기타</option>
+                  <option value="서빙" ${dto.category == '서빙' ? 'selected' : ''}>서빙</option>
+                  <option value="주방보조" ${dto.category == '주방보조' ? 'selected' : ''}>주방보조</option>
+                  <option value="매장관리" ${dto.category == '매장관리' ? 'selected' : ''}>매장관리</option>
+                  <option value="음료제조" ${dto.category == '음료제조' ? 'selected' : ''}>음료제조</option>
+                  <option value="기타" ${dto.category == '기타' ? 'selected' : ''}>기타</option>
                 </select>
               </div>
             </div>
 
             <div class="form-group">
               <label>모집 마감일 <span class="req">*</span></label>
-              <input type="date" id="deadline" name="deadline" onchange="updatePreview();">
+              <input type="date" id="deadline" name="deadline"
+                     value="${dto.deadline}"
+                     onchange="updatePreview();">
               <div class="info-box" style="margin-top: 8px;">
                 💡 마감일이 지나면 공고가 자동으로 마감 처리됩니다.
               </div>
@@ -141,12 +152,12 @@
 
             <div class="form-group">
               <label>급여 유형 <span class="req">*</span></label>
-              <input type="hidden" id="payTypeHidden" name="payType" value="시급">
+              <input type="hidden" id="payTypeHidden" name="payType" value="${empty dto.payType ? '시급' : dto.payType}">
               <div class="chip-group" id="payTypeGroup">
-                <button class="chip active" type="button" data-val="시급" data-key="hour"  onclick="selectPayType(this)">시급</button>
-                <button class="chip"        type="button" data-val="일급" data-key="day"   onclick="selectPayType(this)">일급</button>
-                <button class="chip"        type="button" data-val="월급" data-key="month" onclick="selectPayType(this)">월급</button>
-                <button class="chip"        type="button" data-val="건당" data-key="case"  onclick="selectPayType(this)">건당</button>
+                <button class="chip ${dto.payType == '시급' || empty dto.payType ? 'active' : ''}" type="button" data-val="시급" data-key="hour" onclick="selectPayType(this)">시급</button>
+                <button class="chip ${dto.payType == '일급' ? 'active' : ''}" type="button" data-val="일급" data-key="day" onclick="selectPayType(this)">일급</button>
+                <button class="chip ${dto.payType == '월급' ? 'active' : ''}" type="button" data-val="월급" data-key="month" onclick="selectPayType(this)">월급</button>
+                <button class="chip ${dto.payType == '건당' ? 'active' : ''}" type="button" data-val="건당" data-key="case" onclick="selectPayType(this)">건당</button>
               </div>
             </div>
 
@@ -154,9 +165,10 @@
               <label>급여 금액 <span class="req">*</span></label>
               <input type="number" id="pay" name="pay" min="0"
                      placeholder="숫자만 입력"
+                     value="${dto.pay}"
                      oninput="onPayInput();">
               <div class="warn-box" id="payWarn">
-                ⚠️ 입력하신 금액이 최저시급(${10300}원)보다 낮아요.
+                ⚠️ 입력하신 금액이 최저시급(10,300원)보다 낮아요.
               </div>
               <div class="info-box">
                 💡 2026년 최저시급은 10,300원입니다.
@@ -175,16 +187,16 @@
 
             <div class="form-group">
               <label>근무 기간</label>
-              <input type="hidden" id="workPeriodHidden" name="workPeriod" value="LESS_THAN_A_MONTH">
+              <input type="hidden" id="workPeriodHidden" name="workPeriod" value="${empty dto.workPeriod ? 'LESS_THAN_A_MONTH' : dto.workPeriod}">
               <div class="chip-group" id="workTypeGroup">
-                <button class="chip active" type="button" data-val="LESS_THAN_A_MONTH" onclick="selectWorkType(this)">단기 (1개월 미만)</button>
-                <button class="chip"        type="button" data-val="MORE_THAN_A_MONTH" onclick="selectWorkType(this)">장기 (1개월 이상)</button>
+                <button class="chip ${dto.workPeriod == 'LESS_THAN_A_MONTH' || empty dto.workPeriod ? 'active' : ''}" type="button" data-val="LESS_THAN_A_MONTH" onclick="selectWorkType(this)">단기 (1개월 미만)</button>
+                <button class="chip ${dto.workPeriod == 'MORE_THAN_A_MONTH' ? 'active' : ''}" type="button" data-val="MORE_THAN_A_MONTH" onclick="selectWorkType(this)">장기 (1개월 이상)</button>
               </div>
             </div>
 
             <div class="form-group">
               <label>근무 요일 <span class="req">*</span></label>
-              <input type="hidden" id="workDaysHidden" name="workDays">
+              <input type="hidden" id="workDaysHidden" name="workDays" value="${dto.workDays}">
               <div class="day-chips">
                 <button class="day-chip" type="button" data-val="MON" onclick="toggleDay(this)">월</button>
                 <button class="day-chip" type="button" data-val="TUE" onclick="toggleDay(this)">화</button>
@@ -204,9 +216,9 @@
             <div class="form-group">
               <label>근무 시간</label>
               <div class="time-row">
-                <input type="time" id="startTime" name="startTime" oninput="updatePreview();">
+                <input type="time" id="startTime" name="startTime" value="${dto.startTime}" oninput="updatePreview();">
                 <span class="time-sep">~</span>
-                <input type="time" id="endTime" name="endTime" oninput="updatePreview();">
+                <input type="time" id="endTime" name="endTime" value="${dto.endTime}" oninput="updatePreview();">
               </div>
               <div class="time-check">
                 <input type="checkbox" id="timeNegotiable" name="timeNegotiable" onchange="toggleTimeInput(this);">
@@ -229,6 +241,7 @@
               <div class="input-with-btn">
                 <input type="text" id="location" name="location" readonly
                        placeholder="주소 검색 버튼을 눌러주세요"
+                       value="${dto.location}"
                        oninput="updatePreview();">
                 <button type="button" class="addr-btn" onclick="searchAddress()">
                   <i class="ri-map-pin-2-line"></i> 검색
@@ -239,7 +252,8 @@
             <div class="form-group">
               <label>상세 주소</label>
               <input type="text" id="locationDetail" name="locationDetail"
-                     placeholder="상세 주소 (동, 호수 등)">
+                     placeholder="상세 주소 (동, 호수 등)"
+                     value="${dto.locationDetail}">
             </div>
 
           </div>
@@ -254,9 +268,10 @@
 
             <div class="form-group">
               <label>공고 내용</label>
-              <textarea id="content" name="content" maxlength="2000"
-                        placeholder="업무 내용, 지원 자격, 혜택 등을 자유롭게 작성해주세요."
-                        oninput="updateCharCount('content','contentCount',2000);"></textarea>
+              <textarea id="content" name="description" maxlength="2000"
+		          placeholder="업무 내용, 지원 자격, 혜택 등을 자유롭게 작성해주세요."
+		          oninput="updateCharCount('content','contentCount',2000);">${dto.description}
+		      </textarea>
               <div class="char-count"><span id="contentCount">0</span> / 2000</div>
             </div>
 
@@ -284,7 +299,7 @@
     <i class="ri-arrow-left-s-line"></i>&nbsp;취소
   </a>
   <button type="button" class="btn-primary" onclick="submitForm()">
-    <i class="ri-check-line"></i>&nbsp;공고 등록하기
+    <i class="ri-check-line"></i>&nbsp;${mode=='update' ? '공고 수정하기' : '공고 등록하기'}
   </button>
 </div>
 
@@ -292,5 +307,29 @@
 
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/alba/alba-write.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof updatePreview === 'function') updatePreview();
+
+    const titleEl = document.getElementById('title');
+    const contentEl = document.getElementById('content');
+    if (titleEl) updateCharCount('title','titleCount',40);
+    if (contentEl) updateCharCount('content','contentCount',2000);
+
+    const initialDays = "${dto.workDays}"; 
+    if (initialDays) {
+        const savedDays = initialDays.split(',');
+        savedDays.forEach(day => {
+            const trimmedDay = day.trim();
+            const btn = document.querySelector(`.day-chip[data-val="${trimmedDay}"]`);
+            if (btn) btn.classList.add('active');
+        });
+    }
+    
+    if (typeof updatePreview === 'function') updatePreview();
+});
+</script>
+
 </body>
 </html>

@@ -203,4 +203,18 @@ function submitForm() {
   document.getElementById('writeForm').submit();
 }
 
-document.addEventListener('DOMContentLoaded', () => { updatePreview(); });
+document.addEventListener('DOMContentLoaded', () => {
+    const workDaysHidden = document.getElementById('workDaysHidden');
+    if (workDaysHidden && workDaysHidden.value && workDaysHidden.value.trim().length > 0) {
+        const savedDays = workDaysHidden.value.split(',');
+        savedDays.forEach(day => {
+            const trimmedDay = day.trim();
+            if (trimmedDay) {
+                const btn = document.querySelector(`.day-chip[data-val="${trimmedDay}"]`);
+                if (btn) btn.classList.add('active');
+            }
+        });
+    }
+    
+    if (typeof updatePreview === 'function') updatePreview();
+});
