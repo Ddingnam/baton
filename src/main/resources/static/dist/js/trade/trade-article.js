@@ -96,6 +96,38 @@ const Lightbox = (function () {
     return { init, open, close, prev, next };
 })();
 
+const TimeAgoModule = (function () {
+    function format(dateString) {
+        if (!dateString) return "";
+
+		let cleanDate = dateString.trim().split('.')[0].replace(/-/g, '/');
+		const date = new Date(cleanDate);
+		const now = new Date();
+		const diff = Math.floor((now - date) / 1000);
+
+        if (isNaN(date.getTime())) return dateString;
+        if (diff < 60) return "방금 전";
+        if (diff < 3600) return Math.floor(diff / 60) + "분 전";
+        if (diff < 86400) return Math.floor(diff / 3600) + "시간 전";
+        if (diff < 2592000) return Math.floor(diff / 86400) + "일 전";
+        
+        return dateString.split(' ')[0];
+    }
+
+	function init() {
+	        const elements = document.querySelectorAll('.time-ago');
+	        elements.forEach(el => {
+	            const rawDate = el.getAttribute('data-time') || el.innerText;
+	            if (rawDate) {
+	                el.setAttribute('data-time', rawDate); 
+	                el.innerText = format(rawDate);
+	            }
+	        });
+	    }
+
+    return { init };
+})();
+
 const WishModule = {
     isProcessing: false,
     isLiked: false,
@@ -293,10 +325,10 @@ const MapModule = (function () {
         map.setDraggable(true);
         map.setZoomable(true);
 		
-		const zoomControl = new kakao.maps.ControlPosition.RIGHT;
+		const zoomControl = kakao.maps.ControlPosition.RIGHT;
 		map.addControl(new kakao.maps.ZoomControl(), zoomControl);
 		        
-		const mapTypeControl = new kakao.maps.ControlPosition.TOPRIGHT;
+		const mapTypeControl = kakao.maps.ControlPosition.TOPRIGHT;
 		map.addControl(new kakao.maps.MapTypeControl(), mapTypeControl);
     }
 
@@ -313,6 +345,7 @@ window.addEventListener('DOMContentLoaded', function () {
     Gallery.init();
     Lightbox.init();
 	MapModule.init();
+	TimeAgoModule.init();
 
     const articleEl   = document.getElementById('articleData');
     if (articleEl) {

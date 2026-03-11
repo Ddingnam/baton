@@ -7,29 +7,38 @@ function tlNavigate(params) {
     location.href = '/trade/list?' + params.toString();
 }
 
-document.getElementById('tlSearchInput').addEventListener('keydown', function (e) {
-    if (e.key !== 'Enter') return;
-    const p = tlGetParams();
-    const kw = this.value.trim();
-    if (kw) p.set('keyword', kw);
-    else p.delete('keyword');
-    tlNavigate(p);
-});
+function formatTimeAgo(dateString) {
+    if (!dateString) return "";
+    
+    let cleanDate = dateString.trim().split('.')[0].replace(/-/g, '/');
+    const date = new Date(cleanDate);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
 
-function tlSetCategory(idx) {
-    const p = tlGetParams();
-    if (idx) p.set('categoryIdx', idx);
-    else p.delete('categoryIdx');
-    tlNavigate(p);
+    if (isNaN(date.getTime())) return dateString;
+    
+    if (diff < 60) return "방금 전";
+    if (diff < 3600) return Math.floor(diff / 60) + "분 전";
+    if (diff < 86400) return Math.floor(diff / 3600) + "시간 전";
+    if (diff < 2592000) return Math.floor(diff / 86400) + "일 전";
+    
+    return dateString.split(' ')[0];
 }
 
-function tlChangeSort(val) {
-    const p = tlGetParams();
-    p.set('sort', val);
-    tlNavigate(p);
+function initTimeAgo() {
+    const elements = document.querySelectorAll('.time-ago');
+    elements.forEach(function(el) {
+        const rawDate = el.getAttribute('data-time') || el.innerText;
+        
+		if (rawDate && !el.getAttribute('data-formatted')) {
+            el.setAttribute('data-time', rawDate); 
+            el.innerText = formatTimeAgo(rawDate);
+            el.setAttribute('data-formatted', 'true');
+        }
+    });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+function initSortDropdown(){
     const sortDropdown = document.getElementById('sortDropdown');
     if (!sortDropdown) return;
 
@@ -52,7 +61,69 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function() {
         sortDropdown.classList.remove('active');
     });
-});
+}
+
+function tlRenderChips() {
+    const p = tlGetParams();
+    const container = document.getElementById('tlActiveFilters');
+    if (!container) return;
+
+    const catNames = {
+        '1': '전자기기',
+        '2': '남성의류',
+        '3': '여성의류',
+        '4': '뷰티',
+        '5': '스타굿즈',
+        '6': '가구/인테리어',
+        '7': '도서',
+        '8': '게임',
+		'9': '스포츠/레저',
+		'10': '가전제품',
+		'11': '취미/수집',
+		'12': '반려동물',
+		'13': '식품',
+		'14': '유아동',
+		'15': '티켓/상품권'
+    };
+
+    const chips = [];
+    if (p.get('keyword'))
+        chips.push({ label: '검색: ' + p.get('keyword'), key: 'keyword' });
+    if (p.get('categoryIdx'))
+        chips.push({ label: catNames[p.get('categoryIdx')] || '카테고리', key: 'categoryIdx' });
+    if (p.get('priceMin') || p.get('priceMax'))
+        chips.push({ label: (p.get('priceMin') || '0') + '원 ~ ' + (p.get('priceMax') || '∞') + '원', keys: ['priceMin', 'priceMax'] });
+    if (p.get('available') === 'true')
+        chips.push({ label: '거래 가능', key: 'available' });
+
+    chips.forEach(function (chip) {
+        const el = document.createElement('span');
+        el.className = 'tl-filter-chip';
+        el.innerHTML = chip.label
+            + ' <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">'
+            + '<path d="M18 6 6 18M6 6l12 12"/></svg>';
+        el.addEventListener('click', function () {
+            const pp = tlGetParams();
+            if (chip.keys) chip.keys.forEach(function (k) { pp.delete(k); });
+            else pp.delete(chip.key);
+            tlNavigate(pp);
+        });
+        container.appendChild(el);
+    });
+};
+
+function tlSetCategory(idx) {
+    const p = tlGetParams();
+    if (idx) p.set('categoryIdx', idx);
+    else p.delete('categoryIdx');
+    tlNavigate(p);
+}
+
+function tlChangeSort(val) {
+    const p = tlGetParams();
+    p.set('sort', val);
+    tlNavigate(p);
+}
 
 function tlApplyFilter() {
     const p = tlGetParams();
@@ -118,6 +189,8 @@ function tlToggleWish(e, productIdx) {
                     wishIcon.parentElement.innerHTML = '<i class="ri-heart-3-fill wish-icon"></i> ' + data.likeCount;
                 }
             }
+			
+			showBatonToast(data.isLiked ? "관심 목록에 추가되었습니다." : "관심 목록에서 제거되었습니다.");
         }
     })
     .catch(err => {
@@ -132,51 +205,19 @@ function tlMobileFilter() {
     });
 }
 
-(function tlRenderChips() {
-    const p = tlGetParams();
-    const container = document.getElementById('tlActiveFilters');
-    if (!container) return;
-
-    const catNames = {
-        '1': '전자기기',
-        '2': '남성의류',
-        '3': '여성의류',
-        '4': '뷰티',
-        '5': '스타굿즈',
-        '6': '가구/인테리어',
-        '7': '도서',
-        '8': '게임',
-		'9': '스포츠/레저',
-		'10': '가전제품',
-		'11': '취미/수집',
-		'12': '반려동물',
-		'13': '식품',
-		'14': '유아동',
-		'15': '티켓/상품권'
-    };
-
-    const chips = [];
-    if (p.get('keyword'))
-        chips.push({ label: '검색: ' + p.get('keyword'), key: 'keyword' });
-    if (p.get('categoryIdx'))
-        chips.push({ label: catNames[p.get('categoryIdx')] || '카테고리', key: 'categoryIdx' });
-    if (p.get('priceMin') || p.get('priceMax'))
-        chips.push({ label: (p.get('priceMin') || '0') + '원 ~ ' + (p.get('priceMax') || '∞') + '원', keys: ['priceMin', 'priceMax'] });
-    if (p.get('available') === 'true')
-        chips.push({ label: '거래 가능', key: 'available' });
-
-    chips.forEach(function (chip) {
-        const el = document.createElement('span');
-        el.className = 'tl-filter-chip';
-        el.innerHTML = chip.label
-            + ' <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">'
-            + '<path d="M18 6 6 18M6 6l12 12"/></svg>';
-        el.addEventListener('click', function () {
-            const pp = tlGetParams();
-            if (chip.keys) chip.keys.forEach(function (k) { pp.delete(k); });
-            else pp.delete(chip.key);
-            tlNavigate(pp);
-        });
-        container.appendChild(el);
-    });
-})();
+document.addEventListener('DOMContentLoaded', function() {
+	initSortDropdown();
+	initTimeAgo();
+	renderFilterChips();
+	
+	const searchInput = document.getElementById('tlSearchInput');
+	if (searchInput) {
+		searchInput.addEventListener('keydown', function (e) {
+			if (e.key !== 'Enter') return;
+			const p = tlGetParams();
+			const kw = this.value.trim();
+			if (kw) p.set('keyword', kw); else p.delete('keyword');
+				tlNavigate(p);
+		});
+	}
+});

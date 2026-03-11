@@ -75,6 +75,12 @@ background: var(--primary-light); }
     display: flex;
     gap: 24px;
     align-items: flex-start;
+    width: 100%;
+}
+
+.main-side {
+    flex: 1;
+    min-width: 0;
 }
 
 .sticky-side {

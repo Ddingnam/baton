@@ -114,24 +114,19 @@
                 </p>
 
                 <div class="product-meta">
-                    <span> 조회 ${trade.hitCount}</span>
-                    <span> 찜 <span id="statWish">${trade.likeCount}</span></span>
-                    <span> 채팅 ${trade.chatCount}</span>
-                    <span>${trade.createdDate}</span>
+                    <c:if test="${not empty tagList}">
+                    <div class="tag-list">
+                        <c:forEach var="tag" items="${tagList}">
+                            <span class="tag-chip-view">#${tag}</span>
+                        </c:forEach>
+                    </div>
+                </c:if>
                 </div>
             </div>
 
             <div class="card">
                 <p class="card-title">상품 설명</p>
                 <p class="product-desc">${trade.content}</p>
-                
-                <c:if test="${not empty tagList}">
-                    <div class="tag-list" style="margin-top: 20px;">
-                        <c:forEach var="tag" items="${tagList}">
-                            <span class="tag-chip-view">#${tag}</span>
-                        </c:forEach>
-                    </div>
-                </c:if>
             </div>
 
             <div class="card">
@@ -197,7 +192,7 @@
 
                     <div class="info-item">
                         <p class="info-label">등록일</p>
-                        <p class="info-value">${trade.createdDate}</p>
+                        <p class="info-value time-ago" data-time="${trade.lastUpDate}">${trade.lastUpDate}</p>
                     </div>
 
                     <div class="info-item">
@@ -478,6 +473,8 @@
         </button>
     </div>
 </div>
+
+<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 
 <script src="${pageContext.request.contextPath}/dist/js/trade/trade-article.js"></script>
 <script>

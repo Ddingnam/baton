@@ -129,8 +129,8 @@
                         <div class="field">
                             <label>상품 상태</label>
                             <div class="pill-group">
-                                <c:set var="status" value="${empty trade.productStatus ? '새상품' : trade.productStatus}"/>
-                                <input type="radio" name="productStatus" id="s1" value="새상품" ${status == '새상품' ? 'checked' : ''}><label for="s1">새상품</label>
+                                <c:set var="status" value="${empty trade.productStatus ? '미개봉' : trade.productStatus}"/>
+                                <input type="radio" name="productStatus" id="s1" value="미개봉" ${status == '미개봉' ? 'checked' : ''}><label for="s1">미개봉</label>
                                 <input type="radio" name="productStatus" id="s2" value="사용감없음" ${status == '사용감없음' ? 'checked' : ''}><label for="s2">사용감 없음</label>
                                 <input type="radio" name="productStatus" id="s3" value="사용감적음" ${status == '사용감적음' ? 'checked' : ''}><label for="s3">사용감 적음</label>
                                 <input type="radio" name="productStatus" id="s4" value="사용감많음" ${status == '사용감많음' ? 'checked' : ''}><label for="s4">사용감 많음</label>
@@ -195,6 +195,8 @@
 		<input type="hidden" id="tempProductIdx" value="${tempProductIdx}">
     </form>
 </div>
+
+<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 
 <script src="${pageContext.request.contextPath}/dist/js/trade/trade-write.js"></script>
 <script> const contextPath = '${pageContext.request.contextPath}'; </script>

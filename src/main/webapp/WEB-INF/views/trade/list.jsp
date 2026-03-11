@@ -141,8 +141,12 @@
                                 </div>
 
                                 <div class="card-details">
-                                    <div class="detail-item"><i class="ri-map-pin-2-line"></i> ${not empty item.tradePlace ? item.tradePlace : '택배 거래'}</div>
-                                    <div class="detail-item"><i class="ri-time-line"></i> ${item.createdDate}</div>
+                                    <div class="detail-item"><i class="ri-map-pin-2-line"></i> 
+                                    	${not empty item.tradePlace ? item.tradePlace : '택배 거래'}
+                                    </div>
+                                    <div class="detail-item"><i class="ri-time-line"></i> 
+                                    	<span class="time-ago">${item.lastUpDate}</span>
+                                    </div>
                                 </div>
 
                                 <div class="card-footer">
