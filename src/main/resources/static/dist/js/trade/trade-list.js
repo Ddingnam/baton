@@ -140,10 +140,75 @@ function tlResetFilters() {
     location.href = '/trade/list';
 }
 
-function tlGoPage(page) {
-    const p = tlGetParams();
-    p.set('page', page);
-    location.href = '/trade/list?' + p.toString();
+let isLoading = false;
+
+function LoadMore() {
+    if(isLoading) return;
+    
+	const currentPageInput = document.getElementById('currentPage');
+	const totalPageEl = document.getElementById('totalPage');
+	    
+	if (!currentPageInput || !totalPageEl) return;
+
+	let currentPage = parseInt(currentPageInput.value, 10) || 1;
+	const totalPage = parseInt(totalPageEl.value, 10) || 1;
+	let nextPage = currentPage + 1;
+
+    if (nextPage > totalPage) return;
+
+    isLoading = true;
+    const btn = document.getElementById('btn-load-more');
+    if(btn) btn.innerHTML = '로딩 중... <i class="ri-loader-4-line"></i>';
+	
+	const p = tlGetParams();
+	const categoryIdx = p.get('categoryIdx') || '';
+	const keyword = document.getElementById('tlSearchInput')?.value || p.get('keyword') || '';
+	const priceMin = document.getElementById('tlPriceMin')?.value || p.get('priceMin') || '';
+	const priceMax = document.getElementById('tlPriceMax')?.value || p.get('priceMax') || '';
+	const sort = p.get('sort') || 'newest';
+	const available = p.get('available') || 'false';
+	
+	const params = new URLSearchParams({
+		page: nextPage,
+		isAjax: 'true',
+		keyword: keyword,
+		categoryIdx: categoryIdx,
+		priceMin: priceMin,
+		priceMax: priceMax,
+		sort: sort,
+		available: available
+	});
+
+	const url = `/trade/list?${params.toString()}`;
+	
+	fetch(url)
+		.then(response => {
+			if (!response.ok) throw new Error("HTTP_ERROR");
+			return response.text();
+		})
+		.then(html => {
+			if (html.trim().length > 0) {
+				const grid = document.querySelector('.tl-product-grid');
+				if(grid) {
+	                    grid.insertAdjacentHTML('beforeend', html);
+	                    initTimeAgo();
+	                }
+	                
+	                currentPageInput.value = nextPage;
+	                
+	                if (nextPage >= totalPage) {
+	                    const container = document.getElementById('more-btn-container');
+	                    if(container) container.style.display = 'none';
+	                }
+	            }
+	            isLoading = false;
+	            if(btn) btn.innerHTML = '더보기 <i class="ri-arrow-down-s-line"></i>';
+	        })
+	        .catch(error => {
+	            console.error('Error:', error);
+	            isLoading = false;
+	            if(btn) btn.innerHTML = '더보기 <i class="ri-arrow-down-s-line"></i>';
+	        });
 }
 
 function tlToggleWish(e, productIdx) {

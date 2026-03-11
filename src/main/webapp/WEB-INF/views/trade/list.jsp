@@ -142,7 +142,17 @@
 
                                 <div class="card-details">
                                     <div class="detail-item"><i class="ri-map-pin-2-line"></i> 
-                                    	${not empty item.tradePlace ? item.tradePlace : '택배 거래'}
+                                    	<c:choose>
+									        <c:when test="${item.tradeType == '둘다가능'}">
+									            ${not empty item.tradePlace ? item.tradePlace : '택배 거래만 가능'} · 택배 거래
+									        </c:when>
+									        <c:when test="${not empty item.tradePlace}">
+									            ${item.tradePlace}
+									        </c:when>
+									        <c:otherwise>
+									            택배 거래만 가능
+									        </c:otherwise>
+									    </c:choose>
                                     </div>
                                     <div class="detail-item"><i class="ri-time-line"></i> 
                                     	<span class="time-ago">${item.lastUpDate}</span>
@@ -174,15 +184,15 @@
             </c:choose>
         </div>
 
-        <c:if test="${total_page > 1}">
-            <div class="pagination-container tl-pagination">
-                <button class="tl-page-btn" onclick="tlGoPage(${page - 1})" ${page <= 1 ? 'disabled' : ''}>&#8249;</button>
-                <c:forEach begin="${pageInfo.startPage}" end="${pageInfo.endPage}" var="p">
-                    <button class="tl-page-btn ${pageInfo.currentPage == p ? 'active' : ''}" onclick="tlGoPage(${p})">${p}</button>
-                </c:forEach>
-                <button class="tl-page-btn" onclick="tlGoPage(${pageInfo.currentPage + 1})" ${pageInfo.currentPage >= total_page ? 'disabled' : ''}>&#8250;</button>
-            </div>
+        <c:if test="${page < total_page}">
+            <div id="more-btn-container" class="more-btn-wrap">
+		        <button type="button" id="btn-load-more" class="btn-more" onclick="LoadMore()">
+		            더보기 <i class="ri-arrow-down-s-line"></i>
+		        </button>
+		    </div>
         </c:if>
+		<input type="hidden" id="currentPage" value="${page}">
+		<input type="hidden" id="totalPage" value="${total_page}">
     </div>
 </main>
 

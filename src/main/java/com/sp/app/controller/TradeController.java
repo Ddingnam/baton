@@ -49,8 +49,10 @@ public class TradeController {
 	        @RequestParam(value = "available", required = false) String available,
 	        @RequestParam(value = "categoryIdx", defaultValue = "") String categoryIdx,
 	        @RequestParam(value = "sort", defaultValue = "newest") String sort,
+	        @RequestParam(value = "isAjax", defaultValue = "false") boolean isAjax,
 	        @AuthenticationPrincipal CustomUserDetails userDetails,
 	        Model model) {
+		
 		try {
 			
 			List<Map<String, Object>> categoryList = service.categoryList();
@@ -96,8 +98,13 @@ public class TradeController {
 	        model.addAttribute("priceMax", priceMax);
 	        model.addAttribute("available", available);
 	        model.addAttribute("sort", sort);
+	        
+	        if (isAjax) {
+	            return "trade/listMore";
+	        }
+	        
 		} catch (Exception e) {
-			log.info("list", e);
+			log.info("list : ", e);
 		}
 		return "trade/list";
 	}
@@ -214,13 +221,17 @@ public class TradeController {
 	public Map<String, Object> getUpdateData(@RequestParam("productIdx") long productIdx) {
 	    Map<String, Object> data = new HashMap<>();
 	    
-	    Trade dto = service.findByIdx(productIdx);
-	    List<TradeImg> imageList = service.findImgsByIdx(productIdx);
-	    List<String> tagList = service.findTagsByIdx(productIdx);
-	    
-	    data.put("trade", dto);
-	    data.put("imageList", imageList);
-	    data.put("tagList", tagList);
+	    try {
+	    	Trade dto = service.findByIdx(productIdx);
+	    	List<TradeImg> imageList = service.findImgsByIdx(productIdx);
+	    	List<String> tagList = service.findTagsByIdx(productIdx);
+	    	
+	    	data.put("trade", dto);
+	    	data.put("imageList", imageList);
+	    	data.put("tagList", tagList);
+		} catch (Exception e) {
+			log.info("getUpdateData : ", e);
+		}
 	    
 	    return data;
 	}

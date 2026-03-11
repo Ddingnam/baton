@@ -722,46 +722,28 @@ a {
     color: var(--text-sub);
 }
 
-.pagination-container {
-    text-align: center;
-    margin-top: 40px;
-    animation: fadeInUp 0.8s ease forwards 0.8s;
-    opacity: 0;
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-}
+.more-btn-wrap { text-align: center; margin-top: 30px; }
 
-.tl-page-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
+.btn-more {
+    width: 200px;
+    padding: 12px 20px;
+    border: 1px solid #ddd;
+    border-radius: 30px;
     background: #fff;
-    font-size: 14px;
+    color: #333;
     font-weight: 600;
-    color: var(--text-sub);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.3s;
 }
 
-.tl-page-btn:hover {
+.btn-more:hover {
+    background: var(--primary-light);
     border-color: var(--primary);
     color: var(--primary);
-    transform: translateY(-2px);
 }
 
-.tl-page-btn.active {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
-}
-
-.tl-page-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    transform: none;
-}
+@keyframes spin { 100% { transform:rotate(360deg); } }
+.ri-loader-4-line { display: inline-block; animation: spin 1s linear infinite; }
 
 .tl-fab {
     position: fixed;
