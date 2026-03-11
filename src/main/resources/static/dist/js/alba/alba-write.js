@@ -1,10 +1,10 @@
 const MIN_WAGE = 10300;
-const DAY_LABEL = {MON:'월',TUE:'화',WED:'수',THU:'목',FRI:'금',SAT:'토',SUN:'일'};
+const DAY_LABEL = { MON: '월', TUE: '화', WED: '수', THU: '목', FRI: '금', SAT: '토', SUN: '일' };
 const uploadedFiles = [];
 
 function searchAddress() {
   new daum.Postcode({
-    oncomplete: function(data) {
+    oncomplete: function (data) {
       document.getElementById('location').value = data.roadAddress || data.jibunAddress;
       document.getElementById('locationDetail').focus();
       updateProgress();
@@ -39,21 +39,24 @@ function toggleDay(btn) {
 
 function selectWeekdays() {
   document.querySelectorAll('.day-chip').forEach(b => {
-    b.classList.toggle('active', !['SAT','SUN'].includes(b.dataset.val));
+    b.classList.toggle('active', !['SAT', 'SUN'].includes(b.dataset.val));
   });
-  syncDays(); updatePreview();
+  syncDays();
+  updatePreview();
 }
 
 function selectWeekend() {
   document.querySelectorAll('.day-chip').forEach(b => {
-    b.classList.toggle('active', ['SAT','SUN'].includes(b.dataset.val));
+    b.classList.toggle('active', ['SAT', 'SUN'].includes(b.dataset.val));
   });
-  syncDays(); updatePreview();
+  syncDays();
+  updatePreview();
 }
 
 function selectAllDays() {
   document.querySelectorAll('.day-chip').forEach(b => b.classList.add('active'));
-  syncDays(); updatePreview();
+  syncDays();
+  updatePreview();
 }
 
 function syncDays() {
@@ -65,8 +68,8 @@ function daysText() {
   const vals = [...document.querySelectorAll('.day-chip.active')].map(b => b.dataset.val);
   if (!vals.length) return '요일 미설정';
   if (vals.length === 7) return '매일';
-  if (JSON.stringify(vals) === JSON.stringify(['MON','TUE','WED','THU','FRI'])) return '월~금';
-  if (JSON.stringify(vals) === JSON.stringify(['SAT','SUN'])) return '토, 일';
+  if (JSON.stringify(vals) === JSON.stringify(['MON', 'TUE', 'WED', 'THU', 'FRI'])) return '월~금';
+  if (JSON.stringify(vals) === JSON.stringify(['SAT', 'SUN'])) return '토, 일';
   return vals.map(v => DAY_LABEL[v]).join(', ');
 }
 
@@ -74,7 +77,10 @@ function toggleTimeInput(cb) {
   const st = document.getElementById('startTime');
   const et = document.getElementById('endTime');
   st.disabled = et.disabled = cb.checked;
-  if (cb.checked) { st.value = ''; et.value = ''; }
+  if (cb.checked) {
+    st.value = '';
+    et.value = '';
+  }
   updatePreview();
 }
 
@@ -82,7 +88,7 @@ function onPayInput() {
   const payType = document.getElementById('payTypeHidden').value;
   const val = parseInt(document.getElementById('pay').value, 10);
   const warn = document.getElementById('payWarn');
-  warn.style.display = (payType === '시급' && val > 0 && val < MIN_WAGE) ? 'block' : 'none';
+  warn.style.display = payType === '시급' && val > 0 && val < MIN_WAGE ? 'block' : 'none';
   updatePreview();
   updateProgress();
 }
@@ -111,7 +117,7 @@ function handleImageUpload(input) {
 function removeImage(btn) {
   const item = btn.closest('.preview-img-item');
   const grid = document.getElementById('imagePreviewGrid');
-  const idx  = [...grid.children].indexOf(item);
+  const idx = [...grid.children].indexOf(item);
   uploadedFiles.splice(idx, 1);
   item.remove();
   if (uploadedFiles.length === 0) {
@@ -119,7 +125,7 @@ function removeImage(btn) {
   }
 }
 
-function updateCharCount(inputId, countId, max) {
+function updateCharCount(inputId, countId) {
   document.getElementById(countId).textContent = document.getElementById(inputId).value.length;
 }
 
@@ -128,35 +134,32 @@ function updatePreview() {
     document.getElementById('title').value || '공고 제목이 여기 표시됩니다';
   document.getElementById('prevEmployer').textContent =
     document.getElementById('employer').value || '업체명';
-	
-	// --- 추가된 D-Day 계산 로직 ---
-	  const deadlineVal = document.getElementById('deadline').value;
-	  const dDayBadge = document.getElementById('prevDday');
-	  
-	  if (deadlineVal) {
-	    const today = new Date();
-	    today.setHours(0, 0, 0, 0); // 시간 제외하고 날짜만 비교
-	    
-	    const dDate = new Date(deadlineVal);
-	    dDate.setHours(0, 0, 0, 0);
-	    
-	    const diffTime = dDate - today;
-	    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-	    if (diffDays < 0) {
-	      dDayBadge.textContent = '마감';
-	      dDayBadge.classList.add('expired');
-	    } else if (diffDays === 0) {
-	      dDayBadge.textContent = 'D-Day';
-	      dDayBadge.classList.remove('expired');
-	    } else {
-	      dDayBadge.textContent = 'D-' + diffDays;
-	      dDayBadge.classList.remove('expired');
-	    }
-	  } else {
-	    dDayBadge.textContent = 'D-?';
-	    dDayBadge.classList.remove('expired');
-	  }
+  const deadlineVal = document.getElementById('deadline').value;
+  const dDayBadge = document.getElementById('prevDday');
+
+  if (deadlineVal) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dDate = new Date(deadlineVal);
+    dDate.setHours(0, 0, 0, 0);
+    const diffTime = dDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) {
+      dDayBadge.textContent = '마감';
+      dDayBadge.classList.add('expired');
+    } else if (diffDays === 0) {
+      dDayBadge.textContent = 'D-Day';
+      dDayBadge.classList.remove('expired');
+    } else {
+      dDayBadge.textContent = 'D-' + diffDays;
+      dDayBadge.classList.remove('expired');
+    }
+  } else {
+    dDayBadge.textContent = 'D-?';
+    dDayBadge.classList.remove('expired');
+  }
 
   const pay = document.getElementById('pay').value;
   document.getElementById('prevPayAmt').textContent =
@@ -165,8 +168,8 @@ function updatePreview() {
   const st = document.getElementById('startTime').value;
   const et = document.getElementById('endTime').value;
   const negotiable = document.getElementById('timeNegotiable').checked;
-  const time = negotiable ? '시간협의' : (st && et ? st + '~' + et : '시간 미설정');
-  const loc  = document.getElementById('location').value || '지역 미설정';
+  const time = negotiable ? '시간협의' : st && et ? st + '~' + et : '시간 미설정';
+  const loc = document.getElementById('location').value || '지역 미설정';
 
   document.getElementById('prevMeta').innerHTML =
     `<span><i class="ri-calendar-line"></i>${daysText()}</span><br>` +
@@ -193,9 +196,9 @@ function updateProgress() {
 
 function submitForm() {
   const title = document.getElementById('title').value.trim();
-  const pay   = document.getElementById('pay').value;
-  const loc   = document.getElementById('location').value.trim();
-  const days  = document.getElementById('workDaysHidden').value;
+  const pay = document.getElementById('pay').value;
+  const loc = document.getElementById('location').value.trim();
+  const days = document.getElementById('workDaysHidden').value;
   if (!title || !pay || !days || !loc) {
     alert('필수 항목을 모두 입력해주세요.');
     return;
@@ -204,17 +207,15 @@ function submitForm() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const workDaysHidden = document.getElementById('workDaysHidden');
-    if (workDaysHidden && workDaysHidden.value && workDaysHidden.value.trim().length > 0) {
-        const savedDays = workDaysHidden.value.split(',');
-        savedDays.forEach(day => {
-            const trimmedDay = day.trim();
-            if (trimmedDay) {
-                const btn = document.querySelector(`.day-chip[data-val="${trimmedDay}"]`);
-                if (btn) btn.classList.add('active');
-            }
-        });
-    }
-    
-    if (typeof updatePreview === 'function') updatePreview();
+  const workDaysHidden = document.getElementById('workDaysHidden');
+
+  if (workDaysHidden && workDaysHidden.value) {
+    const savedDays = workDaysHidden.value.split(',');
+    savedDays.forEach(day => {
+      const btn = document.querySelector(`.day-chip[data-val="${day.trim()}"]`);
+      if (btn) btn.classList.add('active');
+    });
+  }
+
+  updatePreview();
 });

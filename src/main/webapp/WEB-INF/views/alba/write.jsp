@@ -307,29 +307,5 @@
 
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/alba/alba-write.js"></script>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    if (typeof updatePreview === 'function') updatePreview();
-
-    const titleEl = document.getElementById('title');
-    const contentEl = document.getElementById('content');
-    if (titleEl) updateCharCount('title','titleCount',40);
-    if (contentEl) updateCharCount('content','contentCount',2000);
-
-    const initialDays = "${dto.workDays}"; 
-    if (initialDays) {
-        const savedDays = initialDays.split(',');
-        savedDays.forEach(day => {
-            const trimmedDay = day.trim();
-            const btn = document.querySelector(`.day-chip[data-val="${trimmedDay}"]`);
-            if (btn) btn.classList.add('active');
-        });
-    }
-    
-    if (typeof updatePreview === 'function') updatePreview();
-});
-</script>
-
 </body>
 </html>

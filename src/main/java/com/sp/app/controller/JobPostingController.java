@@ -108,13 +108,10 @@ public class JobPostingController {
         try {
             JobPosting dto = postingService.findById(postingIdx);
 
-            // 1. 데이터가 존재하지 않는 경우
             if (dto == null) {
                 return "redirect:/alba/list?page=" + page;
             }
 
-            // 2. 작성자 본인 확인 (long 타입이므로 == 사용)
-            // userDetails가 null이거나 작성자 userIdx와 로그인한 유저의 userIdx가 다를 때
             if (userDetails == null || dto.getUserIdx() != userDetails.getUserIdx()) {
                 return "redirect:/alba/list?page=" + page;
             }
