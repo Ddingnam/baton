@@ -157,7 +157,7 @@
                                     <div class="interaction-info tl-card-stats">
                                         <span><i class="ri-eye-line"></i> ${item.hitCount}</span>
                                         <span><i class="ri-chat-3-line"></i> ${item.chatCount}</span>
-                                        <span><i class="ri-heart-3-fill wish-icon"></i> ${item.likeCount}</span>
+                                        <span><i class="ri-heart-3-line wish-icon"></i> ${item.likeCount}</span>
                                     </div>
                                 </div>
                             </div>

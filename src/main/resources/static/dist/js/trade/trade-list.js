@@ -186,7 +186,7 @@ function tlToggleWish(e, productIdx) {
             if (card) {
                 const wishIcon = card.querySelector('.wish-icon');
                 if (wishIcon) {
-                    wishIcon.parentElement.innerHTML = '<i class="ri-heart-3-fill wish-icon"></i> ' + data.likeCount;
+                    wishIcon.parentElement.innerHTML = '<i class="ri-heart-3-line wish-icon"></i> ' + data.likeCount;
                 }
             }
 			
@@ -208,7 +208,7 @@ function tlMobileFilter() {
 document.addEventListener('DOMContentLoaded', function() {
 	initSortDropdown();
 	initTimeAgo();
-	renderFilterChips();
+	tlRenderChips();
 	
 	const searchInput = document.getElementById('tlSearchInput');
 	if (searchInput) {
