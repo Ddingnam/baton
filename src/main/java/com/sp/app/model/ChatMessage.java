@@ -13,4 +13,5 @@ public class ChatMessage {
     private String nickname;
     private String profilePhoto;
     private Integer unreadCount;
+    private Long tradeIdx;
 }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sp.app.mapper.NotificationMapper">
+    <insert id="insertNotification" parameterType="com.sp.app.model.Notification">
+        INSERT INTO NOTIFICATION (notifIdx, userIdx, notifType, content, url, isRead, createdAt)
+        VALUES (notifSeq.NEXTVAL, #{userIdx}, #{notifType}, #{content}, #{url}, 0, SYSTIMESTAMP)
+    </insert>
+
+    <select id="listNotification" parameterType="Long" resultType="com.sp.app.model.Notification">
+        SELECT notifIdx, userIdx, notifType, content, url, isRead,
+               TO_CHAR(createdAt, 'YYYY-MM-DD HH24:MI') AS createdAt
+        FROM NOTIFICATION
+        WHERE userIdx = #{userIdx}
+        ORDER BY notifIdx DESC
+    </select>
+
+    <update id="updateNotificationRead" parameterType="Long">
+        UPDATE NOTIFICATION SET isRead = 1 WHERE notifIdx = #{notifIdx}
+    </update>
+
+    <update id="updateAllNotificationRead" parameterType="Long">
+        UPDATE NOTIFICATION SET isRead = 1 WHERE userIdx = #{userIdx}
+    </update>
+
+    <select id="unreadNotificationCount" parameterType="Long" resultType="int">
+        SELECT COUNT(*) FROM NOTIFICATION WHERE userIdx = #{userIdx} AND isRead = 0
+    </select>
+</mapper>

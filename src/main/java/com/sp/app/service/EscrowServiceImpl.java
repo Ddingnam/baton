@@ -13,15 +13,16 @@ import java.util.Map;
 public class EscrowServiceImpl implements EscrowService {
 
     private final PaymentMapper paymentMapper;
+    private final NotificationService notificationService;
 
-    public EscrowServiceImpl(PaymentMapper paymentMapper) {
+    public EscrowServiceImpl(PaymentMapper paymentMapper, NotificationService notificationService) {
         this.paymentMapper = paymentMapper;
+        this.notificationService = notificationService;
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void processEscrowPayment(Map<String, Object> paramMap) throws Exception {
-
     	int count = paymentMapper.checkTradeExist(Long.parseLong(paramMap.get("productIdx").toString()));
         if (count > 0) {
             throw new RuntimeException("이미 안전결제가 완료되거나 진행 중인 상품입니다.");
@@ -35,16 +36,27 @@ public class EscrowServiceImpl implements EscrowService {
         paymentMapper.insertTradeTransaction(paramMap);
 
         long buyerIdx = Long.parseLong(paramMap.get("buyerIdx").toString());
+        long sellerIdx = Long.parseLong(paramMap.get("sellerIdx").toString());
+        long productIdx = Long.parseLong(paramMap.get("productIdx").toString());
+        
         int currentPoint = paymentMapper.getCurrentPoint(buyerIdx);
         paramMap.put("totalPoint", currentPoint);
 
         paymentMapper.insertPointHistoryForEscrow(paramMap);
+        
+        notificationService.sendNotification(sellerIdx, "안전결제", "게시물에 안전결제가 접수되었습니다. 운송장을 입력해주세요.", "/trade/article?productIdx=" + productIdx);
     }
     
     @Override
     public void updateShippingInfo(Map<String, Object> paramMap) throws Exception {
         try {
             paymentMapper.updateShippingInfo(paramMap);
+            
+            long productIdx = Long.parseLong(paramMap.get("productIdx").toString());
+            Map<String, Object> tradeInfo = paymentMapper.getTradeTransactionByProduct(productIdx);
+            long buyerIdx = Long.parseLong(tradeInfo.get("BUYERIDX").toString());
+            
+            notificationService.sendNotification(buyerIdx, "배송시작", "판매자가 상품 발송을 완료했습니다. 운송장 번호를 확인해주세요.", "/trade/article?productIdx=" + productIdx);
         } catch (Exception e) {
             throw e;
         }
@@ -71,10 +83,8 @@ public class EscrowServiceImpl implements EscrowService {
             }
 
             long sellerIdx = Long.parseLong(tradeInfo.get("SELLERIDX").toString());
-            
             int totalUsedPoint = Integer.parseInt(tradeInfo.get("TOTALUSED_POINT").toString());
             int safetyFee = Integer.parseInt(tradeInfo.get("SAFETYFEE").toString());
-            
             int settlementAmount = totalUsedPoint - safetyFee;
 
             Map<String, Object> pointMap = new HashMap<>();
@@ -91,6 +101,8 @@ public class EscrowServiceImpl implements EscrowService {
             historyMap.put("totalPoint", currentPoint);
             paymentMapper.insertPointHistoryForSeller(historyMap);
             paymentMapper.updateArticleStatusToSoldOut(productIdx);
+            
+            notificationService.sendNotification(sellerIdx, "구매확정", "구매자가 상품 구매를 확정하여 포인트 정산이 완료되었습니다.", "/trade/article?productIdx=" + productIdx);
         } catch (Exception e) {
             throw e;
         }
@@ -98,20 +110,12 @@ public class EscrowServiceImpl implements EscrowService {
     
     @Override
     public int checkTradeExist(long productIdx) throws Exception {
-        try {
-            return paymentMapper.checkTradeExist(productIdx);
-        } catch (Exception e) {
-            throw e;
-        }
+        return paymentMapper.checkTradeExist(productIdx);
     }
     
     @Override
     public Map<String, Object> getTradeTransaction(long productIdx) throws Exception {
-        try {
-            return paymentMapper.getTradeTransactionByProduct(productIdx);
-        } catch (Exception e) {
-            throw e;
-        }
+        return paymentMapper.getTradeTransactionByProduct(productIdx);
     }
     
     @Transactional(rollbackFor = Exception.class)
@@ -152,15 +156,17 @@ public class EscrowServiceImpl implements EscrowService {
         historyMap.put("buyerIdx", buyerIdx);
         historyMap.put("totalPoint", currentPoint);
         paymentMapper.insertPointHistoryForRefund(historyMap);
+        
+        if(userIdx == buyerIdx) {
+            notificationService.sendNotification(sellerIdx, "결제취소", "구매자가 안전결제를 취소했습니다.", "/trade/article?productIdx=" + productIdx);
+        } else {
+            notificationService.sendNotification(buyerIdx, "주문취소", "판매자가 거래를 취소하여 포인트가 환불되었습니다.", "/trade/article?productIdx=" + productIdx);
+        }
     }
-    
+
     @Override
     public String getUserAddress(long userIdx) throws Exception {
-        try {
-            return paymentMapper.getUserAddress(userIdx);
-        } catch (Exception e) {
-            throw e;
-        }
+        return paymentMapper.getUserAddress(userIdx);
     }
     
     @Transactional(rollbackFor = Exception.class)
