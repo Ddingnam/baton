@@ -1,11 +1,40 @@
 const Gallery = (function () {
-    function selectThumb(idx) {
-        document.querySelectorAll('.indicator-dot').forEach((el, i) => {
-            el.classList.toggle('active', i === idx);
-        });
+
+    let current = 0;
+
+    function init(){
+        const dots = document.querySelectorAll(".indicator-dot");
+        if(dots.length <= 1) return;
+        setInterval(next,4000);
     }
-    return { selectThumb };
+
+    function go(index){
+
+        const main = document.getElementById("mainImage");
+        const dots = document.querySelectorAll(".indicator-dot");
+
+        if(!main || !dots[index]) return;
+
+        const src = dots[index].dataset.src;
+        if(src) main.src = CONTEXT_PATH + src;
+
+        dots.forEach((d,i)=>d.classList.toggle("active", i===index));
+
+        current = index;
+    }
+
+    function next(){
+        const dots = document.querySelectorAll(".indicator-dot");
+        let nextIndex = current + 1;
+        if(nextIndex >= dots.length) nextIndex = 0;
+        go(nextIndex);
+    }
+
+    return { init, go };
+
 })();
+
+document.addEventListener("DOMContentLoaded", Gallery.init);
 
 const WishModule = (function () {
     let wished = false;

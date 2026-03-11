@@ -48,119 +48,87 @@
         </div>
     </header>
 
-    <div class="tabs-header-wrap" id="tabMenu">
-        <ul class="tabs-header-container">
-            <li class="tab-item active" onclick="scrollToSection('section-conditions', this)">근무조건</li>
-            <li class="tab-item" onclick="scrollToSection('section-description', this)">상세요강</li>
-            <li class="tab-item" onclick="scrollToSection('section-company', this)">기업정보</li>
-        </ul>
-    </div>
-
-    <div class="content-container">
-
-        <section id="section-conditions" class="scroll-section" style="padding-top: 20px;">
-            <div class="summary-section">
-                <div class="pay-highlight">
-                    <span class="pay-label">급여</span>
-                    <strong class="pay-type">${dto.payType}</strong>
-                    <strong class="pay-amount"><fmt:formatNumber value="${dto.pay}" pattern="#,###"/>원</strong>
-                </div>
-
-                <ul class="summary-list">
-				    <li>
-				        <i class="ri-calendar-check-line"></i>
-				        <div class="summary-text">
-				            <span class="label">근무기간</span>
-				            <span class="value">
-				                <c:choose>
-				                    <c:when test="${dto.workPeriod == 'ONE_DAY'}">하루</c:when>
-				                    <c:when test="${dto.workPeriod == 'LESS_THAN_A_WEEK'}">1주일 이하</c:when>
-				                    <c:when test="${dto.workPeriod == 'LESS_THAN_A_MONTH'}">1개월 미만</c:when>
-				                    <c:when test="${dto.workPeriod == 'MORE_THAN_A_MONTH'}">1개월 이상</c:when>
-				                    <c:when test="${dto.workPeriod == 'ONE_TO_THREE_MONTHS'}">1~3개월</c:when>
-				                    <c:when test="${dto.workPeriod == 'THREE_TO_SIX_MONTHS'}">3~6개월</c:when>
-				                    <c:when test="${dto.workPeriod == 'SIX_MONTHS_TO_ONE_YEAR'}">6개월~1년</c:when>
-				                    <c:when test="${dto.workPeriod == 'MORE_THAN_A_YEAR'}">1년 이상</c:when>
-				                    <c:otherwise>${dto.workPeriod}</c:otherwise> </c:choose>
-				            </span>
-				        </div>
-				    </li>
-				    <li>
-				        <i class="ri-calendar-event-line"></i>
-				        <div class="summary-text">
-				            <span class="label">근무요일</span>
-				            <c:set var="koreanDays" value="${dto.workDays}" />
-				            <c:set var="koreanDays" value="${fn:replace(koreanDays, 'MON', '월')}" />
-				            <c:set var="koreanDays" value="${fn:replace(koreanDays, 'TUE', '화')}" />
-				            <c:set var="koreanDays" value="${fn:replace(koreanDays, 'WED', '수')}" />
-				            <c:set var="koreanDays" value="${fn:replace(koreanDays, 'THU', '목')}" />
-				            <c:set var="koreanDays" value="${fn:replace(koreanDays, 'FRI', '금')}" />
-				            <c:set var="koreanDays" value="${fn:replace(koreanDays, 'SAT', '토')}" />
-				            <c:set var="koreanDays" value="${fn:replace(koreanDays, 'SUN', '일')}" />
-				            <span class="value">${koreanDays}</span>
-				        </div>
-				    </li>
-				    <li>
-				        <i class="ri-time-line"></i>
-				        <div class="summary-text">
-				            <span class="label">근무시간</span>
-				            <span class="value">${dto.workTime} <c:if test="${dto.timeNegotiable == 'Y'}"><span class="nego">(협의가능)</span></c:if></span>
-				        </div>
-				    </li>
-				</ul>
-            </div>
-
-            <div class="detail-table-section">
-                <h2 class="section-title">상세 근무조건</h2>
-                <table class="detail-table">
-                    <tbody>
-                        <tr>
-                            <th>모집분야</th>
-                            <td>${dto.category}</td>
-                        </tr>
-                        <tr>
-                            <th>모집상태</th>
-                            <td>${dto.recruitStatus}</td>
-                        </tr>
-                        <c:if test="${not empty dto.location}">
-							<tr>
-							    <th>근무지역</th>
-							    <td>
-							        ${dto.location} ${dto.locationDetail}
-							        <button type="button" class="btn-copy-mini" onclick="copyAddress('${dto.location} ${dto.locationDetail}')">주소복사</button>
-							        
-							        <div id="map" style="width:100%; height:300px; margin-top:15px; border-radius:8px; border:1px solid #eee;"></div>
-							        
-							        <input type="hidden" id="mapAddress" value="${dto.location}">
-							        <input type="hidden" id="mapPlaceName" value="${dto.employer}">
-							    </td>
-							</tr>
-						</c:if>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+		    <div class="tabs-header-wrap" id="tabMenu">
+		        <ul class="tabs-header-container">
+		            <li class="tab-item active" onclick="scrollToSection('section-conditions', this)">근무조건</li>
+		            <li class="tab-item" onclick="scrollToSection('section-description', this)">상세요강</li>
+		            <li class="tab-item" onclick="scrollToSection('section-company', this)">기업정보</li>
+		        </ul>
+		    </div>
+		
+		    <section id="section-conditions" class="scroll-section summary-section">
+			   <div class="summary-section">
+			    <div class="pay-highlight-container">
+			        <div class="pay-top">
+			            <span class="pay-badge">${dto.payType}</span>
+			            <strong class="pay-amount"><fmt:formatNumber value="${dto.pay}" pattern="#,###"/>원</strong>
+			        </div>
+			        <div class="pay-info-tags">
+			            <span class="info-tag light">협의가능</span>
+			            <span class="info-tag blue">주휴포함</span>
+			        </div>
+			        <div class="min-wage-info">
+			            2026년 최저시급 10,320원 
+			            <button type="button" class="btn-calc-mini"><i class="ri-calculator-line"></i> 급여계산기</button>
+			        </div>
+			    </div>
+			
+			    <ul class="summary-list">
+			        <li>
+			            <i class="ri-calendar-check-line"></i>
+			            <div class="summary-text">
+			                <span class="label">근무기간</span>
+			                <span class="value">
+			                    <c:choose>
+			                        <c:when test="${dto.workPeriod == 'MORE_THAN_A_YEAR'}">1년 이상</c:when>
+			                        <c:otherwise>${dto.workPeriod}</c:otherwise>
+			                    </c:choose>
+			                </span>
+			            </div>
+			        </li>
+			
+			        <li>
+			            <i class="ri-calendar-event-line"></i>
+			            <div class="summary-text">
+			                <span class="label">근무요일</span>
+			                <span class="value">${koreanDays}</span>
+			            </div>
+			        </li>
+			
+			        <li>
+			            <i class="ri-time-line"></i>
+			            <div class="summary-text">
+			                <span class="label">근무시간</span>
+			                <span class="value">${dto.workTime}</span>
+			            </div>
+			        </li>
+			    </ul>
+			</section>
 
         <div class="divider"></div>
 
         <section id="section-description" class="scroll-section">
             <h2 class="section-title">상세 모집요강</h2>
             
-            <c:if test="${not empty imageList}">
-                <div class="gallery-section-inner">
-                    <div class="main-image-wrap">
-                        <img id="mainImage" src="${pageContext.request.contextPath}${imageList[0].imgUrl}" alt="${dto.title}">
-                    </div>
-                    <c:if test="${imageList.size() > 1}">
-                        <div class="image-indicators">
-                            <c:forEach var="item" items="${imageList}" varStatus="st">
-                                <button type="button" class="indicator-dot ${st.index == 0 ? 'active' : ''}"
-                                        onclick="Gallery.selectThumb(${st.index})"></button>
-                            </c:forEach>
-                        </div>
-                    </c:if>
-                </div>
-            </c:if>
+		            <c:if test="${not empty imageList}">
+						<div class="gallery-section-inner">
+						
+						        <div class="main-image-wrap">
+						            <img id="mainImage"
+						                 src="${pageContext.request.contextPath}${imageList[0].imgUrl}">
+						        </div>
+						
+						        <c:if test="${imageList.size() > 1}">
+						            <div class="image-indicators">
+						                <c:forEach var="item" items="${imageList}" varStatus="st">
+						                    <button class="indicator-dot ${st.index==0?'active':''}"
+						                            data-src="${item.imgUrl}"
+						                            onclick="Gallery.go(${st.index})"></button>
+						                </c:forEach>
+						            </div>
+						        </c:if>
+						    </div>
+						</c:if>
 
             <div class="article-text">${dto.description}</div>
 
