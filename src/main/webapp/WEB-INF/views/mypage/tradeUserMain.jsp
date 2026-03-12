@@ -92,7 +92,7 @@
 					            <c:when test="${not empty tradeList}">
 					                <c:forEach var="item" items="${tradeList}">
 					                    <div class="lc-item" style="cursor:pointer" 
-					                         onclick="location.href='${pageContext.request.contextPath}/trade/article/${item.productIdx}'">
+					                         onclick="location.href='${pageContext.request.contextPath}/trade/article?productIdx=${item.productIdx}'">
 					                        
 					                        <div class="item-icon theme-icon-bg">
 					                            <i class="ri-shopping-bag-3-fill"></i>
@@ -102,7 +102,7 @@
 					                            <h4>${item.title}</h4>
 					                            <p class="info-metrics">
 					                                <fmt:formatNumber value="${item.price}" type="number"/>원 · 
-					                                <c:out value="${fn:substring(item.createdDate.toString(), 0, 10)}"/>
+					                                <c:out value="${fn:substring(item.lastUpDate.toString(), 0, 10)}"/>
 					                            </p>
 					                        </div>
 					                        

@@ -58,7 +58,7 @@ public class TradeController {
 			List<Map<String, Object>> categoryList = service.categoryList();
 	        model.addAttribute("categoryList", categoryList);
 			
-			int size = 12; // 한 페이지에 보여줄 개수
+			int size = 12;
 	        int total_page = 0;
 	        int dataCount = 0;
 

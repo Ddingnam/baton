@@ -83,6 +83,7 @@
 	    FROM product p
 	    JOIN users u ON p.userIdx = u.userIdx
 	    WHERE p.productIdx = #{productIdx}
+	    ORDER BY p.lastUpDate DESC
 	</select>
 	
 	<select id="findByUserIdx" parameterType="map" resultType="com.sp.app.model.Trade">
@@ -96,6 +97,7 @@
 				AND tradeStatus IN ('판매완료', '판매중', '예약중')
 			</otherwise>
 		</choose>
+		ORDER BY lastUpDate DESC
 	</select>
 	
 	<select id="findTempTradeByUserIdx" parameterType="long" resultType="com.sp.app.model.Trade">

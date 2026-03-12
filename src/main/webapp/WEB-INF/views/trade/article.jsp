@@ -221,21 +221,21 @@
                             </c:choose>
                         </p>
                     </div>
-                    	<sec:authentication property="principal.member.userIdx" var="loggedInUserId"/>
-                    	<c:choose>
-                    		<c:when test="${loggedInUserId == trade.userIdx}">
-                    			<button class="seller-profile-btn"
-			                        onclick="location.href='${pageContext.request.contextPath}/mypage'">
-			                        내정보 보기
-			                    </button>
-                    		</c:when>
-                    		<c:otherwise>
-                    			<button class="seller-profile-btn"
-			                        onclick="location.href='${pageContext.request.contextPath}/mypage/tradeUserMain?userIdx=${trade.userIdx}'">
-			                        프로필 보기
-			                    </button>
-                    		</c:otherwise>
-                    	</c:choose>
+					<sec:authentication property="principal.member.userIdx" var="loggedInUserId"/>
+					<c:choose>
+						<c:when test="${loggedInUserId == trade.userIdx}">
+                    		<button class="seller-profile-btn"
+								onclick="location.href='${pageContext.request.contextPath}/mypage'">
+								내정보 보기
+							</button>
+                    	</c:when>
+                    	<c:otherwise>
+                    		<button class="seller-profile-btn"
+			            		onclick="location.href='${pageContext.request.contextPath}/mypage/tradeUserMain?userIdx=${trade.userIdx}'">
+			                    프로필 보기
+							</button>
+                    	</c:otherwise>
+                    </c:choose>
                 </div>
             </div>
 			
