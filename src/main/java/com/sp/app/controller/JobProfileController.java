@@ -1,6 +1,5 @@
 package com.sp.app.controller;
 
-import java.lang.reflect.Member;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,9 +30,8 @@ public class JobProfileController {
         }
 
         model.addAttribute("name", info.getName());
-        //model.addAttribute("phone", info.getPhone());
 
-        return "resume/resume-write";
+        return "resume/write";
     }
 
     @PostMapping("write")
