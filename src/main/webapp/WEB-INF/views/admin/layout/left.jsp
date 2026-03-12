@@ -3,21 +3,66 @@
 
 <aside class="sidebar">
     <div class="brand-area">
-        <span class="brand-txt">BATON ADMIN</span>
+        <span class="brand-txt">BATON <span>ADMIN</span></span>
     </div>
 
     <nav class="nav-menu">
-        <div class="nav-group-tl">Analytics</div>
+        <div class="nav-group-tl">Overview</div>
         <div class="nav-item">
             <a href="${pageContext.request.contextPath}/admin" class="nav-link active">
-                <div class="nav-left"><span>대시보드</span></div>
+                <div class="nav-left">
+                    <span>대시보드</span>
+                </div>
             </a>
         </div>
 
-        <div class="nav-group-tl">Management</div>
+        <div class="nav-group-tl">Service Management</div>
         <div class="nav-item has-sub">
             <a href="#" class="nav-link">
-                <div class="nav-left"><span>회원 관리</span></div>
+                <div class="nav-left">
+                    <span>중고거래</span>
+                </div>
+                <i class="ri-arrow-down-s-line nav-arrow"></i>
+            </a>
+            <div class="sub-menu">
+                <a href="${pageContext.request.contextPath}/admin/trade/list" class="sub-link">거래 게시글 관리</a>
+                <a href="${pageContext.request.contextPath}/admin/trade/report" class="sub-link">신고 게시글 처리</a>
+            </div>
+        </div>
+
+        <div class="nav-item has-sub">
+            <a href="#" class="nav-link">
+                <div class="nav-left">
+                    <span>동네생활</span>
+                </div>
+                <i class="ri-arrow-down-s-line nav-arrow"></i>
+            </a>
+            <div class="sub-menu">
+                <a href="${pageContext.request.contextPath}/admin/community/list" class="sub-link">커뮤니티 관리</a>
+                <a href="${pageContext.request.contextPath}/admin/alba/list" class="sub-link">동네알바 관리</a>
+                <a href="${pageContext.request.contextPath}/admin/crew/list" class="sub-link">동네모임 관리</a>
+            </div>
+        </div>
+
+        <div class="nav-item has-sub">
+            <a href="#" class="nav-link">
+                <div class="nav-left">
+                    <span>결제 및 안심거래</span>
+                </div>
+                <i class="ri-arrow-down-s-line nav-arrow"></i>
+            </a>
+            <div class="sub-menu">
+                <a href="${pageContext.request.contextPath}/admin/payment/list" class="sub-link">결제/충전 내역</a>
+                <a href="${pageContext.request.contextPath}/admin/escrow/list" class="sub-link">안심결제(에스크로)</a>
+            </div>
+        </div>
+
+        <div class="nav-group-tl">User & CS</div>
+        <div class="nav-item has-sub">
+            <a href="#" class="nav-link">
+                <div class="nav-left">
+                    <span>회원 관리</span>
+                </div>
                 <i class="ri-arrow-down-s-line nav-arrow"></i>
             </a>
             <div class="sub-menu">
@@ -29,35 +74,26 @@
 
         <div class="nav-item has-sub">
             <a href="#" class="nav-link">
-                <div class="nav-left"> <span>거래 및 주문</span></div>
+                <div class="nav-left">
+                    <span>고객센터</span>
+                </div>
                 <i class="ri-arrow-down-s-line nav-arrow"></i>
             </a>
             <div class="sub-menu">
-                <a href="${pageContext.request.contextPath}/admin/trade/list" class="sub-link">중고 거래 게시글</a>
-                <a href="${pageContext.request.contextPath}/admin/order/list" class="sub-link">결제 내역</a>
+                <a href="${pageContext.request.contextPath}/admin/cs/notice/list" class="sub-link">공지사항</a>
+                <a href="${pageContext.request.contextPath}/admin/cs/inquiry/list" class="sub-link">1:1 문의</a>
             </div>
-        </div>
-
-        <div class="nav-group-tl">CS Center</div>
-        <div class="nav-item">
-            <a href="${pageContext.request.contextPath}/admin/cs/notice/list" class="nav-link">
-                <div class="nav-left"><span>공지사항</span></div>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="${pageContext.request.contextPath}/admin/cs/inquiry/list" class="nav-link">
-                <div class="nav-left"><span>1:1 문의</span></div>
-            </a>
         </div>
     </nav>
 
     <div class="sidebar-footer">
         <div class="user-profile">
             <div class="user-avatar">
-                <i class="ri-user-smile-line"></i>
+                <i class="ri-shield-user-fill"></i>
             </div>
             <div class="user-info">
-                <span class="user-name">관리자</span> <span class="user-role">Super Admin</span>
+                <span class="user-name">관리자</span>
+                <span class="user-role">Super Admin</span>
             </div>
         </div>
         <div class="user-actions">
