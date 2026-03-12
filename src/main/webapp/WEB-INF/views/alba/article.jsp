@@ -175,8 +175,6 @@
                 </section>
             </c:if>
         </sec:authorize>
-
-    </div>
 </main>
 
 <div class="bottom-fixed-bar">
