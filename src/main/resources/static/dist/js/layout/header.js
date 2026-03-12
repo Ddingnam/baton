@@ -92,7 +92,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	const displayMsg = window.SERVER_MSG || window.SERVER_MESSAGE;
     if (displayMsg && displayMsg.trim() !== "") {
         showBatonToast(displayMsg);
-    }
+    };
+	
+	if (window.IS_FIRST_LOGIN && !window.HAS_MAIN_REGION) {
+	    $("#batonAuthLayer").fadeIn(300);
+	}
 });
 
 function showBatonToast(text) {
@@ -117,4 +121,8 @@ function showBatonToast(text) {
             }
         }, 700); 
     }, 2000);
+}
+
+function closeBatonAuthLayer() {
+    $("#batonAuthLayer").fadeOut(200);
 }

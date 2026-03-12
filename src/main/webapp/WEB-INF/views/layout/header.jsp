@@ -94,9 +94,40 @@
 	</div>
 </c:if>
 
+<div id="batonAuthLayer" class="bt-overlay" style="display: none;">
+    <article class="bt-modal-sheet">
+        <header class="bt-modal-visual">
+            <div class="bt-visual-track">
+                <div class="bt-alert-circle">
+                    <i class="ri-map-pin-add-line"></i>
+                </div>
+            </div>
+        </header>
+        
+        <section class="bt-modal-body">
+            <h2 class="bt-text-title"><span class="bt-highlight">바통 터치</span> 준비,<br>아직 한 단계가 남았어요!</h2>
+            <p class="bt-text-desc">
+                지금 계신 곳을 인증해야 우리 동네 이웃들과<br>
+                따뜻한 바통을 이어받을 수 있어요.
+            </p>
+        </section>
+
+        <footer class="bt-modal-footer">
+            <button type="button" class="bt-btn bt-btn-primary" onclick="location.href='${pageContext.request.contextPath}/member/regionAuth/main'">
+                지금 바로 인증하기
+            </button>
+            <button type="button" class="bt-btn bt-btn-ghost" onclick="closeBatonAuthLayer()">
+                나중에 할게요
+            </button>
+        </footer>
+    </article>
+</div>
+
 <script>
 	window.SERVER_MSG = "${msg != null ? msg : ''}";
     window.SERVER_MESSAGE = "${message != null ? message : ''}";
+	window.IS_FIRST_LOGIN = ${not empty isFirstLogin ? isFirstLogin : false};
+	window.HAS_MAIN_REGION = ${not empty member.userRegionInfo.mainRegion ? true : false};
 </script>
 
 <c:if test="${not empty msg}">
@@ -104,6 +135,9 @@
 </c:if>
 <c:if test="${not empty message}">
 	<c:remove var="message" scope="session" />
+</c:if>
+<c:if test="${not empty isFirstLogin}">
+	<c:remove var="isFirstLogin" scope="session" />
 </c:if>
 
 <sec:authorize access="isAuthenticated()">

@@ -63,6 +63,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler{
 	        Authentication authentication) throws IOException, ServletException {
 
 		request.getSession().setAttribute("msg", authentication.getName() + "님, 환영합니다!");
+		request.getSession().setAttribute("isFirstLogin", true);
 		
 		try {
 		    UserDto dto2 = memberService.findByLoginId(authentication.getName());
