@@ -15,4 +15,7 @@ public interface PollVoteRepository extends JpaRepository<PollVote, Long> {
 
     @Query("SELECT COUNT(DISTINCT v.memberId) FROM PollVote v WHERE v.poll.pollId = :pollId")
     public long countDistinctMemberByPollPollId(@Param("pollId") Long pollId);
+    
+    @Query("SELECT DISTINCT v.poll FROM PollVote v WHERE v.memberId = :memberId")
+    public List<com.sp.app.domain.entity.CommunityPoll> findDistinctPollsByMemberId(@Param("memberId") Long memberId);
 }

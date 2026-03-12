@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -66,23 +67,23 @@
 
 					<div class="stat-grid">
 						<div class="stat-box">
-							<div class="stat-icon theme-icon-bg"><i class="ri-shopping-bag-3-line"></i></div>
-							<strong>4 건</strong>
-							<span>판매/구매</span>
+							<div class="stat-icon theme-icon-bg"><i class="ri-chat-3-line"></i></div>
+							<strong>${fn:length(myReplies)} 개</strong>
+							<span>작성한 댓글</span>
 						</div>
 						<div class="stat-box">
-							<div class="stat-icon theme-icon-bg"><i class="ri-team-line"></i></div>
-							<strong>2 개</strong>
-							<span>참여 모임</span>
+							<div class="stat-icon theme-icon-bg"><i class="ri-bookmark-line"></i></div>
+							<strong>${fn:length(myScraps)} 개</strong>
+							<span>저장한 글</span>
 						</div>
 						<div class="stat-box">
-							<div class="stat-icon theme-icon-bg"><i class="ri-briefcase-4-line"></i></div>
-							<strong>5 건</strong>
-							<span>지원 알바</span>
+							<div class="stat-icon theme-icon-bg"><i class="ri-bar-chart-box-line"></i></div>
+							<strong>${fn:length(myVotes)} 개</strong>
+							<span>참여한 투표</span>
 						</div>
 						<div class="stat-box">
 							<div class="stat-icon theme-icon-bg"><i class="ri-edit-2-line"></i></div>
-							<strong>12 개</strong>
+							<strong>${fn:length(myPosts)} 개</strong>
 							<span>작성한 글</span>
 						</div>
 					</div>
@@ -117,14 +118,21 @@
 								</div>
 								<div class="item-right"><span class="theme-badge-outline">열람대기</span></div>
 							</div>
-							<div class="lc-item">
-								<div class="item-icon theme-icon-bg"><i class="ri-chat-3-fill"></i></div>
-								<div class="item-info">
-									<h4>강남역 근처 조용한 노트북 카페 추천해주세요!</h4>
-									<p class="info-metrics">커뮤니티 · 2시간 전 · 댓글 5</p>
+							<%-- 최근 커뮤니티 글 (실제 데이터) --%>
+							<c:if test="${not empty myPosts}">
+								<div class="lc-item" style="cursor:pointer" onclick="location.href='${pageContext.request.contextPath}/community/article/${myPosts[0].id}'">
+									<div class="item-icon theme-icon-bg"><i class="ri-chat-3-fill"></i></div>
+									<div class="item-info">
+										<h4>${myPosts[0].subject}</h4>
+										<p class="info-metrics">커뮤니티 · <c:out value="${fn:substring(myPosts[0].regDate.toString(), 5, 10)}"/></p>
+									</div>
+									<div class="item-right">
+										<c:if test="${not empty myPosts[0].category}">
+											<span class="theme-badge">${myPosts[0].category}</span>
+										</c:if>
+									</div>
 								</div>
-								<div class="item-right"><span class="theme-badge">동네질문</span></div>
-							</div>
+							</c:if>
 						</div>
 					</div>
 
@@ -379,79 +387,148 @@
 							<button class="inner-tab active" data-inner="comm-posts">작성한 글</button>
 							<button class="inner-tab"        data-inner="comm-comments">댓글단 글</button>
 							<button class="inner-tab"        data-inner="comm-saved">저장한 글</button>
+							<button class="inner-tab"        data-inner="comm-votes">참여한 투표</button>
 						</div>
 
 						<div class="inner-section active" id="comm-posts">
 							<div class="lc-list">
-								<div class="lc-item">
-									<div class="item-info">
-										<span class="corp-name theme-text">동네질문</span>
-										<h4>강남역 근처 조용한 노트북 카페 추천해주세요!</h4>
-										<div class="comm-stats">
-											<span><i class="ri-eye-line"></i> 234</span>
-											<span><i class="ri-chat-3-line"></i> 댓글 5</span>
-											<span><i class="ri-heart-3-line"></i> 12</span>
-											<span>2시간 전</span>
+								<c:choose>
+									<c:when test="${empty myPosts}">
+										<div class="lc-empty">
+											<i class="ri-file-text-line"></i>
+											<p>아직 작성한 글이 없어요</p>
+											<a href="${pageContext.request.contextPath}/community/list" class="theme-link">커뮤니티 가기 <i class="ri-arrow-right-s-line"></i></a>
 										</div>
-									</div>
-								</div>
-								<div class="lc-item">
-									<div class="item-info">
-										<span class="corp-name theme-text">생활정보</span>
-										<h4>서초동 새벽 분리수거 요일 변경됐나요?</h4>
-										<div class="comm-stats">
-											<span><i class="ri-eye-line"></i> 88</span>
-											<span><i class="ri-chat-3-line"></i> 댓글 3</span>
-											<span><i class="ri-heart-3-line"></i> 4</span>
-											<span>1일 전</span>
-										</div>
-									</div>
-								</div>
-								<div class="lc-item">
-									<div class="item-info">
-										<span class="corp-name theme-text">동네맛집</span>
-										<h4>교대역 점심 맛집 공유해요 (직접 가본 곳만)</h4>
-										<div class="comm-stats">
-											<span><i class="ri-eye-line"></i> 512</span>
-											<span><i class="ri-chat-3-line"></i> 댓글 22</span>
-											<span><i class="ri-heart-3-line"></i> 67</span>
-											<span>3일 전</span>
-										</div>
-									</div>
-								</div>
+									</c:when>
+									<c:otherwise>
+										<c:forEach var="post" items="${myPosts}">
+											<div class="lc-item" style="cursor:pointer" onclick="location.href='${pageContext.request.contextPath}/community/article/${post.id}'">
+												<div class="item-info">
+													<c:if test="${not empty post.category}">
+														<span class="corp-name theme-text">${post.category}</span>
+													</c:if>
+													<h4>${post.subject}</h4>
+													<div class="comm-stats">
+														<span><i class="ri-eye-line"></i> ${post.hitCount}</span>
+														<span><i class="ri-heart-3-line"></i> ${post.likeCount}</span>
+														<%-- LocalDateTime → substring으로 MM-dd 추출 --%>
+														<span><c:out value="${fn:substring(post.regDate.toString(), 5, 10)}"/></span>
+													</div>
+												</div>
+											</div>
+										</c:forEach>
+									</c:otherwise>
+								</c:choose>
 							</div>
 						</div>
 
 						<div class="inner-section" id="comm-comments">
 							<div class="lc-list">
-								<div class="lc-item">
-									<div class="item-info">
-										<h4>서초동 헬스장 추천 부탁드려요</h4>
-										<p class="info-metrics">내 댓글: "더케이 스포렉스 강추예요! 시설도 좋고 가격도 합리적이에요"</p>
-										<div class="comm-stats"><span>1일 전</span></div>
-									</div>
-								</div>
-								<div class="lc-item">
-									<div class="item-info">
-										<h4>한강 러닝 같이 하실 분 구해요</h4>
-										<p class="info-metrics">내 댓글: "저도 관심있어요! 쪽지 보내도 될까요?"</p>
-										<div class="comm-stats"><span>4일 전</span></div>
-									</div>
-								</div>
+								<c:choose>
+									<c:when test="${empty myReplies}">
+										<div class="lc-empty">
+											<i class="ri-chat-3-line"></i>
+											<p>아직 작성한 댓글이 없어요</p>
+										</div>
+									</c:when>
+									<c:otherwise>
+										<c:forEach var="reply" items="${myReplies}">
+											<div class="lc-item" style="cursor:pointer" onclick="location.href='${pageContext.request.contextPath}/community/article/${reply.communityId}'">
+												<div class="item-info">
+													<h4>${reply.communitySubject}</h4>
+													<p class="info-metrics">내 ${reply.parentReply ? '댓글' : '대댓글'}: "${reply.content}"</p>
+													<div class="comm-stats">
+														<span><c:out value="${fn:substring(reply.regDate.toString(), 5, 10)}"/></span>
+													</div>
+												</div>
+											</div>
+										</c:forEach>
+									</c:otherwise>
+								</c:choose>
 							</div>
 						</div>
 
 						<div class="inner-section" id="comm-saved">
 							<div class="lc-list">
-								<div class="lc-item">
-									<div class="item-info">
-										<span class="corp-name theme-text">생활정보</span>
-										<h4>서초구 복지관 무료 프로그램 총정리 (2025)</h4>
-										<div class="comm-stats"><span>2일 전 저장</span></div>
-									</div>
-								</div>
+								<c:choose>
+									<c:when test="${empty myScraps}">
+										<div class="lc-empty">
+											<i class="ri-bookmark-line"></i>
+											<p>저장한 글이 없어요</p>
+										</div>
+									</c:when>
+									<c:otherwise>
+										<c:forEach var="scrap" items="${myScraps}">
+											<div class="lc-item" style="cursor:pointer" onclick="location.href='${pageContext.request.contextPath}/community/article/${scrap.id}'">
+												<div class="item-info">
+													<c:if test="${not empty scrap.category}">
+														<span class="corp-name theme-text">${scrap.category}</span>
+													</c:if>
+													<h4>${scrap.subject}</h4>
+													<div class="comm-stats">
+														<span><i class="ri-eye-line"></i> ${scrap.hitCount}</span>
+														<span><i class="ri-heart-3-line"></i> ${scrap.likeCount}</span>
+														<span><c:out value="${fn:substring(scrap.regDate.toString(), 5, 10)}"/> 저장</span>
+													</div>
+												</div>
+											</div>
+										</c:forEach>
+									</c:otherwise>
+								</c:choose>
 							</div>
 						</div>
+
+						<div class="inner-section" id="comm-votes">
+							<div class="lc-list">
+								<c:choose>
+									<c:when test="${empty myVotes}">
+										<div class="lc-empty">
+											<i class="ri-bar-chart-box-line"></i>
+											<p>참여한 투표가 없어요</p>
+										</div>
+									</c:when>
+									<c:otherwise>
+										<c:forEach var="vote" items="${myVotes}">
+											<div class="lc-item" style="cursor:pointer" onclick="location.href='${pageContext.request.contextPath}/community/article/${vote.communityId}'">
+												<div class="item-icon theme-icon-bg">
+													<i class="ri-bar-chart-box-line"></i>
+												</div>
+												<div class="item-info">
+													<h4>${vote.communitySubject}</h4>
+													<p class="info-metrics">투표 제목: ${vote.pollTitle}</p>
+													<p class="info-metrics">내 선택: <strong class="theme-text">${vote.myOptions}</strong></p>
+													<div class="comm-stats">
+														<span><i class="ri-group-line"></i> 총 ${vote.totalVotes}명 참여</span>
+														<c:choose>
+															<c:when test="${vote.expired}">
+																<span style="color:#8B95A1;">투표 종료</span>
+															</c:when>
+															<c:when test="${not empty vote.pollEndDate}">
+																<span class="theme-text">~${vote.pollEndDate} 까지</span>
+															</c:when>
+															<c:otherwise>
+																<span class="theme-text">진행중</span>
+															</c:otherwise>
+														</c:choose>
+													</div>
+												</div>
+												<div class="item-right">
+													<c:choose>
+														<c:when test="${vote.expired}">
+															<span style="background:#F2F4F6;color:#8B95A1;padding:6px 12px;border-radius:8px;font-size:13px;font-weight:700;">종료</span>
+														</c:when>
+														<c:otherwise>
+															<span class="theme-badge">진행중</span>
+														</c:otherwise>
+													</c:choose>
+												</div>
+											</div>
+										</c:forEach>
+									</c:otherwise>
+								</c:choose>
+							</div>
+						</div>
+
 					</div>
 				</section>
 
@@ -464,16 +541,16 @@
 	<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
 	<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_main.js"></script>
 	<script src="${pageContext.request.contextPath}/dist/js/payment/payment.js"></script>
-	
+
 	<script>
-	document.querySelectorAll('.inner-tab').forEach(tab => {
+	document.querySelectorAll('.inner-tab').forEach(function(tab) {
 		tab.addEventListener('click', function() {
-			const card = this.closest('.list-card');
-			card.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
-			card.querySelectorAll('.inner-section').forEach(s => s.classList.remove('active'));
+			var card = this.closest('.list-card');
+			card.querySelectorAll('.inner-tab').forEach(function(t) { t.classList.remove('active'); });
+			card.querySelectorAll('.inner-section').forEach(function(s) { s.classList.remove('active'); });
 			this.classList.add('active');
-			const target = this.getAttribute('data-inner');
-			const sec = document.getElementById(target);
+			var target = this.getAttribute('data-inner');
+			var sec = document.getElementById(target);
 			if (sec) sec.classList.add('active');
 		});
 	});

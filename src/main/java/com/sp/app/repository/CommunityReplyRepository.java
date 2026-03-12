@@ -6,4 +6,5 @@ import com.sp.app.domain.entity.CommunityReply;
 
 public interface CommunityReplyRepository extends JpaRepository<CommunityReply, Long> {
 	public List<CommunityReply> findByCommunityIdOrderByRegDateAsc(Long communityId);
+	public List<CommunityReply> findByMemberIdxAndIsDeletedFalseOrderByRegDateDesc(Long memberIdx);
 }
