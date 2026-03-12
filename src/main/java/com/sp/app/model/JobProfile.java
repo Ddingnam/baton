@@ -1,24 +1,20 @@
 package com.sp.app.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 public class JobProfile {
     private long profileIdx;
     private long userIdx;
-    
+
     private String title;
-    private String careerType;
-    private String careerDesc;
-    private String desiredCategory;
-    private String desiredLocation;
     private String introduce;
-    private String createdDate;
-    
     private String userName;
     private String phone;
+    private String email;
+    private String gender;  
+    private String birth;
+    private String strengths;
+    private String additionalInfo; 
+    private String createdDate; 
 }

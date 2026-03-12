@@ -32,15 +32,14 @@
         </section>
 
         <section class="form-section">
-            <h2 class="section-title">기본 정보</h2>
             <div class="info-grid">
                 <div class="input-group">
                     <label>이름</label>
-                    <input type="text" name="name" class="form-input readonly" value="홍길동" readonly="readonly" />
+                    <input type="text" name="userName" class="form-input readonly" value="${name}" readonly>
                 </div>
                 <div class="input-group">
                     <label>연락처</label>
-                    <input type="text" name="phone" class="form-input readonly" value="010-1234-5678" readonly="readonly" />
+                    <input type="text" name="phone" class="form-input readonly" value="${phone}" readonly>
                 </div>
             </div>
         </section>
@@ -105,7 +104,6 @@
 <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 
 <script>
-    // 경력 여부에 따라 상세 입력창 토글하는 간단한 스크립트
     function toggleCareerDetails(show) {
         const details = document.getElementById('careerDetails');
         if(show) {

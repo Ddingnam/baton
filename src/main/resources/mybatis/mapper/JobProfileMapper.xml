@@ -2,19 +2,47 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.JobProfileMapper">
 
-    <insert id="insertJobProfile" parameterType="com.sp.app.model.JobProfile">
-        <selectKey keyProperty="profileIdx" resultType="long" order="BEFORE">
-            SELECT seq_job_profile.NEXTVAL FROM dual
-        </selectKey>
+<insert id="insertJobProfile" parameterType="com.sp.app.model.JobProfile">
+    <selectKey keyProperty="profileIdx" resultType="long" order="BEFORE">
+        SELECT seq_job_profile.NEXTVAL FROM dual
+    </selectKey>
 
-        INSERT INTO job_profile (
-            profile_idx, user_idx, title, career_type, career_desc, 
-            desired_category, desired_location, introduce, created_date
-        ) VALUES (
-            #{profileIdx}, #{userIdx}, #{title}, #{careerType}, 
-            #{careerDesc, jdbcType=VARCHAR}, #{desiredCategory, jdbcType=VARCHAR}, 
-            #{desiredLocation, jdbcType=VARCHAR}, #{introduce, jdbcType=CLOB}, SYSDATE
-        )
-    </insert>
+    INSERT INTO JOBPROFILE (
+        PROFILEIDX,
+        USERIDX,
+        PROFILETITLE,
+        INTRODUCTION,
+        NAME,
+        TEL,
+        EMAIL,
+        GENDER,
+        BIRTH,
+        STRENGTHS,
+        ADDITIONALINFO,
+        PROFILESTATUS,
+        ISDEFAULT,
+        ISPUBLIC,
+        CREATEDDATE,
+        UPDATEDDATE
+    ) VALUES (
+        #{profileIdx},
+        #{userIdx},
+        #{title},
+        #{introduce, jdbcType=CLOB},
+        #{userName},
+        #{phone},
+        #{email},
+        #{gender},
+        #{birth},
+        #{strengths},
+        #{additionalInfo},
+        1,
+        'N',
+        'Y',
+        SYSDATE,
+        SYSDATE
+    )
+</insert>
+
 
 </mapper>
