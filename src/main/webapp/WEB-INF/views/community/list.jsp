@@ -163,10 +163,6 @@
 
 <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 
-<button class="cm-fab" id="cmFab" onclick="location.href='${pageContext.request.contextPath}/community/write'">
-    <i class="ri-pencil-line"></i>
-</button>
-
 <script src="${pageContext.request.contextPath}/dist/js/community/community-list.js"></script>
 </body>
 </html>
