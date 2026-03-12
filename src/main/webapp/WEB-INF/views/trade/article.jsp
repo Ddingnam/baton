@@ -206,7 +206,6 @@
         </div>
 
         <div class="sticky-side">
-
             <div class="card">
                 <p class="card-title">판매자 정보</p>
                 <div class="seller-row">
@@ -222,13 +221,24 @@
                             </c:choose>
                         </p>
                     </div>
-                    <button class="seller-profile-btn"
-                        onclick="location.href='${pageContext.request.contextPath}/member/profile?userIdx=${sellerUserIdx}'">
-                        프로필 보기
-                    </button>
+                    	<sec:authentication property="principal.member.userIdx" var="loggedInUserId"/>
+                    	<c:choose>
+                    		<c:when test="${loggedInUserId == trade.userIdx}">
+                    			<button class="seller-profile-btn"
+			                        onclick="location.href='${pageContext.request.contextPath}/mypage'">
+			                        내정보 보기
+			                    </button>
+                    		</c:when>
+                    		<c:otherwise>
+                    			<button class="seller-profile-btn"
+			                        onclick="location.href='${pageContext.request.contextPath}/mypage/tradeUserMain?userIdx=${trade.userIdx}'">
+			                        프로필 보기
+			                    </button>
+                    		</c:otherwise>
+                    	</c:choose>
                 </div>
             </div>
-
+			
             <div class="card action-card">
 			    <div class="stats-row">
 			        <div class="stat-item">

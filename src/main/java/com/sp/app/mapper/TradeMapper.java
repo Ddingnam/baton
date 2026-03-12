@@ -29,6 +29,7 @@ public interface TradeMapper {
 	public void deleteTradePostImgAll(long productIdx) throws SQLException;
 	
 	public Trade findByIdx(long productIdx);
+	public List<Trade> findByUserIdx(Map<String, Object> map);
 	public Trade findTempTradeByUserIdx(long userIdx);
 	public List<TradeImg> findImagesByIdx(long productIdx);
 	public List<String> findTagsByIdx(long productIdx);

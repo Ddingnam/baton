@@ -17,6 +17,7 @@ public interface TradeService {
 	public void updateLastUpDate(long productIdx) throws SQLException;
 	
 	public Trade findByIdx(long productIdx);
+	public List<Trade> findByUserIdx(Map<String, Object> map);
 	public Trade findTempTradeByUserIdx(long UserIdx);
 	public List<TradeImg> findImgsByIdx(long productIdx);
 	public List<String> findTagsByIdx(long productIdx);

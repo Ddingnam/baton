@@ -191,6 +191,18 @@ public class TradeServiceImpl implements TradeService {
 		}
 		return dto;
 	}
+	
+	@Override
+	public List<Trade> findByUserIdx(Map<String, Object> map) {
+		List<Trade> list = null;
+	    try {
+	        list = mapper.findByUserIdx(map);
+	    } catch (Exception e) {
+	        log.info("findByUserIdx : ", e);
+	        throw e;
+	    }
+	    return list;
+	}
 
 	@Override
 	public List<TradeImg> findImgsByIdx(long productIdx) {

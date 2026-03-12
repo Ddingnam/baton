@@ -77,13 +77,25 @@
 	        p.productIdx, p.title, p.content, p.price, p.shippingFee, 
 	        p.userIdx, p.hitCount, p.likeCount, p.chatCount,
 	        p.tradeType, p.tradeStatus, p.tradePlace, 
-	        p.latitude, p.longitude, p.regionIdx, 
-	        r.coreAddress,  p.productStatus, p.pullCount, 
+	        p.latitude, p.longitude, p.regionIdx, p.productStatus, p.pullCount, 
 	        p.lastUpDate, p.createdDate, p.updatedDate, 
 	        p.categoryIdx, u.nickName
 	    FROM product p
 	    JOIN users u ON p.userIdx = u.userIdx
-	    LEFT JOIN region r ON p.regionIdx = r.regionIdx  WHERE p.productIdx = #{productIdx}
+	    WHERE p.productIdx = #{productIdx}
+	</select>
+	
+	<select id="findByUserIdx" parameterType="map" resultType="com.sp.app.model.Trade">
+		SELECT * FROM product 
+		WHERE userIdx = #{userIdx} 
+		<choose>
+			<when test="loginUserIdx != null and userIdx == loginUserIdx">
+				AND (tradeStatus != '임시저장')
+			</when>
+			<otherwise>
+				AND tradeStatus IN ('판매완료', '판매중', '예약중')
+			</otherwise>
+		</choose>
 	</select>
 	
 	<select id="findTempTradeByUserIdx" parameterType="long" resultType="com.sp.app.model.Trade">
@@ -117,8 +129,7 @@
 	        SELECT ROWNUM rnum, tb.* FROM (
 	            SELECT 
 	                p.productIdx, p.title, p.price, p.userIdx, p.tradePlace,
-	                p.tradeType, p.tradeStatus, p.productStatus, p.createdDate, p.lastUpDate, p.updatedDate, p.hitCount, p.likeCount, p.chatCount,
-	                r.coreAddress, 
+	                p.tradeType, p.tradeStatus, p.productStatus, p.createdDate, p.lastUpDate, p.updatedDate, p.hitCount, p.likeCount, p.chatCount, 
 	                (SELECT imgUrl FROM productImages WHERE productIdx = p.productIdx AND imgOrder = 1) as imgUrl,
 	                
 	                <choose>
@@ -129,7 +140,7 @@
 	                </choose> as isLiked
 	                
 	            FROM product p
-	            LEFT JOIN region r ON p.regionIdx = r.regionIdx 
+	            
 	            <include refid="where-condition"/>
 	            <choose>
 	                <when test="sort == 'lowPrice'">
@@ -221,4 +232,5 @@
 	<delete id="deleteTradePostImgAll" parameterType="long">
 		DELETE FROM productImages WHERE productIdx = #{productIdx}
 	</delete>
+	
 </mapper>

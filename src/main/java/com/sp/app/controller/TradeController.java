@@ -22,6 +22,8 @@ import com.sp.app.model.Trade;
 import com.sp.app.model.TradeAiResponse;
 import com.sp.app.model.TradeImg;
 import com.sp.app.security.CustomUserDetails;
+import com.sp.app.service.EscrowService;
+import com.sp.app.service.TradeAiService;
 import com.sp.app.service.TradeService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,8 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/trade/*")
 public class TradeController {
 	private final TradeService service;	
-	private final com.sp.app.service.EscrowService escrowService;
-	private final com.sp.app.service.TradeAiService tradeAiService;
+	private final EscrowService escrowService;
+	private final TradeAiService tradeAiService;
 	
 	@Value("${file.upload-root}/trade")
     private String uploadPath;
