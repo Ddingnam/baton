@@ -22,4 +22,15 @@ public class JobProfileServiceImpl implements JobProfileService {
             throw e;
         }
     }
+    
+    @Override
+    public int getResumeCount(long userIdx) throws Exception {
+        int count = 0;
+        try {
+            count = mapper.getResumeCount(userIdx); 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
 }

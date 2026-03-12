@@ -51,6 +51,13 @@
 					</div>
 					
 					<div class="toolbar-top-actions">
+					<c:if test="${resumeCount > 0}">
+					    <button class="btn-create-resume" style="background-color: #f3f4f6; color: #333; border: 1px solid #ddd;" 
+					            onclick="location.href='${pageContext.request.contextPath}/resume/myList'">
+					        <i class="ri-user-smile-line"></i> 나의 이력서 <strong style="color: #ff6b6b;">${resumeCount}개</strong>
+					    </button>
+					</c:if>
+    				
 						<button class="btn-create-resume" onclick="location.href='${pageContext.request.contextPath}/resume/write'">
 							<i class="ri-file-text-line"></i> 이력서 등록
 						</button>

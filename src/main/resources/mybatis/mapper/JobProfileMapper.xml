@@ -44,5 +44,11 @@
     )
 </insert>
 
+<select id="getResumeCount" parameterType="Long" resultType="Integer">
+    SELECT NVL(COUNT(*), 0) 
+    FROM JOBPROFILE 
+    WHERE userIdx = #{userIdx}
+</select>
+
 
 </mapper>

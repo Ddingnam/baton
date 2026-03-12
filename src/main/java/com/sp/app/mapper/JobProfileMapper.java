@@ -8,5 +8,6 @@ import com.sp.app.model.JobProfile;
 public interface JobProfileMapper {
 
 	void insertJobProfile(JobProfile dto);
+	public int getResumeCount(long userIdx) throws Exception;
 	
 }

@@ -7,4 +7,6 @@ public interface JobProfileService {
     
     // public List<JobProfile> listJobProfile(Map<String, Object> map);
     // public JobProfile findById(long profileIdx); // 나중에 추가할꺼임
+    
+    public int getResumeCount(long userIdx) throws Exception;
 }

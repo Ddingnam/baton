@@ -3,6 +3,9 @@ package com.sp.app.controller;
 import com.sp.app.model.JobPosting;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.JobPostingService;
+
+import com.sp.app.service.JobProfileService; // 이력서
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,6 +25,7 @@ import java.util.Map;
 public class JobPostingController {
 
     private final JobPostingService postingService;
+    private final JobProfileService jobProfileService;
 
     @GetMapping("list")
     public String list(
@@ -29,7 +33,17 @@ public class JobPostingController {
             @RequestParam(value="sido", required=false) String sido,
             @RequestParam(value="gugun", required=false) String gugun,
             @RequestParam(value="dong", required=false) String dong,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             Model model) {
+    	
+    	int resumeCount = 0;
+        if (userDetails != null) {
+            try {
+                resumeCount = jobProfileService.getResumeCount(userDetails.getUserIdx());
+            } catch (Exception e) {
+                log.error("이력서 개수 조회 실패", e);
+            }
+        }
         
         int size = 10;
         int offset = (current_page - 1) * size;
@@ -48,6 +62,7 @@ public class JobPostingController {
         model.addAttribute("list", list);
         model.addAttribute("dataCount", dataCount);
         model.addAttribute("page", current_page);
+        model.addAttribute("resumeCount", resumeCount); // 이력서
         
         return "alba/list";
     }
