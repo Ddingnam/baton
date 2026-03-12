@@ -58,21 +58,21 @@
 		
 		    <section id="section-conditions" class="scroll-section summary-section">
 			   <div class="summary-section">
-			    <div class="pay-highlight-container">
-			        <div class="pay-top">
-			            <span class="pay-badge">${dto.payType}</span>
-			            <strong class="pay-amount"><fmt:formatNumber value="${dto.pay}" pattern="#,###"/>원</strong>
-			        </div>
-			        <div class="pay-info-tags">
-			            <span class="info-tag light">협의가능</span>
-			            <span class="info-tag blue">주휴포함</span>
-			        </div>
-			        <div class="min-wage-info">
-			            2026년 최저시급 10,320원 
-			            <button type="button" class="btn-calc-mini"><i class="ri-calculator-line"></i> 급여계산기</button>
-			        </div>
-			    </div>
-			
+				   <div class="pay-highlight-container">
+				        <div class="pay-top">
+				            <span class="pay-badge">${dto.payType}</span>
+				            <strong class="pay-amount"><fmt:formatNumber value="${dto.pay}" pattern="#,###"/>원</strong>
+				        </div>
+				        <div class="pay-info-tags">
+				            <span class="info-tag light">협의가능</span>
+				            <span class="info-tag blue">주휴포함</span>
+				        </div>
+				        <div class="min-wage-info">
+				            2026년 최저시급 10,320원 
+				            <button type="button" class="btn-calc-mini"><i class="ri-calculator-line"></i> 급여계산기</button>
+				        </div>
+				    </div>
+			    </div>			
 			    <ul class="summary-list">
 			        <li>
 			            <i class="ri-calendar-check-line"></i>
