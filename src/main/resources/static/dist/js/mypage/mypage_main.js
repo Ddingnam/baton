@@ -1,63 +1,66 @@
-document.addEventListener("DOMContentLoaded", () => {
-	const root = document.getElementById('mp-theme-root');
-	const tabs = document.querySelectorAll('.tab-item');
-	const sections = document.querySelectorAll('.mp-section');
+(function () {
+	'use strict';
 
+	function initMypage() {
+		var root = document.getElementById('mp-theme-root');
+		var tabs = document.querySelectorAll('.tab-item');
+		var sections = document.querySelectorAll('.mp-section');
 
-	const urlParams = new URLSearchParams(window.location.search);
-	const activeTabParam = urlParams.get('tab');
+		if (!root || tabs.length === 0 || sections.length === 0) return;
 
+		var urlParams = new URLSearchParams(window.location.search);
+		var activeTabParam = urlParams.get('tab');
 
-	let targetTab = document.querySelector('.tab-item[data-target="sec-overview"]');
+		var targetTab = document.querySelector('.tab-item[data-target="sec-overview"]');
 
+		if (activeTabParam) {
+			var foundTab = document.querySelector('.tab-item[data-target="sec-' + activeTabParam + '"]');
+			if (foundTab) {
+				targetTab = foundTab;
+			}
+		}
 
-	if (activeTabParam) {
-		const foundTab = document.querySelector('.tab-item[data-target="sec-' + activeTabParam + '"]');
-		if (foundTab) {
-			targetTab = foundTab;
+		function applyTheme(tab) {
+			tabs.forEach(function (t) { t.classList.remove('active'); });
+			tab.classList.add('active');
+
+			var color = tab.getAttribute('data-color');
+			var bg    = tab.getAttribute('data-bg');
+
+			root.style.setProperty('--mp-theme', color);
+			root.style.setProperty('--mp-theme-bg', bg);
+
+			document.documentElement.style.setProperty('--header-domain-color', color);
+			document.documentElement.style.setProperty('--header-domain-bg', bg);
+
+			var targetId = tab.getAttribute('data-target');
+			sections.forEach(function (sec) {
+				sec.classList.remove('active');
+				if (sec.id === targetId) {
+					sec.classList.add('active');
+				}
+			});
+		}
+
+		tabs.forEach(function (tab) {
+			tab.addEventListener('click', function () {
+				applyTheme(tab);
+
+				var newParam = tab.getAttribute('data-target').replace('sec-', '');
+				var newUrl   = window.location.pathname + '?tab=' + newParam;
+				window.history.replaceState({}, '', newUrl);
+			});
+		});
+
+		if (targetTab) {
+			applyTheme(targetTab);
 		}
 	}
 
-
-	const applyTheme = (tab) => {
-
-		tabs.forEach(t => t.classList.remove('active'));
-		tab.classList.add('active');
-
-
-		const color = tab.getAttribute('data-color');
-		const bg = tab.getAttribute('data-bg');
-
-
-		root.style.setProperty('--mp-theme', color);
-		root.style.setProperty('--mp-theme-bg', bg);
-
-
-		document.documentElement.style.setProperty('--header-domain-color', color);
-		document.documentElement.style.setProperty('--header-domain-bg', bg);
-
-
-		const targetId = tab.getAttribute('data-target');
-		sections.forEach(sec => {
-			sec.classList.remove('active');
-			if (sec.id === targetId) {
-				sec.classList.add('active');
-			}
-		});
-	};
-
-	tabs.forEach(tab => {
-		tab.addEventListener('click', () => {
-			applyTheme(tab);
-
-
-			const newParam = tab.getAttribute('data-target').replace('sec-', '');
-			const newUrl = window.location.pathname + '?tab=' + newParam;
-			window.history.replaceState({}, '', newUrl);
-		});
-	});
-
-	if (targetTab) {
-		applyTheme(targetTab);
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initMypage);
+	} else {
+		initMypage();
 	}
-});
+
+})();

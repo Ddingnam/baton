@@ -62,8 +62,11 @@
 						<label class="cat-pill"><input type="radio" name="category" value="1" ${mode=='write' || dto.category == 1 ? 'checked' : ''}><span>일상</span></label>
 						<label class="cat-pill"><input type="radio" name="category" value="2" ${dto.category == 2 ? 'checked' : ''}><span>동네질문</span></label>
 						<label class="cat-pill"><input type="radio" name="category" value="3" ${dto.category == 3 ? 'checked' : ''}><span>동네맛집</span></label>
-						<label class="cat-pill"><input type="radio" name="category" value="4" ${dto.category == 4 ? 'checked' : ''}><span>동네소식</span></label>
+						<label class="cat-pill"><input type="radio" name="category" value="4" ${dto.category == 4 ? 'checked' : ''}><span>같이해요</span></label>
 						<label class="cat-pill"><input type="radio" name="category" value="5" ${dto.category == 5 ? 'checked' : ''}><span>분실/실종</span></label>
+						<label class="cat-pill"><input type="radio" name="category" value="6" ${dto.category == 6 ? 'checked' : ''}><span>동네사건사고</span></label>
+						<label class="cat-pill"><input type="radio" name="category" value="7" ${dto.category == 7 ? 'checked' : ''}><span>생활정보</span></label>
+						<label class="cat-pill"><input type="radio" name="category" value="8" ${dto.category == 8 ? 'checked' : ''}><span>취미생활</span></label>
 					</div>
 
 					<div class="content-group">

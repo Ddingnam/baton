@@ -8,17 +8,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.sp.app.mapper.PaymentMapper;
 import com.sp.app.security.CustomUserDetails;
+import com.sp.app.service.MypageService;
+
+import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/mypage")
+@RequiredArgsConstructor
 public class MyPageController {
-	
-	private final PaymentMapper paymentMapper;
-	
-	public MyPageController(PaymentMapper paymentMapper) {
-        this.paymentMapper = paymentMapper;
-    }
-	
+
+    private final PaymentMapper paymentMapper;
+    private final MypageService mypageService;
+
     @GetMapping({"", "/", "/main"})
     public String main(Model model, Authentication auth) {
 
@@ -27,8 +28,12 @@ public class MyPageController {
             long userIdx = userDetails.getUserIdx();
 
             int currentPoint = paymentMapper.getCurrentPoint(userIdx);
-      
             model.addAttribute("userPoint", currentPoint);
+
+            model.addAttribute("myPosts",   mypageService.getMyPosts(userIdx));
+            model.addAttribute("myReplies", mypageService.getMyReplies(userIdx));
+            model.addAttribute("myScraps",  mypageService.getMyScraps(userIdx));
+            model.addAttribute("myVotes",   mypageService.getMyVotes(userIdx));
         }
 
         return "mypage/main";

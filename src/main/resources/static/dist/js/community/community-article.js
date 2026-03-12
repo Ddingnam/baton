@@ -166,16 +166,34 @@ function initPoll() {
                 submitBtn.style.display = 'inline-block';
                 submitBtn.textContent   = data.voted ? '투표 변경' : '투표하기';
                 submitBtn.onclick       = null;
-                submitBtn.onclick       = function() { submitVote(realPollId); };
 
-                var cancelBtn = document.getElementById('btnVoteCancel');
-                if (cancelBtn) {
-                    if (data.voted) {
-                        cancelBtn.style.display = 'inline-block';
-                        cancelBtn.onclick = null;
-                        cancelBtn.onclick = function() { cancelVote(realPollId); };
-                    } else {
-                        cancelBtn.style.display = 'none';
+                // 마감일 체크
+                var endDateEl = document.getElementById('pollEndDate');
+                var endDateStr = endDateEl ? endDateEl.dataset.date : null;
+                var isExpired = endDateStr && new Date(endDateStr) < new Date();
+
+                if (isExpired) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '투표 마감';
+                    submitBtn.style.opacity = '0.5';
+                    submitBtn.style.cursor = 'not-allowed';
+                    var cancelBtn = document.getElementById('btnVoteCancel');
+                    if (cancelBtn) cancelBtn.style.display = 'none';
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '';
+                    submitBtn.style.cursor = '';
+                    submitBtn.onclick = function() { submitVote(realPollId); };
+
+                    var cancelBtn = document.getElementById('btnVoteCancel');
+                    if (cancelBtn) {
+                        if (data.voted) {
+                            cancelBtn.style.display = 'inline-block';
+                            cancelBtn.onclick = null;
+                            cancelBtn.onclick = function() { cancelVote(realPollId); };
+                        } else {
+                            cancelBtn.style.display = 'none';
+                        }
                     }
                 }
             } else {

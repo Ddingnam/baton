@@ -50,7 +50,7 @@ body {
 	min-height: 600px;
 	display: flex;
 	flex-direction: column;
-	overflow: hidden;
+	overflow: clip; /* hidden → clip: border-radius 유지하면서 자식 스크롤 허용 */
 }
 
 .editor-header {
@@ -231,8 +231,16 @@ body {
 
 .category-pills {
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	gap: 8px;
+	overflow-x: auto;
+	padding-bottom: 6px;
+	padding-right: 30px; /* 마지막 pill이 잘리지 않게 */
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+.category-pills::-webkit-scrollbar {
+	display: none;
 }
 
 .cat-pill input {
@@ -250,6 +258,8 @@ body {
 	cursor: pointer;
 	transition: var(--transition);
 	border: 1px solid transparent;
+	white-space: nowrap;
+	flex-shrink: 0;
 }
 
 .cat-pill input:checked+span {

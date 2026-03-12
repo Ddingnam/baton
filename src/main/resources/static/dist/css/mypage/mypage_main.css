@@ -1102,3 +1102,19 @@ body {
 	margin-top: 10px;
 	color: #4E5968;
 }
+
+.lc-empty {
+    text-align: center;
+    padding: 40px 0;
+    color: #B0B8C1;
+}
+.lc-empty i {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 12px;
+}
+.lc-empty p {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+}

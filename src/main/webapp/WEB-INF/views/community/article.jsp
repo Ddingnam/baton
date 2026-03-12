@@ -25,11 +25,14 @@
         <div class="article-header">
             <div class="category-badge">
                 <c:choose>
-                    <c:when test="${dto.category == '1'}">일상</c:when>
-                    <c:when test="${dto.category == '2'}">동네질문</c:when>
-                    <c:when test="${dto.category == '3'}">동네맛집</c:when>
-                    <c:when test="${dto.category == '4'}">동네소식</c:when>
-                    <c:when test="${dto.category == '5'}">분실/실종</c:when>
+                    <c:when test="${dto.category == '1' || dto.category == '일상'}">일상</c:when>
+                    <c:when test="${dto.category == '2' || dto.category == '동네질문'}">동네질문</c:when>
+                    <c:when test="${dto.category == '3' || dto.category == '동네맛집'}">동네맛집</c:when>
+                    <c:when test="${dto.category == '4' || dto.category == '같이해요'}">같이해요</c:when>
+                    <c:when test="${dto.category == '5' || dto.category == '분실/실종'}">분실/실종</c:when>
+                    <c:when test="${dto.category == '6' || dto.category == '동네사건사고'}">동네사건사고</c:when>
+                    <c:when test="${dto.category == '7' || dto.category == '생활정보'}">생활정보</c:when>
+                    <c:when test="${dto.category == '8' || dto.category == '취미생활'}">취미생활</c:when>
                     <c:otherwise>${dto.category}</c:otherwise>
                 </c:choose>
             </div>

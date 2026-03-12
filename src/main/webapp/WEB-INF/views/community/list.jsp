@@ -43,11 +43,14 @@
             <div class="toolbar-top">
                 <div class="filter-group">
                     <button type="button" class="filter-btn ${empty category ? 'active' : ''}" onclick="location.href='${pageContext.request.contextPath}/community/list'">전체</button>
+                    <button type="button" class="filter-btn ${category == '일상' ? 'active' : ''}" onclick="filterByCategory('일상')">일상</button>
                     <button type="button" class="filter-btn ${category == '동네질문' ? 'active' : ''}" onclick="filterByCategory('동네질문')">동네질문</button>
                     <button type="button" class="filter-btn ${category == '동네맛집' ? 'active' : ''}" onclick="filterByCategory('동네맛집')">동네맛집</button>
-                    <button type="button" class="filter-btn ${category == '동네소식' ? 'active' : ''}" onclick="filterByCategory('동네소식')">동네소식</button>
+                    <button type="button" class="filter-btn ${category == '같이해요' ? 'active' : ''}" onclick="filterByCategory('같이해요')">같이해요</button>
                     <button type="button" class="filter-btn ${category == '분실/실종' ? 'active' : ''}" onclick="filterByCategory('분실/실종')">분실/실종</button>
-                    <button type="button" class="filter-btn ${category == '일상' ? 'active' : ''}" onclick="filterByCategory('일상')">일상</button>
+                    <button type="button" class="filter-btn ${category == '동네사건사고' ? 'active' : ''}" onclick="filterByCategory('동네사건사고')">동네사건사고</button>
+                    <button type="button" class="filter-btn ${category == '생활정보' ? 'active' : ''}" onclick="filterByCategory('생활정보')">생활정보</button>
+                    <button type="button" class="filter-btn ${category == '취미생활' ? 'active' : ''}" onclick="filterByCategory('취미생활')">취미생활</button>
                 </div>
                 <button class="btn-create-cm" onclick="location.href='${pageContext.request.contextPath}/community/write'">
                     <i class="ri-pencil-line"></i> 글쓰기
@@ -109,8 +112,11 @@
                                 <c:when test="${dto.category == '1' || dto.category == '일상'}">일상</c:when>
                                 <c:when test="${dto.category == '2' || dto.category == '동네질문'}">동네질문</c:when>
                                 <c:when test="${dto.category == '3' || dto.category == '동네맛집'}">동네맛집</c:when>
-                                <c:when test="${dto.category == '4' || dto.category == '동네소식'}">동네소식</c:when>
+                                <c:when test="${dto.category == '4' || dto.category == '같이해요'}">같이해요</c:when>
                                 <c:when test="${dto.category == '5' || dto.category == '분실/실종'}">분실/실종</c:when>
+                                <c:when test="${dto.category == '6' || dto.category == '동네사건사고'}">동네사건사고</c:when>
+                                <c:when test="${dto.category == '7' || dto.category == '생활정보'}">생활정보</c:when>
+                                <c:when test="${dto.category == '8' || dto.category == '취미생활'}">취미생활</c:when>
                                 <c:otherwise>${dto.category}</c:otherwise>
                             </c:choose>
                         </span>
@@ -162,10 +168,6 @@
 </main>
 
 <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
-
-<button class="cm-fab" id="cmFab" onclick="location.href='${pageContext.request.contextPath}/community/write'">
-    <i class="ri-pencil-line"></i>
-</button>
 
 <script src="${pageContext.request.contextPath}/dist/js/community/community-list.js"></script>
 </body>

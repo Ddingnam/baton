@@ -285,8 +285,10 @@ const PullUpModule = (function () {
             if (data.status === 'success') {
                 showBatonToast('🚀 게시글이 맨 위로 올라갔습니다!');
                 setTimeout(() => location.reload(), 1200);
-            } else {
-                showBatonToast(data.message || '끌어올리기를 할 수 없습니다.');
+            } else if (data.status === 'limit') {
+				showBatonToast(data.message);
+			} else {
+                showBatonToast('끌어올리기를 할 수 없습니다.');
             }
         })
         .catch(() => showBatonToast('네트워크 오류가 발생했습니다.'));
