@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.sp.app.domain.dto.MemberDto;
+import com.sp.app.domain.dto.RegionDto;
 import com.sp.app.domain.dto.SnsUserDto;
 import com.sp.app.domain.dto.UserDto;
+import com.sp.app.domain.dto.UserRegionInfo;
 
 public interface MemberService {
 	public SnsUserDto loginSnsUser(Map<String, Object> map);
@@ -56,4 +58,11 @@ public interface MemberService {
 	public String findUserId(Map<String, Object> map);
 	public long findByUserIdAndEmail(Map<String, Object> map);
 	public void updateUserPwd(Map<String, Object> map) throws SQLException;
+	
+	public RegionDto findUserRegion(Map<String, Object> map);
+	public void saveRegion(RegionDto dto) throws SQLException;
+	public void deleteRegion(Map<String, Object> map) throws SQLException;
+	public void updateActiveStatus(Map<String, Object> map) throws SQLException;
+	
+	public UserRegionInfo getUserRegionInfo(Long userIdx);
 }

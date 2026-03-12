@@ -5,6 +5,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,6 +63,23 @@ public class MemberController {
 		model.addAttribute("mode", "account");
 		
 		return "member/townAuth";
+	}
+	
+	@GetMapping("/regionAuth/{type}")
+	public String regionAuth(
+			@AuthenticationPrincipal CustomUserDetails userDetails,
+			RedirectAttributes rattr,
+			@PathVariable(name = "type") String type,
+			Model model) {
+		
+		if(userDetails == null) {
+			rattr.addFlashAttribute("msg", "로그인이 필요한 서비스입니다.");
+			return "redirect:/";
+		}
+		
+	    model.addAttribute("regionType", type.equals("main") ? 1 : 2);
+	    
+	    return "member/regionAuth";
 	}
 	
 	@GetMapping("join")
@@ -218,5 +236,7 @@ public class MemberController {
 	    
 		return "member/linkComplete";
 	}
+	
+	
 
 }

@@ -1,6 +1,7 @@
 package com.sp.app.service;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -12,8 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sp.app.common.MyUtil;
 import com.sp.app.common.StorageService;
 import com.sp.app.domain.dto.MemberDto;
+import com.sp.app.domain.dto.RegionDto;
 import com.sp.app.domain.dto.SnsUserDto;
 import com.sp.app.domain.dto.UserDto;
+import com.sp.app.domain.dto.UserRegionInfo;
 import com.sp.app.mapper.MemberMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -342,5 +345,68 @@ public class MemberServiceImpl implements MemberService {
 			log.info("updateUserPwd : ", e);
 			throw e;
 		}
+	}
+
+	@Override
+	public RegionDto findUserRegion(Map<String, Object> map) {
+		RegionDto regionDto = null;
+		try {
+			regionDto = mapper.findUserRegion(map);
+		} catch (Exception e) {
+			log.info("findUserRegion", e);
+		}
+		return regionDto;
+	}
+
+	@Override
+	public void saveRegion(RegionDto dto) throws SQLException {
+		try {
+			mapper.saveRegion(dto);
+		} catch (Exception e) {
+			log.info("saveRegion : ", e);
+		}
+	}
+
+	@Override
+	public void deleteRegion(Map<String, Object> map) throws SQLException {
+		try {
+			mapper.deleteRegion(map);
+		} catch (Exception e) {
+			log.info("deleteRegion : ", e);
+		}
+	}
+
+	@Override
+	public void updateActiveStatus(Map<String, Object> map) throws SQLException {
+		try {
+			mapper.updateActiveStatus(map);
+		} catch (Exception e) {
+			log.info("updateActiveStatus : ", e);
+		}
+	}
+
+	@Override
+	public UserRegionInfo getUserRegionInfo(Long userIdx) {
+		UserRegionInfo userRegionInfo = new UserRegionInfo();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("userIdx", userIdx);
+		try {
+			map.put("regionType", 1);
+	        RegionDto main = mapper.findUserRegion(map);
+	        userRegionInfo.setMainRegion(main);
+	        
+	        map.put("regionType", 2);
+	        RegionDto sub = mapper.findUserRegion(map);
+	        userRegionInfo.setSubRegion(sub);
+	        
+	        if (sub != null && sub.getIsActive() == 1) {
+	            userRegionInfo.setActiveType(2);
+	        } else {
+	            userRegionInfo.setActiveType(1);
+	        }
+		} catch (Exception e) {
+			log.info("getUserRegionInfo", e);
+		}
+		return userRegionInfo;	
 	}
 }

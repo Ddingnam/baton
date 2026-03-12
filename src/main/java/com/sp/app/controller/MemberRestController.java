@@ -6,10 +6,12 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,13 +20,17 @@ import org.springframework.web.bind.support.SessionStatus;
 
 import com.sp.app.common.MyUtil;
 import com.sp.app.domain.dto.GuestSessionInfo;
+import com.sp.app.domain.dto.RegionDto;
 import com.sp.app.domain.dto.SnsUserDto;
 import com.sp.app.domain.dto.UserDto;
+import com.sp.app.domain.dto.UserRegionInfo;
 import com.sp.app.mail.Mail;
 import com.sp.app.mail.MailSender;
+import com.sp.app.security.CustomUserDetails;
 import com.sp.app.security.LoginSnsSuccessHandler;
 import com.sp.app.service.MemberService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -423,6 +429,36 @@ public class MemberRestController {
 		}
     }
     
+    @PostMapping("verifyLocation")
+    public ResponseEntity<?> verifyLocation(
+    		@AuthenticationPrincipal CustomUserDetails userDetails,
+    		@RequestBody RegionDto regionDTO,
+    		HttpSession session) {
+    	Map<String, Object> model = new HashMap<>();
+    	
+    	if(userDetails == null) {
+    		model.put("state", "fail");
+    		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(model);
+    	}
+    	
+        try {
+            Long userIdx = userDetails.getMember().getUserIdx();
+            regionDTO.setUserIdx(userIdx);
+
+            service.saveRegion(regionDTO);
+            
+            UserRegionInfo userRegionInfo = service.getUserRegionInfo(userIdx);
+            userDetails.getMember().setUserRegionInfo(userRegionInfo);
+            
+            model.put("state", "success");
+            return ResponseEntity.ok(model);
+
+        } catch (Exception e) {
+        	log.info("verifyLocation error: ", e);
+            model.put("state", "serverError");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
+        }
+    }
     
 	
 

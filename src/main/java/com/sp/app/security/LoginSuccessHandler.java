@@ -13,12 +13,10 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
-import org.springframework.web.servlet.FlashMap;
-import org.springframework.web.servlet.FlashMapManager;
-import org.springframework.web.servlet.support.RequestContextUtils;
 
 import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.domain.dto.UserDto;
+import com.sp.app.domain.dto.UserRegionInfo;
 import com.sp.app.service.MemberService;
 
 import jakarta.servlet.ServletException;
@@ -75,7 +73,11 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler{
 		    info.setEmail(dto2.getEmail());
 		    info.setUserLevel(dto2.getUserLevel());
 		    info.setAvatar(dto2.getProfile_photo());
-		    info.setLogin_type("local");
+		    info.setLogin_type(dto2.getProvider());
+		    
+		    UserRegionInfo userRegionInfo = memberService.getUserRegionInfo(dto2.getUserIdx());
+		    info.setUserRegionInfo(userRegionInfo);
+		    
 		    request.getSession().setAttribute("member", info);
 		} catch (Exception e) {
 			
