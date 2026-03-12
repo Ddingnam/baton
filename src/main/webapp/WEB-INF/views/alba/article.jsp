@@ -25,7 +25,7 @@
 
 <jsp:include page="/WEB-INF/views/layout/header.jsp" />
 
-<main class="albamon-layout">
+<main class="main-layout">
 
     <header class="detail-recruit-header">
         <h1 class="recruit-title">
@@ -48,133 +48,133 @@
         </div>
     </header>
 
-		    <div class="tabs-header-wrap" id="tabMenu">
-		        <ul class="tabs-header-container">
-		            <li class="tab-item active" onclick="scrollToSection('section-conditions', this)">근무조건</li>
-		            <li class="tab-item" onclick="scrollToSection('section-description', this)">상세요강</li>
-		            <li class="tab-item" onclick="scrollToSection('section-company', this)">기업정보</li>
-		        </ul>
-		    </div>
-		
-		    <section id="section-conditions" class="scroll-section summary-section">
-			   <div class="summary-section">
-				   <div class="pay-highlight-container">
-				        <div class="pay-top">
-				            <span class="pay-badge">${dto.payType}</span>
-				            <strong class="pay-amount"><fmt:formatNumber value="${dto.pay}" pattern="#,###"/>원</strong>
-				        </div>
-				        <div class="pay-info-tags">
-				            <span class="info-tag light">협의가능</span>
-				            <span class="info-tag blue">주휴포함</span>
-				        </div>
-				        <div class="min-wage-info">
-				            2026년 최저시급 10,320원 
-				            <button type="button" class="btn-calc-mini"><i class="ri-calculator-line"></i> 급여계산기</button>
-				        </div>
-				    </div>
-			    </div>			
-			    <ul class="summary-list">
-			        <li>
-			            <i class="ri-calendar-check-line"></i>
-			            <div class="summary-text">
-			                <span class="label">근무기간</span>
-			                <span class="value">
-			                    <c:choose>
-			                        <c:when test="${dto.workPeriod == 'MORE_THAN_A_YEAR'}">1년 이상</c:when>
-			                        <c:otherwise>${dto.workPeriod}</c:otherwise>
-			                    </c:choose>
-			                </span>
-			            </div>
-			        </li>
-			
-			        <li>
-			            <i class="ri-calendar-event-line"></i>
-			            <div class="summary-text">
-			                <span class="label">근무요일</span>
-			                <span class="value">${koreanDays}</span>
-			            </div>
-			        </li>
-			
-			        <li>
-			            <i class="ri-time-line"></i>
-			            <div class="summary-text">
-			                <span class="label">근무시간</span>
-			                <span class="value">${dto.workTime}</span>
-			            </div>
-			        </li>
-			    </ul>
-			</section>
+    <div class="tabs-header-wrap" id="tabMenu">
+        <ul class="tabs-header-container">
+            <li class="tab-item active" onclick="scrollToSection('section-conditions', this)">근무조건</li>
+            <li class="tab-item" onclick="scrollToSection('section-description', this)">상세요강</li>
+            <li class="tab-item" onclick="scrollToSection('section-company', this)">기업정보</li>
+        </ul>
+    </div>
 
-        <div class="divider"></div>
+    <section id="section-conditions" class="scroll-section summary-section">
+       <div class="summary-section">
+           <div class="pay-highlight-container">
+                <div class="pay-top">
+                    <span class="pay-badge">${dto.payType}</span>
+                    <strong class="pay-amount"><fmt:formatNumber value="${dto.pay}" pattern="#,###"/>원</strong>
+                </div>
+                <div class="pay-info-tags">
+                    <span class="info-tag light">협의가능</span>
+                    <span class="info-tag blue">주휴포함</span>
+                </div>
+                <div class="min-wage-info">
+                    2026년 최저시급 10,320원 
+                    <button type="button" class="btn-calc-mini"><i class="ri-calculator-line"></i> 급여계산기</button>
+                </div>
+            </div>
+        </div>			
+        <ul class="summary-list">
+            <li>
+                <i class="ri-calendar-check-line"></i>
+                <div class="summary-text">
+                    <span class="label">근무기간</span>
+                    <span class="value">
+                        <c:choose>
+                            <c:when test="${dto.workPeriod == 'MORE_THAN_A_YEAR'}">1년 이상</c:when>
+                            <c:otherwise>${dto.workPeriod}</c:otherwise>
+                        </c:choose>
+                    </span>
+                </div>
+            </li>
 
-        <section id="section-description" class="scroll-section">
-            <h2 class="section-title">상세 모집요강</h2>
+            <li>
+                <i class="ri-calendar-event-line"></i>
+                <div class="summary-text">
+                    <span class="label">근무요일</span>
+                    <span class="value">${koreanDays}</span>
+                </div>
+            </li>
+
+            <li>
+                <i class="ri-time-line"></i>
+                <div class="summary-text">
+                    <span class="label">근무시간</span>
+                    <span class="value">${dto.workTime}</span>
+                </div>
+            </li>
+        </ul>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="section-description" class="scroll-section">
+        <h2 class="section-title">상세 모집요강</h2>
+        
+        <c:if test="${not empty imageList}">
+            <div class="gallery-section-inner">
             
-		            <c:if test="${not empty imageList}">
-						<div class="gallery-section-inner">
-						
-						        <div class="main-image-wrap">
-						            <img id="mainImage"
-						                 src="${pageContext.request.contextPath}${imageList[0].imgUrl}">
-						        </div>
-						
-						        <c:if test="${imageList.size() > 1}">
-						            <div class="image-indicators">
-						                <c:forEach var="item" items="${imageList}" varStatus="st">
-						                    <button class="indicator-dot ${st.index==0?'active':''}"
-						                            data-src="${item.imgUrl}"
-						                            onclick="Gallery.go(${st.index})"></button>
-						                </c:forEach>
-						            </div>
-						        </c:if>
-						    </div>
-						</c:if>
+                    <div class="main-image-wrap">
+                        <img id="mainImage"
+                             src="${pageContext.request.contextPath}${imageList[0].imgUrl}">
+                    </div>
+            
+                    <c:if test="${imageList.size() > 1}">
+                        <div class="image-indicators">
+                            <c:forEach var="item" items="${imageList}" varStatus="st">
+                                <button class="indicator-dot ${st.index==0?'active':''}"
+                                        data-src="${item.imgUrl}"
+                                        onclick="Gallery.go(${st.index})"></button>
+                            </c:forEach>
+                        </div>
+                    </c:if>
+                </div>
+            </c:if>
 
-            <div class="article-text">${dto.description}</div>
+        <div class="article-text">${dto.description}</div>
 
-            <div class="article-stats">
-                <span><i class="ri-eye-line"></i> 조회 ${dto.hitCount}</span>
-                <span><i class="ri-heart-3-line"></i> 관심 ${dto.likeCount}</span>
-                <span><i class="ri-message-3-line"></i> 지원 ${dto.chatCount}</span>
+        <div class="article-stats">
+            <span><i class="ri-eye-line"></i> 조회 ${dto.hitCount}</span>
+            <span><i class="ri-heart-3-line"></i> 관심 ${dto.likeCount}</span>
+            <span><i class="ri-message-3-line"></i> 지원 ${dto.chatCount}</span>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="section-company" class="scroll-section">
+        <h2 class="section-title">기업 정보</h2>
+        <section class="safety-warning default-warning">
+            <div class="warning-icon"><i class="ri-shield-star-fill"></i></div>
+            <div class="warning-text">
+                <strong>안심하고 지원하세요!</strong>
+                <p>채권추심 고액알바 및 통장, 비밀번호 요구는 보이스피싱 사기 범죄일 수 있습니다. 가담 시 사기방조죄로 처벌받을 수 있으니 절대 응하지 마세요.</p>
             </div>
         </section>
+    </section>
 
-        <div class="divider"></div>
-
-        <section id="section-company" class="scroll-section">
-            <h2 class="section-title">기업 정보</h2>
-            <section class="safety-warning albamon-warning">
-                <div class="warning-icon"><i class="ri-shield-star-fill"></i></div>
-                <div class="warning-text">
-                    <strong>안심하고 지원하세요!</strong>
-                    <p>채권추심 고액알바 및 통장, 비밀번호 요구는 보이스피싱 사기 범죄일 수 있습니다. 가담 시 사기방조죄로 처벌받을 수 있으니 절대 응하지 마세요.</p>
+    <sec:authorize access="isAuthenticated()">
+        <sec:authentication property="principal.member.userIdx" var="loggedInUserId" />
+        <c:if test="${loggedInUserId == dto.userIdx}">
+            <section class="owner-manage-section">
+                <h2 class="section-title" style="border:none; margin-bottom:10px;">내 공고 관리</h2>
+                <div class="manage-grid">
+                    <button type="button" class="btn-manage" onclick="StatusModule.open()">
+                        <i class="ri-loop-left-line"></i> 상태 변경
+                    </button>
+                    <button type="button" class="btn-manage" onclick="PullUpModule.execute(${dto.postingIdx})">
+                        <i class="ri-arrow-up-circle-line"></i> 끌어올리기
+                    </button>
+                    <button type="button" class="btn-manage"
+                            onclick="location.href='${pageContext.request.contextPath}/alba/update?postingIdx=${dto.postingIdx}&page=${page}'">
+                        <i class="ri-edit-line"></i> 수정
+                    </button>
+                    <button type="button" class="btn-manage danger" onclick="confirmDelete(${dto.postingIdx})">
+                        <i class="ri-delete-bin-line"></i> 삭제
+                    </button>
                 </div>
             </section>
-        </section>
-
-        <sec:authorize access="isAuthenticated()">
-            <sec:authentication property="principal.member.userIdx" var="loggedInUserId" />
-            <c:if test="${loggedInUserId == dto.userIdx}">
-                <section class="owner-manage-section">
-                    <h2 class="section-title" style="border:none; margin-bottom:10px;">내 공고 관리</h2>
-                    <div class="manage-grid">
-                        <button type="button" class="btn-manage" onclick="StatusModule.open()">
-                            <i class="ri-loop-left-line"></i> 상태 변경
-                        </button>
-                        <button type="button" class="btn-manage" onclick="PullUpModule.execute(${dto.postingIdx})">
-                            <i class="ri-arrow-up-circle-line"></i> 끌어올리기
-                        </button>
-                        <button type="button" class="btn-manage"
-                                onclick="location.href='${pageContext.request.contextPath}/alba/update?postingIdx=${dto.postingIdx}&page=${page}'">
-                            <i class="ri-edit-line"></i> 수정
-                        </button>
-                        <button type="button" class="btn-manage danger" onclick="confirmDelete(${dto.postingIdx})">
-                            <i class="ri-delete-bin-line"></i> 삭제
-                        </button>
-                    </div>
-                </section>
-            </c:if>
-        </sec:authorize>
+        </c:if>
+    </sec:authorize>
 </main>
 
 <div class="bottom-fixed-bar">
