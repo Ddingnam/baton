@@ -338,5 +338,16 @@ public class TradeServiceImpl implements TradeService {
 		}
 		return dto;
 	}
+
+	@Override
+	public String findLastUpDateByIdx(long productIdx) {
+		String lastUpDate = null;
+		try {
+			lastUpDate = mapper.findLastUpDateByProductIdx(productIdx);
+		} catch (Exception e) {
+			log.info("findLastUpDateByIdx : ", e);
+		}
+		return lastUpDate;
+	}
 	
 }

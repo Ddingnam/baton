@@ -1,5 +1,7 @@
 package com.sp.app.controller;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.sp.app.common.MyUtil;
-import com.sp.app.common.StorageService;
 import com.sp.app.model.Trade;
 import com.sp.app.model.TradeAiResponse;
 import com.sp.app.model.TradeImg;
@@ -32,9 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequestMapping("/trade/*")
 public class TradeController {
-	private final TradeService service;
-	private final StorageService storageService;
-	private final MyUtil myUtil;
+	private final TradeService service;	
 	private final com.sp.app.service.EscrowService escrowService;
 	private final com.sp.app.service.TradeAiService tradeAiService;
 	
@@ -292,8 +290,25 @@ public class TradeController {
 	@ResponseBody
 	public Map<String, Object> tradePullUp(@RequestParam("productIdx") long productIdx) {
 		Map<String, Object> map = new HashMap<>();
-		
 		try {
+			String lastUpDateStr = service.findLastUpDateByIdx(productIdx);
+			
+			if(lastUpDateStr != null) {
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+				LocalDateTime lastUpTime = LocalDateTime.parse(lastUpDateStr, formatter);
+				LocalDateTime todayTime = LocalDateTime.now();
+				
+				if(lastUpTime.plusDays(1).isAfter(todayTime)) {
+					long diffSeconds = java.time.Duration.between(todayTime, lastUpTime.plusDays(1)).getSeconds();
+	                long hours = diffSeconds / 3600;
+	                long minutes = (diffSeconds % 3600) / 60;
+
+	                map.put("status", "limit");
+	                map.put("message", String.format("아직 끌어올릴 수 없습니다. (%d시간 %d분 남음)", hours, minutes));
+	                return map;
+				}
+			}
+			
 	        service.updateLastUpDate(productIdx);
 	        
 	        map.put("status", "success");

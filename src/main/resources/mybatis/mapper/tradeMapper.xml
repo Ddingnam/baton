@@ -181,6 +181,10 @@
 		UPDATE product SET tradeStatus = #{tradeStatus} WHERE productIdx = #{productIdx}
 	</update>
 	
+	<select id="findLastUpDateByProductIdx" resultType="String">
+		SELECT TO_CHAR(lastUpDate, 'YYYY-MM-DD HH24:MI:SS') as lastUpDate FROM product WHERE productIdx = #{productIdx}
+	</select>
+	
 	<update id="updateLastUpDate">
 		UPDATE product SET lastUpDate = SYSDATE WHERE productIdx = #{productIdx}
 	</update>
