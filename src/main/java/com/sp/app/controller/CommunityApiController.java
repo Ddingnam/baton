@@ -256,7 +256,7 @@ public class CommunityApiController {
         } catch (Exception e) {
             log.error("투표 실패", e);
             result.put("success", false);
-            result.put("message", "투표 중 오류가 발생했습니다.");
+            result.put("message", e.getMessage() != null ? e.getMessage() : "투표 중 오류가 발생했습니다.");
             return ResponseEntity.ok(result);
         }
     }
