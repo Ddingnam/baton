@@ -76,9 +76,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const idInput = document.querySelector('input[name="login_id"]');
     const pwInput = document.querySelector('input[name="password"]'); 
     const urlParams = new URLSearchParams(window.location.search);
-    
+
     if (urlParams.has('authorization_error')) {
-        alert('관리자 권한이 없습니다. 일반 로그인 페이지를 이용해 주세요.');
+        alertMsg.textContent = '관리자 권한이 없습니다. 일반 로그인 페이지를 이용해 주세요.';
+        alertBox.classList.add('show');
+        
+        setTimeout(() => {
+            alertBox.classList.remove('show');
+        }, 3000);
+
         history.replaceState({}, null, location.pathname);
     }
     
