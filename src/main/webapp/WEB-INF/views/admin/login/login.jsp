@@ -31,7 +31,6 @@
         </div>
         
         <form id="loginForm" class="auth-form" action="${pageContext.request.contextPath}/member/login" method="post" novalidate>
-            <input type="hidden" name="loginType" value="ADMIN">
             <div class="input-wrap">
                 <i class="ri-user-3-fill icon"></i>
                 <input type="text" name="login_id" placeholder="Admin ID" autocomplete="off">
@@ -78,16 +77,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
 
     if (urlParams.has('authorization_error')) {
-        alertMsg.textContent = '관리자 권한이 없습니다. 일반 로그인 페이지를 이용해 주세요.';
+        showCustomAlert('관리자 권한이 없습니다. 일반 로그인을 이용해 주세요.');
+        history.replaceState({}, null, location.pathname);
+    } 
+    else if (urlParams.has('error')) {
+        let msg = urlParams.get('message') || '아이디 또는 비밀번호가 일치하지 않습니다.';
+        showCustomAlert(msg);
+        history.replaceState({}, null, location.pathname);
+    }
+
+    function showCustomAlert(message) {
+        alertMsg.textContent = message;
         alertBox.classList.add('show');
-        
         setTimeout(() => {
             alertBox.classList.remove('show');
         }, 3000);
-
-        history.replaceState({}, null, location.pathname);
     }
-    
+
     let alertTimeout;
 
     function showError(inputElement, message) {
@@ -128,7 +134,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
 </script>
 
 </body>
