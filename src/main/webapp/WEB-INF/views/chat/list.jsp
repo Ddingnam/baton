@@ -38,6 +38,19 @@
     .custom-context-menu { position: absolute; background: white; border: 1px solid #ddd; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; padding: 8px 0; z-index: 1000; width: 160px; font-size: 14px; display: none; }
     .custom-context-menu .menu-item { padding: 10px 15px; cursor: pointer; color: #333; transition: background 0.2s; }
     .custom-context-menu .menu-item:hover { background: #f4f6f8; }
+    
+    .tab-container { display: flex; border-bottom: 2px solid #eaeaea; margin-bottom: 20px; }
+    .tab-btn { flex: 1; padding: 15px 0; background: none; border: none; font-size: 16px; font-weight: 700; color: #888; cursor: pointer; transition: 0.3s; position: relative; }
+    .tab-btn.active { color: #333; }
+    .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 3px; background: #00B050; border-radius: 3px 3px 0 0; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .notif-item { padding: 20px; border: 1px solid #eaeaea; border-radius: 16px; margin-bottom: 15px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.02); background: #fff; }
+    .notif-item.unread { background: #F2FAF8; }
+    .notif-item:hover { border-color: #00B050; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,176,80,0.08); }
+    .notif-type { font-size: 12px; color: #00B050; font-weight: 700; margin-bottom: 5px; }
+    .notif-content { font-size: 15px; color: #333; margin-bottom: 8px; word-break: break-all; line-height: 1.4; }
+    .notif-date { font-size: 12px; color: #999; }
 </style>
 </head>
 <body>
@@ -58,6 +71,7 @@
                 .date { font-size: 12px !important; }
                 .recent-msg { font-size: 13px !important; }
                 .badge { padding: 2px 8px !important; font-size: 11px !important; border-radius: 10px !important; }
+                
             </style>
             <div class="popup-header">내 채팅방 목록</div>
         </c:when>
@@ -67,7 +81,14 @@
     </c:choose>
 
     <div class="container chat-list-wrapper">
-        <h2 class="page-title">내 채팅방 목록</h2>
+        <h2 class="page-title">내 소식</h2>
+
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="switchTab('chat')">채팅</button>
+            <button class="tab-btn" onclick="switchTab('notif')">알림 <span id="notifTabBadge" class="badge" style="display:none; background:#FF4D4F; margin-left:4px;">0</span></button>
+        </div>
+
+        <div id="chatTab" class="tab-content active">
 
         <div class="list-container" id="listContainer">
             <c:if test="${empty list}">
@@ -101,10 +122,19 @@
                     </div>
                 </div>
             </c:forEach>
-        </div>
-    </div>
-
-    <div id="contextMenu" class="custom-context-menu">
+            </div> 
+        </div> 
+        
+	<div id="notifTab" class="tab-content">
+	    <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:10px;">
+	        <button onclick="markAllAsRead()" style="background:#f0f0f0; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; color:#555; font-size:13px;">모두 읽음</button>
+	        <button onclick="deleteAllNotifications()" style="background:#ffebe9; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; color:#e74c3c; font-size:13px;">모두 삭제</button>
+	    </div>
+	    <div class="list-container" id="pageNotifList">
+	    </div>
+	</div>
+		
+	<div id="contextMenu" class="custom-context-menu">
         <div class="menu-item" onclick="menuAction('open')">채팅방 열기</div>
         <div class="menu-item" style="color:#e74c3c;" onclick="menuAction('leave')">삭제하기</div>
     </div>
@@ -113,138 +143,216 @@
         <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
     </c:if>
 
-    <script>
-        const myUserIdx = ${myUserIdx};
-        let stompClient = null;
+<script>
+const myUserIdx = ${myUserIdx};
+let stompClient = null;
 
-        function openChatRoom(tradeIdx, userIdx) {
-            let url = '${pageContext.request.contextPath}/chat/room?tradeIdx=' + tradeIdx + '&toUserIdx=' + userIdx;
-            
-            <c:choose>
-                <c:when test="${param.mode == 'popup'}">
-                    location.href = url;
-                </c:when>
-                <c:otherwise>
-                    window.open(url, 'chatRoom', 'width=450, height=700, left=200, top=100, scrollbars=yes, resizable=yes');
-                </c:otherwise>
-            </c:choose>
-        }
+function openChatRoom(tradeIdx, userIdx) {
+    let url = '${pageContext.request.contextPath}/chat/room?tradeIdx=' + tradeIdx + '&toUserIdx=' + userIdx;
+    
+    <c:choose>
+        <c:when test="${param.mode == 'popup'}">
+            location.href = url;
+        </c:when>
+        <c:otherwise>
+            window.open(url, 'chatRoom', 'width=450, height=700, left=200, top=100, scrollbars=yes, resizable=yes');
+        </c:otherwise>
+    </c:choose>
+}
 
-        function connectList() {
-            let socket = new SockJS('${pageContext.request.contextPath}/ws/chat');
-            stompClient = Stomp.over(socket);
-            stompClient.debug = null; 
+function connectList() {
+    let socket = new SockJS('${pageContext.request.contextPath}/ws/chat');
+    stompClient = Stomp.over(socket);
+    stompClient.debug = null; 
 
-            stompClient.connect({}, function (frame) {
-                <c:forEach var="room" items="${list}">
-                    stompClient.subscribe('/topic/room/${room.roomIdx}', function (chat) {
-                        let message = JSON.parse(chat.body);
-                        if(message.msgType !== 4) {
-                            updateRoomListUI(${room.roomIdx}, message);
-                        } else {
-                            if(message.userIdx === myUserIdx) {
-                                let badge = document.getElementById('badge-${room.roomIdx}');
-                                if(badge) {
-                                    badge.innerText = '0';
-                                    badge.style.display = 'none';
-                                }
-                            }
-                        }
-                    });
-                </c:forEach>
-
-                stompClient.subscribe('/topic/alarms/' + myUserIdx, function(msg) {
-                    let data = msg.body;
-                    if(data.startsWith('room_deleted:')) {
-                        let deletedRoomIdx = data.split(':')[1];
-                        let roomEl = document.getElementById('room-' + deletedRoomIdx);
-                        if(roomEl) {
-                            roomEl.remove();
-                        }
-                        
-                        let listContainer = document.getElementById('listContainer');
-                        if(listContainer.children.length === 0) {
-                            listContainer.innerHTML = '<div class="empty-msg"><i class="ri-chat-3-line"></i>진행 중인 대화가 없습니다.</div>';
+    stompClient.connect({}, function (frame) {
+        <c:forEach var="room" items="${list}">
+            stompClient.subscribe('/topic/room/${room.roomIdx}', function (chat) {
+                let message = JSON.parse(chat.body);
+                if(message.msgType !== 4) {
+                    updateRoomListUI(${room.roomIdx}, message);
+                } else {
+                    if(message.userIdx === myUserIdx) {
+                        let badge = document.getElementById('badge-${room.roomIdx}');
+                        if(badge) {
+                            badge.innerText = '0';
+                            badge.style.display = 'none';
                         }
                     }
-                });
+                }
             });
-        }
+        </c:forEach>
 
-        function updateRoomListUI(roomIdx, message) {
-            let roomEl = document.getElementById('room-' + roomIdx);
-            if(!roomEl) return;
-
-            let msgEl = document.getElementById('msg-' + roomIdx);
-            if(msgEl) msgEl.innerText = message.content;
-
-            let now = new Date();
-            let timeStr = String(now.getMonth()+1).padStart(2,'0') + "-" + String(now.getDate()).padStart(2,'0') + " " + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-            
-            let dateEl = document.getElementById('date-' + roomIdx);
-            if(dateEl) dateEl.innerText = timeStr;
-
-            if(message.userIdx !== myUserIdx) {
-                let badge = document.getElementById('badge-' + roomIdx);
-                if(badge) {
-                    let count = parseInt(badge.innerText || '0') + 1;
-                    badge.innerText = count;
-                    badge.style.display = 'inline-block';
+        stompClient.subscribe('/topic/alarms/' + myUserIdx, function(msg) {
+            let data = msg.body;
+            if(data.startsWith('room_deleted:')) {
+                let deletedRoomIdx = data.split(':')[1];
+                let roomEl = document.getElementById('room-' + deletedRoomIdx);
+                if(roomEl) {
+                    roomEl.remove();
+                }
+                
+                let listContainer = document.getElementById('listContainer');
+                if(listContainer.children.length === 0) {
+                    listContainer.innerHTML = '<div class="empty-msg"><i class="ri-chat-3-line"></i>진행 중인 대화가 없습니다.</div>';
                 }
             }
+        });
+    });
+}
 
-            let container = document.getElementById('listContainer');
-            container.insertBefore(roomEl, container.firstChild);
+function updateRoomListUI(roomIdx, message) {
+    let roomEl = document.getElementById('room-' + roomIdx);
+    if(!roomEl) return;
+
+    let msgEl = document.getElementById('msg-' + roomIdx);
+    if(msgEl) msgEl.innerText = message.content;
+
+    let now = new Date();
+    let timeStr = String(now.getMonth()+1).padStart(2,'0') + "-" + String(now.getDate()).padStart(2,'0') + " " + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+    
+    let dateEl = document.getElementById('date-' + roomIdx);
+    if(dateEl) dateEl.innerText = timeStr;
+
+    if(message.userIdx !== myUserIdx) {
+        let badge = document.getElementById('badge-' + roomIdx);
+        if(badge) {
+            let count = parseInt(badge.innerText || '0') + 1;
+            badge.innerText = count;
+            badge.style.display = 'inline-block';
         }
+    }
 
-        let selectedTradeIdx = null, selectedUserIdx = null, selectedRoomIdx = null;
+    let container = document.getElementById('listContainer');
+    container.insertBefore(roomEl, container.firstChild);
+}
 
-        document.querySelectorAll('.room-item').forEach(item => {
-            item.addEventListener('contextmenu', function(e) {
-                e.preventDefault(); 
-                
-                selectedTradeIdx = this.dataset.tradeIdx;
-                selectedUserIdx = this.dataset.userIdx;
-                selectedRoomIdx = this.dataset.roomIdx;
-                
-                let menu = document.getElementById('contextMenu');
-                menu.style.display = 'block';
-                menu.style.left = e.pageX + 'px';
-                menu.style.top = e.pageY + 'px';
-            });
-        });
+let selectedTradeIdx = null, selectedUserIdx = null, selectedRoomIdx = null;
 
-        document.addEventListener('click', function(e) {
-            let menu = document.getElementById('contextMenu');
-            if(menu) menu.style.display = 'none';
-        });
+document.querySelectorAll('.room-item').forEach(item => {
+    item.addEventListener('contextmenu', function(e) {
+        e.preventDefault(); 
+        
+        selectedTradeIdx = this.dataset.tradeIdx;
+        selectedUserIdx = this.dataset.userIdx;
+        selectedRoomIdx = this.dataset.roomIdx;
+        
+        let menu = document.getElementById('contextMenu');
+        menu.style.display = 'block';
+        menu.style.left = e.pageX + 'px';
+        menu.style.top = e.pageY + 'px';
+    });
+});
 
-        function menuAction(action) {
-            if(action === 'open') {
-                openChatRoom(selectedTradeIdx, selectedUserIdx);
-            } else if(action === 'leave') {
-                if(!confirm('채팅방을 삭제하시겠습니까?')) return;
-                
-                const params = new URLSearchParams();
-                params.append('roomIdx', selectedRoomIdx);
-                
-                fetch('${pageContext.request.contextPath}/chat/delete', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: params
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if(data.state === 'true') {
-                        location.reload();
-                    }
-                });
+document.addEventListener('click', function(e) {
+    let menu = document.getElementById('contextMenu');
+    if(menu) menu.style.display = 'none';
+});
+
+function menuAction(action) {
+    if(action === 'open') {
+        openChatRoom(selectedTradeIdx, selectedUserIdx);
+    } else if(action === 'leave') {
+        if(!confirm('채팅방을 삭제하시겠습니까?')) return;
+        
+        const params = new URLSearchParams();
+        params.append('roomIdx', selectedRoomIdx);
+        
+        fetch('${pageContext.request.contextPath}/chat/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.state === 'true') {
+                location.reload();
             }
-        }
+        });
+    }
+}
 
-        window.onload = function() { 
-            connectList();
-        };
-    </script>
+window.onload = function() { 
+    connectList();
+    updateTabBadges();
+};
+
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+    if(tabId === 'chat') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('chatTab').classList.add('active');
+    } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('notifTab').classList.add('active');
+        loadPageNotifications();
+    }
+}
+
+function loadPageNotifications() {
+    fetch('${pageContext.request.contextPath}/api/notification/list')
+    .then(res => res.json())
+    .then(data => {
+        let list = document.getElementById('pageNotifList');
+        list.innerHTML = '';
+        if(!data || data.length === 0) {
+            list.innerHTML = '<div class="empty-msg"><i class="ri-notification-3-line"></i><br>새로운 알림이 없습니다.</div>';
+        } else {
+            data.forEach(n => {
+                let unreadClass = n.isRead === 0 ? 'unread' : '';
+                let html = '<div class="notif-item ' + unreadClass + '" onclick="readPageNotif(' + n.notifIdx + ', \'' + n.url + '\')">' +
+                           '<div class="notif-type">' + n.notifType + '</div>' +
+                           '<div class="notif-content">' + n.content + '</div>' +
+                           '<div class="notif-date">' + n.createdAt + '</div>' +
+                           '</div>';
+                list.insertAdjacentHTML('beforeend', html);
+            });
+        }
+        updateTabBadges();
+    });
+}
+
+function readPageNotif(notifIdx, url) {
+    fetch('${pageContext.request.contextPath}/api/notification/read', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'notifIdx=' + notifIdx
+    }).then(() => {
+        if(url && url !== 'null') location.href = '${pageContext.request.contextPath}' + url;
+        else loadPageNotifications();
+    });
+}
+
+function markAllAsRead() {
+    fetch('${pageContext.request.contextPath}/api/notification/readAll', { method: 'POST' })
+    .then(() => { loadPageNotifications(); });
+}
+
+function updateTabBadges() {
+    fetch('${pageContext.request.contextPath}/api/notification/unreadCount')
+    .then(res => res.text())
+    .then(count => {
+        let badge = document.getElementById('notifTabBadge');
+        if(parseInt(count) > 0) {
+            badge.innerText = count;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    });
+}
+
+function deleteAllNotifications() {
+    if(!confirm('모든 알림을 삭제하시겠습니까?')) return;
+    
+    fetch('${pageContext.request.contextPath}/api/notification/deleteAll', { method: 'POST' })
+    .then(() => { 
+        loadPageNotifications(); 
+    });
+}
+    
+</script>
 </body>
 </html>

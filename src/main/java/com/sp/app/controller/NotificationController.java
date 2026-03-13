@@ -60,4 +60,18 @@ public class NotificationController {
         }
         return map;
     }
+    
+    @PostMapping("/deleteAll")
+    public Map<String, Object> deleteAllNotif(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            if(userDetails != null) {
+                service.deleteAllNotifications(userDetails.getUserIdx());
+                map.put("state", "true");
+            }
+        } catch(Exception e) {
+            map.put("state", "false");
+        }
+        return map;
+    }
 }

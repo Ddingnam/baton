@@ -11,4 +11,5 @@ public interface NotificationMapper {
     void updateNotificationRead(Long notifIdx);
     void updateAllNotificationRead(Long userIdx);
     int unreadNotificationCount(Long userIdx);
+    void deleteAllNotifications(Long userIdx);
 }

@@ -22,12 +22,10 @@ public class ChatController {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatService chatService;
-    private final NotificationService notificationService;
 
     public ChatController(SimpMessagingTemplate messagingTemplate, ChatService chatService, NotificationService notificationService) {
         this.messagingTemplate = messagingTemplate;
         this.chatService = chatService;
-        this.notificationService = notificationService;
     }
 
     @MessageMapping("/chat/send")
@@ -37,12 +35,9 @@ public class ChatController {
 
         messagingTemplate.convertAndSend("/topic/room/" + message.getRoomIdx(), message);
 
-        String senderName = chatService.getCounterpartNickname(message.getRoomIdx(), message.getUserIdx());
-
         List<Long> members = chatService.getRoomMembers(message.getRoomIdx());
         for (Long memberIdx : members) {
             if (!memberIdx.equals(message.getUserIdx())) {
-                notificationService.sendNotification(memberIdx, "채팅", senderName + ": " + message.getContent(), "/chat/room?tradeIdx=" + message.getTradeIdx() + "&toUserIdx=" + message.getUserIdx());
                 messagingTemplate.convertAndSend("/topic/alarms/" + memberIdx, "new_chat");
             }
         }

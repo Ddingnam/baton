@@ -49,4 +49,9 @@ public class NotificationServiceImpl implements NotificationService {
     public int unreadNotificationCount(Long userIdx) {
         return mapper.unreadNotificationCount(userIdx);
     }
+    
+    @Override
+    public void deleteAllNotifications(Long userIdx) {
+        mapper.deleteAllNotifications(userIdx);
+    }
 }

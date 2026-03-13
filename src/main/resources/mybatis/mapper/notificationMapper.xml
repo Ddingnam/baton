@@ -25,4 +25,8 @@
     <select id="unreadNotificationCount" parameterType="Long" resultType="int">
         SELECT COUNT(*) FROM NOTIFICATION WHERE userIdx = #{userIdx} AND isRead = 0
     </select>
+    
+    <delete id="deleteAllNotifications" parameterType="Long">
+        DELETE FROM NOTIFICATION WHERE userIdx = #{userIdx}
+    </delete>
 </mapper>
