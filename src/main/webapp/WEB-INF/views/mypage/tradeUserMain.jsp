@@ -69,12 +69,12 @@
 						</div>
 						<div class="stat-box">
 							<div class="stat-icon theme-icon-bg"><i class="ri-bar-chart-box-line"></i></div>
-							<strong id="followerCount">${followerCount} 명</strong>
+							<strong id="followerCount">${empty followerCount ? 0 : followerCount} 명</strong>
 							<span>팔로워</span>
 						</div>
 						<div class="stat-box">
 							<div class="stat-icon theme-icon-bg"><i class="ri-edit-2-line"></i></div>
-							<strong>0 명</strong>
+							<strong>${empty followingCount ? 0 : followingCount} 명</strong>
 							<span>팔로잉</span>
 						</div>
 					</div>

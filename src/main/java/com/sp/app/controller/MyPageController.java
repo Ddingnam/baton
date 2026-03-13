@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import com.sp.app.domain.dto.UserDto;
 import com.sp.app.mapper.PaymentMapper;
 import com.sp.app.model.Trade;
 import com.sp.app.security.CustomUserDetails;
+import com.sp.app.service.FollowService;
 import com.sp.app.service.MemberService;
 import com.sp.app.service.MypageService;
 import com.sp.app.service.TradeService;
@@ -32,6 +34,7 @@ public class MyPageController {
     private final MypageService mypageService;
     private final MemberService memberService;
     private final TradeService tradeService;
+    private final FollowService followService;
 
     @GetMapping({"", "/", "/main"})
     public String main(Model model, Authentication auth) {
@@ -53,16 +56,30 @@ public class MyPageController {
     }
     
     @GetMapping("/tradeUserMain")
-    public String tradeUserMain(@RequestParam("userIdx") long userIdx, Model model) {
+    public String tradeUserMain(@RequestParam("userIdx") long userIdx, 
+    		@AuthenticationPrincipal CustomUserDetails userDetails,
+    		Model model) {
     	Map<String, Object> map = new HashMap<>();
     	try {
     		UserDto userDto = memberService.findById(userIdx);
+    		long followerCount = followService.countByFollowing(userIdx);
+    		long followingCount = followService.countByFollower(userIdx);
+    		boolean isFollowing = false;
     		
+            if (userDetails != null) {
+                isFollowing = followService.isFollowing(userDetails.getUserIdx(), userIdx);
+            }
+            
+            model.addAttribute("isFollowing", isFollowing);
+            model.addAttribute("followerCount", followerCount);
+    		model.addAttribute("followingCount", followingCount);
+            
     		map.put("userIdx", userIdx);
     		List<Trade> tradeList = tradeService.findByUserIdx(map);
     		
     		model.addAttribute("dto", userDto);
     		model.addAttribute("tradeList", tradeList);
+    		
 		} catch (Exception e) {
 			log.info("tradeUserMain", e);
 		}

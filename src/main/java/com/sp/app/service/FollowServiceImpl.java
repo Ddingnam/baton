@@ -1,5 +1,7 @@
 package com.sp.app.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.sp.app.domain.entity.Follow;
@@ -47,6 +49,28 @@ public class FollowServiceImpl implements FollowService{
 		User follower = userRepository.getReferenceById(followerIdx);
         User following = userRepository.getReferenceById(followingIdx);
         return followRepository.existsByFollowerAndFollowing(follower, following);
+	}
+
+	@Override
+	public long countByFollowing(long userIdx) {
+		User user = userRepository.getReferenceById(userIdx);
+	    return followRepository.countByFollowing(user);
+	}
+
+	@Override
+	public long countByFollower(long userIdx) {
+		User user = userRepository.getReferenceById(userIdx);
+	    return followRepository.countByFollower(user);
+	}
+
+	@Override
+	public List<User> getFollowerList(Long userIdx) {
+		return followRepository.findFollowerList(userIdx);
+	}
+
+	@Override
+	public List<User> getFollowingList(Long userIdx) {
+		return followRepository.findFollowingList(userIdx);
 	}
 
 }
