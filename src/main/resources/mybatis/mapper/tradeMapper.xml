@@ -18,11 +18,11 @@
 			<if test="priceMax != null and priceMax != ''">
 				AND p.price &lt;= #{priceMax}
 			</if>
-		
-			<if test="userRegionIdx != null">
-				AND p.regionIdx = #{userRegionIdx}
+		<!-- 
+			<if test="regionCode != null">
+				AND p.regionCode = #{regionCode}
 			</if>
-			
+		 -->	
 			<if test="keyword != null and keyword != ''">
 				AND (
 					p.title LIKE '%' || #{keyword} || '%' 
@@ -46,10 +46,10 @@
 	        SELECT seq_product.NEXTVAL FROM DUAL
 	    </selectKey>
 		INSERT INTO product(productIdx, title, content, price, shippingFee, userIdx, tradeStatus, tradeType, 
-			tradePlace, latitude, longitude, regionIdx, productStatus, categoryIdx)
+			tradePlace, latitude, longitude, <!-- regionCode, --> productStatus, categoryIdx)
 		VALUES(#{productIdx}, #{title, jdbcType=VARCHAR}, #{content, jdbcType=VARCHAR}, #{price}, #{shippingFee}, #{userIdx}, #{tradeStatus, jdbcType=VARCHAR}, #{tradeType, jdbcType=VARCHAR},
 			#{tradePlace, jdbcType=VARCHAR}, #{latitude}, #{longitude}, 
-			#{regionIdx}, #{productStatus, jdbcType=VARCHAR}, #{categoryIdx, jdbcType=VARCHAR})
+			<!-- #{regionCode}, --> #{productStatus, jdbcType=VARCHAR}, #{categoryIdx, jdbcType=VARCHAR})
 	</insert>
 	
 	<insert id="insertTradePostImg" parameterType="com.sp.app.model.TradeImg">
@@ -77,11 +77,13 @@
 	        p.productIdx, p.title, p.content, p.price, p.shippingFee, 
 	        p.userIdx, p.hitCount, p.likeCount, p.chatCount,
 	        p.tradeType, p.tradeStatus, p.tradePlace, 
-	        p.latitude, p.longitude, p.regionIdx, p.productStatus, p.pullCount, 
+	        p.latitude, p.longitude, <!-- p.regionCode, r.coreAddress, --> 
+	        p.productStatus, p.pullCount, 
 	        p.lastUpDate, p.createdDate, p.updatedDate, 
 	        p.categoryIdx, u.nickName
 	    FROM product p
 	    JOIN users u ON p.userIdx = u.userIdx
+	    <!-- LEFT JOIN region r ON p.regionCode = r.regionCode -->
 	    WHERE p.productIdx = #{productIdx}
 	    ORDER BY p.lastUpDate DESC
 	</select>
@@ -130,19 +132,20 @@
 	    SELECT * FROM (
 	        SELECT ROWNUM rnum, tb.* FROM (
 	            SELECT 
-	                p.productIdx, p.title, p.price, p.userIdx, p.tradePlace,
-	                p.tradeType, p.tradeStatus, p.productStatus, p.createdDate, p.lastUpDate, p.updatedDate, p.hitCount, p.likeCount, p.chatCount, 
-	                (SELECT imgUrl FROM productImages WHERE productIdx = p.productIdx AND imgOrder = 1) as imgUrl,
-	                
+	                p.productIdx, p.title, p.price, p.userIdx, p.tradePlace, p.tradeType, 
+	                p.tradeStatus, p.productStatus, p.createdDate, p.lastUpDate, 
+	                p.updatedDate, p.hitCount, p.likeCount, p.chatCount, <!-- r.coreAddress, -->
+	                (SELECT imgUrl 
+	                	FROM productImages 
+	                	WHERE productIdx = p.productIdx AND imgOrder = 1) as imgUrl,
 	                <choose>
 	                    <when test="userIdx != null">
 	                        (SELECT COUNT(*) FROM wishList WHERE productIdx = p.productIdx AND userIdx = #{userIdx})
 	                    </when>
 	                    <otherwise>0</otherwise>
 	                </choose> as isLiked
-	                
 	            FROM product p
-	            
+	            <!-- LEFT JOIN region r ON p.regionCode = r.regionCode -->
 	            <include refid="where-condition"/>
 	            <choose>
 	                <when test="sort == 'lowPrice'">

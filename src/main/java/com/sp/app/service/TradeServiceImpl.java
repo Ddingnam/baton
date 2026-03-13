@@ -29,8 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 public class TradeServiceImpl implements TradeService {
 	private final TradeMapper mapper;
 	private final StorageService storageService;
-	private final WishListRepository wishListRepository;
-    private final ProductRepository productRepository;
 
 	@Override
 	@Transactional
@@ -264,42 +262,6 @@ public class TradeServiceImpl implements TradeService {
 	}
 
 	@Override
-	@Transactional
-	public Map<String, Object> toggleWishList(long productIdx, long userIdx) throws Exception {
-		Map<String, Object> result = new HashMap<>();
-        
-        WishListId id = new WishListId(productIdx, userIdx);
-        
-        Product product = productRepository.findById(productIdx)
-                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
-
-        Optional<WishList> wishOpt = wishListRepository.findById(id);
-
-        if (wishOpt.isPresent()) {
-        	wishListRepository.delete(wishOpt.get());
-            product.updateLikeCount(-1);
-            result.put("isLiked", false);
-        } else {
-        	WishList newWish = WishList.builder()
-                    .productIdx(productIdx)
-                    .userIdx(userIdx)
-                    .build();
-        	wishListRepository.save(newWish);
-            product.updateLikeCount(1);
-            result.put("isLiked", true);
-        }
-
-        result.put("likeCount", product.getLikeCount());
-        return result;
-	}
-
-	@Override
-	public boolean isUserLiked(long productIdx, long userIdx) {
-		WishListId id = new WishListId(productIdx, userIdx);
-	    return wishListRepository.existsById(id);
-	}
-
-	@Override
 	public void updateTradeStatus(long productIdx, String tradeStatus) throws Exception {
 		Map<String, Object> map = new HashMap<>();
 		
@@ -361,5 +323,5 @@ public class TradeServiceImpl implements TradeService {
 		}
 		return lastUpDate;
 	}
-	
+
 }

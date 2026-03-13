@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -39,8 +40,14 @@
 						</div>
 					</div>
 				</div>
+				<sec:authentication property="principal.member.userIdx" var="loggedInUserId"/>
 				<div class="pb-right">
-					<button class="theme-btn" onclick="">팔로우</button>
+					<c:if test="${loggedInUserId != dto.userIdx}"> <button id="btnFollow" 
+				                class="theme-btn ${isFollowing ? 'following' : ''}" 
+				                data-following-idx="${dto.userIdx}">
+				            ${isFollowing ? '팔로잉' : '팔로우'}
+				        </button>
+				    </c:if>
 				</div>
 			</div>
 

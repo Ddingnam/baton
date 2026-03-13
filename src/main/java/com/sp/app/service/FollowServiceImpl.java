@@ -1,0 +1,47 @@
+package com.sp.app.service;
+
+import org.springframework.stereotype.Service;
+
+import com.sp.app.domain.entity.Follow;
+import com.sp.app.domain.entity.User;
+import com.sp.app.repository.FollowRepository;
+import com.sp.app.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class FollowServiceImpl implements FollowService{
+	private final FollowRepository followRepository;
+    private final UserRepository userRepository;
+
+	@Override
+	public void follow(Long followerIdx, Long followingIdx) throws Exception {
+		if (followerIdx.equals(followingIdx)) throw new RuntimeException("자기 자신은 팔로우 불가");
+
+        User follower = userRepository.findById(followerIdx).orElseThrow();
+        User following = userRepository.findById(followingIdx).orElseThrow();
+
+        if (!followRepository.existsByFollowerAndFollowing(follower, following)) {
+            followRepository.save(new Follow(follower, following));
+        }
+	}
+
+	@Override
+	public void unfollow(Long followerIdx, Long followingIdx) throws Exception {
+		User follower = userRepository.findById(followerIdx).orElseThrow();
+        User following = userRepository.findById(followingIdx).orElseThrow();
+        followRepository.deleteByFollowerAndFollowing(follower, following);
+		
+	}
+
+	@Override
+	public boolean isFollowing(Long followerIdx, Long followingIdx) {
+		User follower = userRepository.getReferenceById(followerIdx);
+        User following = userRepository.getReferenceById(followingIdx);
+        return followRepository.existsByFollowerAndFollowing(follower, following);
+	}
+
+}

@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sp.app.domain.dto.RegionDto;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,7 +36,7 @@ public class Trade {
 	private String tradePlace;
 	private String latitude;
 	private String longitude;
-	private long regionIdx;	
+	private String regionCode;
 	private String coreAddress;
 
 	private String lastUpDate;

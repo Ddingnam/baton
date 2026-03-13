@@ -23,8 +23,10 @@ import com.sp.app.model.TradeAiResponse;
 import com.sp.app.model.TradeImg;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.EscrowService;
+import com.sp.app.service.FollowService;
 import com.sp.app.service.TradeAiService;
 import com.sp.app.service.TradeService;
+import com.sp.app.service.WishListService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,8 @@ public class TradeController {
 	private final TradeService service;	
 	private final EscrowService escrowService;
 	private final TradeAiService tradeAiService;
+	private final WishListService wishListService;
+	private final FollowService followService;
 	
 	@Value("${file.upload-root}/trade")
     private String uploadPath;
@@ -119,7 +123,7 @@ public class TradeController {
 			
 			boolean isLiked = false;
 	        if (userDetails != null) {
-	            isLiked = service.isUserLiked(productIdx, userDetails.getMember().getUserIdx());
+	            isLiked = wishListService.isUserLiked(productIdx, userDetails.getMember().getUserIdx());
 	        }
 			
 	        Map<String, Object> escrowInfo = escrowService.getTradeTransaction(productIdx);
@@ -162,7 +166,7 @@ public class TradeController {
 			@AuthenticationPrincipal CustomUserDetails userDetails) throws Exception{
 		try {
 			dto.setUserIdx(userDetails.getUserIdx());
-
+			dto.setRegionCode(userDetails.getMember().getUserRegionInfo().getActiveRegion().getRegionCode());
 			service.saveTradePost(dto, uploadPath);
 		} catch (Exception e) {
 			log.info("writeSubmit : ", e);
@@ -274,11 +278,46 @@ public class TradeController {
 
 	        long userIdx = userDetails.getMember().getUserIdx();
 	        
-	        Map<String, Object> result = service.toggleWishList(productIdx, userIdx);
+	        Map<String, Object> result = wishListService.toggleWishList(productIdx, userIdx);
 	        
 	        map.put("status", "success");
 	        map.put("isLiked", result.get("isLiked"));
 	        map.put("likeCount", result.get("likeCount"));
+	        
+	    } catch (Exception e) {
+	        map.put("status", "error");
+	        map.put("message", e.getMessage());
+	    }
+	    
+	    return map;
+	}
+	
+	@PostMapping("toggleFollow")
+	@ResponseBody
+	public Map<String, Object> toggleFollow(
+	        @RequestParam("followingIdx") long followingIdx,
+	        @AuthenticationPrincipal CustomUserDetails userDetails) {
+	    
+	    Map<String, Object> map = new HashMap<>();
+	    try {
+	        if (userDetails == null) {
+	            map.put("status", "loginRequired");
+	            return map;
+	        }
+
+	        long followerIdx = userDetails.getMember().getUserIdx(); // 나
+	        
+	        boolean isFollowing = followService.isFollowing(followerIdx, followingIdx);
+	        
+	        if (isFollowing) {
+	            followService.unfollow(followerIdx, followingIdx);
+	            map.put("isFollowing", false);
+	        } else {
+	            followService.follow(followerIdx, followingIdx);
+	            map.put("isFollowing", true);
+	        }
+	        
+	        map.put("status", "success");
 	        
 	    } catch (Exception e) {
 	        map.put("status", "error");
