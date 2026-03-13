@@ -46,7 +46,6 @@ public class LoginSnsSuccessHandler {
 					.roles(Arrays.asList(dto.getAuthority()))
 					.build();
 			
-			// 시큐리티 로그인 처리
 			Authentication authentication =
 					new UsernamePasswordAuthenticationToken(
 							userDetails,
@@ -59,7 +58,9 @@ public class LoginSnsSuccessHandler {
 			
 			HttpServletRequest request = RequestUtils.getCurrentRequest();
 		    HttpSession session = request.getSession(true);
-            
+		    
+		    session.setAttribute("msg", dto.getUserId() + "님, 환영합니다!");
+		    session.setAttribute("isFirstLogin", true);
 		    session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);	
 		    
 		} catch (Exception e) {

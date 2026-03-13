@@ -38,6 +38,9 @@
 				<li><a href="${pageContext.request.contextPath}/community/list">
 						<i class="ri-discuss-line"></i> 커뮤니티
 				</a></li>
+				<li><a href="javascript:void(0);" onclick="testRegionInfo()">
+						<i class="ri-map-pin-line"></i> 동네 테스트
+				</a></li>
 			</ul>
 		</div>
 		<div class="sidebar-setting"
@@ -53,13 +56,27 @@
 		</div>
 	</aside>
 
-
-
 	<div id="baton-sidebar-open" class="sidebar-show-btn"
 		onclick="handleSidebar()">
 		<i class="ri-menu-unfold-line"></i>
 	</div>
 
 	<script src="${pageContext.request.contextPath}/dist/js/layout/left.js"></script>
+	
+	<script>
+	function testRegionInfo() {
+	    const mainAddr = "${not empty member.userRegionInfo.mainRegion ? member.userRegionInfo.mainRegion.coreAddress : '미등록'}";
+	    const subAddr = "${not empty member.userRegionInfo.subRegion ? member.userRegionInfo.subRegion.coreAddress : '미등록'}";
+	    const activeAddr = "${not empty member.userRegionInfo.activeRegion ? member.userRegionInfo.activeRegion.coreAddress : '활성 동네 없음'}";
+	    const activeType = "${member.userRegionInfo.activeType == 1 ? '주 동네' : (member.userRegionInfo.activeType == 2 ? '부 동네' : '미설정')}";
+
+	    alert(
+	        "--- [BATON 동네 정보] ---\n" +
+	        "주 동네: " + mainAddr + "\n" +
+	        "부 동네: " + subAddr + "\n\n" +
+	        "현재 활성: " + activeAddr + " (" + activeType + ")"
+	    );
+	}
+	</script>
 </body>
 </html>
