@@ -27,7 +27,7 @@
                 <h1 class="main-title">우리 동네 <span class="highlight">커뮤니티</span></h1>
                 <p class="desc">이웃들과 다양한 동네 소식을 나누고 질문해보세요.</p>
             </div>
-            
+
             <form name="searchForm" class="hero-search-box" action="${pageContext.request.contextPath}/community/list" method="get">
                 <input type="hidden" name="category" value="${category}">
                 <input type="hidden" name="sort" value="${sort}">
@@ -86,6 +86,7 @@
 
             <c:forEach var="dto" items="${list}" varStatus="vs">
                 <a href="${pageContext.request.contextPath}/community/article/${dto.id}?page=${page}" class="cm-item-card" style="animation-delay: ${vs.index * 0.05}s">
+
                     <c:set var="thumbUrl" value="" />
                     <c:if test="${not empty dto.content}">
                         <c:set var="imgTag" value='src="' />
@@ -98,6 +99,7 @@
                             </c:if>
                         </c:if>
                     </c:if>
+
                     <div class="card-visual ${empty thumbUrl ? 'no-image' : ''}">
                         <c:choose>
                             <c:when test="${not empty thumbUrl}">
@@ -131,8 +133,7 @@
                             tmp.innerHTML = `<c:out value="${dto.content}" escapeXml="false"/>`;
                             var text = (tmp.innerText || tmp.textContent || '').replace(/\s+/g,' ').trim();
                             var el = document.getElementById('cardText_${dto.id}');
-                            if(el) el.innerText = text.length > 80 ? text.substring(0,80)+'...' : text;
-                        })();
+                            if(el) el.innerText = text.length > 80 ? text.substring(0,80)+'...' : text;})();
                         </script>
 
                         <div class="card-meta">
@@ -149,7 +150,10 @@
                         <div class="card-footer">
                             <div class="user-info">
                                 <div class="user-avatar"><i class="ri-user-6-line"></i></div>
-                                <span class="user-nick">${dto.writerNickname}</span>
+                                <span class="user-nick"
+                                      onclick="event.preventDefault(); event.stopPropagation(); location.href='${pageContext.request.contextPath}/community/user/${dto.memberIdx}'">
+                                    ${dto.writerNickname}
+                                </span>
                             </div>
                             <div class="stats-info">
                                 <span><i class="ri-eye-line"></i>${dto.hitCount}</span>
@@ -157,6 +161,7 @@
                             </div>
                         </div>
                     </div>
+
                 </a>
             </c:forEach>
         </div>

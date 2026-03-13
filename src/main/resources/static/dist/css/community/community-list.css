@@ -332,7 +332,9 @@ a { text-decoration: none; color: inherit; }
     align-items: center;
     justify-content: center;
     background: #F2F4F6;
+    position: relative;
 }
+
 .card-visual.no-image::after { display: none; }
 .card-visual.no-image i {
     font-size: 32px;
@@ -444,6 +446,12 @@ a { text-decoration: none; color: inherit; }
     font-size: 13px;
     font-weight: 600;
     color: var(--text-main);
+    text-decoration: none;
+}
+
+.user-nick:hover {
+    color: var(--primary);
+    text-decoration: underline;
 }
 
 .stats-info {

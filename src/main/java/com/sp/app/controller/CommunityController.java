@@ -1,5 +1,6 @@
 package com.sp.app.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,7 +48,7 @@ public class CommunityController {
 
     @Value("${file.upload-root}/community")
     private String uploadPath;
-    
+
     @Value("${kakao.map.key}")
     private String kakaoMapKey;
 
@@ -184,10 +186,10 @@ public class CommunityController {
             Map<String, Object> map = new HashMap<>();
             map.put("communityId", id);
             map.put("memberIdx", info.getUserIdx());
-            
+
             model.addAttribute("isUserLiked", service.isUserLiked(map));
             model.addAttribute("isUserScraped", service.isUserScraped(map));
-            
+
             model.addAttribute("dto", dto);
             model.addAttribute("page", page);
             model.addAttribute("query", query);
@@ -198,13 +200,13 @@ public class CommunityController {
             return "redirect:/community/list?" + query;
         }
     }
-    
+
     @GetMapping("update")
     public String updateForm(@RequestParam("id") long id,
             @RequestParam("page") String page,
             @SessionAttribute("member") SessionInfo info,
             Model model) throws Exception {
-        
+
         CommunityDto dto = service.getCommunity(id);
         if (dto == null || !dto.getMemberIdx().equals(info.getUserIdx())) {
             return "redirect:/community/list?page=" + page;
@@ -213,7 +215,7 @@ public class CommunityController {
         model.addAttribute("mode", "update");
         model.addAttribute("page", page);
         model.addAttribute("dto", dto);
-        model.addAttribute("kakaoMapKey", kakaoMapKey); 
+        model.addAttribute("kakaoMapKey", kakaoMapKey);
 
         return "community/write";
     }
@@ -257,7 +259,7 @@ public class CommunityController {
         session.setAttribute("msg", "게시글이 삭제되었습니다.");
         return "redirect:/community/list?page=" + page;
     }
-    
+
     @PostMapping("like")
     public ResponseEntity<?> like(@RequestParam("id") long id, @SessionAttribute("member") SessionInfo info) {
         Map<String, Object> result = new HashMap<>();
@@ -272,7 +274,7 @@ public class CommunityController {
         }
         return ResponseEntity.ok(result);
     }
-    
+
     @PostMapping("scrap")
     public ResponseEntity<?> scrap(@RequestParam("id") long id, @SessionAttribute("member") SessionInfo info) {
         Map<String, Object> result = new HashMap<>();
@@ -285,7 +287,7 @@ public class CommunityController {
         }
         return ResponseEntity.ok(result);
     }
-    
+
     @GetMapping("download")
     public ResponseEntity<?> download(@RequestParam("filename") String filename, @RequestParam("originalFilename") String originalFilename) {
         try {
@@ -337,6 +339,72 @@ public class CommunityController {
             return "community/write";
         } catch (Exception e) {
             return "redirect:/community/write";
+        }
+    }
+
+    @GetMapping("user/{memberIdx}")
+    public String userProfile(
+            @PathVariable("memberIdx") Long memberIdx,
+            @SessionAttribute("member") SessionInfo info,
+            Model model) {
+
+        try {
+            List<CommunityDto> postList = service.getUserPostList(memberIdx);
+
+            int postCount  = (int) service.getUserPostCount(memberIdx);
+            int replyCount = (int) service.getUserReplyCount(memberIdx);
+            int totalLikes = service.getUserTotalLikes(memberIdx);
+
+            String profileNickname;
+            if (!postList.isEmpty()) {
+                profileNickname = postList.get(0).getWriterNickname();
+            } else if (info.getUserIdx() == memberIdx) {
+                profileNickname = info.getName();
+            } else {
+                profileNickname = "익명";
+            }
+
+            LocalDateTime joinDate = service.getUserJoinDate(memberIdx);
+
+            model.addAttribute("profileMemberIdx", memberIdx);
+            model.addAttribute("profileNickname", profileNickname);
+            model.addAttribute("postList", postList);
+            model.addAttribute("postCount", postCount);
+            model.addAttribute("replyCount", replyCount);
+            model.addAttribute("totalLikes", totalLikes);
+            model.addAttribute("joinDate", joinDate);
+
+        } catch (Exception e) {
+            log.error("userProfile error", e);
+        }
+
+        return "community/userProfile";
+    }
+
+    @GetMapping("user/replies")
+    @ResponseBody
+    public ResponseEntity<?> userReplies(@RequestParam("memberIdx") Long memberIdx) {
+        try {
+            List<Map<String, Object>> list = service.getUserRepliesWithPostTitle(memberIdx);
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            log.error("userReplies error", e);
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("user/posts")
+    @ResponseBody
+    public ResponseEntity<?> userPosts(
+            @RequestParam("memberIdx") Long memberIdx,
+            @RequestParam(defaultValue = "1") int page) {
+        try {
+            Pageable pageable = PageRequest.of(page - 1, 10, Sort.by("id").descending());
+            List<CommunityDto> list = service.getUserPostListPaged(memberIdx, pageable);
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            log.error("userPosts error", e);
+            return ResponseEntity.badRequest().build();
         }
     }
 }

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sp.app.common.StorageService;
 import com.sp.app.domain.dto.CommunityDto;
+import com.sp.app.domain.dto.UserDto;
 import com.sp.app.domain.entity.Community;
 import com.sp.app.domain.entity.CommunityHashTag;
 import com.sp.app.domain.entity.CommunityImage;
@@ -27,6 +29,7 @@ import com.sp.app.domain.entity.CommunityScrap;
 import com.sp.app.domain.entity.PollOption;
 import com.sp.app.domain.entity.PollVote;
 import com.sp.app.repository.CommunityPollRepository;
+import com.sp.app.repository.CommunityReplyRepository;
 import com.sp.app.repository.CommunityRepository;
 import com.sp.app.repository.PollOptionRepository;
 import com.sp.app.repository.PollVoteRepository;
@@ -40,10 +43,12 @@ import lombok.extern.slf4j.Slf4j;
 public class CommunityServiceImpl implements CommunityService {
 
 	private final CommunityRepository communityRepository;
+	private final CommunityReplyRepository communityReplyRepository;
 	private final CommunityPollRepository communityPollRepository;
 	private final PollOptionRepository pollOptionRepository;
 	private final PollVoteRepository pollVoteRepository;
 	private final StorageService storageService;
+	private final MemberService memberService;
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
@@ -299,6 +304,7 @@ public class CommunityServiceImpl implements CommunityService {
 					community.addHashTag(CommunityHashTag.builder().tagName(tagName).build());
 				}
 			}
+
 		} catch (Exception e) {
 			log.error("updateTempCommunity error", e);
 			throw e;
@@ -473,6 +479,89 @@ public class CommunityServiceImpl implements CommunityService {
 		communityRepository.delete(community);
 	}
 
+	@Override
+	public long getPollTotalVotes(long communityId) {
+		CommunityPoll poll = communityPollRepository.findByCommunityId(communityId);
+		if (poll == null) return 0;
+		return pollVoteRepository.countDistinctMemberByPollPollId(poll.getPollId());
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<CommunityDto> getUserPostList(Long memberIdx) {
+		return communityRepository
+				.findByMemberIdxAndTemporaryFalseOrderByRegDateDesc(memberIdx)
+				.stream()
+				.limit(10)
+				.map(this::toDto)
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<CommunityDto> getUserPostListPaged(Long memberIdx, Pageable pageable) {
+		return communityRepository
+				.findByMemberIdxAndTemporaryFalse(memberIdx, pageable)
+				.getContent()
+				.stream()
+				.map(this::toDto)
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public long getUserPostCount(Long memberIdx) {
+		return communityRepository.countByMemberIdxAndTemporaryFalse(memberIdx);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public long getUserReplyCount(Long memberIdx) {
+		return communityReplyRepository.countByMemberIdxAndIsDeletedFalse(memberIdx);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public int getUserTotalLikes(Long memberIdx) {
+		return communityRepository
+				.findByMemberIdxAndTemporaryFalseOrderByRegDateDesc(memberIdx)
+				.stream()
+				.mapToInt(Community::getLikeCount)
+				.sum();
+	}
+
+	@Override
+	public LocalDateTime getUserJoinDate(Long memberIdx) {
+	    try {
+	        UserDto user = memberService.findById(memberIdx);
+	        if (user != null && user.getCreatedDate() != null && !user.getCreatedDate().isBlank()) {
+	            return LocalDateTime.parse(user.getCreatedDate(),
+	                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	        }
+	    } catch (Exception e) {
+	        log.warn("getUserJoinDate 파싱 실패, memberIdx={}", memberIdx, e);
+	    }
+	    return null;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Map<String, Object>> getUserRepliesWithPostTitle(Long memberIdx) {
+		return communityReplyRepository
+				.findByMemberIdxAndIsDeletedFalseOrderByRegDateDesc(memberIdx)
+				.stream()
+				.map(r -> {
+					Map<String, Object> m = new HashMap<>();
+					m.put("id",          r.getId());
+					m.put("content",     r.getContent());
+					m.put("regDate",     r.getRegDate());
+					m.put("communityId", r.getCommunity() != null ? r.getCommunity().getId() : null);
+					m.put("postTitle",   r.getCommunity() != null ? r.getCommunity().getSubject() : "");
+					return m;
+				})
+				.collect(Collectors.toList());
+	}
+
 	private CommunityDto toDto(Community entity) {
 		List<CommunityDto.AttachFileInfo> attachFileInfos = entity.getAttachFiles().stream()
 				.map(af -> new CommunityDto.AttachFileInfo(
@@ -513,12 +602,5 @@ public class CommunityServiceImpl implements CommunityService {
 		}
 		
 		return dto;
-	}
-
-	@Override
-	public long getPollTotalVotes(long communityId) {
-		CommunityPoll poll = communityPollRepository.findByCommunityId(communityId);
-		if (poll == null) return 0;
-		return pollVoteRepository.countDistinctMemberByPollPollId(poll.getPollId());
 	}
 }

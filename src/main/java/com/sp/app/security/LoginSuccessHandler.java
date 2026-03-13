@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -23,7 +25,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class LoginSuccessHandler implements AuthenticationSuccessHandler{
+public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 	private RequestCache requestCache = new HttpSessionRequestCache();
 	private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 	private String defaultUrl;
@@ -59,43 +61,50 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler{
 	}
 	
 	protected void resultRedirectStrategy(HttpServletRequest request, 
-	        HttpServletResponse response,
-	        Authentication authentication) throws IOException, ServletException {
+			HttpServletResponse response,
+			Authentication authentication) throws IOException, ServletException {
 
 		request.getSession().setAttribute("msg", authentication.getName() + "님, 환영합니다!");
 		request.getSession().setAttribute("isFirstLogin", true);
 		
 		try {
-		    UserDto dto2 = memberService.findByLoginId(authentication.getName());
-		    SessionInfo info = new SessionInfo();
-		    info.setUserIdx(dto2.getUserIdx());
-		    info.setUserId(dto2.getUserId());
-		    info.setName(dto2.getName());
-		    info.setEmail(dto2.getEmail());
-		    info.setUserLevel(dto2.getUserLevel());
-		    info.setAvatar(dto2.getProfile_photo());
-		    info.setLogin_type(dto2.getProvider());
-		    
-		    UserRegionInfo userRegionInfo = memberService.getUserRegionInfo(dto2.getUserIdx());
-		    info.setUserRegionInfo(userRegionInfo);
-		    
-		    request.getSession().setAttribute("member", info);
-		} catch (Exception e) {
+			UserDto dto2 = memberService.findByLoginId(authentication.getName());
+			SessionInfo info = new SessionInfo();
+			info.setUserIdx(dto2.getUserIdx());
+			info.setUserId(dto2.getUserId());
+			info.setName(dto2.getName());
+			info.setEmail(dto2.getEmail());
+			info.setUserLevel(dto2.getUserLevel());
+			info.setAvatar(dto2.getProfile_photo());
+			info.setLogin_type(dto2.getProvider());
 			
+			UserRegionInfo userRegionInfo = memberService.getUserRegionInfo(dto2.getUserIdx());
+			info.setUserRegionInfo(userRegionInfo);
+			
+			request.getSession().setAttribute("member", info);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-	    
-	    SavedRequest savedRequest = requestCache.getRequest(request, response);
+		
+		Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
+		
+		if (roles.contains("ROLE_ADMIN") || roles.contains("ROLE_EMP")) {
+			redirectStrategy.sendRedirect(request, response, "/admin");
+			return;
+		}
 
-	    if (savedRequest != null) {
-	        String targetUrl = savedRequest.getRedirectUrl();
-	        redirectStrategy.sendRedirect(request, response, targetUrl);
-	    } else {
-	        if (defaultUrl == null || defaultUrl.isEmpty()) {
-	            redirectStrategy.sendRedirect(request, response, "/");
-	        } else {
-	            redirectStrategy.sendRedirect(request, response, defaultUrl);
-	        }
-	    }
+		SavedRequest savedRequest = requestCache.getRequest(request, response);
+
+		if (savedRequest != null) {
+			String targetUrl = savedRequest.getRedirectUrl();
+			redirectStrategy.sendRedirect(request, response, targetUrl);
+		} else {
+			if (defaultUrl == null || defaultUrl.isEmpty()) {
+				redirectStrategy.sendRedirect(request, response, "/");
+			} else {
+				redirectStrategy.sendRedirect(request, response, defaultUrl);
+			}
+		}
 	}
 
 	public void setDefaultUrl(String defaultUrl) {

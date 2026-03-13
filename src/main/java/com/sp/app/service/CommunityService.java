@@ -1,5 +1,6 @@
 package com.sp.app.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -36,4 +37,11 @@ public interface CommunityService {
 	public void updateTempCommunity(CommunityDto dto, String uploadPath) throws Exception;
 	
 	public long getPollTotalVotes(long communityId);
+	public List<CommunityDto> getUserPostList(Long memberIdx);
+	public List<CommunityDto> getUserPostListPaged(Long memberIdx, Pageable pageable);
+	public long getUserPostCount(Long memberIdx);
+	public long getUserReplyCount(Long memberIdx);
+	public int getUserTotalLikes(Long memberIdx);
+	public LocalDateTime getUserJoinDate(Long memberIdx);
+	public List<Map<String, Object>> getUserRepliesWithPostTitle(Long memberIdx);
 }

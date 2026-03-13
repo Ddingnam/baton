@@ -27,7 +27,7 @@ public class SpringSecurityConfig {
 
 		String[] excludeUri = { "/", "/index.jsp", "/member/**", "/dist/**",
 				"/guest/main", "/guest/list", "/uploads/photo/**", "/favicon.ico", "/WEB-INF/views/**", "/static/**",
-				"/oauth/kakao/callback", "/js/**" };
+				"/oauth/kakao/callback", "/admin/login", "/js/**" };
 
 		http.cors(Customizer.withDefaults())
 			.csrf(AbstractHttpConfigurer::disable)
@@ -60,10 +60,20 @@ public class SpringSecurityConfig {
 			.maximumSessions(1)
 			.expiredUrl("/member/expired"));
 
-		http.exceptionHandling((exceptionConfig) -> exceptionConfig.accessDeniedPage("/member/noAuthorized"));
+		http.exceptionHandling((exceptionConfig) -> exceptionConfig
+			    .accessDeniedPage("/member/noAuthorized")
+			    .authenticationEntryPoint((request, response, authException) -> {
+			        String uri = request.getRequestURI();
+			        if (uri.startsWith("/admin")) {
+			            response.sendRedirect("/admin/login");
+			        } else {
+			            response.sendRedirect("/member/login");
+			        }
+			    })
+			);
 
-		return http.build();
-	}
+			return http.build();
+		}
 
 	@Bean
 	PasswordEncoder passwordEncoder() {

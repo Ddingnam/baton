@@ -43,7 +43,7 @@
                     <img src="${pageContext.request.contextPath}/dist/images/avatar.png" alt="프로필">
                 </div>
                 <div class="profile-info">
-                    <div class="nickname">${dto.writerNickname}</div>
+                    <a href="${pageContext.request.contextPath}/community/user/${dto.memberIdx}" class="nickname">${dto.writerNickname}</a>
                     <div class="meta">
                         <span id="articleRegDate" data-date="${dto.regDate}"></span>
                         <span class="dot">·</span>
