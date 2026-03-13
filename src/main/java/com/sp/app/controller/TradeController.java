@@ -166,7 +166,7 @@ public class TradeController {
 			@AuthenticationPrincipal CustomUserDetails userDetails) throws Exception{
 		try {
 			dto.setUserIdx(userDetails.getUserIdx());
-			dto.setRegionCode(userDetails.getMember().getUserRegionInfo().getActiveRegion().getRegionCode());
+			// dto.setRegionCode(userDetails.getMember().getUserRegionInfo().getActiveRegion().getRegionCode());
 			service.saveTradePost(dto, uploadPath);
 		} catch (Exception e) {
 			log.info("writeSubmit : ", e);
