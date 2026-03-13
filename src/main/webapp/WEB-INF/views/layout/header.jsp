@@ -147,56 +147,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        checkUnreadAlarms();
-        connectGlobalAlarm();
-        window.addEventListener('focus', checkUnreadAlarms);
-    });
-
-    function checkUnreadAlarms() {
-        let url = '${pageContext.request.contextPath}/chat/api/unread?_=' + new Date().getTime();
-        fetch(url, { cache: 'no-store' })
-            .then(response => response.text())
-            .then(count => {
-                
-                if(parseInt(count) > 0) {
-                    turnOnAlarmDots();
-                } else {
-                    turnOffAlarmDots(); 
-                }
-            })
-            .catch(error => console.error('채팅 알림 조회 실패:', error));
-    }
-
-    function connectGlobalAlarm() {
-        let socket = new SockJS('${pageContext.request.contextPath}/ws/chat');
-        let stompClient = Stomp.over(socket);
-        stompClient.debug = null; 
-
-        stompClient.connect({}, function (frame) {
-            stompClient.subscribe('/topic/alarms/${loggedInUserId}', function (message) {
-                if(message.body.includes('new_chat')) {
-                    turnOnAlarmDots(); 
-                } else if(message.body.includes('read_chat')) {
-                    checkUnreadAlarms();
-                }
-            });
-        });
-    }
-
-    function turnOnAlarmDots() {
-        let dot1 = document.querySelector('.badge-dot-inline');
-        let dot2 = document.querySelector('.notification-dot');
-        if(dot1) dot1.style.display = 'inline-block';
-        if(dot2) dot2.style.display = 'inline-block';
-    }
-
-    function turnOffAlarmDots() {
-        let dot1 = document.querySelector('.badge-dot-inline');
-        let dot2 = document.querySelector('.notification-dot');
-        if(dot1) dot1.style.display = 'none';
-        if(dot2) dot2.style.display = 'none';
-    }
+    window.LOGGED_IN_USER_ID = "${loggedInUserId}";
 </script>
 </sec:authorize>
 

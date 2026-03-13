@@ -72,6 +72,8 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const profileBtn = document.getElementById('profileDropdownBtn');
     const profileMenu = document.getElementById('profileDropdownMenu');
+    const notifBtn = document.getElementById('notifDropdownBtn');
+    const notifMenu = document.getElementById('notifDropdownMenu');
 
     if (profileBtn && profileMenu) {
         profileBtn.addEventListener('click', (e) => {
@@ -79,24 +81,49 @@ document.addEventListener("DOMContentLoaded", () => {
             e.stopPropagation();
             profileBtn.classList.toggle('active');
             profileMenu.classList.toggle('show');
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
-                profileBtn.classList.remove('active');
-                profileMenu.classList.remove('show');
-            }
+            if (notifMenu) notifMenu.style.display = 'none';
         });
     }
+
+    if (notifBtn && notifMenu) {
+        notifBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            notifMenu.style.display = notifMenu.style.display === 'none' || notifMenu.style.display === '' ? 'block' : 'none';
+            if (profileBtn) profileBtn.classList.remove('active');
+            if (profileMenu) profileMenu.classList.remove('show');
+        });
+        
+        notifMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (profileBtn && profileMenu && !profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
+            profileBtn.classList.remove('active');
+            profileMenu.classList.remove('show');
+        }
+        if (notifBtn && notifMenu && !notifBtn.contains(e.target) && !notifMenu.contains(e.target)) {
+            notifMenu.style.display = 'none';
+        }
+    });
 	
 	const displayMsg = window.SERVER_MSG || window.SERVER_MESSAGE;
     if (displayMsg && displayMsg.trim() !== "") {
         showBatonToast(displayMsg);
-    };
+    }
 	
 	if (window.IS_FIRST_LOGIN && !window.HAS_MAIN_REGION) {
 	    $("#batonAuthLayer").fadeIn(300);
 	}
+
+    if (window.LOGGED_IN_USER_ID) {
+        checkUnreadAlarms();
+        fetchNotifications();
+        connectGlobalAlarm();
+        window.addEventListener('focus', checkUnreadAlarms);
+    }
 });
 
 function showBatonToast(text) {
@@ -125,4 +152,127 @@ function showBatonToast(text) {
 
 function closeBatonAuthLayer() {
     $("#batonAuthLayer").fadeOut(200);
+}
+
+function fetchNotifications() {
+    fetch(window.contextPath + '/api/notification/list')
+    .then(res => res.json())
+    .then(data => {
+        let list = document.getElementById('notifList');
+        if(!list) return;
+        list.innerHTML = '';
+        if(!data || data.length === 0) {
+            list.innerHTML = '<div style="padding:40px; text-align:center; color:#999; font-size:14px;"><i class="ri-notification-badge-line" style="font-size:24px; display:block; margin-bottom:10px; color:#ddd;"></i>새로운 알림이 없습니다.</div>';
+        } else {
+            data.forEach(n => renderSingleNotif(n, false));
+        }
+    });
+
+    fetch(window.contextPath + '/api/notification/unreadCount')
+    .then(res => res.text())
+    .then(count => {
+        let badge = document.getElementById('notifBadge');
+        if(!badge) return;
+        if(parseInt(count) > 0) {
+            badge.style.display = 'block';
+        } else {
+            badge.style.display = 'none';
+        }
+    });
+}
+
+function renderSingleNotif(notif, prepend = true) {
+    let list = document.getElementById('notifList');
+    if(!list) return;
+    if(list.querySelector('.ri-notification-badge-line')) list.innerHTML = '';
+
+    let bg = notif.isRead === 0 ? '#F2FAF8' : '#fff';
+    let html = '<div id="notif-' + notif.notifIdx + '" style="padding:15px 20px; border-bottom:1px solid #eee; background:' + bg + '; cursor:pointer; transition:0.2s;" onclick="readNotif(' + notif.notifIdx + ', \'' + notif.url + '\')">' +
+               '<div style="font-size:12px; color:#00B98D; font-weight:700; margin-bottom:5px;">' + notif.notifType + '</div>' +
+               '<div style="font-size:14px; color:#333; margin-bottom:6px; word-break:break-all; line-height:1.4;">' + notif.content + '</div>' +
+               '<div style="font-size:11px; color:#999;">' + notif.createdAt + '</div>' +
+               '</div>';
+    
+    if(prepend) {
+        list.insertAdjacentHTML('afterbegin', html);
+    } else {
+        list.insertAdjacentHTML('beforeend', html);
+    }
+}
+
+function readNotif(notifIdx, url) {
+    fetch(window.contextPath + '/api/notification/read', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'notifIdx=' + notifIdx
+    }).then(() => {
+        if(url && url !== 'null') location.href = window.contextPath + url;
+    });
+}
+
+function readAllNotifications() {
+    fetch(window.contextPath + '/api/notification/readAll', { method: 'POST' })
+    .then(() => { fetchNotifications(); });
+}
+
+function checkUnreadAlarms() {
+    let url = window.contextPath + '/chat/api/unread?_=' + new Date().getTime();
+    fetch(url, { cache: 'no-store' })
+        .then(response => response.text())
+        .then(count => {
+            if(parseInt(count) > 0) {
+                turnOnAlarmDots();
+            } else {
+                turnOffAlarmDots();
+            }
+        });
+}
+
+function connectGlobalAlarm() {
+    let socket = new SockJS(window.contextPath + '/ws/chat');
+    let stompClient = Stomp.over(socket);
+    stompClient.debug = null; 
+
+    stompClient.connect({}, function (frame) {
+        stompClient.subscribe('/topic/alarms/' + window.LOGGED_IN_USER_ID, function (message) {
+            try {
+                let notif = JSON.parse(message.body);
+                if(notif.notifIdx) {
+                    renderSingleNotif(notif, true);
+                    let badge = document.getElementById('notifBadge');
+                    if(badge) badge.style.display = 'block';
+                    return;
+                }
+            } catch(e) {}
+
+            if(message.body.includes('new_chat')) {
+                turnOnAlarmDots(); 
+            } else if(message.body.includes('read_chat')) {
+                checkUnreadAlarms();
+            } else if(message.body.includes('room_deleted')) {
+                let deletedRoomIdx = message.body.split(':')[1];
+                let roomEl = document.getElementById('room-' + deletedRoomIdx);
+                if(roomEl) roomEl.remove();
+                
+                let listContainer = document.getElementById('listContainer');
+                if(listContainer && listContainer.children.length === 0) {
+                    listContainer.innerHTML = '<div class="empty-msg"><i class="ri-chat-3-line"></i>진행 중인 대화가 없습니다.</div>';
+                }
+            }
+        });
+    });
+}
+
+function turnOnAlarmDots() {
+    let dot1 = document.querySelector('.badge-dot-inline');
+    let dot2 = document.querySelector('.notification-dot');
+    if(dot1) dot1.style.display = 'inline-block';
+    if(dot2) dot2.style.display = 'inline-block';
+}
+
+function turnOffAlarmDots() {
+    let dot1 = document.querySelector('.badge-dot-inline');
+    let dot2 = document.querySelector('.notification-dot');
+    if(dot1) dot1.style.display = 'none';
+    if(dot2) dot2.style.display = 'none';
 }

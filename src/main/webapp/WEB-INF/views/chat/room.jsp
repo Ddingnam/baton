@@ -159,7 +159,17 @@
         let content = input.value.trim();
         if(!content) return;
 
-        let messageModel = { roomIdx: currentRoomIdx, userIdx: myUserIdx, content: content, msgType: 1 };
+        const urlParams = new URLSearchParams(window.location.search);
+        const tradeIdx = urlParams.get('tradeIdx');
+
+        let messageModel = { 
+            roomIdx: currentRoomIdx, 
+            userIdx: myUserIdx, 
+            content: content, 
+            msgType: 1,
+            tradeIdx: tradeIdx
+        };
+        
         stompClient.send("/app/chat/send", {}, JSON.stringify(messageModel));
         input.value = '';
         input.focus();
