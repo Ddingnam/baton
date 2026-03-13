@@ -42,11 +42,12 @@
 				</div>
 				<sec:authentication property="principal.member.userIdx" var="loggedInUserId"/>
 				<div class="pb-right">
-					<c:if test="${loggedInUserId != dto.userIdx}"> <button id="btnFollow" 
-				                class="theme-btn ${isFollowing ? 'following' : ''}" 
-				                data-following-idx="${dto.userIdx}">
-				            ${isFollowing ? '팔로잉' : '팔로우'}
-				        </button>
+					<c:if test="${loggedInUserId != dto.userIdx}"> 
+						<button id="btnFollow" 
+						        class="theme-btn ${isFollowing ? 'following' : ''}" 
+						        data-following-idx="${dto.userIdx}"
+						        onclick="FollowModule.toggle('${dto.userIdx}')"> ${isFollowing ? '팔로잉' : '팔로우'}
+						</button>
 				    </c:if>
 				</div>
 			</div>
@@ -68,7 +69,7 @@
 						</div>
 						<div class="stat-box">
 							<div class="stat-icon theme-icon-bg"><i class="ri-bar-chart-box-line"></i></div>
-							<strong>0 명</strong>
+							<strong id="followerCount">${followerCount} 명</strong>
 							<span>팔로워</span>
 						</div>
 						<div class="stat-box">
@@ -151,6 +152,7 @@
 	<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 	<jsp:include page="/WEB-INF/views/payment/chargeModal.jsp" />
 	<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+	<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_follow.js"></script>
 	<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_main.js"></script>
 	<script src="${pageContext.request.contextPath}/dist/js/payment/payment.js"></script>
 

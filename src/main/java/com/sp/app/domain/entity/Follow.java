@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -23,19 +24,21 @@ import lombok.NoArgsConstructor;
 public class Follow {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "followIdx")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "follow_seq_gen")
+    @SequenceGenerator(name = "follow_seq_gen", sequenceName = "seq_follow", 
+    	allocationSize = 1)
+    @Column(name = "followidx")
     private Long followIdx;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "followerIdx", nullable = false)
+    @JoinColumn(name = "followeridx", nullable = false)
     private User follower;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "followingIdx", nullable = false)
+    @JoinColumn(name = "followingidx", nullable = false)
     private User following;
 
-    @Column(name = "followDate", nullable = false, updatable = false)
+    @Column(name = "followdate", nullable = false, updatable = false)
     private LocalDateTime followDate;
 
     @Builder

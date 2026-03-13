@@ -18,22 +18,27 @@ public class FollowServiceImpl implements FollowService{
     private final UserRepository userRepository;
 
 	@Override
-	public void follow(Long followerIdx, Long followingIdx) throws Exception {
+	public long follow(Long followerIdx, Long followingIdx) throws Exception {
 		if (followerIdx.equals(followingIdx)) throw new RuntimeException("자기 자신은 팔로우 불가");
 
         User follower = userRepository.findById(followerIdx).orElseThrow();
         User following = userRepository.findById(followingIdx).orElseThrow();
-
+        
         if (!followRepository.existsByFollowerAndFollowing(follower, following)) {
             followRepository.save(new Follow(follower, following));
         }
+        
+        return followRepository.countByFollowing(following);
 	}
 
 	@Override
-	public void unfollow(Long followerIdx, Long followingIdx) throws Exception {
+	public long unfollow(Long followerIdx, Long followingIdx) throws Exception {
 		User follower = userRepository.findById(followerIdx).orElseThrow();
         User following = userRepository.findById(followingIdx).orElseThrow();
+        
         followRepository.deleteByFollowerAndFollowing(follower, following);
+        
+        return followRepository.countByFollowing(following);
 		
 	}
 

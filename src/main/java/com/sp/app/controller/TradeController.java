@@ -310,11 +310,13 @@ public class TradeController {
 	        boolean isFollowing = followService.isFollowing(followerIdx, followingIdx);
 	        
 	        if (isFollowing) {
-	            followService.unfollow(followerIdx, followingIdx);
+	            long count = followService.unfollow(followerIdx, followingIdx);
 	            map.put("isFollowing", false);
+	            map.put("followerCount", count);
 	        } else {
-	            followService.follow(followerIdx, followingIdx);
+	            long count = followService.follow(followerIdx, followingIdx);
 	            map.put("isFollowing", true);
+	            map.put("followerCount", count);
 	        }
 	        
 	        map.put("status", "success");

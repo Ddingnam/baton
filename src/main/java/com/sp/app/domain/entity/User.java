@@ -20,15 +20,16 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userIdx")
+    @Column(name = "useridx")
     private Long userIdx;
-
+    
+    @Column(name = "userid")
     private String userId;
     private String name;
     private String nickname;
     
 
-    @Column(name = "createdDate")
+    @Column(name = "createddate")
     private LocalDateTime createdDate;
 
     @Column(name = "status")
