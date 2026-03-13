@@ -12,14 +12,20 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class RegionDto {
-	private int regionType;
-    private String regionCode;
+	private long regionIdx;
+	private long userIdx;
+	private int regionType;    
+	private int isActive;
+	private int isAuthenticated;
+	private String authDate;
+	
+	private String regionCode;
+	private String sido;
+	private String sigungu;
+	private String dong;
+	private double lat;
+	private double lng;
+    
     private String fullAddress;
     private String coreAddress;
-    private double lat;
-    private double lng;
-    
-    private Long userIdx;
-    private int isActive;
-    private int isAuthenticated;
 }

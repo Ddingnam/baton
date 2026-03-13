@@ -59,8 +59,10 @@ public interface MemberService {
 	public long findByUserIdAndEmail(Map<String, Object> map);
 	public void updateUserPwd(Map<String, Object> map) throws SQLException;
 	
-	public RegionDto findUserRegion(Map<String, Object> map);
-	public void saveRegion(RegionDto dto) throws SQLException;
+	public RegionDto findRegionByCode(String regionCode);
+	public RegionDto findUserRegionbyType(Map<String, Object> map);
+	
+	public void saveUserRegion(RegionDto dto) throws SQLException;
 	public void deleteRegion(Map<String, Object> map) throws SQLException;
 	public void updateActiveStatus(Map<String, Object> map) throws SQLException;
 	

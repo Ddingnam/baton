@@ -346,31 +346,43 @@ public class MemberServiceImpl implements MemberService {
 			throw e;
 		}
 	}
-
+	
 	@Override
-	public RegionDto findUserRegion(Map<String, Object> map) {
+	public RegionDto findRegionByCode(String regionCode) {
 		RegionDto regionDto = null;
 		try {
-			regionDto = mapper.findUserRegion(map);
+			regionDto = mapper.findRegionbyCode(regionCode);
 		} catch (Exception e) {
-			log.info("findUserRegion", e);
+			log.info("findRegionByCode", e);
 		}
 		return regionDto;
 	}
 
 	@Override
-	public void saveRegion(RegionDto dto) throws SQLException {
+	public RegionDto findUserRegionbyType(Map<String, Object> map) {
+		RegionDto regionDto = null;
 		try {
-			mapper.saveRegion(dto);
+			regionDto = mapper.findUserRegionbyType(map);
 		} catch (Exception e) {
-			log.info("saveRegion : ", e);
+			log.info("findUserRegionbyType", e);
+		}
+		return regionDto;
+	}
+
+	@Override
+	public void saveUserRegion(RegionDto dto) throws SQLException {
+		try {
+			mapper.insertRegion(dto);
+			mapper.saveUserRegion(dto);
+		} catch (Exception e) {
+			log.info("saveUserRegion : ", e);
 		}
 	}
 
 	@Override
 	public void deleteRegion(Map<String, Object> map) throws SQLException {
 		try {
-			mapper.deleteRegion(map);
+			// mapper.deleteRegion(map);
 		} catch (Exception e) {
 			log.info("deleteRegion : ", e);
 		}
@@ -392,11 +404,11 @@ public class MemberServiceImpl implements MemberService {
 		map.put("userIdx", userIdx);
 		try {
 			map.put("regionType", 1);
-	        RegionDto main = mapper.findUserRegion(map);
+	        RegionDto main = mapper.findUserRegionbyType(map);
 	        userRegionInfo.setMainRegion(main);
 	        
 	        map.put("regionType", 2);
-	        RegionDto sub = mapper.findUserRegion(map);
+	        RegionDto sub = mapper.findUserRegionbyType(map);
 	        userRegionInfo.setSubRegion(sub);
 	        
 	        if (sub != null && sub.getIsActive() == 1) {

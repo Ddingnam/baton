@@ -19,7 +19,6 @@ public interface MemberMapper {
 	public Long userSeq();	
 	public void insertUser(UserDto dto) throws SQLException;
 	public void insertSnsUser(SnsUserDto dto) throws SQLException;
-	public void insertRegion(UserDto dto) throws SQLException;
 	
 	public void insertMember12(MemberDto dto) throws SQLException;
 	public void insertMemberStatus(MemberDto dto) throws SQLException;
@@ -65,10 +64,12 @@ public interface MemberMapper {
 	public long findByUserIdAndEmail(Map<String, Object> map);
 	public void updateUserPwd(Map<String, Object> map) throws SQLException;
 	
-	public RegionDto findUserRegion(Map<String, Object> map);
-	public void saveRegion(RegionDto dto) throws SQLException;
-	public void deleteRegion(Map<String, Object> map) throws SQLException;
+	public void insertRegion(RegionDto dto) throws SQLException;
 	
+	public RegionDto findUserRegionbyType(Map<String, Object> map);
+	public RegionDto findRegionbyCode(String regionCode);
+	
+	public void saveUserRegion(RegionDto dto) throws SQLException;
+	public void deleteUserRegion(Map<String, Object> map) throws SQLException;
 	public void updateActiveStatus(Map<String, Object> map) throws SQLException;
-	
 }

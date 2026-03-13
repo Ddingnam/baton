@@ -21,6 +21,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import com.sp.app.common.MyUtil;
 import com.sp.app.domain.dto.GuestSessionInfo;
 import com.sp.app.domain.dto.RegionDto;
+import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.domain.dto.SnsUserDto;
 import com.sp.app.domain.dto.UserDto;
 import com.sp.app.domain.dto.UserRegionInfo;
@@ -429,6 +430,52 @@ public class MemberRestController {
 		}
     }
     
+    @PostMapping("checkLocation")
+    public ResponseEntity<?> checkLocation(
+    		@AuthenticationPrincipal CustomUserDetails userDetails,
+    		@RequestParam("regionType") String regionType,
+    		@RequestParam("regionCode") String regionCode) {
+    	Map<String, Object> model = new HashMap<>();
+    	
+    	if (userDetails == null) {
+    	    model.put("state", "fail");
+    	    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(model);
+    	}
+
+    	if (regionType == null || regionCode == null) {
+    	    model.put("state", "badRequest");
+    	    return ResponseEntity.badRequest().body(model);
+    	}
+    	
+        try {
+            Long userIdx = userDetails.getMember().getUserIdx();
+            UserRegionInfo regionInfo = service.getUserRegionInfo(userIdx);
+            
+            if(regionInfo != null) {
+	            if (regionType.equals("1")) {
+	                if (regionInfo.getSubRegion() != null && regionCode.equals(regionInfo.getSubRegion().getRegionCode())) {
+	                    model.put("state", "subDuplicated");
+	                    return ResponseEntity.ok(model);
+	                }
+	            } 
+	            else if (regionType.equals("2")) {
+	                if (regionInfo.getMainRegion() != null && regionCode.equals(regionInfo.getMainRegion().getRegionCode())) {
+	                    model.put("state", "mainDuplicated");
+	                    return ResponseEntity.ok(model);
+	                }
+	            }
+            }
+            
+            model.put("state", "success");
+            return ResponseEntity.ok(model);
+
+        } catch (Exception e) {
+        	log.info("checkLocation error: ", e);
+            model.put("state", "serverError");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
+        }
+    }
+    
     @PostMapping("verifyLocation")
     public ResponseEntity<?> verifyLocation(
     		@AuthenticationPrincipal CustomUserDetails userDetails,
@@ -441,14 +488,25 @@ public class MemberRestController {
     		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(model);
     	}
     	
+    	if (regionDTO == null) {
+    	    model.put("state", "badRequest");
+    	    return ResponseEntity.badRequest().body(model);
+    	}
+    	
         try {
             Long userIdx = userDetails.getMember().getUserIdx();
             regionDTO.setUserIdx(userIdx);
 
-            service.saveRegion(regionDTO);
+            service.saveUserRegion(regionDTO);
             
             UserRegionInfo userRegionInfo = service.getUserRegionInfo(userIdx);
             userDetails.getMember().setUserRegionInfo(userRegionInfo);
+            
+            SessionInfo info = (SessionInfo) session.getAttribute("member");
+            if(info != null) {
+                info.setUserRegionInfo(userRegionInfo);
+                session.setAttribute("member", info);
+            }
             
             model.put("state", "success");
             return ResponseEntity.ok(model);
@@ -459,7 +517,4 @@ public class MemberRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
         }
     }
-    
-	
-
 }

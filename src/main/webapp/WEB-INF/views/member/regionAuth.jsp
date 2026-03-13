@@ -116,8 +116,13 @@ let geocoder = new kakao.maps.services.Geocoder();
 let targetAddress = "";
 let targetDong = ""; 
 
-let finalLat = 0;
-let finalLng = 0;
+let finalRepresentLat = 0; 
+let finalRepresentLng = 0; 
+
+let finalSido = "";
+let finalSigungu = "";
+let finalDong = "";
+
 let finalFullAddress = "";
 let finalCoreAddress = "";
 let finalRegionCode = "";
@@ -251,24 +256,35 @@ function executeVerification(lat, lng, addr) {
                 for(let i = 0; i < result.length; i++) {
                     if(result[i].region_type === 'B') {
                         finalRegionCode = result[i].code; 
+                        finalSido = result[i].region_1depth_name;
+                        finalSigungu = result[i].region_2depth_name;
+                        finalDong = result[i].region_3depth_name;
                         finalCoreAddress = result[i].region_3depth_name;
                         break;
                     }
                 }
+                
+                finalFullAddress = finalSido + " " + finalSigungu + " " + finalDong;
 
-                finalLat = lat;
-                finalLng = lng;
-                finalFullAddress = currentAddressFull;
-
-                toast.className = "auth-error-toast item-2 auth-success";
-                toast.innerHTML = '<i class="ri-checkbox-circle-fill"></i> 현재 위치가 [' + targetDong + '] 주변으로 일치합니다.';
-                document.getElementById("btnComplete").disabled = false;
+                geocoder.addressSearch(finalFullAddress, function(searchResult, searchStatus) {
+                    if (searchStatus === kakao.maps.services.Status.OK) {
+                        finalRepresentLat = searchResult[0].y;
+                        finalRepresentLng = searchResult[0].x;
+                    } else {
+                        finalRepresentLat = lat; 
+                        finalRepresentLng = lng; 
+                    }
+                    
+                    toast.className = "auth-error-toast item-2 auth-success";
+                    toast.innerHTML = '<i class="ri-checkbox-circle-fill"></i> 현재 위치가 [' + targetDong + '] 주변으로 일치합니다.';
+                    document.getElementById("btnComplete").disabled = false;
+                });
             }
         });
         
     } else {
         toast.className = "auth-error-toast item-2 shake";
-        toast.innerHTML = '<i class="ri-error-warning-fill"></i> 현재 위치가 목표 지역과 다릅니다.<br>실제 위치: ' + currentAddressFull;
+        toast.innerHTML = '현재 위치가 목표 지역과 다릅니다.<br>실제 위치: ' + currentAddressFull;
         document.getElementById("btnComplete").disabled = true;
     }
 }
@@ -308,19 +324,51 @@ async function completeVerification() {
     const btn = document.getElementById("btnComplete");
     
     btn.disabled = true;
-    btn.innerHTML = "<span>처리 중...</span>";
-
-    const requestData = {
-        regionType: `${regionType}`,
-        regionCode: finalRegionCode,
-        fullAddress: finalFullAddress,
-        coreAddress: finalCoreAddress, 
-        lat: finalLat,
-        lng: finalLng
-    };
+    btn.innerHTML = "<span>검사 중...</span>";
 
     try {
-        const response = await fetch('${pageContext.request.contextPath}/member/verifyLocation', {
+        const checkParams = new URLSearchParams();
+        checkParams.append("regionType", "${regionType}");
+        checkParams.append("regionCode", finalRegionCode);
+
+        const checkResponse = await fetch(`${pageContext.request.contextPath}/member/checkLocation`, {
+            method: 'POST',
+            body: checkParams
+        });
+
+        if (!checkResponse.ok) throw new Error('중복 체크 서버 응답 오류');
+
+        const checkData = await checkResponse.json();
+
+        if (checkData.state === "subDuplicated") {
+            showBatonToast("이미 부 동네로 등록된 곳입니다. 다른 동네를 선택해주세요.");
+            resetBtn(btn);
+            return;
+        } else if (checkData.state === "mainDuplicated") {
+            showBatonToast("이미 주 동네로 등록된 곳입니다. 다른 동네를 선택해주세요.");
+            resetBtn(btn);
+            return;
+        } else if (checkData.state === "fail") {
+            showBatonToast("요청 정보가 올바르지 않습니다.");
+            resetBtn(btn);
+            return;
+        }
+
+        btn.innerHTML = "<span>인증 저장 중...</span>";
+
+        const requestData = {
+            regionType: `${regionType}`,
+            regionCode: finalRegionCode,
+            sido: finalSido,
+            sigungu: finalSigungu,
+            dong: finalDong,
+            lat: finalRepresentLat,
+            lng: finalRepresentLng,
+            fullAddress: finalFullAddress,
+            coreAddress: finalCoreAddress 
+        };
+
+        const saveResponse = await fetch('${pageContext.request.contextPath}/member/verifyLocation', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -328,47 +376,29 @@ async function completeVerification() {
             body: JSON.stringify(requestData)
         });
 
-        if (response.status === 401) {
-        	showBatonToast("로그인이 필요한 서비스입니다.");
-        	await new Promise(resolve => setTimeout(resolve, 1200));
+        if (saveResponse.status === 401) {
+            showBatonToast("로그인이 필요한 서비스입니다.");
+            await new Promise(resolve => setTimeout(resolve, 1200));
             window.location.href = "${pageContext.request.contextPath}/member/login";
             return;
         }
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
+        const saveData = await saveResponse.json();
 
-        const data = await response.json();
-
-        switch(data.state) {
-            case "success":
-            	btn.classList.add('success');
-                btn.innerHTML = '<i class="ri-checkbox-circle-line"></i> <span>인증 완료!</span>';
-                
-                await new Promise(resolve => setTimeout(resolve, 1200));
-
-                window.location.href = "${pageContext.request.contextPath}/";
-                break;
-                
-            case "fail":
-            	showBatonToast("인증 처리에 실패했습니다. 정보를 다시 확인해주세요.");
-                resetBtn(btn);
-                break;
-                
-            case "serverError":
-            	showBatonToast("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-                resetBtn(btn);
-                break;
-                
-            default:
-            	showBatonToast("알 수 없는 오류가 발생했습니다.");
-                resetBtn(btn);
+        if (saveData.state === "success") {
+            btn.classList.add('success');
+            btn.innerHTML = '<i class="ri-checkbox-circle-line"></i> <span>인증 완료!</span>';
+            
+            showBatonToast("동네 인증이 성공적으로 완료되었습니다.");
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            window.location.href = "${pageContext.request.contextPath}/";
+        } else {
+            throw new Error(saveData.state);
         }
 
     } catch (error) {
-        console.error('Fetch Error:', error);
-        showBatonToast("통신 중 오류가 발생했습니다. 네트워크 상태를 확인해주세요.");
+        console.error('Process Error:', error);
+        showBatonToast("처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
         resetBtn(btn);
     }
 }

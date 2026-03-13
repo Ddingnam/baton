@@ -68,8 +68,8 @@ public class MemberController {
 	@GetMapping("/regionAuth/{type}")
 	public String regionAuth(
 			@AuthenticationPrincipal CustomUserDetails userDetails,
-			RedirectAttributes rattr,
 			@PathVariable(name = "type") String type,
+			RedirectAttributes rattr,
 			Model model) {
 		
 		if(userDetails == null) {

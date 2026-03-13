@@ -77,14 +77,6 @@
 		WHERE provider = #{provider, jdbcType=VARCHAR} AND oauthId = #{oauthId, jdbcType=VARCHAR}
 	</select>
 	
-	<insert id="insertRegion" parameterType="com.sp.app.domain.dto.UserDto">
-	    INSERT INTO region (
-	        regionIdx, userIdx, regionCode, fullAddress, coreAddress, lat, lng
-	    ) VALUES (
-	        region_seq.NEXTVAL, #{userIdx}, #{regionCode}, #{fullAddress}, #{coreAddress}, #{lat}, #{lng}
-	    )
-	</insert>
-	
     <insert id="insertMember1" parameterType="com.sp.app.domain.dto.MemberDto">
 		INSERT INTO member1(member_id, login_id, password, sns_provider, sns_id,  
 			enabled, created_at, update_at, failure_cnt)
@@ -342,39 +334,66 @@
 		WHERE useridx = #{userIdx}
 	</update>
 	
-	<select id="findUserRegion" parameterType="map" resultType="com.sp.app.domain.dto.RegionDto">
-        SELECT * FROM region 
-        WHERE userIdx = #{userIdx} AND region_type = #{regionType}
+	<insert id="insertRegion" parameterType="com.sp.app.domain.dto.RegionDto">
+		INSERT INTO region (regionCode, sido, sigungu, dong, represent_lat, represent_lng)
+		SELECT #{regionCode}, #{sido}, #{sigungu}, #{dong}, #{lat}, #{lng}
+		FROM DUAL
+		WHERE NOT EXISTS (
+		    SELECT 1 FROM region WHERE regionCode = #{regionCode}
+		)
+	</insert>
+	
+	<select id="findUserRegionbyType" parameterType="map" resultType="com.sp.app.domain.dto.RegionDto">
+        SELECT u.regionIdx, u.userIdx, u.regionCode, u.regionType,
+        	   u.is_active, u.is_authenticated, u.authDate,
+        	   (r.sido || ' ' || r.sigungu || ' ' || r.dong) AS fullAddress,
+        	   r.dong AS coreAddress
+        FROM userRegion u 
+        JOIN region r ON u.regionCode = r.regionCode
+        WHERE u.userIdx = #{userIdx} AND u.regionType = #{regionType}
     </select>
-
-    <update id="saveRegion" parameterType="com.sp.app.domain.dto.RegionDto">
-        MERGE INTO region r
-	    USING DUAL
-	    ON (r.userIdx = #{userIdx} AND r.region_type = #{regionType})
+    
+    <select id="findRegionbyCode" parameterType="String" resultType="com.sp.app.domain.dto.RegionDto">
+        SELECT regionCode, sido, sigungu, dong, represent_lat, represent_lng,
+        	   (sido || ' ' || sigungu || ' ' || dong) AS fullAddress,
+        	   dong AS coreAddress
+        FROM region
+        WHERE regionCode = #{regionCode}
+    </select>
+    
+    <update id="saveUserRegion" parameterType="com.sp.app.domain.dto.RegionDto">
+	    MERGE INTO userRegion u
+	    USING (
+	        SELECT 
+	            #{userIdx} AS userIdx, 
+	            #{regionType} AS regionType 
+	        FROM DUAL
+	    ) d
+	    ON (u.userIdx = d.userIdx AND u.regionType = d.regionType)
 	    WHEN MATCHED THEN
 	        UPDATE SET 
-	            regionCode = #{regionCode}, 
-	            fullAddress = #{fullAddress}, 
-	            coreAddress = #{coreAddress}, 
-	            lat = #{lat}, 
-	            lng = #{lng},
-	            is_authenticated = 1,
-	            is_active = CASE WHEN #{regionType} = 1 THEN 1 ELSE 0 END,
-	            createdAt = SYSDATE
+	            regionCode = #{regionCode},
+	            authDate = SYSDATE,
+	            is_authenticated = 1
 	    WHEN NOT MATCHED THEN
-	        INSERT (regionIdx, userIdx, region_type, regionCode, fullAddress, coreAddress, lat, lng, is_active, is_authenticated)
-	        VALUES (region_seq.NEXTVAL, #{userIdx}, #{regionType}, #{regionCode}, #{fullAddress}, #{coreAddress}, #{lat}, #{lng}, 
-	                CASE WHEN #{regionType} = 1 THEN 1 ELSE 0 END, 1)
-    </update>
+	        INSERT (
+	            regionIdx, userIdx, regionCode, regionType, 
+	            is_active, is_authenticated, authDate
+	        )
+	        VALUES (
+	            userRegion_seq.NEXTVAL, d.userIdx, #{regionCode}, d.regionType, 
+	            CASE WHEN d.regionType = 1 THEN 1 ELSE 0 END, 1, SYSDATE
+	        )
+	</update>
 
-    <delete id="deleteRegion" parameterType="map">
-        DELETE FROM region WHERE userIdx = #{userIdx} AND region_type = #{regionType}
+    <delete id="deleteUserRegion" parameterType="map">
+        DELETE FROM userRegion WHERE userIdx = #{userIdx} AND regionType = #{regionType}
     </delete>
 
     <update id="updateActiveStatus" parameterType="map">
-        UPDATE region
+        UPDATE userRegion
         SET is_active = CASE 
-            WHEN region_type = #{regionType} THEN 1
+            WHEN regionType = #{regionType} THEN 1
             ELSE 0
         END
         WHERE userIdx = #{userIdx}
