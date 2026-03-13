@@ -14,6 +14,11 @@
 </head>
 <body>
 
+<div id="customAlert" class="custom-alert">
+    <i class="ri-error-warning-fill"></i>
+    <span id="alertMessage">입력란을 작성해 주세요.</span>
+</div>
+
 <div class="auth-layout">
     <div class="auth-box">
         <div class="auth-brand">
@@ -25,15 +30,15 @@
             <p>서비스 관리를 위해 로그인해 주세요.</p>
         </div>
         
-        <form class="auth-form" action="${pageContext.request.contextPath}/member/login" method="post">
+        <form id="loginForm" class="auth-form" action="${pageContext.request.contextPath}/member/login" method="post" novalidate>
             <div class="input-wrap">
                 <i class="ri-user-3-fill icon"></i>
-                <input type="text" name="login_id" placeholder="아이디" required autocomplete="off">
+                <input type="text" name="login_id" placeholder="Admin ID" autocomplete="off">
             </div>
             
             <div class="input-wrap">
                 <i class="ri-lock-password-fill icon"></i>
-                <input type="password" name="password" placeholder="비밀번호" required>
+                <input type="password" name="password" placeholder="PassWord">
             </div>
             
             <div class="auth-tools">
@@ -61,6 +66,56 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('loginForm');
+    const alertBox = document.getElementById('customAlert');
+    const alertMsg = document.getElementById('alertMessage');
+    const idInput = document.querySelector('input[name="login_id"]');
+    const pwInput = document.querySelector('input[name="password"]');
+    
+    let alertTimeout;
+
+    function showError(inputElement, message) {
+        alertMsg.textContent = message;
+        alertBox.classList.add('show');
+        
+        const wrap = inputElement.closest('.input-wrap');
+        wrap.classList.add('error', 'shake');
+        
+        setTimeout(() => wrap.classList.remove('shake'), 300);
+        
+        clearTimeout(alertTimeout);
+        alertTimeout = setTimeout(() => {
+            alertBox.classList.remove('show');
+        }, 3000);
+        
+        inputElement.focus();
+    }
+
+    [idInput, pwInput].forEach(input => {
+        input.addEventListener('input', function() {
+            this.closest('.input-wrap').classList.remove('error');
+            alertBox.classList.remove('show');
+        });
+    });
+
+    form.addEventListener('submit', function(e) {
+        if (!idInput.value.trim()) {
+            e.preventDefault();
+            showError(idInput, '아이디를 입력해 주세요.');
+            return;
+        }
+        
+        if (!pwInput.value.trim()) {
+            e.preventDefault();
+            showError(pwInput, '비밀번호를 입력해 주세요.');
+            return;
+        }
+    });
+});
+</script>
 
 </body>
 </html>
