@@ -23,6 +23,7 @@ public class JobPostingServiceImpl implements JobPostingService {
     private final JobPostingMapper mapper;
     private final StorageService storageService;
     
+    
     @Value("${file.upload-root}/job")
     private String uploadPath;
 
@@ -138,6 +139,11 @@ public class JobPostingServiceImpl implements JobPostingService {
     @Override
     public List<JobPosting> listPostingByArea(Map<String, Object> map) {
         return mapper.listPostingByArea(map);
+    }
+
+    @Override
+    public List<String> listDong(Map<String, Object> map) {
+        return mapper.listDong(map);
     }
     
 }

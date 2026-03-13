@@ -69,6 +69,7 @@
 
 				<div class="advanced-filter-wrap">
 					<div class="filter-tab-group">
+					
 						<label class="filter-tab active"> 
 							<input type="radio" name="filterTab" value="area" checked="checked" /> 
 							<span>지역 <i class="ri-arrow-down-s-line"></i></span>
@@ -214,5 +215,55 @@ const serverData = [
 ];
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/alba/alba-list.js"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=발급받은_JavaScript_키&libraries=services"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const locationNameDiv = document.querySelector('.location-name');
+
+    if (navigator.geolocation) {
+
+        navigator.geolocation.getCurrentPosition(function(position) {
+
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            const geocoder = new kakao.maps.services.Geocoder();
+
+            geocoder.coord2RegionCode(lon, lat, function(result, status) {
+
+                if (status === kakao.maps.services.Status.OK) {
+
+                    const addr = result.find(r => r.region_type === 'B');
+
+                    if (addr) {
+
+                        const province = addr.region_1depth_name;
+                        const city = addr.region_2depth_name;
+                        const dong = addr.region_3depth_name;
+
+                        locationNameDiv.innerHTML = province + ' ' + city + ' <span>' + dong + '</span>';
+
+                        // 🔥 자동 지역 필터
+                        applyAreaFilterAuto(province, city, dong);
+                    }
+                }
+            });
+
+        }, function(error) {
+
+            console.warn("위치 정보를 가져올 수 없습니다.");
+
+        });
+
+    } else {
+
+        console.warn("이 브라우저는 위치 정보를 지원하지 않습니다.");
+
+    }
+
+});
+</script>
 </body>
 </html>

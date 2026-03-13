@@ -168,7 +168,7 @@
                      value="${dto.pay}"
                      oninput="onPayInput();">
               <div class="warn-box" id="payWarn">
-                ⚠️ 입력하신 금액이 최저시급(10,300원)보다 낮아요.
+                ⚠️ 입력하신 금액이 최저시급(10,320원)보다 낮아요.
               </div>
               <div class="info-box">
                 💡 2026년 최저시급은 10,300원입니다.
@@ -189,8 +189,8 @@
               <label>근무 기간</label>
               <input type="hidden" id="workPeriodHidden" name="workPeriod" value="${empty dto.workPeriod ? 'LESS_THAN_A_MONTH' : dto.workPeriod}">
               <div class="chip-group" id="workTypeGroup">
-                <button class="chip ${dto.workPeriod == 'LESS_THAN_A_MONTH' || empty dto.workPeriod ? 'active' : ''}" type="button" data-val="LESS_THAN_A_MONTH" onclick="selectWorkType(this)">단기 (1개월 미만)</button>
-                <button class="chip ${dto.workPeriod == 'MORE_THAN_A_MONTH' ? 'active' : ''}" type="button" data-val="MORE_THAN_A_MONTH" onclick="selectWorkType(this)">장기 (1개월 이상)</button>
+                <button class="chip ${dto.workPeriod == 'LESS_THAN_A_MONTH' || empty dto.workPeriod ? 'active' : ''}" type="button" data-val="LESS_THAN_A_MONTH" onclick="selectWorkType(this)">단기 (6개월 미만)</button>
+                <button class="chip ${dto.workPeriod == 'MORE_THAN_A_MONTH' ? 'active' : ''}" type="button" data-val="MORE_THAN_A_MONTH" onclick="selectWorkType(this)">장기 (6개월 이상)</button>
               </div>
             </div>
 

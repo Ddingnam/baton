@@ -23,4 +23,6 @@ public interface JobPostingMapper {
     void updateHitCount(long postingIdx);   
     
     List<JobPosting> listPostingByArea(Map<String,Object> map);
+    
+    List<String> listDong(Map<String, Object> map);
 }

@@ -6,18 +6,22 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 
 public interface JobPostingService {
+
     void insertPosting(JobPosting dto) throws Exception;
+
     void updatePosting(JobPosting dto) throws Exception;
+
     void deletePosting(long postingIdx) throws Exception;
-    
+
     int dataCount(Map<String, Object> map);
+
     List<JobPosting> listPosting(Map<String, Object> map);
-    JobPosting findById(@Param("postingIdx") long postingIdx);
-    
+
+    JobPosting findById(long postingIdx);
+
     void updateHitCount(long postingIdx) throws Exception;
-   
-    public List<JobPosting> listPostingByArea(Map<String,Object> map);
-    
-    
-    
+
+    List<JobPosting> listPostingByArea(Map<String,Object> map);
+
+    List<String> listDong(Map<String,Object> map);
 }

@@ -79,11 +79,13 @@
                 <div class="summary-text">
                     <span class="label">근무기간</span>
                     <span class="value">
-                        <c:choose>
-                            <c:when test="${dto.workPeriod == 'MORE_THAN_A_YEAR'}">1년 이상</c:when>
-                            <c:otherwise>${dto.workPeriod}</c:otherwise>
-                        </c:choose>
-                    </span>
+					    <c:choose>
+					        <c:when test="${dto.workPeriod == 'MORE_THAN_A_YEAR'}">1년 이상</c:when>
+					        <c:when test="${dto.workPeriod == 'MORE_THAN_A_MONTH'}">1개월~6개월</c:when>
+					        <c:when test="${dto.workPeriod == 'LESS_THAN_A_MONTH'}">1개월 미만(단기)</c:when>
+					        <c:otherwise>${dto.workPeriod}</c:otherwise>
+					    </c:choose>
+					</span>
                 </div>
             </li>
 

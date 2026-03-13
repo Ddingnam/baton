@@ -177,5 +177,13 @@
 	    </where>
 	    ORDER BY created_date DESC
 	</select>
+	
+	<select id="listDong" parameterType="map" resultType="String">
+    SELECT DISTINCT
+        SUBSTR(location, INSTR(location, #{gugun}) + LENGTH(#{gugun}) + 1) AS dong
+    FROM job_posting
+    WHERE location LIKE '%' || #{sido} || '%'
+    AND location LIKE '%' || #{gugun} || '%'
+	</select>
 
 </mapper>
