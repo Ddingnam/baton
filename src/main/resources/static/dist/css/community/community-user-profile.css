@@ -1,12 +1,4 @@
 @charset "UTF-8";
-
-/* ═══════════════════════════════════════════════════
-   community-user-profile.css
-   ─ 배경: #FFFFFF (흰색)
-   ─ 포인트: #7C5CFC (보라)
-   ─ 사이드바 없음 / 마이페이지 CSS 의존 없음
-═══════════════════════════════════════════════════ */
-
 :root {
     --up-purple:      #7C5CFC;
     --up-purple-dark: #6644F0;
@@ -18,7 +10,7 @@
     --border:         #ECEEF2;
     --bg-hover:       #FAFAFA;
     --white:          #FFFFFF;
-    --radius-card:    20px;
+    --radius-card:    24px; /* 카드 라운드 더 둥글게 */
     --radius-sm:      10px;
     --ease-spring:    cubic-bezier(0.34, 1.4, 0.64, 1);
     --ease-out:       cubic-bezier(0.16, 1, 0.3, 1);
@@ -26,7 +18,6 @@
 
 body { background: #FFFFFF; }
 
-/* ── 페이지 진입 애니메이션 ── */
 @keyframes up-fadein {
     from { opacity: 0; transform: translateY(24px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -44,29 +35,28 @@ body { background: #FFFFFF; }
 
 /* ── 래퍼 ── */
 .up-page {
-    max-width: 720px;
+    max-width: 760px; /* 너비 약간 증가 */
     margin: 0 auto;
     padding: 120px 24px 100px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 24px; /* 간격 증가 */
 }
 
-/* ════════════════════════════════
-   프로필 헤더 카드
-════════════════════════════════ */
+/* ── 헤더 카드 개선 ── */
 .up-header-card {
     background: var(--white);
-    border: 1.5px solid var(--border);
+    /* border: 1.5px solid var(--border); */ /* 테두리 제거 */
     border-radius: var(--radius-card);
     overflow: hidden;
     animation: up-fadein .6s var(--ease-out) both;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* 부드러운 그림자 추가 */
 }
 
-/* 커버 스트립 */
 .up-cover {
-    height: 80px;
-    background: linear-gradient(120deg, #EDE8FF 0%, #F3F0FF 50%, #E8E4FF 100%);
+    height: 110px; /* 높이 증가 */
+    /* 더 풍부한 그라데이션 적용 */
+    background: linear-gradient(135deg, #7C5CFC 0%, #A78BFA 100%);
     position: relative;
 }
 .up-cover::after {
@@ -74,155 +64,160 @@ body { background: #FFFFFF; }
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at 20% 50%, rgba(124,92,252,.15) 0%, transparent 60%),
-        radial-gradient(circle at 80% 30%, rgba(124,92,252,.10) 0%, transparent 50%);
+        radial-gradient(circle at 20% 50%, rgba(255,255,255,.15) 0%, transparent 60%),
+        radial-gradient(circle at 80% 30%, rgba(255,255,255,.10) 0%, transparent 50%);
 }
 
-/* 본문 영역 */
 .up-header-body {
-    padding: 0 28px 24px;
+    padding: 0 32px 32px;
+    position: relative;
 }
 
-/* 아바타 행 */
 .up-avatar-row {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    margin-top: -28px;
-    margin-bottom: 14px;
-}
-
+    margin-top: -50px;
+    margin-bottom: 16px;
+    position: relative;
+} 
 .up-avatar {
-    width: 60px;
-    height: 60px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     background: var(--up-purple-bg);
-    border: 3px solid var(--white);
+    border: 4px solid var(--white);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 30px;
     font-weight: 800;
     color: var(--up-purple);
     overflow: hidden;
     flex-shrink: 0;
-    box-shadow: 0 2px 12px rgba(124,92,252,.18);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* 그림자 강화 */
     transition: transform .4s var(--ease-spring);
     position: relative;
 }
-.up-avatar:hover { transform: scale(1.08) rotate(-4deg); }
+.up-avatar:hover { transform: scale(1.05) rotate(-4deg); }
 .up-avatar img   { width: 100%; height: 100%; object-fit: cover; }
 
 .up-my-badge {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     color: var(--up-purple);
     background: var(--up-purple-bg);
     border: 1px solid #D4C8FF;
-    padding: 4px 12px;
+    padding: 6px 14px;
     border-radius: 99px;
     align-self: flex-end;
     margin-bottom: 4px;
 }
 
-/* 이름 / 메타 */
+.up-user-info {
+    margin-top: 8px;
+}
+
 .up-name {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 800;
     color: var(--text-primary);
     margin: 0 0 6px;
-    letter-spacing: -.3px;
+    letter-spacing: -.5px;
+}
+
+.up-bio {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0 0 16px;
+    line-height: 1.5;
 }
 
 .up-meta {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 13px;
+    gap: 8px;
+    font-size: 14px;
     color: var(--text-muted);
     flex-wrap: wrap;
 }
-.up-meta i     { font-size: 13px; color: var(--up-purple); }
-.up-meta-sep   { width: 3px; height: 3px; border-radius: 50%; background: var(--border); }
+.up-meta i     { font-size: 15px; color: var(--up-purple); }
+/* .up-meta-sep   { width: 3px; height: 3px; border-radius: 50%; background: var(--border); } */ /* 구분선 제거 */
+.up-meta-sep-icon { font-size: 4px !important; color: var(--border) !important; vertical-align: middle; }
 
 
-/* ════════════════════════════════
-   스탯 그리드
-════════════════════════════════ */
 .up-stat-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    gap: 16px; /* 간격 증가 */
     animation: up-fadein .6s var(--ease-out) .08s both;
 }
 
 .up-stat {
     background: var(--white);
-    border: 1.5px solid var(--border);
-    border-radius: 16px;
-    padding: 20px 16px;
+    /* border: 1.5px solid var(--border); */ /* 테두리 제거 */
+    border-radius: 20px; /* 라운드 증가 */
+    padding: 24px 16px; /* 패딩 증가 */
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
     cursor: default;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04); /* 기본 그림자 추가 */
     transition: border-color .2s, transform .3s var(--ease-spring), box-shadow .3s;
 }
 .up-stat:hover {
-    border-color: #C4B5FD;
+    /* border-color: #C4B5FD; */
     transform: translateY(-5px);
-    box-shadow: 0 8px 24px rgba(124,92,252,.10);
+    box-shadow: 0 8px 24px rgba(124,92,252,.12); /* 호버 그림자 강화 */
 }
 
 .up-stat-icon {
-    width: 40px; height: 40px;
-    border-radius: 11px;
+    width: 44px; height: 44px; /* 아이콘 크기 증가 */
+    border-radius: 12px;
     background: var(--up-purple-bg);
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px; color: var(--up-purple);
+    font-size: 20px; color: var(--up-purple);
     transition: transform .3s var(--ease-spring);
 }
 .up-stat:hover .up-stat-icon { transform: scale(1.15) rotate(-6deg); }
 
 .up-stat strong {
-    font-size: 22px;
+    font-size: 24px; /* 폰트 크기 증가 */
     font-weight: 800;
     color: var(--text-primary);
     line-height: 1;
 }
 .up-stat span {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text-muted);
 }
 
-
-/* ════════════════════════════════
-   활동 카드
-════════════════════════════════ */
 .up-activity-card {
     background: var(--white);
-    border: 1.5px solid var(--border);
+    /* border: 1.5px solid var(--border); */ /* 테두리 제거 */
     border-radius: var(--radius-card);
-    padding: 28px;
+    padding: 32px; /* 패딩 증가 */
     animation: up-fadein .6s var(--ease-out) .16s both;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05); /* 그림자 추가 */
 }
 
 .up-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 24px; /* 마진 증가 */
 }
 .up-card-header h3 {
-    font-size: 16px;
+    font-size: 18px; /* 폰트 크기 증가 */
     font-weight: 800;
     color: var(--text-primary);
     margin: 0;
 }
 .up-go-link {
-    font-size: 13px;
+    font-size: 14px; /* 폰트 크기 증가 */
     font-weight: 700;
     color: var(--up-purple);
     text-decoration: none;
@@ -232,24 +227,22 @@ body { background: #FFFFFF; }
     transition: opacity .15s;
 }
 .up-go-link:hover { opacity: .7; }
-.up-go-link i { font-size: 16px; transition: transform .2s; }
+.up-go-link i { font-size: 18px; transition: transform .2s; } /* 아이콘 크기 증가 */
 .up-go-link:hover i { transform: translateX(3px); }
 
-
-/* ── 탭 ── */
 .up-tabs {
     display: flex;
     gap: 0;
     border-bottom: 1.5px solid var(--border);
-    margin-bottom: 20px;
+    margin-bottom: 24px; /* 마진 증가 */
 }
 
 .up-tab {
     background: none;
     border: none;
     padding: 0 4px 12px;
-    margin-right: 20px;
-    font-size: 14px;
+    margin-right: 24px; /* 마진 증가 */
+    font-size: 15px; /* 폰트 크기 증가 */
     font-weight: 600;
     color: var(--text-muted);
     cursor: pointer;
@@ -270,23 +263,18 @@ body { background: #FFFFFF; }
 .up-tab.on::after { right: 0; }
 .up-tab:hover:not(.on) { color: var(--text-secondary); }
 
-
-/* ── 패널 ── */
 .up-panel     { display: none; }
 .up-panel.on  {
     display: block;
     animation: up-tab-in .4s var(--ease-out) both;
 }
-
-
-/* ── 게시글 / 댓글 행 ── */
 .up-list      { display: flex; flex-direction: column; }
 
 .up-row {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 16px 0;
+    gap: 16px; /* 간격 증가 */
+    padding: 18px 0; /* 패딩 증가 */
     border-bottom: 1px solid var(--border);
     cursor: pointer;
     position: relative;
@@ -298,8 +286,8 @@ body { background: #FFFFFF; }
     content: '';
     position: absolute;
     left: 0; top: 50%;
-    width: 3px; height: 0;
-    border-radius: 3px;
+    width: 4px; /* 두께 증가 */ height: 0;
+    border-radius: 4px;
     background: var(--up-purple);
     transform: translateY(-50%);
     transition: height .25s var(--ease-spring);
@@ -307,98 +295,93 @@ body { background: #FFFFFF; }
 .up-row:hover {
     background: var(--bg-hover);
     border-radius: var(--radius-sm);
-    padding: 16px 14px;
-    margin: 0 -14px;
+    padding: 18px 16px; /* 패딩 증가 */
+    margin: 0 -16px; /* 마진 증가 */
 }
 .up-row:hover::before { height: 60%; }
 
 .up-row-info  { flex: 1; min-width: 0; }
 
 .up-row-cat {
-    font-size: 11.5px;
+    font-size: 12px; /* 폰트 크기 증가 */
     font-weight: 700;
     color: var(--up-purple);
     display: block;
-    margin-bottom: 3px;
+    margin-bottom: 4px;
 }
 .up-row-title {
-    font-size: 14px;
+    font-size: 15px; /* 폰트 크기 증가 */
     font-weight: 600;
     color: var(--text-primary);
-    margin: 0 0 5px;
+    margin: 0 0 6px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .up-row-stats {
     display: flex;
-    gap: 10px;
-    font-size: 12px;
+    gap: 12px; /* 간격 증가 */
+    font-size: 13px; /* 폰트 크기 증가 */
     color: var(--text-muted);
 }
 .up-row-stats span {
-    display: flex; align-items: center; gap: 3px;
+    display: flex; align-items: center; gap: 4px;
 }
 
-/* 댓글 origin */
 .up-origin {
-    display: flex; align-items: center; gap: 4px;
-    font-size: 11.5px; color: var(--text-muted);
-    margin-bottom: 4px;
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12.5px; /* 폰트 크기 증가 */
+    color: var(--text-muted);
+    margin-bottom: 6px;
     overflow: hidden;
 }
-.up-origin i    { font-size: 10px; color: var(--up-purple); flex-shrink: 0; }
+.up-origin i    { font-size: 12px; color: var(--up-purple); flex-shrink: 0; }
 .up-origin span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-
-/* ── 빈 상태 ── */
 .up-empty {
     text-align: center;
-    padding: 44px 0 32px;
+    padding: 50px 0 40px; /* 패딩 증가 */
     color: var(--text-muted);
 }
-.up-empty i { font-size: 36px; display: block; margin-bottom: 10px; color: #C4B5FD; }
-.up-empty p { font-size: 13px; font-weight: 600; margin: 0 0 12px; }
+.up-empty i { font-size: 40px; display: block; margin-bottom: 12px; color: #C4B5FD; }
+.up-empty p { font-size: 14px; font-weight: 600; margin: 0 0 16px; }
 
 
-/* ── 더 보기 버튼 ── */
-.up-more-wrap { text-align: center; padding: 20px 0 4px; }
+.up-more-wrap { text-align: center; padding: 24px 0 8px; }
 .up-more-btn {
     background: none;
     border: 1.5px solid var(--border);
     border-radius: 99px;
-    padding: 9px 28px;
+    padding: 10px 32px; /* 패딩 증가 */
     font-family: inherit;
-    font-size: 13px;
+    font-size: 14px; /* 폰트 크기 증가 */
     font-weight: 700;
     color: var(--text-secondary);
     cursor: pointer;
-    transition: border-color .2s, color .2s, transform .2s;
+    transition: all .2s; /* 트랜지션 일괄 적용 */
 }
 .up-more-btn:hover {
     border-color: var(--up-purple);
     color: var(--up-purple);
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124,92,252,.15); /* 호버 그림자 추가 */
 }
-.up-more-btn:disabled { opacity: .5; cursor: default; transform: none; }
+.up-more-btn:disabled { opacity: .5; cursor: default; transform: none; box-shadow: none; }
 
 
-/* ── 로딩 스피너 ── */
 .up-loading {
     display: flex; flex-direction: column; align-items: center;
-    gap: 10px; padding: 40px 0;
-    color: var(--text-muted); font-size: 13px; font-weight: 600;
+    gap: 12px; padding: 50px 0;
+    color: var(--text-muted); font-size: 14px; font-weight: 600;
 }
 .up-spinner {
-    width: 22px; height: 22px;
-    border: 2.5px solid var(--border);
+    width: 24px; height: 24px;
+    border: 3px solid var(--border);
     border-top-color: var(--up-purple);
     border-radius: 50%;
     animation: up-spin .5s linear infinite;
 }
 
-
-/* ── Toast ── */
 .up-toast-wrap {
     position: fixed; bottom: 32px; left: 50%;
     transform: translateX(-50%);
@@ -419,13 +402,13 @@ body { background: #FFFFFF; }
 .up-toast i { color: #A78BFA; }
 
 
-/* ── Responsive ── */
 @media (max-width: 600px) {
     .up-page         { padding: 90px 16px 80px; gap: 16px; }
-    .up-header-body  { padding: 0 20px 20px; }
-    .up-activity-card { padding: 20px; }
-    .up-stat-row     { gap: 8px; }
+    .up-header-body  { padding: 0 20px 24px; }
+    .up-activity-card { padding: 24px 20px; }
+    .up-stat-row     { gap: 12px; }
     .up-stat         { padding: 16px 10px; }
-    .up-stat strong  { font-size: 18px; }
-    .up-cover        { height: 64px; }
+    .up-stat strong  { font-size: 20px; }
+    .up-cover        { height: 80px; }
+    .up-avatar       { width: 72px; height: 72px; margin-top: -36px; font-size: 26px; }
 }

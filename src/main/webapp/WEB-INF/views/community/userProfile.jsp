@@ -19,10 +19,8 @@
 
 <jsp:include page="/WEB-INF/views/layout/header.jsp" />
 
-<%-- ── 사이드바 없음: 단일 컬럼 레이아웃 ── --%>
 <div class="up-page">
 
-    <%-- ▌프로필 헤더 카드 ▐ --%>
     <div class="up-header-card">
         <div class="up-cover"></div>
         <div class="up-header-body">
@@ -42,17 +40,19 @@
                 </c:if>
             </div>
 
-            <h2 class="up-name">${profileNickname}</h2>
-            <div class="up-meta">
-                <i class="ri-calendar-2-line"></i>
-                <span id="joinDate" data-date="${joinDate}"></span>
-                <span class="up-meta-sep"></span>
-                <span>가입</span>
+            <div class="up-user-info">
+                <h2 class="up-name">${profileNickname}</h2>
+                <p class="up-bio">반갑습니다! 커뮤니티에서 활동 중인 ${profileNickname}입니다.</p>
+                <div class="up-meta">
+                    <i class="ri-calendar-2-line"></i>
+                    <span id="joinDate" data-date="${joinDate}"></span>
+                    <i class="ri-checkbox-blank-circle-fill up-meta-sep-icon"></i>
+                    <span>가입함</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <%-- ▌통계 ▐ --%>
     <div class="up-stat-row">
         <div class="up-stat">
             <div class="up-stat-icon"><i class="ri-edit-2-line"></i></div>
@@ -71,7 +71,6 @@
         </div>
     </div>
 
-    <%-- ▌커뮤니티 활동 카드 ▐ --%>
     <div class="up-activity-card">
 
         <div class="up-card-header">
@@ -81,7 +80,6 @@
             </a>
         </div>
 
-        <%-- 탭 --%>
         <div class="up-tabs">
             <button class="up-tab on" data-panel="panel-posts">
                 작성한 글<c:if test="${postCount > 0}"> · ${postCount}</c:if>
@@ -91,7 +89,6 @@
             </button>
         </div>
 
-        <%-- 게시글 패널 --%>
         <div class="up-panel on" id="panel-posts">
             <div class="up-list" id="postList">
                 <c:choose>
@@ -145,8 +142,6 @@
                 </div>
             </c:if>
         </div>
-
-        <%-- 댓글 패널 (JS로 로드) --%>
         <div class="up-panel" id="panel-replies">
             <div class="up-list" id="replyList">
                 <div class="up-loading">
@@ -156,9 +151,9 @@
             </div>
         </div>
 
-    </div><%-- /up-activity-card --%>
+    </div>
 
-</div><%-- /up-page --%>
+</div>
 
 <div class="up-toast-wrap" id="toastContainer"></div>
 

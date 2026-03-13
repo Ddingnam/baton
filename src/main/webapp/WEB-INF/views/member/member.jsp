@@ -35,6 +35,7 @@
 			<div class="row justify-content-center">
 				<div class="col-md-10 bg-white box-shadow my-4 p-5">
 					<form name="memberForm" method="post" enctype="multipart/form-data">
+						<input type="hidden" name="loginType" value="USER">
 						<div class="d-flex align-items-start align-items-sm-center gap-3 pb-4 border-bottom">
 							<img src="${pageContext.request.contextPath}/dist/images/user.png" class="img-avatar d-block w-px-100 h-px-100 rounded">
 							<div class="ms-3">

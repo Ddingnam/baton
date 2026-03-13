@@ -64,6 +64,16 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 			HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
 
+		String loginType = request.getParameter("loginType");
+		Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
+		boolean isAdminOrEmp = roles.contains("ROLE_ADMIN") || roles.contains("ROLE_EMP");
+
+		if ("ADMIN".equals(loginType) && !isAdminOrEmp) {
+			request.getSession().invalidate();
+			redirectStrategy.sendRedirect(request, response, "/admin/login?authorization_error");
+			return;
+		}
+		
 		request.getSession().setAttribute("msg", authentication.getName() + "님, 환영합니다!");
 		request.getSession().setAttribute("isFirstLogin", true);
 		
@@ -86,13 +96,11 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 			e.printStackTrace();
 		}
 		
-		Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-		
-		if (roles.contains("ROLE_ADMIN") || roles.contains("ROLE_EMP")) {
+		if ("ADMIN".equals(loginType)) {
 			redirectStrategy.sendRedirect(request, response, "/admin");
 			return;
 		}
-
+		
 		SavedRequest savedRequest = requestCache.getRequest(request, response);
 
 		if (savedRequest != null) {

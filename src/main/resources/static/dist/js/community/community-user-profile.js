@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     animateStats();
     loadReplies();
 
-    // 탭 전환
     document.querySelectorAll('.up-tab').forEach(tab => {
         tab.addEventListener('click', function () {
             document.querySelectorAll('.up-tab').forEach(t => t.classList.remove('on'));
@@ -19,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-/* ── 날짜 렌더 ── */
 function renderDates() {
     const joinEl = document.getElementById('joinDate');
     if (joinEl?.dataset.date) {
@@ -50,7 +48,6 @@ function fmtRelative(s) {
     return fmtFull(s);
 }
 
-/* ── 숫자 카운트업 ── */
 function animateStats() {
     document.querySelectorAll('[data-stat]').forEach(el => {
         const target = parseInt(el.dataset.stat) || 0;
@@ -65,7 +62,6 @@ function animateStats() {
     });
 }
 
-/* ── 댓글 목록 로드 ── */
 function loadReplies() {
     const box = document.getElementById('replyList');
     if (!box) return;
@@ -92,7 +88,6 @@ function loadReplies() {
                     </div>
                 </div>`).join('');
 
-            // 날짜 렌더링
             box.querySelectorAll('[data-date]').forEach(el => {
                 el.textContent = fmtRelative(el.dataset.date);
             });
@@ -102,7 +97,6 @@ function loadReplies() {
         });
 }
 
-/* ── 게시글 더 보기 ── */
 function loadMorePosts() {
     _page++;
     const btn = document.getElementById('moreBtn');
@@ -139,7 +133,6 @@ function loadMorePosts() {
         });
 }
 
-/* ── 유틸 ── */
 function emptyHTML(icon, msg) {
     return `<div class="up-empty">
         <i class="${icon}"></i>
