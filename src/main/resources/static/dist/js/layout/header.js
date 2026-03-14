@@ -234,30 +234,32 @@ function connectGlobalAlarm() {
     stompClient.debug = null; 
 
     stompClient.connect({}, function (frame) {
-        stompClient.subscribe('/topic/alarms/' + window.LOGGED_IN_USER_ID, function (message) {
+		stompClient.subscribe('/topic/alarms/' + window.LOGGED_IN_USER_ID, function (message) {
             try {
-                let notif = JSON.parse(message.body);
-                if(notif.notifIdx) {
-                    renderSingleNotif(notif, true);
+                let data = JSON.parse(message.body);
+              
+                if(data.notifIdx) {
+                    renderSingleNotif(data, true);
                     let badge = document.getElementById('notifBadge');
                     if(badge) badge.style.display = 'block';
+                    turnOnAlarmDots();
+                    showBatonToast("🔔 [" + data.notifType + "] " + data.content); // 팝업창
+                    return;
+                }
+                
+                if(data.type === 'CHAT') {
+                    turnOnAlarmDots();
+                    showBatonToast("💬 " + data.sender + ": " + data.content); // 팝업창
                     return;
                 }
             } catch(e) {}
 
-            if(message.body.includes('new_chat')) {
-                turnOnAlarmDots(); 
-            } else if(message.body.includes('read_chat')) {
+            if(message.body.includes('read_chat')) {
                 checkUnreadAlarms();
             } else if(message.body.includes('room_deleted')) {
                 let deletedRoomIdx = message.body.split(':')[1];
                 let roomEl = document.getElementById('room-' + deletedRoomIdx);
                 if(roomEl) roomEl.remove();
-                
-                let listContainer = document.getElementById('listContainer');
-                if(listContainer && listContainer.children.length === 0) {
-                    listContainer.innerHTML = '<div class="empty-msg"><i class="ri-chat-3-line"></i>진행 중인 대화가 없습니다.</div>';
-                }
             }
         });
     });

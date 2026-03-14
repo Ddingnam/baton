@@ -314,41 +314,38 @@ function loadPageNotifications() {
     });
 }
 
+function notifyParent() {
+    if (window.opener && !window.opener.closed) {
+        if(typeof window.opener.checkUnreadAlarms === 'function') window.opener.checkUnreadAlarms();
+        if(typeof window.opener.fetchNotifications === 'function') window.opener.fetchNotifications();
+    }
+}
+
 function readPageNotif(notifIdx, url) {
     fetch('${pageContext.request.contextPath}/api/notification/read', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'notifIdx=' + notifIdx
     }).then(() => {
-        if(url && url !== 'null') location.href = '${pageContext.request.contextPath}' + url;
+        notifyParent(); 
+        if(url && url !== 'null' && url !== '') location.href = '${pageContext.request.contextPath}' + url;
         else loadPageNotifications();
     });
 }
 
 function markAllAsRead() {
     fetch('${pageContext.request.contextPath}/api/notification/readAll', { method: 'POST' })
-    .then(() => { loadPageNotifications(); });
-}
-
-function updateTabBadges() {
-    fetch('${pageContext.request.contextPath}/api/notification/unreadCount')
-    .then(res => res.text())
-    .then(count => {
-        let badge = document.getElementById('notifTabBadge');
-        if(parseInt(count) > 0) {
-            badge.innerText = count;
-            badge.style.display = 'inline-block';
-        } else {
-            badge.style.display = 'none';
-        }
+    .then(() => { 
+        notifyParent(); 
+        loadPageNotifications(); 
     });
 }
 
 function deleteAllNotifications() {
     if(!confirm('모든 알림을 삭제하시겠습니까?')) return;
-    
     fetch('${pageContext.request.contextPath}/api/notification/deleteAll', { method: 'POST' })
     .then(() => { 
+        notifyParent();
         loadPageNotifications(); 
     });
 }

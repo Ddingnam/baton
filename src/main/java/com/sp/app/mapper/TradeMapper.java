@@ -42,4 +42,6 @@ public interface TradeMapper {
 	public void updateHitCount(long productIdx) throws SQLException;
 	public void updateLastUpDate(long productIdx) throws SQLException;
 	public void updatePullCount(long productIdx) throws SQLException;
+	
+	public List<Long> getWishUserList(long productIdx);
 }

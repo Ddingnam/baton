@@ -23,7 +23,7 @@ public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatService chatService;
 
-    public ChatController(SimpMessagingTemplate messagingTemplate, ChatService chatService, NotificationService notificationService) {
+    public ChatController(SimpMessagingTemplate messagingTemplate, ChatService chatService) {
         this.messagingTemplate = messagingTemplate;
         this.chatService = chatService;
     }
@@ -34,11 +34,18 @@ public class ChatController {
         chatService.updateLastReadDate(message.getRoomIdx(), message.getUserIdx());
 
         messagingTemplate.convertAndSend("/topic/room/" + message.getRoomIdx(), message);
+        
+        String senderName = chatService.getCounterpartNickname(message.getRoomIdx(), message.getUserIdx());
+
+        Map<String, String> alarmData = new HashMap<>();
+        alarmData.put("type", "CHAT");
+        alarmData.put("sender", senderName);
+        alarmData.put("content", message.getContent());
 
         List<Long> members = chatService.getRoomMembers(message.getRoomIdx());
         for (Long memberIdx : members) {
             if (!memberIdx.equals(message.getUserIdx())) {
-                messagingTemplate.convertAndSend("/topic/alarms/" + memberIdx, "new_chat");
+                messagingTemplate.convertAndSend("/topic/alarms/" + memberIdx, alarmData);
             }
         }
     }

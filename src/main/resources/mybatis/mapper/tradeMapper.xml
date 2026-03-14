@@ -238,4 +238,7 @@
 		DELETE FROM productImages WHERE productIdx = #{productIdx}
 	</delete>
 	
+	<select id="getWishUserList" parameterType="long" resultType="Long">
+        SELECT userIdx FROM wishList WHERE productIdx = #{productIdx}
+    </select>
 </mapper>

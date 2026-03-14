@@ -29,6 +29,9 @@ import lombok.extern.slf4j.Slf4j;
 public class TradeServiceImpl implements TradeService {
 	private final TradeMapper mapper;
 	private final StorageService storageService;
+	private final ProductRepository productRepository;
+    private final WishListRepository wishListRepository;
+    private final NotificationService notificationService;
 
 	@Override
 	@Transactional
@@ -148,22 +151,37 @@ public class TradeServiceImpl implements TradeService {
             }
 			
 			mapper.updateTradePost(dto);
-		} catch (Exception e) {
-			log.info("updateTradePost", e);
-			throw e;
-		}
-		
+			
+			try {
+                Trade origin = mapper.findByIdx(dto.getProductIdx());
+                if(origin != null) {
+                    List<Long> wishUsers = mapper.getWishUserList(dto.getProductIdx());
+                    if(wishUsers != null) {
+                        for(Long uIdx : wishUsers) {
+                            if(uIdx != null && uIdx.longValue() != origin.getUserIdx()) {
+                                notificationService.sendNotification(uIdx, "게시글 수정", "[" + dto.getTitle() + "] 상품의 정보가 수정되었습니다.", "/trade/article?productIdx=" + dto.getProductIdx());
+                            }
+                        }
+                    }
+                }
+            } catch(Exception e) {}
+				} catch(Exception e) {
+					log.info("updateTradePost", e);
+					throw e;
+			}
 	}
+	
 
 	@Override
 	@Transactional
 	public void deleteTradePost(long productIdx, String uploadPath) throws Exception {
 		try {
-			
+			Trade trade = mapper.findByIdx(productIdx);
+			List<Long> wishUsers = mapper.getWishUserList(productIdx);
+
 			List<TradeImg> list = mapper.findImagesByIdx(productIdx);
 	        if(list != null) {
 	            for(TradeImg img : list) {
-	                // 저장된 실제 파일 삭제
 	                storageService.deleteFile(uploadPath, img.getSaveName());
 	            }
 	        }
@@ -171,11 +189,18 @@ public class TradeServiceImpl implements TradeService {
 			mapper.deleteTradePostTag(productIdx);
 			mapper.deleteTradePostImgAll(productIdx);
 			mapper.deleteTradePost(productIdx);
+
+			if(trade != null && wishUsers != null) {
+				for(Long uIdx : wishUsers) {
+					if(uIdx != null && uIdx.longValue() != trade.getUserIdx()) {
+						notificationService.sendNotification(uIdx, "게시글 삭제", "[" + trade.getTitle() + "] 상품이 삭제되었습니다.", "");
+					}
+				}
+			}
 		} catch (Exception e) {
 			log.info("deleteTradePost : ", e);
 			throw e;
 		}
-		
 	}
 
 	@Override
@@ -264,26 +289,52 @@ public class TradeServiceImpl implements TradeService {
 	@Override
 	public void updateTradeStatus(long productIdx, String tradeStatus) throws Exception {
 		Map<String, Object> map = new HashMap<>();
-		
 		try {
 			map.put("tradeStatus", tradeStatus);
 			map.put("productIdx", productIdx);
 			
 			mapper.updateTradeStatus(map);
-		} catch (Exception e) {
-			log.info("updateTradeStatus : ", e);
-		}
+			try {
+				Trade trade = mapper.findByIdx(productIdx);
+				if(trade != null) {
+					List<Long> wishUsers = mapper.getWishUserList(productIdx);
+					if(wishUsers != null) {
+						for(Long uIdx : wishUsers) {
+							if(uIdx != null && uIdx.longValue() != trade.getUserIdx()) {
+								notificationService.sendNotification(uIdx, "상태 변경", "[" + trade.getTitle() + "] 상품의 상태가 [" + tradeStatus + "](으)로 변경되었습니다.", "/trade/article?productIdx=" + productIdx);
+							}
+						}
+					}
+				}
+			} catch(Exception e) {
+				log.info("상태변경 알림 전송 에러 : ", e);
+			}
+        } catch (Exception e) {
+            log.info("updateTradeStatus : ", e);
+            throw e;
+        }
 	}
 
 	@Override
 	public void updateLastUpDate(long productIdx) throws SQLException {
 		try {
-			mapper.updateLastUpDate(productIdx);
-			mapper.updatePullCount(productIdx);
-		} catch (Exception e) {
-			log.info("updateLastUpDate : ", e);
-		}
-		
+            mapper.updateLastUpDate(productIdx);
+            mapper.updatePullCount(productIdx);
+
+			Trade trade = mapper.findByIdx(productIdx);
+			if(trade != null) {
+				List<Long> wishUsers = mapper.getWishUserList(productIdx);
+				if(wishUsers != null) {
+					for(Long uIdx : wishUsers) {
+						if(uIdx != null && uIdx.longValue() != trade.getUserIdx()) {
+							notificationService.sendNotification(uIdx, "끌어올림", "[" + trade.getTitle() + "] 상품이 방금 끌어올려졌습니다.", "/trade/article?productIdx=" + productIdx);
+						}
+					}
+				}
+			}
+		} catch(Exception e) {
+            log.info("updateLastUpDate : ", e);
+        }
 	}
 
 	@Override
@@ -323,5 +374,6 @@ public class TradeServiceImpl implements TradeService {
 		}
 		return lastUpDate;
 	}
+	
 
 }
