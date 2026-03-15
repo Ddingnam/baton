@@ -73,19 +73,23 @@ public class EscrowController {
         }
 
         try {
-        	int tradeCount = escrowService.checkTradeExist(productIdx);
-            if (tradeCount > 0) {
+            Trade trade = tradeService.findByIdx(productIdx); 
+ 
+            if (trade == null || "판매완료".equals(trade.getTradeStatus()) || "예약중".equals(trade.getTradeStatus())) {
                 mav.setViewName("redirect:/"); 
                 return mav;
             }
-            
-            Trade trade = tradeService.findByIdx(productIdx); 
 
             int price = trade.getPrice();
             int safetyFee = 0;
             int totalPrice = price;
             
-            String userAddress = escrowService.getUserAddress(userDetails.getUserIdx());
+            String userAddress = "";
+            try {
+                userAddress = escrowService.getUserAddress(userDetails.getUserIdx());
+            } catch(Exception e) {
+                userAddress = "주소 미등록";
+            }
 
             mav.addObject("product", trade); 
             mav.addObject("safetyFee", safetyFee);
@@ -95,6 +99,7 @@ public class EscrowController {
             mav.setViewName("payment/checkout"); 
 
         } catch (Exception e) {
+            e.printStackTrace();
             mav.setViewName("redirect:/"); 
         }
 

@@ -14,7 +14,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/trade/trade-article.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
-<jsp:include page="/WEB-INF/views/api/api.jsp"/>
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/layout/header.jsp" />
@@ -323,7 +322,7 @@
 					        <c:if test="${trade.price > 0}">
 					            <c:choose>
 					                <c:when test="${empty escrowInfo or escrowInfo.TRADESTATUS == 'CANCELED'}">
-					                    <button class="pay-btn"
+					                    <button type="button" class="pay-btn"
 					                        onclick="location.href='${pageContext.request.contextPath}/escrow/checkout?productIdx=${trade.productIdx}'">
 					                        <i class="ri-wallet-3-line"></i> 안전 결제하기
 					                    </button>

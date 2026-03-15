@@ -126,14 +126,13 @@
         </div> 
         
 	<div id="notifTab" class="tab-content">
-	    <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:10px;">
-	        <button onclick="markAllAsRead()" style="background:#f0f0f0; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; color:#555; font-size:13px;">모두 읽음</button>
-	        <button onclick="deleteAllNotifications()" style="background:#ffebe9; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; color:#e74c3c; font-size:13px;">모두 삭제</button>
-	    </div>
-	    <div class="list-container" id="pageNotifList">
-	    </div>
+		    <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:10px;">
+		        <button onclick="markAllAsRead()" style="background:#f0f0f0; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; color:#555; font-size:13px;">모두 읽음</button>
+		        <button onclick="deleteAllNotifications()" style="background:#ffebe9; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; color:#e74c3c; font-size:13px;">모두 삭제</button>
+		    </div>
+	    	<div class="list-container" id="pageNotifList"></div>
+		</div>
 	</div>
-		
 	<div id="contextMenu" class="custom-context-menu">
         <div class="menu-item" onclick="menuAction('open')">채팅방 열기</div>
         <div class="menu-item" style="color:#e74c3c;" onclick="menuAction('leave')">삭제하기</div>
@@ -319,6 +318,8 @@ function notifyParent() {
         if(typeof window.opener.checkUnreadAlarms === 'function') window.opener.checkUnreadAlarms();
         if(typeof window.opener.fetchNotifications === 'function') window.opener.fetchNotifications();
     }
+    if(typeof window.checkUnreadAlarms === 'function') window.checkUnreadAlarms();
+    if(typeof window.fetchNotifications === 'function') window.fetchNotifications();
 }
 
 function readPageNotif(notifIdx, url) {

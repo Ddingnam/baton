@@ -216,16 +216,19 @@ function readAllNotifications() {
 }
 
 function checkUnreadAlarms() {
-    let url = window.contextPath + '/chat/api/unread?_=' + new Date().getTime();
-    fetch(url, { cache: 'no-store' })
-        .then(response => response.text())
-        .then(count => {
-            if(parseInt(count) > 0) {
-                turnOnAlarmDots();
-            } else {
-                turnOffAlarmDots();
-            }
-        });
+    let chatUrl = window.contextPath + '/chat/api/unread?_=' + new Date().getTime();
+    let notifUrl = window.contextPath + '/api/notification/unreadCount?_=' + new Date().getTime();
+
+    Promise.all([
+        fetch(chatUrl, { cache: 'no-store' }).then(res => res.text()).catch(() => "0"),
+        fetch(notifUrl, { cache: 'no-store' }).then(res => res.text()).catch(() => "0")
+    ]).then(([chatCount, notifCount]) => {
+        if (parseInt(chatCount) > 0 || parseInt(notifCount) > 0) {
+            turnOnAlarmDots();
+        } else {
+            turnOffAlarmDots();
+        }
+    });
 }
 
 function connectGlobalAlarm() {
@@ -237,19 +240,17 @@ function connectGlobalAlarm() {
 		stompClient.subscribe('/topic/alarms/' + window.LOGGED_IN_USER_ID, function (message) {
             try {
                 let data = JSON.parse(message.body);
-              
-                if(data.notifIdx) {
+
+                if(data.notifType) {
                     renderSingleNotif(data, true);
-                    let badge = document.getElementById('notifBadge');
-                    if(badge) badge.style.display = 'block';
                     turnOnAlarmDots();
-                    showBatonToast("🔔 [" + data.notifType + "] " + data.content); // 팝업창
+                    showBatonToast("🔔 [" + data.notifType + "] " + data.content); 
                     return;
                 }
                 
                 if(data.type === 'CHAT') {
                     turnOnAlarmDots();
-                    showBatonToast("💬 " + data.sender + ": " + data.content); // 팝업창
+                    showBatonToast("💬 " + data.sender + ": " + data.content); 
                     return;
                 }
             } catch(e) {}
