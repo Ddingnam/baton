@@ -144,10 +144,11 @@
 
     <select id="getUserAddress" parameterType="long" resultType="String">
         SELECT FULLADDRESS FROM (
-            SELECT FULLADDRESS
-            FROM REGION
-            WHERE USERIDX = #{userIdx} AND IS_ACTIVE = 1
-            ORDER BY CREATEDAT DESC
+            SELECT TRIM(r.SIDO || ' ' || NVL(r.SIGUNGU, '') || ' ' || r.DONG) AS FULLADDRESS
+            FROM USERREGION ur
+            JOIN REGION r ON ur.REGIONCODE = r.REGIONCODE
+            WHERE ur.USERIDX = #{userIdx}
+            ORDER BY ur.IS_ACTIVE DESC, ur.REGIONIDX ASC
         ) WHERE ROWNUM = 1
     </select>
     
