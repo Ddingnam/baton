@@ -17,6 +17,7 @@ import com.sp.app.domain.dto.UserDto;
 import com.sp.app.domain.entity.User;
 import com.sp.app.mapper.PaymentMapper;
 import com.sp.app.model.Trade;
+import com.sp.app.model.TradeImg;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.FollowService;
 import com.sp.app.service.MemberService;
@@ -52,6 +53,18 @@ public class MyPageController {
             model.addAttribute("myReplies", mypageService.getMyReplies(userIdx));
             model.addAttribute("myScraps",  mypageService.getMyScraps(userIdx));
             model.addAttribute("myVotes",   mypageService.getMyVotes(userIdx));
+            
+            Map<String, Object> map = new HashMap<>();
+            map.put("userIdx", userIdx);
+            List<Trade> tradeList = tradeService.findByUserIdx(map);
+            
+            for (Trade trade : tradeList) {
+                List<TradeImg> images = tradeService.findImgsByIdx(trade.getProductIdx());
+                trade.setImageList(images);
+            }
+            
+            model.addAttribute("tradeList", tradeList);
+            
         }
 
         return "mypage/main";

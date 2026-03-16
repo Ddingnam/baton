@@ -18,11 +18,11 @@
 			<if test="priceMax != null and priceMax != ''">
 				AND p.price &lt;= #{priceMax}
 			</if>
-		<!-- 
+
 			<if test="regionCode != null">
 				AND p.regionCode = #{regionCode}
 			</if>
-		 -->	
+
 			<if test="keyword != null and keyword != ''">
 				AND (
 					p.title LIKE '%' || #{keyword} || '%' 
@@ -46,10 +46,10 @@
 	        SELECT seq_product.NEXTVAL FROM DUAL
 	    </selectKey>
 		INSERT INTO product(productIdx, title, content, price, shippingFee, userIdx, tradeStatus, tradeType, 
-			tradePlace, latitude, longitude, <!-- regionCode, --> productStatus, categoryIdx)
+			tradePlace, latitude, longitude, regionCode, productStatus, categoryIdx)
 		VALUES(#{productIdx}, #{title, jdbcType=VARCHAR}, #{content, jdbcType=VARCHAR}, #{price}, #{shippingFee}, #{userIdx}, #{tradeStatus, jdbcType=VARCHAR}, #{tradeType, jdbcType=VARCHAR},
 			#{tradePlace, jdbcType=VARCHAR}, #{latitude}, #{longitude}, 
-			<!-- #{regionCode}, --> #{productStatus, jdbcType=VARCHAR}, #{categoryIdx, jdbcType=VARCHAR})
+			#{regionCode}, #{productStatus, jdbcType=VARCHAR}, #{categoryIdx, jdbcType=VARCHAR})
 	</insert>
 	
 	<insert id="insertTradePostImg" parameterType="com.sp.app.model.TradeImg">
@@ -77,13 +77,13 @@
 	        p.productIdx, p.title, p.content, p.price, p.shippingFee, 
 	        p.userIdx, p.hitCount, p.likeCount, p.chatCount,
 	        p.tradeType, p.tradeStatus, p.tradePlace, 
-	        p.latitude, p.longitude, <!-- p.regionCode, r.coreAddress, --> 
+	        p.latitude, p.longitude, p.regionCode, r.dong, 
 	        p.productStatus, p.pullCount, 
 	        p.lastUpDate, p.createdDate, p.updatedDate, 
 	        p.categoryIdx, u.nickName
 	    FROM product p
 	    JOIN users u ON p.userIdx = u.userIdx
-	    <!-- LEFT JOIN region r ON p.regionCode = r.regionCode -->
+	    LEFT JOIN region r ON p.regionCode = r.regionCode
 	    WHERE p.productIdx = #{productIdx}
 	    ORDER BY p.lastUpDate DESC
 	</select>
@@ -134,7 +134,7 @@
 	            SELECT 
 	                p.productIdx, p.title, p.price, p.userIdx, p.tradePlace, p.tradeType, 
 	                p.tradeStatus, p.productStatus, p.createdDate, p.lastUpDate, 
-	                p.updatedDate, p.hitCount, p.likeCount, p.chatCount, <!-- r.coreAddress, -->
+	                p.updatedDate, p.hitCount, p.likeCount, p.chatCount, p.regionCode, r.dong, 
 	                (SELECT imgUrl 
 	                	FROM productImages 
 	                	WHERE productIdx = p.productIdx AND imgOrder = 1) as imgUrl,
@@ -145,7 +145,7 @@
 	                    <otherwise>0</otherwise>
 	                </choose> as isLiked
 	            FROM product p
-	            <!-- LEFT JOIN region r ON p.regionCode = r.regionCode -->
+	            LEFT JOIN region r ON p.regionCode = r.regionCode
 	            <include refid="where-condition"/>
 	            <choose>
 	                <when test="sort == 'lowPrice'">
@@ -241,4 +241,12 @@
 	<select id="getWishUserList" parameterType="long" resultType="Long">
         SELECT userIdx FROM wishList WHERE productIdx = #{productIdx}
     </select>
+    
+    <select id="findWishList" parameterType="long" resultType="com.sp.app.model.Trade">
+	    SELECT t.productIdx, t.title, t.price, t.tradeStatus, t.lastUpDate, t.hitCount, t.coreAddress
+	    FROM trade t
+	    JOIN wishList w ON t.productIdx = w.productIdx
+	    WHERE w.userIdx = #{userIdx}
+	    ORDER BY t.productIdx DESC
+	</select>
 </mapper>

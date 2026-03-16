@@ -15,7 +15,7 @@ public class TradeImg {
 	private int imgOrder;
     private long productIdx;
     
-    private String originalName; 
-    private String saveName;     
+    private String originalName;
+    private String saveName;
     private String imgUrl;
 }

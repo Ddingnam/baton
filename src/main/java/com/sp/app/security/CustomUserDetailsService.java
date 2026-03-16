@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.domain.dto.UserDto;
+import com.sp.app.domain.dto.UserRegionInfo;
 import com.sp.app.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 	}
 	
 	private UserDetails toUserDetails(UserDto member, String authority, List<String> authorities) {
+		UserRegionInfo userRegionInfo = memberService.getUserRegionInfo(member.getUserIdx());
 		SessionInfo info = SessionInfo.builder()
 				.userIdx(member.getUserIdx())
 				.userId(member.getUserId())
@@ -50,6 +52,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 				.userLevel(NumericRoleGranted.getUserLevel(authority != null ? authority : "USER"))
 				.avatar(member.getProfile_photo())
 				.login_type(member.getProvider())
+				.userRegionInfo(userRegionInfo)
 				.build();
 		
 		return CustomUserDetails.builder()

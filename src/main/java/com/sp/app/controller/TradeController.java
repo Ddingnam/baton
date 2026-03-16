@@ -59,6 +59,7 @@ public class TradeController {
 		
 		try {
 			
+			String regionCode = userDetails.getMember().getUserRegionInfo().getActiveRegion().getRegionCode();
 			List<Map<String, Object>> categoryList = service.categoryList();
 	        model.addAttribute("categoryList", categoryList);
 			
@@ -68,6 +69,7 @@ public class TradeController {
 
 	        Map<String, Object> map = new HashMap<>();
 	        map.put("keyword", keyword);
+	        map.put("regionCode", regionCode);
 	        map.put("categoryIdx", categoryIdx);
 	        map.put("priceMin", priceMin);
 	        map.put("priceMax", priceMax);
@@ -166,7 +168,7 @@ public class TradeController {
 			@AuthenticationPrincipal CustomUserDetails userDetails) throws Exception{
 		try {
 			dto.setUserIdx(userDetails.getUserIdx());
-			// dto.setRegionCode(userDetails.getMember().getUserRegionInfo().getActiveRegion().getRegionCode());
+			dto.setRegionCode(userDetails.getMember().getUserRegionInfo().getActiveRegion().getRegionCode());
 			service.saveTradePost(dto, uploadPath);
 		} catch (Exception e) {
 			log.info("writeSubmit : ", e);

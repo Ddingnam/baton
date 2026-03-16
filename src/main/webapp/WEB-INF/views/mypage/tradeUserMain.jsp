@@ -176,18 +176,5 @@
 <script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_main.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/util/timeAgo.js"></script>
 
-<script>
-document.querySelectorAll('.inner-tab').forEach(function(tab) {
-	tab.addEventListener('click', function() {
-		var card = this.closest('.list-card');
-		card.querySelectorAll('.inner-tab').forEach(function(t) { t.classList.remove('active'); });
-		card.querySelectorAll('.inner-section').forEach(function(s) { s.classList.remove('active'); });
-		this.classList.add('active');
-		var target = this.getAttribute('data-inner');
-		var sec = document.getElementById(target);
-		if (sec) sec.classList.add('active');
-	});
-});
-</script>
 </body>
 </html>

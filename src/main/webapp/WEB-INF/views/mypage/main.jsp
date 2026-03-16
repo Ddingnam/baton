@@ -171,95 +171,113 @@
 
 						<div class="inner-section active" id="trade-sell">
 							<div class="lc-list">
-								<div class="lc-item">
-									<div class="item-thumb"><i class="ri-image-line"></i></div>
-									<div class="item-info">
-										<h4>나이키 에어포스 화이트 270</h4>
-										<p class="info-metrics">판매중 · 1일 전 · 조회 42</p>
-									</div>
-									<div class="item-right">
-										<span class="theme-badge">예약중</span>
-										<strong class="price">85,000원</strong>
-									</div>
-								</div>
-								<div class="lc-item">
-									<div class="item-thumb"><i class="ri-image-line"></i></div>
-									<div class="item-info">
-										<h4>다이슨 에어랩 스타일러 컴플리트</h4>
-										<p class="info-metrics">판매중 · 3일 전 · 조회 128</p>
-									</div>
-									<div class="item-right">
-										<span class="theme-badge">판매중</span>
-										<strong class="price">320,000원</strong>
-									</div>
-								</div>
-								<div class="lc-item">
-									<div class="item-thumb"><i class="ri-image-line"></i></div>
-									<div class="item-info">
-										<h4>맥북 에어 M2 스페이스그레이 256GB</h4>
-										<p class="info-metrics">거래완료 · 2주 전 · 조회 87</p>
-									</div>
-									<div class="item-right">
-										<span style="background:#F2F4F6;color:#8B95A1;padding:6px 12px;border-radius:8px;font-size:13px;font-weight:700;">거래완료</span>
-										<strong class="price">980,000원</strong>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="inner-section" id="trade-buy">
-							<div class="lc-list">
-								<div class="lc-item">
-									<div class="item-thumb"><i class="ri-image-line"></i></div>
-									<div class="item-info">
-										<h4>아이폰 15 프로 미개봉 급매</h4>
-										<p class="info-metrics">거래완료 · 1시간 전</p>
-									</div>
-									<div class="item-right">
-										<span class="theme-badge">거래완료</span>
-										<strong class="price">1,050,000원</strong>
-									</div>
-								</div>
-								<div class="lc-item">
-									<div class="item-thumb"><i class="ri-image-line"></i></div>
-									<div class="item-info">
-										<h4>무인양품 오크 협탁</h4>
-										<p class="info-metrics">거래완료 · 5일 전</p>
-									</div>
-									<div class="item-right">
-										<span style="background:#F2F4F6;color:#8B95A1;padding:6px 12px;border-radius:8px;font-size:13px;font-weight:700;">거래완료</span>
-										<strong class="price">45,000원</strong>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="inner-section" id="trade-wish">
-							<div class="lc-list">
-								<div class="lc-item">
-									<div class="item-thumb"><i class="ri-image-line"></i></div>
-									<div class="item-info">
-										<h4>애플워치 울트라 2세대</h4>
-										<p class="info-metrics">판매중 · 서초동</p>
-										<div class="price-drop"><i class="ri-arrow-down-s-fill"></i> 20,000원 인하</div>
-									</div>
-									<div class="item-right">
-										<strong class="price">620,000원</strong>
-									</div>
-								</div>
-								<div class="lc-item">
-									<div class="item-thumb"><i class="ri-image-line"></i></div>
-									<div class="item-info">
-										<h4>소니 WH-1000XM5 노이즈캔슬링</h4>
-										<p class="info-metrics">판매중 · 강남동</p>
-									</div>
-									<div class="item-right">
-										<strong class="price">280,000원</strong>
-									</div>
-								</div>
-							</div>
-						</div>
-						
+								<c:choose>
+				                    <c:when test="${empty tradeList}">
+				                        <div class="lc-empty">
+				                            <i class="ri-shopping-bag-line"></i>
+				                            <p>판매 내역이 없습니다.</p>
+				                        </div>
+				                    </c:when>
+				                    <c:otherwise>
+				                        <c:forEach var="item" items="${tradeList}">
+				                            <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/article?productIdx=${item.productIdx}'">
+				                                <div class="item-thumb">
+				                                    <c:choose>
+												        <c:when test="${not empty item.imageList}">
+												            <img src="${pageContext.request.contextPath}/uploads/trade/${item.imageList[0].saveName}" 
+												                 alt="상품이미지" 
+												                 style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
+												        </c:when>
+												        <c:otherwise>
+												            <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f5f5f5; border-radius:8px;">
+												                <i class="ri-image-line" style="font-size: 24px; color: #ccc;"></i>
+												            </div>
+												        </c:otherwise>
+												    </c:choose>
+				                                </div>
+				                                <div class="item-info">
+				                                    <h4>${item.title}</h4>
+				                                    <p class="info-metrics">${item.tradeStatus} · ${item.lastUpDate} · 조회 ${item.hitCount}</p>
+				                                </div>
+				                                <div class="item-right">
+				                                    <span class="${item.tradeStatus == '판매완료' ? 'theme-badge-done' : 'theme-badge'}">${item.tradeStatus}</span>
+				                                    <strong class="price"><fmt:formatNumber value="${item.price}" pattern="#,###"/>원</strong>
+				                                </div>
+				                            </div>
+				                        </c:forEach>
+				                    </c:otherwise>
+				                </c:choose>
+				            </div>
+				        </div>
+				
+				        <div class="inner-section" id="trade-buy">
+				            <div class="lc-list">
+				                <c:choose>
+				                    <c:when test="${empty myPurchases}">
+				                        <div class="lc-empty">
+				                            <i class="ri-handbag-line"></i>
+				                            <p>구매 내역이 없습니다.</p>
+				                        </div>
+				                    </c:when>
+				                    <c:otherwise>
+				                        <c:forEach var="item" items="${myPurchases}">
+				                            <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/article/${item.id}'">
+				                                <div class="item-thumb">
+				                                    <c:choose>
+				                                        <c:when test="${not empty item.thumbnail}">
+				                                            <img src="${item.thumbnail}" alt="상품이미지" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
+				                                        </c:when>
+				                                        <c:otherwise><i class="ri-image-line"></i></c:otherwise>
+				                                    </c:choose>
+				                                </div>
+				                                <div class="item-info">
+				                                    <h4>${item.title}</h4>
+				                                    <p class="info-metrics">거래완료 · ${item.buyDate}</p>
+				                                </div>
+				                                <div class="item-right">
+				                                    <span class="theme-badge">거래완료</span>
+				                                    <strong class="price"><fmt:formatNumber value="${item.price}" pattern="#,###"/>원</strong>
+				                                </div>
+				                            </div>
+				                        </c:forEach>
+				                    </c:otherwise>
+				                </c:choose>
+				            </div>
+				        </div>
+				
+				        <div class="inner-section" id="trade-wish">
+				            <div class="lc-list">
+				                <c:choose>
+				                    <c:when test="${empty myWishlist}">
+				                        <div class="lc-empty">
+				                            <i class="ri-heart-line"></i>
+				                            <p>찜한 상품이 없습니다.</p>
+				                        </div>
+				                    </c:when>
+				                    <c:otherwise>
+				                        <c:forEach var="item" items="${myWishlist}">
+				                            <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/article/${item.id}'">
+				                                <div class="item-thumb">
+				                                    <c:choose>
+				                                        <c:when test="${not empty item.thumbnail}">
+				                                            <img src="${item.thumbnail}" alt="상품이미지" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
+				                                        </c:when>
+				                                        <c:otherwise><i class="ri-image-line"></i></c:otherwise>
+				                                    </c:choose>
+				                                </div>
+				                                <div class="item-info">
+				                                    <h4>${item.title}</h4>
+				                                    <p class="info-metrics">${item.status} · ${item.location}</p>
+				                                </div>
+				                                <div class="item-right">
+				                                    <strong class="price"><fmt:formatNumber value="${item.price}" pattern="#,###"/>원</strong>
+				                                </div>
+				                            </div>
+				                        </c:forEach>
+				                    </c:otherwise>
+				                </c:choose>
+				            </div>
+				        </div>
 						
 						<div class="inner-section" id="trade-follower">
 						    <div class="lc-list">

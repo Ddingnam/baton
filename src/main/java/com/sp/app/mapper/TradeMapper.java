@@ -44,4 +44,5 @@ public interface TradeMapper {
 	public void updatePullCount(long productIdx) throws SQLException;
 	
 	public List<Long> getWishUserList(long productIdx);
+	public List<Trade> findWishListByUserIdx(long userIdx);
 }
