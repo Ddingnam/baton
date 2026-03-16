@@ -1,0 +1,109 @@
+package com.sp.app.admin.service;
+
+import com.sp.app.admin.mapper.AdminMemberMapper;
+import com.sp.app.domain.dto.UserDto;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class AdminMemberServiceImpl implements AdminMemberService {
+
+    private final AdminMemberMapper mapper;
+
+    @Override
+    public List<UserDto> listMembers(Map<String, Object> map) {
+        return mapper.listMembers(map);
+    }
+
+    @Override
+    public int countMembers(Map<String, Object> map) {
+        return mapper.countMembers(map);
+    }
+
+    @Override
+    public UserDto getMemberDetail(Long userIdx) {
+        return mapper.getMemberDetail(userIdx);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateMemberStatus(Map<String, Object> map) throws Exception {
+        mapper.updateMemberStatus(map);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateAuthority(Map<String, Object> map) throws Exception {
+        mapper.deleteAuthority((String) map.get("userId"));
+        mapper.insertAuthority(map);
+    }
+
+    @Override
+    public List<Map<String, Object>> listSanctions(Map<String, Object> map) {
+        return mapper.listSanctions(map);
+    }
+
+    @Override
+    public int countSanctions(Map<String, Object> map) {
+        return mapper.countSanctions(map);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void insertSanction(Map<String, Object> map) throws Exception {
+        mapper.insertSanction(map);
+        Map<String, Object> statusMap = new java.util.HashMap<>();
+        statusMap.put("userIdx", map.get("userIdx"));
+        statusMap.put("status", 2);
+        mapper.updateMemberStatus(statusMap);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void liftSanction(Map<String, Object> map) throws Exception {
+        mapper.liftSanction(map);
+        Map<String, Object> statusMap = new java.util.HashMap<>();
+        statusMap.put("userIdx", map.get("userIdx"));
+        statusMap.put("status", 1);
+        mapper.updateMemberStatus(statusMap);
+    }
+
+    @Override
+    public List<Map<String, Object>> listWithdrawals(Map<String, Object> map) {
+        return mapper.listWithdrawals(map);
+    }
+
+    @Override
+    public int countWithdrawals(Map<String, Object> map) {
+        return mapper.countWithdrawals(map);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void approveWithdrawal(Map<String, Object> map) throws Exception {
+        map.put("withdrawStatus", "APPROVED");
+        mapper.updateWithdrawalStatus(map);
+        Map<String, Object> statusMap = new java.util.HashMap<>();
+        statusMap.put("userIdx", map.get("userIdx"));
+        statusMap.put("status", 9);
+        mapper.updateMemberStatus(statusMap);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void rejectWithdrawal(Map<String, Object> map) throws Exception {
+        map.put("withdrawStatus", "REJECTED");
+        mapper.updateWithdrawalStatus(map);
+        Map<String, Object> statusMap = new java.util.HashMap<>();
+        statusMap.put("userIdx", map.get("userIdx"));
+        statusMap.put("status", 1);
+        mapper.updateMemberStatus(statusMap);
+    }
+}

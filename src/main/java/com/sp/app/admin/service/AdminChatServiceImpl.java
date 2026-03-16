@@ -1,7 +1,7 @@
-package com.sp.app.service;
+package com.sp.app.admin.service;
 
-import com.sp.app.mapper.AdminChatMapper;
 import com.sp.app.model.ChatRoom;
+import com.sp.app.admin.mapper.AdminChatMapper;
 import com.sp.app.domain.dto.UserDto;
 import org.springframework.stereotype.Service;
 import java.util.List;

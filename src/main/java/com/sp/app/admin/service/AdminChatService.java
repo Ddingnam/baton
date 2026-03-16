@@ -1,12 +1,10 @@
-package com.sp.app.mapper;
+package com.sp.app.admin.service;
 
 import com.sp.app.model.ChatRoom;
 import com.sp.app.domain.dto.UserDto;
-import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
-@Mapper
-public interface AdminChatMapper {
+public interface AdminChatService {
 	public List<ChatRoom> listAdminRooms();
 	public List<UserDto> listAdminMembers();
 }

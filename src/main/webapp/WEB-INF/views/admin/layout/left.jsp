@@ -15,6 +15,18 @@
         </div>
 
         <div class="nav-category">서비스 관리</div>
+          
+        <div class="nav-box has-child">
+            <a href="#" class="nav-btn">
+                <div class="nav-content">회원 관리</div>
+                <i class="ri-arrow-down-s-line nav-chev"></i>
+            </a>
+            <div class="sub-list">
+                <a href="${pageContext.request.contextPath}/admin/member/list" class="sub-item">전체 회원 목록</a>
+                <a href="${pageContext.request.contextPath}/admin/member/sanction" class="sub-item">제재 내역 관리</a>
+                <a href="${pageContext.request.contextPath}/admin/member/withdrawal" class="sub-item">탈퇴 요청 처리</a>
+            </div>
+        </div>
         
         <div class="nav-box has-child">
             <a href="#" class="nav-btn">
@@ -36,18 +48,6 @@
                 <a href="${pageContext.request.contextPath}/admin/community/list" class="sub-item">커뮤니티 관리</a>
                 <a href="${pageContext.request.contextPath}/admin/crew/list" class="sub-item">동네모임 관리</a>
                 <a href="${pageContext.request.contextPath}/admin/alba/list" class="sub-item">알바구인 관리</a>
-            </div>
-        </div>
-        
-        <div class="nav-box has-child">
-            <a href="#" class="nav-btn">
-                <div class="nav-content">회원 관리</div>
-                <i class="ri-arrow-down-s-line nav-chev"></i>
-            </a>
-            <div class="sub-list">
-                <a href="${pageContext.request.contextPath}/admin/member/list" class="sub-item">전체 회원 목록</a>
-                <a href="${pageContext.request.contextPath}/admin/member/sanction" class="sub-item">제재 내역 관리</a>
-                <a href="${pageContext.request.contextPath}/admin/member/withdrawal" class="sub-item">탈퇴 요청 처리</a>
             </div>
         </div>
 

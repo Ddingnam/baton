@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sp.app.admin.mapper.AdminMemberMapper">
+
+    <select id="listMembers" parameterType="map" resultType="com.sp.app.domain.dto.UserDto">
+        SELECT * FROM (
+            SELECT ROWNUM AS rn, t.* FROM (
+                SELECT u.userIdx, u.userId, u.name, u.nickname, u.email,
+                       u.tel, u.status, u.createdDate, u.lastLoginDate,
+                       u.profile_photo, u.score, u.userLevel, u.batonpoint,
+                       a.authority
+                FROM users u
+                LEFT JOIN userAuthority a ON u.userId = a.userId
+                <where>
+                    <if test="kwd != null and kwd != ''">
+                        <choose>
+                            <when test="schType == 'userId'">AND u.userId LIKE '%' || #{kwd} || '%'</when>
+                            <when test="schType == 'nickname'">AND u.nickname LIKE '%' || #{kwd} || '%'</when>
+                            <when test="schType == 'email'">AND u.email LIKE '%' || #{kwd} || '%'</when>
+                            <otherwise>AND (u.userId LIKE '%' || #{kwd} || '%' OR u.nickname LIKE '%' || #{kwd} || '%')</otherwise>
+                        </choose>
+                    </if>
+                    <if test="status != null and status != ''">AND u.status = #{status}</if>
+                </where>
+                ORDER BY u.createdDate DESC
+            ) t
+            WHERE ROWNUM &lt;= #{offset} + #{pageSize}
+        )
+        WHERE rn &gt; #{offset}
+    </select>
+
+    <select id="countMembers" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM users u
+        <where>
+            <if test="kwd != null and kwd != ''">
+                <choose>
+                    <when test="schType == 'userId'">AND u.userId LIKE '%' || #{kwd} || '%'</when>
+                    <when test="schType == 'nickname'">AND u.nickname LIKE '%' || #{kwd} || '%'</when>
+                    <when test="schType == 'email'">AND u.email LIKE '%' || #{kwd} || '%'</when>
+                    <otherwise>AND (u.userId LIKE '%' || #{kwd} || '%' OR u.nickname LIKE '%' || #{kwd} || '%')</otherwise>
+                </choose>
+            </if>
+            <if test="status != null and status != ''">AND u.status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="getMemberDetail" resultType="com.sp.app.domain.dto.UserDto">
+        SELECT u.userIdx, u.userId, u.name, u.nickname, u.email,
+               u.tel, u.status, u.createdDate, u.lastLoginDate, u.updatedDate,
+               TO_CHAR(u.birth, 'YYYY-MM-DD') AS birth,
+               u.profile_photo, u.score, u.userLevel, u.batonpoint,
+               u.pwdFailCount, a.authority
+        FROM users u
+        LEFT JOIN userAuthority a ON u.userId = a.userId
+        WHERE u.userIdx = #{userIdx}
+    </select>
+
+    <update id="updateMemberStatus" parameterType="map">
+        UPDATE users SET status = #{status}, updatedDate = CURRENT_TIMESTAMP
+        WHERE userIdx = #{userIdx}
+    </update>
+
+    <delete id="deleteAuthority">
+        DELETE FROM userAuthority WHERE userId = #{userId}
+    </delete>
+
+    <insert id="insertAuthority" parameterType="map">
+        INSERT INTO userAuthority (userId, authority) VALUES (#{userId}, #{authority})
+    </insert>
+
+    <select id="listSanctions" parameterType="map" resultType="map">
+        SELECT * FROM (
+            SELECT ROWNUM AS rn, t.* FROM (
+                SELECT s.sanctionIdx, s.userIdx, s.reason, s.sanctionType,
+                       TO_CHAR(s.startDate, 'YYYY-MM-DD') AS startDate,
+                       TO_CHAR(s.endDate,   'YYYY-MM-DD') AS endDate,
+                       TO_CHAR(s.createdDate, 'YYYY-MM-DD HH24:MI') AS createdDate,
+                       s.isLifted, s.liftReason,
+                       u.userId, u.nickname, u.email
+                FROM adminSanction s
+                JOIN users u ON s.userIdx = u.userIdx
+                <where>
+                    <if test="kwd != null and kwd != ''">
+                        AND (u.userId LIKE '%' || #{kwd} || '%'
+                          OR u.nickname LIKE '%' || #{kwd} || '%')
+                    </if>
+                </where>
+                ORDER BY s.createdDate DESC
+            ) t
+            WHERE ROWNUM &lt;= #{offset} + #{pageSize}
+        )
+        WHERE rn &gt; #{offset}
+    </select>
+
+    <select id="countSanctions" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM adminSanction s
+        JOIN users u ON s.userIdx = u.userIdx
+        <where>
+            <if test="kwd != null and kwd != ''">
+                AND (u.userId LIKE '%' || #{kwd} || '%'
+                  OR u.nickname LIKE '%' || #{kwd} || '%')
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertSanction" parameterType="map">
+        INSERT INTO adminSanction (
+            sanctionIdx, userIdx, reason, sanctionType,
+            startDate, endDate, createdDate, isLifted
+        ) VALUES (
+            adminSanction_seq.NEXTVAL,
+            #{userIdx}, #{reason}, #{sanctionType},
+            CURRENT_TIMESTAMP,
+            <choose>
+                <when test="sanctionType == 'PERMANENT'">NULL</when>
+                <otherwise>CURRENT_TIMESTAMP + #{days}</otherwise>
+            </choose>,
+            CURRENT_TIMESTAMP, 0
+        )
+    </insert>
+
+    <update id="liftSanction" parameterType="map">
+        UPDATE adminSanction
+        SET isLifted = 1, liftReason = #{liftReason}, liftDate = CURRENT_TIMESTAMP
+        WHERE sanctionIdx = #{sanctionIdx}
+    </update>
+
+    <select id="listWithdrawals" parameterType="map" resultType="map">
+        SELECT * FROM (
+            SELECT ROWNUM AS rn, t.* FROM (
+                SELECT w.withdrawIdx, w.userIdx, w.reason,
+                       TO_CHAR(w.requestDate, 'YYYY-MM-DD HH24:MI') AS requestDate,
+                       w.withdrawStatus,
+                       u.userId, u.nickname, u.email, u.createdDate
+                FROM withdrawRequest w
+                JOIN users u ON w.userIdx = u.userIdx
+                <where>
+                    <if test="kwd != null and kwd != ''">
+                        AND (u.userId LIKE '%' || #{kwd} || '%'
+                          OR u.nickname LIKE '%' || #{kwd} || '%')
+                    </if>
+                </where>
+                ORDER BY w.requestDate DESC
+            ) t
+            WHERE ROWNUM &lt;= #{offset} + #{pageSize}
+        )
+        WHERE rn &gt; #{offset}
+    </select>
+
+    <select id="countWithdrawals" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM withdrawRequest w
+        JOIN users u ON w.userIdx = u.userIdx
+        <where>
+            <if test="kwd != null and kwd != ''">
+                AND (u.userId LIKE '%' || #{kwd} || '%'
+                  OR u.nickname LIKE '%' || #{kwd} || '%')
+            </if>
+        </where>
+    </select>
+
+    <update id="updateWithdrawalStatus" parameterType="map">
+        UPDATE withdrawRequest
+        SET withdrawStatus = #{withdrawStatus}, processDate = CURRENT_TIMESTAMP
+        WHERE withdrawIdx = #{withdrawIdx}
+    </update>
+
+</mapper>
