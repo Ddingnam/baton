@@ -82,6 +82,7 @@
 			</div>
 		</div>
 	</div>
+	
 </header>
 
 <div id="baton-toast-container" class="baton-toast-container"></div>
@@ -122,7 +123,13 @@
         </footer>
     </article>
 </div>
-
+<div id="adminTransitionOverlay" class="admin-transition-overlay">
+    <div class="admin-loader-box">
+        <div class="admin-loader-spinner"></div>
+        <div class="admin-loader-text">BATON<span class="dot">.</span> ADMIN</div>
+        <p>관리자 환경으로 이동하고 있습니다</p>
+    </div>
+</div>
 <script>
 	window.SERVER_MSG = "${msg != null ? msg : ''}";
     window.SERVER_MESSAGE = "${message != null ? message : ''}";

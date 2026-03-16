@@ -13,4 +13,6 @@ public class ChatRoom {
     private int unreadCount;
     private String tradeTitle;     
     private String tradeSaveName;
+    private String roomName;
+    private int roomType;
 }

@@ -2,19 +2,19 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 
 <aside class="agency-sidebar">
-    <div class="brand-logo">
+    <div class="brand-logo" onclick="location.reload()" style="cursor:pointer;">
         BATON<span class="dot">.</span>
     </div>
 
     <nav class="nav-wrapper">
-        <div class="nav-category">Overview</div>
+        <div class="nav-category">개요</div>
         <div class="nav-box">
             <a href="${pageContext.request.contextPath}/admin" class="nav-btn active">
-                <div class="nav-content">Dashboard</div>
+                <div class="nav-content">대시보드</div>
             </a>
         </div>
 
-        <div class="nav-category">Services</div>
+        <div class="nav-category">서비스 관리</div>
         
         <div class="nav-box has-child">
             <a href="#" class="nav-btn">
@@ -34,23 +34,10 @@
             </a>
             <div class="sub-list">
                 <a href="${pageContext.request.contextPath}/admin/community/list" class="sub-item">커뮤니티 관리</a>
-                <a href="${pageContext.request.contextPath}/admin/alba/list" class="sub-item">동네알바 관리</a>
                 <a href="${pageContext.request.contextPath}/admin/crew/list" class="sub-item">동네모임 관리</a>
+                <a href="${pageContext.request.contextPath}/admin/alba/list" class="sub-item">알바구인 관리</a>
             </div>
         </div>
-
-        <div class="nav-box has-child">
-            <a href="#" class="nav-btn">
-                <div class="nav-content">결제 및 안심거래</div>
-                <i class="ri-arrow-down-s-line nav-chev"></i>
-            </a>
-            <div class="sub-list">
-                <a href="${pageContext.request.contextPath}/admin/payment/list" class="sub-item">결제/충전 내역</a>
-                <a href="${pageContext.request.contextPath}/admin/escrow/list" class="sub-item">안심결제(에스크로)</a>
-            </div>
-        </div>
-
-        <div class="nav-category">System</div>
         
         <div class="nav-box has-child">
             <a href="#" class="nav-btn">
@@ -77,11 +64,16 @@
     </nav>
 
     <div class="sidebar-foot">
+        <button class="chat-entry-btn" onclick="location.href='${pageContext.request.contextPath}/admin/chat'">
+            <i class="ri-message-3-fill"></i>
+            <span>팀 채팅</span>
+            <div class="chat-unread-badge">3</div>
+        </button>
         <div class="user-badge">
             <div class="avt-circle">AD</div>
             <div class="user-texts">
-                <span class="u-name">Administrator</span>
-                <span class="u-role">Super Admin</span>
+                <span class="u-name">관리자</span>
+                <span class="u-role">최고 관리자</span>
             </div>
         </div>
     </div>

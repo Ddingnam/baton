@@ -3,11 +3,15 @@
 let _page = 1;
 let _profileMemberIdx = '';
 let _repliesLoaded = false;
+let _postsLoading = false;
+let _postsEnd = false;
 
 function initUserProfileModal(memberIdx) {
     _profileMemberIdx = String(memberIdx);
     _page = 1;
     _repliesLoaded = false;
+    _postsLoading = false;
+    _postsEnd = false;
 
     const container = document.querySelector('.up-modal-wrap') || document;
 
@@ -30,9 +34,19 @@ function initUserProfileModal(memberIdx) {
         });
     });
 
-    const moreBtn = container.querySelector('#moreBtn');
-    if (moreBtn) {
-        moreBtn.addEventListener('click', () => loadMorePosts(container));
+    const scrollEl = document.querySelector('#profileModal .modal-content');
+    if (scrollEl) {
+        scrollEl._infiniteHandler && scrollEl.removeEventListener('scroll', scrollEl._infiniteHandler);
+        scrollEl._infiniteHandler = function () {
+            const postPanel = container.querySelector('#panel-posts-modal');
+            if (!postPanel || !postPanel.classList.contains('on')) return;
+            if (_postsLoading || _postsEnd) return;
+            const threshold = 100;
+            if (this.scrollTop + this.clientHeight >= this.scrollHeight - threshold) {
+                loadMorePosts(container);
+            }
+        };
+        scrollEl.addEventListener('scroll', scrollEl._infiniteHandler);
     }
 }
 
@@ -92,7 +106,7 @@ function loadReplies(container) {
 
     const basePath = typeof contextPath !== 'undefined' ? contextPath : '';
 
-    fetch(`${basePath}/community/user/replies?memberIdx=${encodeURIComponent(_profileMemberIdx)}`)
+    fetch(`${basePath}/community/user/replies?memberIdx=${encodeURIComponent(_profileMemberIdx)}`, { credentials: 'same-origin' })
         .then(r => {
             if (!r.ok) throw new Error('network');
             return r.json();
@@ -128,24 +142,31 @@ function loadReplies(container) {
 }
 
 function loadMorePosts(container) {
+    if (_postsLoading || _postsEnd) return;
+    _postsLoading = true;
     _page++;
-    const btn = container.querySelector('#moreBtn');
-    if (btn) { btn.disabled = true; btn.textContent = '불러오는 중...'; }
 
     const basePath = typeof contextPath !== 'undefined' ? contextPath : '';
+    const list = container.querySelector('#postList');
 
-    fetch(`${basePath}/community/user/posts?memberIdx=${encodeURIComponent(_profileMemberIdx)}&page=${_page}`)
+    const spinner = document.createElement('div');
+    spinner.className = 'up-loading up-scroll-spinner';
+    spinner.innerHTML = '<div class="up-spinner"></div>';
+    if (list) list.appendChild(spinner);
+
+    fetch(`${basePath}/community/user/posts?memberIdx=${encodeURIComponent(_profileMemberIdx)}&page=${_page}`, {
+        credentials: 'same-origin'
+    })
         .then(r => {
             if (!r.ok) throw new Error('network');
             return r.json();
         })
         .then(data => {
+            spinner.remove();
             if (!data?.length) {
-                const wrap = container.querySelector('#moreBtnWrap');
-                if (wrap) wrap.remove();
+                _postsEnd = true;
                 return;
             }
-            const list = container.querySelector('#postList');
             if (!list) return;
 
             data.forEach(item => {
@@ -156,7 +177,7 @@ function loadMorePosts(container) {
                 });
                 div.innerHTML = `
                     <div class="up-row-info">
-                        <span class="up-row-cat">${esc(item.category || '')}</span>
+                        <span class="up-row-cat">${catLabel(item.category)}</span>
                         <p class="up-row-title">${esc(item.subject)}</p>
                         <div class="up-row-stats">
                             <span><i class="ri-eye-line"></i> ${item.hitCount}</span>
@@ -166,11 +187,13 @@ function loadMorePosts(container) {
                     </div>`;
                 list.appendChild(div);
             });
-
-            if (btn) { btn.disabled = false; btn.textContent = '더 보기'; }
         })
         .catch(() => {
-            if (btn) { btn.disabled = false; btn.textContent = '다시 시도'; }
+            spinner.remove();
+            _page--;
+        })
+        .finally(() => {
+            _postsLoading = false;
         });
 }
 
@@ -179,6 +202,15 @@ function emptyHTML(icon, msg) {
         <i class="${icon}"></i>
         <p>${msg}</p>
     </div>`;
+}
+
+function catLabel(c) {
+    const map = {
+        '1': '일상', '2': '동네질문', '3': '동네맛집',
+        '4': '같이해요', '5': '분실/실종', '6': '동네사건사고',
+        '7': '생활정보', '8': '취미생활'
+    };
+    return map[String(c)] || esc(c || '');
 }
 
 function esc(s) {

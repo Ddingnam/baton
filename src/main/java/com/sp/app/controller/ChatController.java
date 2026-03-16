@@ -1,10 +1,5 @@
 package com.sp.app.controller;
 
-import com.sp.app.model.ChatMessage;
-import com.sp.app.service.ChatService;
-import com.sp.app.service.NotificationService;
-import com.sp.app.security.CustomUserDetails;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +11,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.sp.app.model.ChatMessage;
+import com.sp.app.security.CustomUserDetails;
+import com.sp.app.service.ChatService;
 
 @Controller
 public class ChatController {
@@ -72,5 +71,12 @@ public class ChatController {
             model.put("state", "false");
         }
         return model;
+    }
+    
+    @MessageMapping("/chat/typing")
+    public void typingSignal(ChatMessage message) {
+        messagingTemplate.convertAndSend(
+            "/topic/typing/" + message.getRoomIdx(), message
+        );
     }
 }

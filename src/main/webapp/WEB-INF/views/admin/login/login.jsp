@@ -31,6 +31,9 @@
         </div>
         
         <form id="loginForm" class="auth-form" action="${pageContext.request.contextPath}/member/login" method="post" novalidate>
+            
+            <input type="hidden" name="loginType" value="ADMIN">
+
             <div class="input-wrap">
                 <i class="ri-user-3-fill icon"></i>
                 <input type="text" name="login_id" placeholder="Admin ID" autocomplete="off">
@@ -73,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const alertBox = document.getElementById('customAlert');
     const alertMsg = document.getElementById('alertMessage');
     const idInput = document.querySelector('input[name="login_id"]');
-    const pwInput = document.querySelector('input[name="password"]'); 
+    const pwInput = document.querySelector('input[name="password"]');
     const urlParams = new URLSearchParams(window.location.search);
 
     if (urlParams.has('authorization_error')) {

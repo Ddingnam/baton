@@ -102,4 +102,8 @@ public class CustomUserDetails implements UserDetails{
         return member.getUserIdx();
     }
 
+	public String getNickname() {
+		return member.getName();
+	}
+
 }

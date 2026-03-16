@@ -399,7 +399,7 @@ public class CommunityController {
     @ResponseBody
     public ResponseEntity<?> userPosts(
             @RequestParam("memberIdx") Long memberIdx,
-            @RequestParam(defaultValue = "1") int page) {
+            @RequestParam(name = "page", defaultValue = "1") int page) {
         try {
             Pageable pageable = PageRequest.of(page - 1, 10, Sort.by("id").descending());
             List<CommunityDto> list = service.getUserPostListPaged(memberIdx, pageable);

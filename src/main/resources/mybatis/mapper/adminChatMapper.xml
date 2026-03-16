@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sp.app.mapper.AdminChatMapper">
+
+    <select id="listAdminRooms" resultType="com.sp.app.model.ChatRoom">
+        SELECT
+            cr.roomIdx,
+            cr.roomName,
+            (
+                SELECT content
+                FROM (
+                    SELECT content 
+                    FROM chatMessage 
+                    WHERE roomIdx = cr.roomIdx
+                    ORDER BY msgIdx DESC
+                ) WHERE ROWNUM = 1
+            ) AS recentMessage,
+            0 AS unreadCount
+        FROM chatRoom cr
+        WHERE cr.roomType = 2
+        ORDER BY cr.roomIdx ASC
+    </select>
+
+    <select id="listAdminMembers" resultType="com.sp.app.domain.dto.UserDto">
+        SELECT 
+            u.userIdx, 
+            u.userId, 
+            u.name, 
+            u.nickname, 
+            u.profile_photo,
+            a.authority
+        FROM users u
+        JOIN userAuthority a ON u.userId = a.userId
+        WHERE a.authority IN ('ROLE_ADMIN', 'ADMIN')
+        ORDER BY u.userIdx ASC
+    </select>
+
+</mapper>

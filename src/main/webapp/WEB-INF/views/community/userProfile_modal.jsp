@@ -112,11 +112,7 @@
                 </c:choose>
             </div>
 
-            <c:if test="${postCount > 10}">
-                <div class="up-more-wrap" id="moreBtnWrap">
-                    <button type="button" class="up-more-btn" id="moreBtn">더 보기</button>
-                </div>
-            </c:if>
+
         </div>
 
         <div class="up-panel" id="panel-replies-modal">

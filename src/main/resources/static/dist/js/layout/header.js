@@ -124,6 +124,26 @@ document.addEventListener("DOMContentLoaded", () => {
         connectGlobalAlarm();
         window.addEventListener('focus', checkUnreadAlarms);
     }
+	
+	    const adminIcon = document.querySelector('.admin-icon');
+	    const adminOverlay = document.getElementById('adminTransitionOverlay');
+
+	    if (adminIcon && adminOverlay) {
+	        adminIcon.addEventListener('click', function(e) {
+	            e.preventDefault();
+	            const targetUrl = this.getAttribute('href');
+	            
+	            adminOverlay.style.display = 'flex';
+	            
+	            setTimeout(() => {
+	                adminOverlay.classList.add('show');
+	            }, 10);
+	            
+	            setTimeout(() => {
+	                window.location.href = targetUrl;
+	            }, 1200);
+	        });
+	    }
 });
 
 function showBatonToast(text) {
@@ -279,3 +299,4 @@ function turnOffAlarmDots() {
     if(dot1) dot1.style.display = 'none';
     if(dot2) dot2.style.display = 'none';
 }
+

@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sp.app.common.StorageService;
 import com.sp.app.domain.dto.CommunityDto;
-import com.sp.app.domain.dto.UserDto;
 import com.sp.app.domain.entity.Community;
 import com.sp.app.domain.entity.CommunityHashTag;
 import com.sp.app.domain.entity.CommunityImage;
@@ -33,6 +32,7 @@ import com.sp.app.repository.CommunityReplyRepository;
 import com.sp.app.repository.CommunityRepository;
 import com.sp.app.repository.PollOptionRepository;
 import com.sp.app.repository.PollVoteRepository;
+import com.sp.app.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +49,7 @@ public class CommunityServiceImpl implements CommunityService {
 	private final PollVoteRepository pollVoteRepository;
 	private final StorageService storageService;
 	private final MemberService memberService;
+	private final UserRepository userRepository;
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
@@ -533,13 +534,12 @@ public class CommunityServiceImpl implements CommunityService {
 	@Override
 	public LocalDateTime getUserJoinDate(Long memberIdx) {
 	    try {
-	        UserDto user = memberService.findById(memberIdx);
-	        if (user != null && user.getCreatedDate() != null && !user.getCreatedDate().isBlank()) {
-	            return LocalDateTime.parse(user.getCreatedDate(),
-	                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	        com.sp.app.domain.entity.User user = userRepository.findById(memberIdx).orElse(null);
+	        if (user != null) {
+	            return user.getCreatedDate();
 	        }
 	    } catch (Exception e) {
-	        log.warn("getUserJoinDate 파싱 실패, memberIdx={}", memberIdx, e);
+	        log.warn("getUserJoinDate 조회 실패, memberIdx={}", memberIdx, e);
 	    }
 	    return null;
 	}
