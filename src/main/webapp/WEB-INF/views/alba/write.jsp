@@ -13,6 +13,7 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/main/main.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/alba/alba-write.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/member/regionAuth.css">
 </head>
 <body>
 
@@ -238,12 +239,13 @@
 
             <div class="form-group">
               <label>주소 <span class="req">*</span></label>
+              
               <div class="input-with-btn">
                 <input type="text" id="location" name="location" readonly
                        placeholder="주소 검색 버튼을 눌러주세요"
                        value="${dto.location}"
                        oninput="updatePreview();">
-                <button type="button" class="addr-btn" onclick="searchAddress()">
+                <button type="button" class="addr-btn" onclick="openRegionModal()">
                   <i class="ri-map-pin-2-line"></i> 검색
                 </button>
               </div>

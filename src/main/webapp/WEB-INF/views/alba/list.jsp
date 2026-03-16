@@ -215,7 +215,6 @@ const serverData = [
 ];
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/alba/alba-list.js"></script>
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=발급받은_JavaScript_키&libraries=services"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
