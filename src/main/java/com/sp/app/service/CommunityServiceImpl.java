@@ -50,6 +50,7 @@ public class CommunityServiceImpl implements CommunityService {
 	private final StorageService storageService;
 	private final MemberService memberService;
 	private final UserRepository userRepository;
+	private final NotificationService notificationService;
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
@@ -257,7 +258,24 @@ public class CommunityServiceImpl implements CommunityService {
 			} catch (Exception attachEx) {
 				log.warn("첨부파일 처리 중 오류 (테이블 미생성 가능성): {}", attachEx.getMessage());
 			}
-
+			
+			try {
+				if (community.getLikes() != null) {
+					for (CommunityLike like : community.getLikes()) {
+						if (!like.getMemberIdx().equals(community.getMemberIdx())) { 
+							notificationService.sendNotification(
+								like.getMemberIdx(), 
+								"게시글 수정", 
+								"[" + dto.getSubject() + "] 게시글이 수정되었습니다.", 
+								"/community/article?id=" + dto.getId()
+							);
+						}
+					}
+				}
+			} catch(Exception e) { 
+				log.info("커뮤니티 수정 알림 전송 실패: ", e); 
+			}
+		
 		} catch (Exception e) {
 			log.error("updateCommunity error", e);
 			throw e;
@@ -327,6 +345,24 @@ public class CommunityServiceImpl implements CommunityService {
 					storageService.deleteFile(uploadPath, af.getSaveFilename());
 				}
 			}
+			
+			try {
+				if (community.getLikes() != null) {
+					for (CommunityLike like : community.getLikes()) {
+						if (!like.getMemberIdx().equals(community.getMemberIdx())) {
+							notificationService.sendNotification(
+								like.getMemberIdx(), 
+								"게시글 삭제", 
+								"[" + community.getSubject() + "] 게시글이 삭제되었습니다.", 
+								""
+							);
+						}
+					}
+				}
+			} catch(Exception e) { 
+				log.info("커뮤니티 삭제 알림 전송 실패: ", e); 
+			}
+			
 			communityRepository.delete(community);
 		} catch (Exception e) {
 			log.error("deleteCommunity error", e);
