@@ -14,6 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/community/community-list.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/community/community-user-profile.css">
 </head>
 <body>
 
@@ -133,7 +134,8 @@
                             tmp.innerHTML = `<c:out value="${dto.content}" escapeXml="false"/>`;
                             var text = (tmp.innerText || tmp.textContent || '').replace(/\s+/g,' ').trim();
                             var el = document.getElementById('cardText_${dto.id}');
-                            if(el) el.innerText = text.length > 80 ? text.substring(0,80)+'...' : text;})();
+                            if(el) el.innerText = text.length > 80 ? text.substring(0,80)+'...' : text;
+                        })();
                         </script>
 
                         <div class="card-meta">
@@ -151,7 +153,7 @@
                             <div class="user-info">
                                 <div class="user-avatar"><i class="ri-user-6-line"></i></div>
                                 <span class="user-nick"
-                                      onclick="event.preventDefault(); event.stopPropagation(); location.href='${pageContext.request.contextPath}/community/user/${dto.memberIdx}'">
+                                      onclick="event.preventDefault(); event.stopPropagation(); openProfileModal('${dto.memberIdx}');">
                                     ${dto.writerNickname}
                                 </span>
                             </div>
@@ -172,8 +174,68 @@
     </div>
 </main>
 
+<div id="profileModal">
+    <div class="modal-dialog">
+        <div class="modal-content" id="profileModalContent">
+            <div class="up-modal-loading" id="profileModalLoading">
+                <div class="up-modal-sk-cover"></div>
+                <div class="up-modal-sk-body">
+                    <div class="up-modal-sk-avatar"></div>
+                    <div class="up-modal-sk-line w60"></div>
+                    <div class="up-modal-sk-line w40"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 
+<script>
+    const contextPath = "${pageContext.request.contextPath}";
+
+    function openProfileModal(memberIdx) {
+        const modalEl   = document.getElementById('profileModal');
+        const contentEl = document.getElementById('profileModalContent');
+        const loadingEl = document.getElementById('profileModalLoading');
+
+        [...contentEl.children].forEach(el => {
+            if (el.id !== 'profileModalLoading') el.remove();
+        });
+        if (loadingEl) loadingEl.style.display = '';
+
+        modalEl.classList.add('open');
+        document.body.style.overflow = 'hidden';
+
+        modalEl.onclick = function(e) {
+            if (e.target === modalEl) closeProfileModal();
+        };
+
+        fetch(contextPath + '/community/user/' + encodeURIComponent(memberIdx))
+            .then(r => {
+                if (!r.ok) throw new Error('server error');
+                return r.text();
+            })
+            .then(html => {
+                if (loadingEl) loadingEl.style.display = 'none';
+                const frag = document.createRange().createContextualFragment(html);
+                contentEl.appendChild(frag);
+            })
+            .catch(() => {
+                contentEl.innerHTML = '<div style="padding:40px;text-align:center;color:#888;">프로필을 불러오지 못했어요 😢</div>';
+            });
+    }
+
+    function closeProfileModal() {
+        document.getElementById('profileModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeProfileModal();
+    });
+</script>
+<script src="${pageContext.request.contextPath}/dist/js/community/community-user-profile.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/community/community-list.js"></script>
 </body>
 </html>

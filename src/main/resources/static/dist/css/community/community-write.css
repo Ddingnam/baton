@@ -1509,3 +1509,51 @@ input:checked + .slider:before {
     .editor-header-right { display: none; }
     .editor-footer { padding: 14px 20px; }
 }
+
+.ql-img-overlay {
+    position: absolute;
+    box-sizing: border-box;
+    border: 2px solid #8A63FF;
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.ql-img-handle {
+    position: absolute;
+    right: -6px;
+    bottom: -6px;
+    width: 14px;
+    height: 14px;
+    background: #8A63FF;
+    border: 2px solid #fff;
+    border-radius: 3px;
+    cursor: se-resize;
+    pointer-events: all;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+.ql-img-label {
+    position: absolute;
+    top: -26px;
+    left: 0;
+    background: #8A63FF;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+    font-family: 'Pretendard', sans-serif;
+}
+
+#quillEditor img {
+    max-width: 100%;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: box-shadow 0.15s;
+}
+#quillEditor img:hover {
+    box-shadow: 0 0 0 2px rgba(138, 99, 255, 0.4);
+}

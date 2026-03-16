@@ -260,6 +260,7 @@
 	<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 
 	<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/quill-image-resize-module@3.0.0/image-resize.min.js"></script>
 	<script src="${pageContext.request.contextPath}/dist/js/community/community-write.js"></script>
 	<script>
     let placesService = null;

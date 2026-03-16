@@ -1,30 +1,49 @@
 'use strict';
 
 let _page = 1;
+let _profileMemberIdx = '';
+let _repliesLoaded = false;
 
-document.addEventListener('DOMContentLoaded', () => {
-    renderDates();
-    animateStats();
-    loadReplies();
+function initUserProfileModal(memberIdx) {
+    _profileMemberIdx = String(memberIdx);
+    _page = 1;
+    _repliesLoaded = false;
 
-    document.querySelectorAll('.up-tab').forEach(tab => {
+    const container = document.querySelector('.up-modal-wrap') || document;
+
+    renderDates(container);
+    animateStats(container);
+
+    container.querySelectorAll('.up-tab').forEach(tab => {
         tab.addEventListener('click', function () {
-            document.querySelectorAll('.up-tab').forEach(t => t.classList.remove('on'));
-            document.querySelectorAll('.up-panel').forEach(p => p.classList.remove('on'));
+            container.querySelectorAll('.up-tab').forEach(t => t.classList.remove('on'));
+            container.querySelectorAll('.up-panel').forEach(p => p.classList.remove('on'));
             this.classList.add('on');
-            const target = document.getElementById(this.dataset.panel);
+
+            const target = container.querySelector('#' + this.dataset.panel);
             if (target) target.classList.add('on');
+
+            if (this.dataset.panel === 'panel-replies-modal' && !_repliesLoaded) {
+                loadReplies(container);
+                _repliesLoaded = true;
+            }
         });
     });
-});
 
-function renderDates() {
-    const joinEl = document.getElementById('joinDate');
+    const moreBtn = container.querySelector('#moreBtn');
+    if (moreBtn) {
+        moreBtn.addEventListener('click', () => loadMorePosts(container));
+    }
+}
+
+function renderDates(container) {
+    const joinEl = container.querySelector('#profileJoinDate') || container.querySelector('#joinDate');
     if (joinEl?.dataset.date) {
         joinEl.textContent = fmtFull(joinEl.dataset.date);
     }
-    document.querySelectorAll('[data-date]:not(#joinDate)').forEach(el => {
-        el.textContent = fmtRelative(el.dataset.date);
+
+    container.querySelectorAll('[data-date]:not(#profileJoinDate):not(#joinDate)').forEach(el => {
+        if (el.dataset.date) el.textContent = fmtRelative(el.dataset.date);
     });
 }
 
@@ -48,10 +67,10 @@ function fmtRelative(s) {
     return fmtFull(s);
 }
 
-function animateStats() {
-    document.querySelectorAll('[data-stat]').forEach(el => {
-        const target = parseInt(el.dataset.stat) || 0;
-        if (!target) return;
+function animateStats(container) {
+    container.querySelectorAll('[data-stat]').forEach(el => {
+        const target = parseInt(el.dataset.stat, 10) || 0;
+        if (!target) { el.textContent = '0'; return; }
         let t0 = null;
         (function tick(ts) {
             if (!t0) t0 = ts;
@@ -62,12 +81,22 @@ function animateStats() {
     });
 }
 
-function loadReplies() {
-    const box = document.getElementById('replyList');
+function loadReplies(container) {
+    const box = container.querySelector('#replyList');
     if (!box) return;
 
-    fetch(`${contextPath}/community/user/replies?memberIdx=${profileMemberIdx}`)
-        .then(r => r.json())
+    box.innerHTML = `<div class="up-loading">
+        <div class="up-spinner"></div>
+        <span>불러오는 중</span>
+    </div>`;
+
+    const basePath = typeof contextPath !== 'undefined' ? contextPath : '';
+
+    fetch(`${basePath}/community/user/replies?memberIdx=${encodeURIComponent(_profileMemberIdx)}`)
+        .then(r => {
+            if (!r.ok) throw new Error('network');
+            return r.json();
+        })
         .then(data => {
             if (!data?.length) {
                 box.innerHTML = emptyHTML('ri-chat-3-line', '아직 남긴 댓글이 없어요');
@@ -75,7 +104,7 @@ function loadReplies() {
             }
             box.innerHTML = data.map(item => `
                 <div class="up-row"
-                     onclick="location.href='${contextPath}/community/article/${esc(item.communityId)}'">
+                     onclick="location.href='${basePath}/community/article/${esc(item.communityId)}'">
                     <div class="up-row-info">
                         <div class="up-origin">
                             <i class="ri-corner-up-right-line"></i>
@@ -88,32 +117,43 @@ function loadReplies() {
                     </div>
                 </div>`).join('');
 
+            /* 방금 추가된 날짜 요소 렌더링 */
             box.querySelectorAll('[data-date]').forEach(el => {
                 el.textContent = fmtRelative(el.dataset.date);
             });
         })
         .catch(() => {
-            box.innerHTML = emptyHTML('ri-error-warning-line', '불러오지 못했어요');
+            box.innerHTML = emptyHTML('ri-error-warning-line', '댓글을 불러오지 못했어요');
         });
 }
 
-function loadMorePosts() {
+function loadMorePosts(container) {
     _page++;
-    const btn = document.getElementById('moreBtn');
+    const btn = container.querySelector('#moreBtn');
     if (btn) { btn.disabled = true; btn.textContent = '불러오는 중...'; }
 
-    fetch(`${contextPath}/community/user/posts?memberIdx=${profileMemberIdx}&page=${_page}`)
-        .then(r => r.json())
+    const basePath = typeof contextPath !== 'undefined' ? contextPath : '';
+
+    fetch(`${basePath}/community/user/posts?memberIdx=${encodeURIComponent(_profileMemberIdx)}&page=${_page}`)
+        .then(r => {
+            if (!r.ok) throw new Error('network');
+            return r.json();
+        })
         .then(data => {
             if (!data?.length) {
-                document.getElementById('moreBtnWrap')?.remove();
+                const wrap = container.querySelector('#moreBtnWrap');
+                if (wrap) wrap.remove();
                 return;
             }
-            const list = document.getElementById('postList');
+            const list = container.querySelector('#postList');
+            if (!list) return;
+
             data.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'up-row';
-                div.onclick = () => location.href = `${contextPath}/community/article/${item.id}`;
+                div.addEventListener('click', () => {
+                    location.href = `${basePath}/community/article/${item.id}`;
+                });
                 div.innerHTML = `
                     <div class="up-row-info">
                         <span class="up-row-cat">${esc(item.category || '')}</span>
@@ -126,10 +166,11 @@ function loadMorePosts() {
                     </div>`;
                 list.appendChild(div);
             });
+
             if (btn) { btn.disabled = false; btn.textContent = '더 보기'; }
         })
         .catch(() => {
-            if (btn) { btn.disabled = false; btn.textContent = '더 보기'; }
+            if (btn) { btn.disabled = false; btn.textContent = '다시 시도'; }
         });
 }
 

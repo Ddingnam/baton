@@ -13,6 +13,7 @@
 <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/community/community-article.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/community/community-user-profile.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoMapKey}&libraries=services&autoload=false"></script>
 </head>
@@ -37,24 +38,24 @@
                 </c:choose>
             </div>
             <h1 class="article-subject">${dto.subject}</h1>
-            
+
             <div class="profile-box">
                 <div class="profile-img">
                     <img src="${pageContext.request.contextPath}/dist/images/avatar.png" alt="프로필">
                 </div>
                 <div class="profile-info">
-                    <a href="${pageContext.request.contextPath}/community/user/${dto.memberIdx}" class="nickname">${dto.writerNickname}</a>
+                    <a href="javascript:void(0);" onclick="openProfileModal('${dto.memberIdx}')" class="nickname">${dto.writerNickname}</a>
                     <div class="meta">
                         <span id="articleRegDate" data-date="${dto.regDate}"></span>
                         <span class="dot">·</span>
                         <span>조회 ${dto.hitCount}</span>
                     </div>
                 </div>
-                
+
                 <c:if test="${sessionScope.member.userIdx == dto.memberIdx}">
                     <div class="more-btn-wrapper">
                         <button type="button" class="btn-more" onclick="toggleMenu()">
-                             <i class="ri-more-fill"></i>
+                            <i class="ri-more-fill"></i>
                         </button>
                         <div class="dropdown-menu" id="dropdownMenu">
                             <button type="button" onclick="checkAndEdit('${dto.id}', '${page}')">수정</button>
@@ -93,14 +94,13 @@
             </c:if>
 
             <div class="content-text ql-editor">
-			    ${dto.content}
-			</div>
-
+                ${dto.content}
+            </div>
 
             <c:if test="${dto.latitude != null && dto.latitude != 0}">
                 <div class="map-card">
-                    <div class="map-header" 
-                         style="cursor:pointer;" 
+                    <div class="map-header"
+                         style="cursor:pointer;"
                          onclick="window.open('https://map.kakao.com/link/map/${dto.placeName},${dto.latitude},${dto.longitude}', '_blank')"
                          title="카카오맵에서 보기">
                         <i class="ri-map-pin-fill"></i>
@@ -164,7 +164,7 @@
 
         <div class="reply-section">
             <h3 class="reply-title">댓글 <span class="highlight" id="replyCount">0</span></h3>
-            
+
             <div class="reply-input-box">
                 <textarea id="replyContent" placeholder="이웃에게 따뜻한 댓글을 남겨주세요." class="input-reply"></textarea>
                 <div class="input-bottom">
@@ -177,16 +177,73 @@
     </div>
 </div>
 
+<div id="profileModal">
+    <div class="modal-dialog">
+        <div class="modal-content" id="profileModalContent">
+            <div class="up-modal-loading" id="profileModalLoading">
+                <div class="up-modal-sk-cover"></div>
+                <div class="up-modal-sk-body">
+                    <div class="up-modal-sk-avatar"></div>
+                    <div class="up-modal-sk-line w60"></div>
+                    <div class="up-modal-sk-line w40"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="toast-container" id="toastContainer"></div>
 
 <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 
-<script> 
+<script>
     const contextPath = "${pageContext.request.contextPath}";
     const communityId = "${dto.id}";
     const currentMemberIdx = "${sessionScope.member.userIdx}";
     const currentPage = "${page}";
+
+    function openProfileModal(memberIdx) {
+        const modalEl   = document.getElementById('profileModal');
+        const contentEl = document.getElementById('profileModalContent');
+        const loadingEl = document.getElementById('profileModalLoading');
+
+        [...contentEl.children].forEach(el => {
+            if (el.id !== 'profileModalLoading') el.remove();
+        });
+        if (loadingEl) loadingEl.style.display = '';
+
+        modalEl.classList.add('open');
+        document.body.style.overflow = 'hidden';
+
+        modalEl.onclick = function(e) {
+            if (e.target === modalEl) closeProfileModal();
+        };
+
+        fetch(contextPath + '/community/user/' + encodeURIComponent(memberIdx))
+            .then(r => {
+                if (!r.ok) throw new Error('server error');
+                return r.text();
+            })
+            .then(html => {
+                if (loadingEl) loadingEl.style.display = 'none';
+                const frag = document.createRange().createContextualFragment(html);
+                contentEl.appendChild(frag);
+            })
+            .catch(() => {
+                contentEl.innerHTML = '<div style="padding:40px;text-align:center;color:#888;">프로필을 불러오지 못했어요 😢</div>';
+            });
+    }
+
+    function closeProfileModal() {
+        document.getElementById('profileModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeProfileModal();
+    });
 </script>
+<script src="${pageContext.request.contextPath}/dist/js/community/community-user-profile.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/community/community-article.js"></script>
 
 </body>

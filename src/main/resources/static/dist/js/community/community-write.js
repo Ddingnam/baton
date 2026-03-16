@@ -122,6 +122,8 @@ function initCategoryPills() {
 }
 
 function initQuill() {
+    window.Quill = Quill;
+    
 	quill = new Quill('#quillEditor', {
 		theme: 'snow',
 		placeholder: '오늘 있었던 일을 이웃들과 나눠보세요 :)',
@@ -137,6 +139,9 @@ function initQuill() {
 					['clean']
 				],
 				handlers: { image: imageHandler, link: linkHandler }
+			},
+			imageResize: {
+				displaySize: true
 			}
 		}
 	});
@@ -685,6 +690,9 @@ window.sendOk = function() {
         inp.type = 'hidden'; inp.name = 'removedFiles'; inp.value = name;
         f.appendChild(inp);
     });
-    _syncAttachInput();
-    if (_origSendOk) _origSendOk();
-};
+    
+    // 원본 sendOk 호출을 추가하여 정상적으로 등록 폼이 submit 되도록 수정
+    if (typeof _origSendOk === 'function') {
+        _origSendOk();
+    }
+}

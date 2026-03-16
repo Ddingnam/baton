@@ -1,6 +1,7 @@
 package com.sp.app.controller;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -358,13 +359,14 @@ public class CommunityController {
             String profileNickname;
             if (!postList.isEmpty()) {
                 profileNickname = postList.get(0).getWriterNickname();
-            } else if (info.getUserIdx() == memberIdx) {
+            } else if (memberIdx.equals(info.getUserIdx())) {
                 profileNickname = info.getName();
             } else {
                 profileNickname = "익명";
             }
 
             LocalDateTime joinDate = service.getUserJoinDate(memberIdx);
+            String joinDateStr = (joinDate != null) ? joinDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "";
 
             model.addAttribute("profileMemberIdx", memberIdx);
             model.addAttribute("profileNickname", profileNickname);
@@ -372,13 +374,13 @@ public class CommunityController {
             model.addAttribute("postCount", postCount);
             model.addAttribute("replyCount", replyCount);
             model.addAttribute("totalLikes", totalLikes);
-            model.addAttribute("joinDate", joinDate);
+            model.addAttribute("joinDate", joinDateStr);
 
         } catch (Exception e) {
             log.error("userProfile error", e);
         }
 
-        return "community/userProfile";
+        return "community/userProfile_modal";
     }
 
     @GetMapping("user/replies")

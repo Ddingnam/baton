@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     initPoll();
-    loadReplies();
+    loadArticleReplies();
     formatPollDate();
     formatArticleDate();
 });
@@ -373,7 +373,7 @@ function deleteArticle(id) {
     });
 }
 
-function loadReplies() {
+function loadArticleReplies() {
     fetch(`${contextPath}/community/reply/list?communityId=${communityId}`)
         .then(resp => resp.json())
         .then(data => {
@@ -409,7 +409,7 @@ function renderReplies(list) {
                 <div class="reply-profile">
                     <img src="${contextPath}/dist/images/avatar.png" alt="프로필" class="reply-avatar">
                     <div>
-                        <span class="reply-nickname">${escapeHtml(reply.writerNickname)}</span>
+                        <span class="reply-nickname" style="cursor: pointer;" onclick="openProfileModal('${reply.memberIdx}')">${escapeHtml(reply.writerNickname)}</span>
                         <span class="reply-date">${formatDate(reply.regDate)}</span>
                     </div>
                 </div>
@@ -445,7 +445,7 @@ function sendReply(id) {
     .then(data => {
         if (data.state === 'true') {
             document.getElementById('replyContent').value = '';
-            loadReplies();
+            loadArticleReplies();
         } else {
             showBatonToast('댓글 등록에 실패했습니다.');
         }
@@ -482,7 +482,7 @@ function sendSubReply(parentId) {
         if (data.state === 'true') {
             textarea.value = '';
             closeReplyBox(parentId);
-            loadReplies();
+            loadArticleReplies();
         } else {
             showBatonToast('답글 등록에 실패했습니다.');
         }
@@ -500,7 +500,7 @@ function deleteReply(replyId) {
         .then(resp => resp.json())
         .then(data => {
             if (data.state === 'true') {
-                loadReplies();
+                loadArticleReplies();
             } else {
                 showBatonToast('삭제에 실패했습니다.');
             }
