@@ -11,4 +11,9 @@ public class CrewController {
 	public String list() {
 		return "crew/list";
 	}
+	
+	@GetMapping("main")
+	public String crewMain() {
+	    return "crew/main"; 
+	}
 }

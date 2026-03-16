@@ -125,25 +125,34 @@ document.addEventListener("DOMContentLoaded", () => {
         window.addEventListener('focus', checkUnreadAlarms);
     }
 	
-	    const adminIcon = document.querySelector('.admin-icon');
-	    const adminOverlay = document.getElementById('adminTransitionOverlay');
+    const adminIcon = document.querySelector('.admin-icon');
+    const adminOverlay = document.getElementById('adminTransitionOverlay');
 
-	    if (adminIcon && adminOverlay) {
-	        adminIcon.addEventListener('click', function(e) {
-	            e.preventDefault();
-	            const targetUrl = this.getAttribute('href');
-	            
-	            adminOverlay.style.display = 'flex';
-	            
-	            setTimeout(() => {
-	                adminOverlay.classList.add('show');
-	            }, 10);
-	            
-	            setTimeout(() => {
-	                window.location.href = targetUrl;
-	            }, 1200);
-	        });
-	    }
+    if (adminIcon && adminOverlay) {
+        adminIcon.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetUrl = this.getAttribute('href');
+            
+            adminOverlay.style.display = 'flex';
+            
+            setTimeout(() => {
+                adminOverlay.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                window.location.href = targetUrl;
+            }, 1200);
+        });
+    }
+	
+	const crewBtn = document.getElementById('crew-chat-trigger');
+    const sidePanel = document.querySelector('.right-chat-panel');
+
+    if (crewBtn && sidePanel) {
+        crewBtn.addEventListener('click', function() {
+            sidePanel.classList.toggle('chat-closed');
+        });
+    }
 });
 
 function showBatonToast(text) {

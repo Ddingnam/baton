@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/layout/header.css">
@@ -86,6 +87,16 @@
 </header>
 
 <div id="baton-toast-container" class="baton-toast-container"></div>
+
+<c:set var="currentUri" value="${requestScope['jakarta.servlet.forward.request_uri']}" />
+<c:if test="${fn:contains(currentUri, '/crew')}">
+    <div id="crew-chat-trigger" title="크루 채팅 열기/닫기">
+        <div class="chat-icon-wrapper">
+            <i class="ri-team-fill"></i>
+            <span class="crew-notification-dot" style="display: none;"></span>
+        </div>
+    </div>
+</c:if>
 
 <c:if test="${!hideChatbot}">
 	<div id="baton-chatbot-trigger">
