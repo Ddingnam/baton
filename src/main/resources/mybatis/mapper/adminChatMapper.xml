@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.sp.app.mapper.AdminChatMapper">
+<mapper namespace="com.sp.app.admin.mapper.AdminChatMapper">
 
     <select id="listAdminRooms" resultType="com.sp.app.model.ChatRoom">
         SELECT

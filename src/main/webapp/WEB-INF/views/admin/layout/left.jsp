@@ -64,11 +64,11 @@
     </nav>
 
     <div class="sidebar-foot">
-        <button class="chat-entry-btn" onclick="location.href='${pageContext.request.contextPath}/admin/chat'">
-            <i class="ri-message-3-fill"></i>
-            <span>팀 채팅</span>
-            <div class="chat-unread-badge">3</div>
-        </button>
+        <button type="button" class="chat-entry-btn" onclick="location.href='${pageContext.request.contextPath}/admin/chat'">
+		    <i class="ri-message-3-fill"></i>
+		    <span>팀 채팅</span>
+		    <div class="chat-unread-badge">3</div>
+		</button>
         <div class="user-badge">
             <div class="avt-circle">AD</div>
             <div class="user-texts">

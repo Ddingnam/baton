@@ -174,7 +174,6 @@
     </main>
 </div>
 
-<%-- 회원 상세 모달 --%>
 <div class="fullscreen-overlay" id="detailOverlay">
     <div class="member-detail-modal">
         <button class="fm-close" id="detailClose"><i class="ri-close-line"></i></button>
@@ -189,10 +188,17 @@
                     <span class="stat-val" id="dLevel"></span>
                     <span class="stat-lbl">레벨</span>
                 </div>
-                <div class="detail-stat">
-                    <span class="stat-val" id="dScore"></span>
+                
+                <div class="detail-stat" style="flex: 1.5;">
                     <span class="stat-lbl">매너온도</span>
+                    <span class="stat-val" id="dScoreText" style="margin-top:2px;"></span>
+                    <div class="manner-temp-wrap">
+                        <div class="manner-bar-bg">
+                            <div class="manner-bar-fill" id="dScoreBar"></div>
+                        </div>
+                    </div>
                 </div>
+
                 <div class="detail-stat">
                     <span class="stat-val" id="dPoint"></span>
                     <span class="stat-lbl">포인트</span>
@@ -260,6 +266,9 @@
                         <div class="fm-field">
                             <label class="fm-label">제재 사유</label>
                             <textarea class="fm-input" id="sanctionReason" rows="3" placeholder="제재 사유를 구체적으로 입력하세요"></textarea>
+                            <div class="fm-helper error" id="reasonError">
+                                <i class="ri-error-warning-line"></i> 제재 사유를 입력해주세요.
+                            </div>
                         </div>
                         <div class="sanction-btns">
                             <button class="btn-pill btn-light" onclick="switchPane('paneInfo')">취소</button>

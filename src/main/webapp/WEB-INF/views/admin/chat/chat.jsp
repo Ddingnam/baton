@@ -39,8 +39,7 @@
                 <c:forEach var="room" items="${roomList}">
                     <div class="chat-room-item ${room.roomIdx == currentRoomIdx ? 'active' : ''}"
                          data-roomidx="${room.roomIdx}"
-                         data-roomname="${room.roomName}"
-                         onclick="switchRoom(${room.roomIdx}, '${room.roomName}')">
+                         data-roomname="${room.roomName}">
                         <div class="chat-room-icon"><i class="ri-hashtag"></i></div>
                         <div class="chat-room-info">
                             <span class="chat-room-name">${room.roomName}</span>

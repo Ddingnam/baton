@@ -1,8 +1,5 @@
 @charset "UTF-8";
 
-/* ══════════════════════════════════════════════════════
-   공통 툴바
-══════════════════════════════════════════════════════ */
 .member-toolbar {
     padding: 20px 28px;
     margin-bottom: 24px;
@@ -83,9 +80,6 @@
     height: 44px;
 }
 
-/* ══════════════════════════════════════════════════════
-   통계 카드 행 (list 상단)
-══════════════════════════════════════════════════════ */
 .member-stat-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -123,9 +117,6 @@
 .msc-val  { font-family: 'Montserrat', sans-serif; font-size: 26px; font-weight: 900; color: var(--text-main); letter-spacing: -0.03em; line-height: 1; }
 .msc-lbl  { font-size: 12px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; }
 
-/* ══════════════════════════════════════════════════════
-   테이블 공통
-══════════════════════════════════════════════════════ */
 .member-cell {
     display: flex;
     align-items: center;
@@ -191,9 +182,6 @@
 .empty-row i    { font-size: 44px; display: block; margin-bottom: 14px; opacity: 0.5; }
 .empty-row span { font-size: 14px; font-weight: 700; display: block; }
 
-/* ══════════════════════════════════════════════════════
-   페이지네이션
-══════════════════════════════════════════════════════ */
 .pagination {
     display: flex;
     align-items: center;
@@ -220,9 +208,6 @@
     box-shadow: var(--shadow-glow);
 }
 
-/* ══════════════════════════════════════════════════════
-   회원 상세 모달
-══════════════════════════════════════════════════════ */
 .member-detail-modal {
     width: 900px;
     max-width: 96vw;
@@ -389,9 +374,7 @@
     display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
 
-/* ══════════════════════════════════════════════════════
-   제재 패널
-══════════════════════════════════════════════════════ */
+
 .sanction-form-box {
     background: #FFF5F5;
     border: 1px solid #FEE2E2;
@@ -408,9 +391,6 @@
     margin-top: 20px;
 }
 
-/* ══════════════════════════════════════════════════════
-   소형 모달 (해제/반려 등)
-══════════════════════════════════════════════════════ */
 .mini-modal {
     background: white;
     border-radius: 20px;
@@ -446,9 +426,6 @@
     border-top: 1px solid var(--border-color);
 }
 
-/* ══════════════════════════════════════════════════════
-   제재/탈퇴 페이지 전용
-══════════════════════════════════════════════════════ */
 .reason-cell {
     max-width: 200px;
     white-space: nowrap;
@@ -486,3 +463,99 @@
 .btn-reject:hover { background: var(--border-color); color: var(--text-main); transform: translateY(-1px); }
 
 .tag-red-light { background: #FEE2E2; color: var(--color-red); }
+
+.fullscreen-overlay {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.manner-temp-wrap {
+    width: 80%;
+    margin-top: 6px;
+}
+.manner-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.manner-bar-fill {
+    height: 100%;
+    background: #6EE7B7;
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fm-helper.error {
+    color: var(--color-red);
+    font-size: 12px;
+    margin-top: 6px;
+    display: none;
+    animation: fadeIn 0.2s ease;
+}
+
+#daysField {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+#daysField.hidden {
+    opacity: 0;
+    height: 0;
+    margin: 0;
+}
+
+@keyframes smoothCascade {
+    0% { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+.hero-header {
+    opacity: 0;
+    animation: smoothCascade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: 0.05s;
+}
+
+.member-stat-card {
+    opacity: 0;
+    animation: smoothCascade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.member-stat-card:nth-child(1) { animation-delay: 0.10s; }
+.member-stat-card:nth-child(2) { animation-delay: 0.15s; }
+.member-stat-card:nth-child(3) { animation-delay: 0.20s; }
+.member-stat-card:nth-child(4) { animation-delay: 0.25s; }
+
+.member-toolbar {
+    opacity: 0;
+    animation: smoothCascade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: 0.30s;
+}
+
+.table-block {
+    opacity: 0;
+    animation: smoothCascade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: 0.35s;
+}
+
+.modern-table tbody tr {
+    opacity: 0;
+    animation: smoothCascade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.modern-table tbody tr:nth-child(1) { animation-delay: 0.40s; }
+.modern-table tbody tr:nth-child(2) { animation-delay: 0.45s; }
+.modern-table tbody tr:nth-child(3) { animation-delay: 0.50s; }
+.modern-table tbody tr:nth-child(4) { animation-delay: 0.55s; }
+.modern-table tbody tr:nth-child(5) { animation-delay: 0.60s; }
+.modern-table tbody tr:nth-child(6) { animation-delay: 0.65s; }
+.modern-table tbody tr:nth-child(7) { animation-delay: 0.70s; }
+.modern-table tbody tr:nth-child(8) { animation-delay: 0.75s; }
+.modern-table tbody tr:nth-child(9) { animation-delay: 0.80s; }
+.modern-table tbody tr:nth-child(10) { animation-delay: 0.85s; }
+.modern-table tbody tr:nth-child(n+11) { animation-delay: 0.90s; }

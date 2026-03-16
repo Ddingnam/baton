@@ -318,10 +318,27 @@
         if (roomIdx === CHAT_ROOM_IDX) return;
         isLeaving = true;
         stopTypingSignal();
+        
         if (typingSubscription) typingSubscription.unsubscribe();
-        if (stompClient && stompClient.connected) stompClient.disconnect();
-        location.href = CHAT_CTX + '/admin/chat?roomIdx=' + roomIdx;
+
+        const targetUrl = CHAT_CTX + '/admin/chat?roomIdx=' + roomIdx;
+
+        if (stompClient && stompClient.connected) {
+            stompClient.disconnect(function() {
+                location.href = targetUrl;
+            });
+        } else {
+            location.href = targetUrl;
+        }
     };
+
+    document.querySelectorAll('.chat-room-item').forEach(function(item) {
+        item.addEventListener('click', function() {
+            const roomIdx = Number(this.dataset.roomidx);
+            const roomName = this.dataset.roomname;
+            window.switchRoom(roomIdx, roomName);
+        });
+    });
 
     window.addEventListener('beforeunload', function () {
         isLeaving = true;
