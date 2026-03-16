@@ -12,67 +12,75 @@
     }
     window.filterByStatus = fSt;
 
-    function oDt(id) {
-        cIdx = id;
-        fetch(CTX + '/admin/member/detail/' + id)
-            .then(function (r) {
-                if (!r.ok) {
-                    throw new Error('서버 응답 오류 (' + r.status + ')');
-                }
-                return r.json(); 
-            })
-            .then(function (m) {
-                cId = m.userId;
+	function oDt(id) {
+	        cIdx = id;
+	        
+			fetch(CTX + '/admin/member/detail/' + id, {
+			    method: 'POST',
+			    headers: {}
+			})
+	            .then(function (r) {
+	                if (!r.ok) {
+	                    throw new Error('서버 응답 오류 (' + r.status + ')');
+	                }
+	                return r.json(); 
+	            })
+	            .then(function (m) {
+	                cId = m.userId;
 
-                var i = m.nickname ? m.nickname.charAt(0) : '?';
-                var a = document.getElementById('dAvt');
-                
-                a.style.animation = 'none';
-                void a.offsetWidth;
-                a.style.animation = null;
+	                var i = m.nickname ? m.nickname.charAt(0) : '?';
+	                var a = document.getElementById('dAvt');
+	                
+	                a.style.animation = 'none';
+	                void a.offsetWidth;
+	                a.style.animation = null;
 
-                a.textContent = i;
-                document.getElementById('dName').textContent      = m.nickname    || '-';
-                document.getElementById('dId').textContent        = '@' + (m.userId || '-');
-                document.getElementById('dEmail').textContent     = m.email       || '-';
-                document.getElementById('dTel').textContent       = m.tel         || '-';
-                document.getElementById('dBirth').textContent     = m.birth       || '-';
-                document.getElementById('dCreated').textContent   = m.createdDate  ? m.createdDate.substring(0, 10)   : '-';
-                document.getElementById('dLastLogin').textContent = m.lastLoginDate ? m.lastLoginDate.substring(0, 10) : '-';
-                document.getElementById('dLevel').textContent     = 'Lv.' + (m.userLevel || 1);
-                document.getElementById('dScoreText').textContent = (m.score      || 0) + '°';
-                document.getElementById('dPoint').textContent     = ((m.batonpoint || 0)).toLocaleString();
-                document.getElementById('dAuthority').value       = m.authority   || 'USER';
+	                a.textContent = i;
+	                document.getElementById('dName').textContent      = m.nickname    || '-';
+	                document.getElementById('dId').textContent        = '@' + (m.userId || '-');
+	                document.getElementById('dEmail').textContent     = m.email       || '-';
+	                document.getElementById('dTel').textContent       = m.tel         || '-';
+	                document.getElementById('dBirth').textContent     = m.birth       || '-';
+					document.getElementById('dCreated').textContent = (typeof m.createdDate === 'string') 
+					    ? m.createdDate.substring(0, 10) 
+					    : (m.createdDate ? m.createdDate.join('-') : '-');
+					document.getElementById('dLastLogin').textContent = (typeof m.lastLoginDate === 'string') 
+						? m.lastLoginDate.substring(0, 10) 
+						: (m.lastLoginDate ? m.lastLoginDate.join('-') : '-');
+	                document.getElementById('dLevel').textContent     = 'Lv.' + (m.userLevel || 1);
+	                document.getElementById('dScoreText').textContent = (m.score      || 0) + '°';
+	                document.getElementById('dPoint').textContent     = ((m.batonpoint || 0)).toLocaleString();
+	                document.getElementById('dAuthority').value       = m.authority   || 'USER';
 
-                var b = document.getElementById('dStatusBadge');
-                var bs = document.getElementById('btnSuspend');
-                var ba = document.getElementById('btnActivate');
+	                var b = document.getElementById('dStatusBadge');
+	                var bs = document.getElementById('btnSuspend');
+	                var ba = document.getElementById('btnActivate');
 
-                if (m.status == 1) {
-                    b.textContent = '정상';  
-                    b.className = 'detail-status-badge status-ok';
-                    bs.style.display = ''; 
-                    ba.style.display = 'none';
-                } else if (m.status == 2) {
-                    b.textContent = '제재중'; 
-                    b.className = 'detail-status-badge status-ban';
-                    bs.style.display = 'none'; 
-                    ba.style.display = '';
-                } else {
-                    b.textContent = '탈퇴';  
-                    b.className = 'detail-status-badge status-out';
-                    bs.style.display = 'none'; 
-                    ba.style.display = 'none';
-                }
+	                if (m.status == 1) {
+	                    b.textContent = '정상';  
+	                    b.className = 'detail-status-badge status-ok';
+	                    bs.style.display = ''; 
+	                    ba.style.display = 'none';
+	                } else if (m.status == 2) {
+	                    b.textContent = '제재중'; 
+	                    b.className = 'detail-status-badge status-ban';
+	                    bs.style.display = 'none'; 
+	                    ba.style.display = '';
+	                } else {
+	                    b.textContent = '탈퇴';  
+	                    b.className = 'detail-status-badge status-out';
+	                    bs.style.display = 'none'; 
+	                    ba.style.display = 'none';
+	                }
 
-                swP('paneInfo');
-                document.getElementById('detailOverlay').classList.add('show');
-            })
-            .catch(function(e) {
-                console.error("상세 정보 조회 실패:", e);
-                alert("정보를 불러오지 못했습니다. \n원인: " + e.message + "\n콘솔창(F12)을 확인해주세요.");
-            });
-    }
+	                swP('paneInfo');
+	                document.getElementById('detailOverlay').classList.add('show');
+	            })
+	            .catch(function(e) {
+	                console.error("상세 정보 조회 실패:", e);
+	                alert("정보를 불러오지 못했습니다. \n원인: " + e.message + "\n콘솔창(F12)을 확인해주세요.");
+	            });
+	    }
     window.openDetail = oDt;
 
     document.getElementById('detailClose').addEventListener('click', function () {

@@ -141,9 +141,9 @@
                                         </c:choose>
                                     </td>
                                     <td>
-                                        <button class="action-btn" onclick="openDetail(${m.userIdx})" title="상세보기">
-                                            <i class="ri-eye-line"></i>
-                                        </button>
+                                        <button class="action-btn" onclick="openDetail('${m.userIdx}')" title="상세보기">
+										    <i class="ri-eye-line"></i>
+										</button>
                                     </td>
                                 </tr>
                             </c:forEach>

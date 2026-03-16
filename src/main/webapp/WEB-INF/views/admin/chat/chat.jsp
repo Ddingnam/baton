@@ -207,7 +207,7 @@ var CHAT_MY_IDX   = Number('${myUserIdx}');
 var CHAT_MY_NAME  = '${myNickname}';
 var CHAT_ROOM_IDX = Number('${currentRoomIdx}');
 </script>
+<script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_chat.js"></script>
-
 </body>
 </html>

@@ -51,15 +51,25 @@ public class AdminMemberController {
 
 		return "admin/member/list";
 	}
+    @RequestMapping(value = {"/detail", "/detail/{userIdx}"}, method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public ResponseEntity<UserDto> memberDetail(
+            @PathVariable(value = "userIdx", required = false) Long pathIdx,
+            @RequestParam(value = "userIdx", required = false) Long paramIdx) {
 
-	@GetMapping("/detail/{userIdx}")
-	@ResponseBody
-	public ResponseEntity<UserDto> memberDetail(@PathVariable Long userIdx) {
-		UserDto dto = adminMemberService.getMemberDetail(userIdx);
-		if (dto == null)
-			return ResponseEntity.notFound().build();
-		return ResponseEntity.ok(dto);
-	}
+        Long finalIdx = (pathIdx != null) ? pathIdx : paramIdx;
+
+        if (finalIdx == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        UserDto dto = adminMemberService.getMemberDetail(finalIdx);
+        if (dto == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        return ResponseEntity.ok(dto);
+    }
 
 	@PostMapping("/status")
 	@ResponseBody
