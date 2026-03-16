@@ -118,7 +118,7 @@
 								</div>
 								<div class="item-right"><span class="theme-badge-outline">열람대기</span></div>
 							</div>
-							<%-- 최근 커뮤니티 글 (실제 데이터) --%>
+							
 							<c:if test="${not empty myPosts}">
 								<div class="lc-item" style="cursor:pointer" onclick="location.href='${pageContext.request.contextPath}/community/article/${myPosts[0].id}'">
 									<div class="item-icon theme-icon-bg"><i class="ri-chat-3-fill"></i></div>
@@ -155,14 +155,19 @@
 					<div class="list-card">
 						<div class="lc-header">
 							<h3>나의 거래 내역</h3>
+							
 							<a href="${pageContext.request.contextPath}/mypage/trade/sell" class="theme-link">전체보기 <i class="ri-arrow-right-s-line"></i></a>
 						</div>
 
 						<div class="inner-tabs">
 							<button class="inner-tab active" data-inner="trade-sell">판매내역</button>
-							<button class="inner-tab"        data-inner="trade-buy">구매내역</button>
-							<button class="inner-tab"        data-inner="trade-wish">찜목록</button>
+							<button class="inner-tab" data-inner="trade-buy">구매내역</button>
+							<button class="inner-tab" data-inner="trade-wish">찜목록</button>
+							<button class="inner-tab" data-inner="trade-follower">팔로워 목록</button>
+							<button class="inner-tab" data-inner="trade-following">팔로잉 목록</button>
 						</div>
+						
+						<input type="hidden" id="sessionUserIdx" value="${sessionScope.member.userIdx}">
 
 						<div class="inner-section active" id="trade-sell">
 							<div class="lc-list">
@@ -253,6 +258,23 @@
 									</div>
 								</div>
 							</div>
+						</div>
+						
+						
+						<div class="inner-section" id="trade-follower">
+						    <div class="lc-list">
+						        <div class="lc-empty">
+						        	<p>불러오는 중...</p>
+						        </div>
+						    </div>
+						</div>
+						
+						<div class="inner-section" id="trade-following">
+						    <div class="lc-list">
+								<div class="lc-empty">
+									<p>불러오는 중...</p>
+								</div>
+						    </div>
 						</div>
 					</div>
 				</section>
@@ -411,7 +433,6 @@
 													<div class="comm-stats">
 														<span><i class="ri-eye-line"></i> ${post.hitCount}</span>
 														<span><i class="ri-heart-3-line"></i> ${post.likeCount}</span>
-														<%-- LocalDateTime → substring으로 MM-dd 추출 --%>
 														<span><c:out value="${fn:substring(post.regDate.toString(), 5, 10)}"/></span>
 													</div>
 												</div>
@@ -540,7 +561,9 @@
 	<jsp:include page="/WEB-INF/views/payment/chargeModal.jsp" />
 	<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
 	<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_main.js"></script>
+	<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_follow.js"></script>
 	<script src="${pageContext.request.contextPath}/dist/js/payment/payment.js"></script>
+	
 
 	<script>
 	document.querySelectorAll('.inner-tab').forEach(function(tab) {

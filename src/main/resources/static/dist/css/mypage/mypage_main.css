@@ -109,6 +109,34 @@ body {
 	transition: 0.3s;
 }
 
+.theme-btn-outline {
+    background-color: #F2F4F6;
+    border: none;
+    color: #4E5968;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+}
+
+.theme-btn-outline:hover {
+    background-color: var(--mp-theme-bg);
+    color: var(--mp-theme);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.theme-btn-outline:active {
+    transform: translateY(0);
+    filter: brightness(0.95);
+}
+
 .theme-link {
 	color: var(--mp-theme);
 	font-size: 14px;

@@ -109,8 +109,18 @@
 					                        <div class="item-info">
 					                            <h4>${item.title}</h4>
 					                            <p class="info-metrics">
-					                                <fmt:formatNumber value="${item.price}" type="number"/>원 · 
-					                                <c:out value="${fn:substring(item.lastUpDate.toString(), 0, 10)}"/>
+					                            	<c:choose>
+					                            		<c:when test="${item.price > 0}">
+					                            			<fmt:formatNumber value="${item.price}" type="number"/>원 ·
+					                            		</c:when>
+					                            		<c:otherwise>
+					                            			나눔 ·
+					                            		</c:otherwise>
+					                            	</c:choose>
+					                                 
+					                                <span class="time-ago" data-time="${item.lastUpDate}">
+													    ${item.lastUpDate}
+													</span>
 					                            </p>
 					                        </div>
 					                        
@@ -128,6 +138,17 @@
 					                                    </span>
 					                                </c:otherwise>
 					                            </c:choose>
+					                            	<strong class="price">
+					                            <c:choose>
+					                            	<c:when test="${item.price > 0}">
+					                            		<fmt:formatNumber value="${item.price}" type="number"/>원
+					                            	</c:when>
+					                            	<c:otherwise>
+					                            		나눔
+					                            	</c:otherwise>
+					                            </c:choose>
+					                            	</strong>
+					                            
 					                        </div>
 					                    </div>
 					                </c:forEach>
@@ -142,32 +163,31 @@
 					        </c:choose>
 						</div>
 					</div>
-
 					
 				</div>
 			</div>
 		</main>
 	</div>
 
-	<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
-	<jsp:include page="/WEB-INF/views/payment/chargeModal.jsp" />
-	<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
-	<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_follow.js"></script>
-	<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_main.js"></script>
-	<script src="${pageContext.request.contextPath}/dist/js/payment/payment.js"></script>
+<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
+<jsp:include page="/WEB-INF/views/payment/chargeModal.jsp" />
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_follow.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_main.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/util/timeAgo.js"></script>
 
-	<script>
-	document.querySelectorAll('.inner-tab').forEach(function(tab) {
-		tab.addEventListener('click', function() {
-			var card = this.closest('.list-card');
-			card.querySelectorAll('.inner-tab').forEach(function(t) { t.classList.remove('active'); });
-			card.querySelectorAll('.inner-section').forEach(function(s) { s.classList.remove('active'); });
-			this.classList.add('active');
-			var target = this.getAttribute('data-inner');
-			var sec = document.getElementById(target);
-			if (sec) sec.classList.add('active');
-		});
+<script>
+document.querySelectorAll('.inner-tab').forEach(function(tab) {
+	tab.addEventListener('click', function() {
+		var card = this.closest('.list-card');
+		card.querySelectorAll('.inner-tab').forEach(function(t) { t.classList.remove('active'); });
+		card.querySelectorAll('.inner-section').forEach(function(s) { s.classList.remove('active'); });
+		this.classList.add('active');
+		var target = this.getAttribute('data-inner');
+		var sec = document.getElementById(target);
+		if (sec) sec.classList.add('active');
 	});
-	</script>
+});
+</script>
 </body>
 </html>

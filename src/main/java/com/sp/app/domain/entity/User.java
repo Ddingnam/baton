@@ -27,7 +27,8 @@ public class User {
     private String userId;
     private String name;
     private String nickname;
-    
+    @Column(name = "profile_photo")
+    private String profilePhoto;
 
     @Column(name = "createddate")
     private LocalDateTime createdDate;
