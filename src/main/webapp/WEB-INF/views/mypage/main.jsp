@@ -201,7 +201,16 @@
 				                                </div>
 				                                <div class="item-right">
 				                                    <span class="${item.tradeStatus == '판매완료' ? 'theme-badge-done' : 'theme-badge'}">${item.tradeStatus}</span>
-				                                    <strong class="price"><fmt:formatNumber value="${item.price}" pattern="#,###"/>원</strong>
+				                                    <strong class="price">
+				                                    	<c:choose>
+												            <c:when test="${item.price == 0}">
+												                나눔
+												            </c:when>
+												            <c:otherwise>
+												                <fmt:formatNumber value="${item.price}" pattern="#,###"/>원
+												            </c:otherwise>
+												        </c:choose>
+				                                    </strong>
 				                                </div>
 				                            </div>
 				                        </c:forEach>

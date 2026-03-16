@@ -243,9 +243,10 @@
     </select>
     
     <select id="findWishList" parameterType="long" resultType="com.sp.app.model.Trade">
-	    SELECT t.productIdx, t.title, t.price, t.tradeStatus, t.lastUpDate, t.hitCount, t.coreAddress
+	    SELECT t.productIdx, t.title, t.price, t.tradeStatus, t.lastUpDate, t.hitCount, t.regionCode, r.dong
 	    FROM trade t
 	    JOIN wishList w ON t.productIdx = w.productIdx
+	    JOIN region r ON t.regionIdx = r.regionIdx
 	    WHERE w.userIdx = #{userIdx}
 	    ORDER BY t.productIdx DESC
 	</select>
