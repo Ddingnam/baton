@@ -1,10 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const path = window.location.pathname;
 
-    let domainColor = '#3182F6';
-    let domainBgColor = '#E8F3FF';
-    let pageBg = '#F8FAFF';
-    let currentDomain = 'home'; 
+	let domainColor, domainBgColor, pageBg, currentDomain;
 	
     if (path.includes('/trade/')) {
         domainColor = '#00B98D';
@@ -26,7 +23,12 @@ document.addEventListener("DOMContentLoaded", () => {
         domainBgColor = '#F4F0FF';
         pageBg = '#FBF9FF';
         currentDomain = 'community';
-    }
+    } else {
+		domainColor = '#3182F6';
+		domainBgColor = '#E8F3FF';
+		pageBg = '#F8FAFF';
+		currentDomain = 'home'; 
+	}
 
     if (!path.includes('/mypage')) {
         document.documentElement.style.setProperty('--header-domain-color', domainColor);
@@ -46,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const navLinks = document.querySelectorAll('.nav-menu .nav-link');
     navLinks.forEach(link => {
         const domain = link.getAttribute('data-domain');
-        if (domain === 'home' && (path === '/' || path.endsWith('/main') || path.endsWith('/index.jsp'))) {
+        if (domain === 'home' && (path === '/' || path.endsWith('/index.jsp'))) {
             link.classList.add('active');
         } else if (domain && domain !== 'home' && path.includes('/' + domain + '/')) {
             link.classList.add('active');
@@ -146,13 +148,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 	
 	const crewBtn = document.getElementById('crew-chat-trigger');
-    const sidePanel = document.querySelector('.right-chat-panel');
 
-    if (crewBtn && sidePanel) {
-        crewBtn.addEventListener('click', function() {
-            sidePanel.classList.toggle('chat-closed');
-        });
-    }
+	if (crewBtn) {
+	    crewBtn.addEventListener('click', function() {
+	        if (typeof window.toggleCrewChat === 'function') {
+	            window.toggleCrewChat();
+	        }
+	    });
+	}
 });
 
 function showBatonToast(text) {

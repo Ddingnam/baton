@@ -7,7 +7,7 @@
     <title>Baton | 우리 동네 모임</title>
     <jsp:include page="/WEB-INF/views/layout/headerResources.jsp"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/crew/layout.css">
 </head>
 <body>
@@ -17,30 +17,40 @@
 </header>
 
 <div id="app" v-cloak>
+
+	<router-view name="hero"></router-view>
+
+    <div class="crew-layout-wrapper">
+	    <jsp:include page="/WEB-INF/views/crew/sidebar.jsp" />
+	
+	    <main class="crew-main-container">
+	        <div class="router-view-wrapper">
+	            <div class="content-safe-area">
+	                <router-view></router-view>
+	            </div>
+	        </div>
+	    </main>
+    </div>
     
-    <jsp:include page="/WEB-INF/views/crew/sidebar.jsp" />
-
     <aside class="right-chat-panel" :class="{ 'chat-closed': !isChatOpen }">
-        <crew-chat-component></crew-chat-component>
+        <crew-chat-component @close-chat="console.log('신호 받음!'); isChatOpen = false"></crew-chat-component>
     </aside>
-
-    <main class="crew-main-container">
-        <div class="router-view-wrapper">
-            <div class="content-safe-area">
-                <router-view></router-view>
-            </div>
-        </div>
-    </main>
 
     <footer id="global-footer">
         <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
     </footer>
     
-
 </div>
+
+<jsp:include page="/WEB-INF/views/crew/components/crewHero.jsp" />
+<jsp:include page="/WEB-INF/views/crew/components/crewList.jsp" />
+<jsp:include page="/WEB-INF/views/crew/components/crewDetail.jsp" />
+<jsp:include page="/WEB-INF/views/crew/components/crewChat.jsp" />
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/crew/crew_detail.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/crew/crew_chat.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_app.js"></script>
 </body>
 </html>
