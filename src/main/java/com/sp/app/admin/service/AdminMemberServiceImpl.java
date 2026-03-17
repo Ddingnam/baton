@@ -36,6 +36,13 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     @Transactional(rollbackFor = Exception.class)
     public void updateMemberStatus(Map<String, Object> map) throws Exception {
         mapper.updateMemberStatus(map);
+        
+        int status = Integer.parseInt(String.valueOf(map.get("status")));
+        
+        if (status == 1) {
+            Long userIdx = Long.valueOf(String.valueOf(map.get("userIdx")));
+            mapper.liftSanctionByUserIdx(userIdx);
+        }
     }
 
     @Override
@@ -106,4 +113,5 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         statusMap.put("status", 1);
         mapper.updateMemberStatus(statusMap);
     }
+    
 }

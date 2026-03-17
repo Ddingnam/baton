@@ -199,5 +199,13 @@
         SET withdrawStatus = #{withdrawStatus}, processDate = CURRENT_TIMESTAMP
         WHERE withdrawIdx = #{withdrawIdx}
     </update>
+    
+    <update id="liftSanctionByUserIdx" parameterType="Long">
+        UPDATE adminSanction
+        SET isLifted = 1, 
+            liftReason = '회원 목록에서 관리자 직권 해제', 
+            liftDate = CURRENT_TIMESTAMP
+        WHERE userIdx = #{userIdx} AND isLifted = 0
+    </update>
 
 </mapper>
