@@ -289,20 +289,20 @@
 					
 					        <c:choose>
 					            <c:when test="${not empty escrowInfo and escrowInfo.TRADESTATUS == 'PAY_COMPLETED'}">
-					                <button class="pay-btn" style="margin-top: 10px;" onclick="openShippingModal()">
+					                <button class="pay-btn" onclick="openShippingModal()">
 					                    운송장 입력하기
 					                </button>
-					                <button class="pay-btn" style="margin-top: 10px; background-color: #FF4D4F; border-color: #FF4D4F;" onclick="cancelTrade(${trade.productIdx})">
+					                <button class="pay-btn" style="background-color: #FF4D4F; border-color: #FF4D4F;" onclick="cancelTrade(${trade.productIdx})">
 								        주문 취소 (구매자에게 환불)
 								    </button>
 					            </c:when>
 					            <c:when test="${not empty escrowInfo and escrowInfo.TRADESTATUS == 'SHIPPING'}">
-					                <button class="pay-btn" style="margin-top: 10px;" disabled>
+					                <button class="pay-btn" disabled>
 					                    배송 중 (구매자 확정 대기)
 					                </button>
 					            </c:when>
 					            <c:when test="${not empty escrowInfo and escrowInfo.TRADESTATUS == 'CONFIRMED'}">
-								    <button class="chat-btn" style="margin-top: 10px; cursor: not-allowed;" disabled>
+								    <button class="chat-btn" style="cursor: not-allowed;" disabled>
 								        판매 완료된 상품입니다
 								    </button>
 								</c:when>
@@ -331,25 +331,25 @@
 					                <c:when test="${not empty escrowInfo and escrowInfo.BUYERIDX == loggedInUserId}">
 					                    <c:choose>
 					                        <c:when test="${escrowInfo.TRADESTATUS == 'PAY_COMPLETED'}">
-					                            <button class="pay-btn" style="margin-top: 10px;" disabled>
+					                            <button class="pay-btn" disabled>
 					                                판매자의 발송을 대기 중입니다
 					                            </button>
-					                            <button class="pay-btn" style="margin-top: 10px; background-color: #FF4D4F; border-color: #FF4D4F;" onclick="cancelTrade(${trade.productIdx})">
+					                            <button class="pay-btn" style="background-color: #FF4D4F; border-color: #FF4D4F;" onclick="cancelTrade(${trade.productIdx})">
 											        결제 취소 (포인트 환불)
 											    </button>
 					                        </c:when>
 					                        <c:when test="${escrowInfo.TRADESTATUS == 'SHIPPING'}">
-											    <button class="chat-btn" style="margin-top: 10px;"
+											    <button class="chat-btn" 
 											        onclick="confirmTradePurchase(${trade.productIdx})">
 											        구매 확정하기
 											    </button>
-											    <button class="pay-btn" style="margin-top: 10px; background-color: #FF4D4F; border-color: #FF4D4F;"
+											    <button class="pay-btn" style="background-color: #FF4D4F; border-color: #FF4D4F;"
 											        onclick="requestRefundViaChat(${trade.productIdx}, ${trade.userIdx})">
 											        반품 / 환불 요청하기
 											    </button>
 											</c:when>
 					                        <c:when test="${escrowInfo.TRADESTATUS == 'CONFIRMED'}">
-					                            <button class="pay-btn" style="margin-top: 10px; background-color: #00C471;" disabled>
+					                            <button class="pay-btn" style="background-color: #00C471;" disabled>
 					                                구매 확정 완료
 					                            </button>
 					                        </c:when>
@@ -357,7 +357,7 @@
 					                </c:when>
 					
 					                <c:otherwise>
-					                    <button class="pay-btn" style="margin-top: 10px; background-color: #999;" disabled>
+					                    <button class="pay-btn" style="background-color: #999;" disabled>
 					                        다른 사용자가 안전결제를 진행 중입니다
 					                    </button>
 					                </c:otherwise>
@@ -477,7 +477,7 @@
             </div>
         </div>
         
-        <button type="button" class="pay-btn" style="margin-top: 10px;" onclick="submitShippingInfo()">
+        <button type="button" class="pay-btn" onclick="submitShippingInfo()">
             발송 처리 완료하기
         </button>
     </div>
