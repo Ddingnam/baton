@@ -157,34 +157,38 @@
 								<i class="ri-map-pin-2-fill"></i> 현재 지역
 							</div>
 							<div class="location-name">
-							<div style="background:#222; color:#0f0; padding:10px; font-size:12px; margin-bottom:10px; border-radius:8px;">
-							    [데이터 확인용]<br>
-							    유저 정보: ${loginMember != null ? '정상' : '없음'}<br>
-							    지역 객체: ${loginMember.userRegionInfo != null ? '정상' : '없음'}<br>
-							    활성 지역: ${loginMember.userRegionInfo.activeRegion != null ? '정상' : '없음'}<br>
-							    시도: [${loginMember.userRegionInfo.activeRegion.sido}]<br>
-							    동: [${loginMember.userRegionInfo.activeRegion.dong}]
-							</div>
-								<c:choose>
-								    <c:when test="${empty loginMember}">
-								        로그인 필요
-								    </c:when>
-								
-								   <c:when test="${not empty loginMember.userRegionInfo.activeRegion.sido}">
-								        ${loginMember.userRegionInfo.activeRegion.sido}
-    									${loginMember.userRegionInfo.activeRegion.sigungu}
-								        <span style="font-weight:700;">
-								            ${loginMember.userRegionInfo.activeRegion.dong}
-								        </span>
-								    </c:when>
-								
-								    <c:otherwise>
-								        <a href="${pageContext.request.contextPath}/member/regionAuth/main" style="color:#ff6b6b; text-decoration:underline;">
-                						동네 인증하기
-            							</a>
-								    </c:otherwise>
-								</c:choose>
-							</div>
+    <c:choose>
+        <%-- 1. 로그인 여부 체크 --%>
+        <c:when test="${empty loginMember}">
+            로그인 필요
+        </c:when>
+
+        <%-- 2. 실제 데이터가 있는 mainRegion 혹은 activeRegion 체크 --%>
+        <%-- 디버그 박스에서 데이터가 확인된 경로로 직접 꽂아버리는 게 제일 확실함 --%>
+        <c:when test="${not empty loginMember.userRegionInfo.activeRegion.sido}">
+            ${loginMember.userRegionInfo.activeRegion.sido}
+            ${loginMember.userRegionInfo.activeRegion.sigungu}
+            <span style="font-weight:700;">
+                ${loginMember.userRegionInfo.activeRegion.dong}
+            </span>
+        </c:when>
+        
+        <%-- 만약 위 조건이 안 타면 mainRegion으로 한 번 더 보험 들기 --%>
+        <c:when test="${not empty loginMember.userRegionInfo.mainRegion.sido}">
+            ${loginMember.userRegionInfo.mainRegion.sido}
+            ${loginMember.userRegionInfo.mainRegion.sigungu}
+            <span style="font-weight:700;">
+                ${loginMember.userRegionInfo.mainRegion.dong}
+            </span>
+        </c:when>
+
+        <c:otherwise>
+            <a href="${pageContext.request.contextPath}/member/regionAuth/main" style="color:#ff6b6b; text-decoration:underline;">
+                동네 인증하기
+            </a>
+        </c:otherwise>
+    </c:choose>
+</div>
 						</div>
 						<div class="filter-section" data-filter-type="period">
 							<div class="filter-title">근무 기간</div>
