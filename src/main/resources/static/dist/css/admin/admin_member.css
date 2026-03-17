@@ -80,6 +80,24 @@
     height: 44px;
 }
 
+.fm-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--base-bg);
+    color: var(--text-sub);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.2s;
+    z-index: 99; 
+    cursor: pointer;
+}
+
 .member-stat-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -416,6 +434,8 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 18px; color: var(--text-sub);
     transition: all 0.2s;
+    z-index: 99;
+    cursor: pointer;
 }
 .mini-modal-close:hover { background: var(--color-red); color: white; }
 

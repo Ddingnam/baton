@@ -74,8 +74,8 @@
         SELECT * FROM (
             SELECT ROWNUM AS rn, t.* FROM (
                 SELECT s.sanctionIdx, s.userIdx, s.reason, s.sanctionType,
-                       TO_CHAR(s.startDate, 'YYYY-MM-DD') AS startDate,
-                       TO_CHAR(s.endDate,   'YYYY-MM-DD') AS endDate,
+                       TO_CHAR(s.startDate,   'YYYY-MM-DD')       AS startDate,
+                       TO_CHAR(s.endDate,     'YYYY-MM-DD')       AS endDate,
                        TO_CHAR(s.createdDate, 'YYYY-MM-DD HH24:MI') AS createdDate,
                        s.isLifted, s.liftReason,
                        u.userId, u.nickname, u.email
@@ -83,8 +83,22 @@
                 JOIN users u ON s.userIdx = u.userIdx
                 <where>
                     <if test="kwd != null and kwd != ''">
-                        AND (u.userId LIKE '%' || #{kwd} || '%'
+                        AND (u.userId   LIKE '%' || #{kwd} || '%'
                           OR u.nickname LIKE '%' || #{kwd} || '%')
+                    </if>
+                    <!-- sanctionFilter: ACTIVE=제재중, LIFTED=해제됨, PERMANENT=영구정지 -->
+                    <if test="sanctionFilter != null and sanctionFilter != ''">
+                        <choose>
+                            <when test="sanctionFilter == 'ACTIVE'">
+                                AND s.isLifted = 0
+                            </when>
+                            <when test="sanctionFilter == 'LIFTED'">
+                                AND s.isLifted = 1
+                            </when>
+                            <when test="sanctionFilter == 'PERMANENT'">
+                                AND s.sanctionType = 'PERMANENT' AND s.isLifted = 0
+                            </when>
+                        </choose>
                     </if>
                 </where>
                 ORDER BY s.createdDate DESC
@@ -99,8 +113,21 @@
         JOIN users u ON s.userIdx = u.userIdx
         <where>
             <if test="kwd != null and kwd != ''">
-                AND (u.userId LIKE '%' || #{kwd} || '%'
+                AND (u.userId   LIKE '%' || #{kwd} || '%'
                   OR u.nickname LIKE '%' || #{kwd} || '%')
+            </if>
+            <if test="sanctionFilter != null and sanctionFilter != ''">
+                <choose>
+                    <when test="sanctionFilter == 'ACTIVE'">
+                        AND s.isLifted = 0
+                    </when>
+                    <when test="sanctionFilter == 'LIFTED'">
+                        AND s.isLifted = 1
+                    </when>
+                    <when test="sanctionFilter == 'PERMANENT'">
+                        AND s.sanctionType = 'PERMANENT' AND s.isLifted = 0
+                    </when>
+                </choose>
             </if>
         </where>
     </select>
@@ -138,8 +165,12 @@
                 JOIN users u ON w.userIdx = u.userIdx
                 <where>
                     <if test="kwd != null and kwd != ''">
-                        AND (u.userId LIKE '%' || #{kwd} || '%'
+                        AND (u.userId   LIKE '%' || #{kwd} || '%'
                           OR u.nickname LIKE '%' || #{kwd} || '%')
+                    </if>
+                    <!-- wFilter: PENDING | APPROVED | REJECTED -->
+                    <if test="wFilter != null and wFilter != ''">
+                        AND w.withdrawStatus = #{wFilter}
                     </if>
                 </where>
                 ORDER BY w.requestDate DESC
@@ -154,8 +185,11 @@
         JOIN users u ON w.userIdx = u.userIdx
         <where>
             <if test="kwd != null and kwd != ''">
-                AND (u.userId LIKE '%' || #{kwd} || '%'
+                AND (u.userId   LIKE '%' || #{kwd} || '%'
                   OR u.nickname LIKE '%' || #{kwd} || '%')
+            </if>
+            <if test="wFilter != null and wFilter != ''">
+                AND w.withdrawStatus = #{wFilter}
             </if>
         </where>
     </select>

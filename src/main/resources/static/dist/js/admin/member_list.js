@@ -12,81 +12,111 @@
     }
     window.filterByStatus = fSt;
 
-	function oDt(id) {
-	        cIdx = id;
-	        
-			fetch(CTX + '/admin/member/detail/' + id, {
-			    method: 'POST',
-			    headers: {}
-			})
-	            .then(function (r) {
-	                if (!r.ok) {
-	                    throw new Error('서버 응답 오류 (' + r.status + ')');
-	                }
-	                return r.json(); 
-	            })
-	            .then(function (m) {
-	                cId = m.userId;
+    function loadStatCounts() {
+        var base = CTX + '/admin/member/list';
+        var fetches = [
+            fetch(base + '?status=1&pageSize=1&page=1').then(function(r){ return r.text(); }),
+            fetch(base + '?status=2&pageSize=1&page=1').then(function(r){ return r.text(); }),
+            fetch(base + '?status=9&pageSize=1&page=1').then(function(r){ return r.text(); })
+        ];
+        var n = document.getElementById('countNormal');
+        var b = document.getElementById('countBan');
+        var o = document.getElementById('countOut');
+        var normal  = document.querySelector('[data-count-normal]');
+        var ban     = document.querySelector('[data-count-ban]');
+        var out     = document.querySelector('[data-count-out]');
+        if (n && normal) n.textContent = normal.dataset.countNormal;
+        if (b && ban)    b.textContent = ban.dataset.countBan;
+        if (o && out)    o.textContent = out.dataset.countOut;
+    }
+    loadStatCounts();
 
-	                var i = m.nickname ? m.nickname.charAt(0) : '?';
-	                var a = document.getElementById('dAvt');
-	                
-	                a.style.animation = 'none';
-	                void a.offsetWidth;
-	                a.style.animation = null;
+    function oDt(id) {
+        cIdx = id;
 
-	                a.textContent = i;
-	                document.getElementById('dName').textContent      = m.nickname    || '-';
-	                document.getElementById('dId').textContent        = '@' + (m.userId || '-');
-	                document.getElementById('dEmail').textContent     = m.email       || '-';
-	                document.getElementById('dTel').textContent       = m.tel         || '-';
-	                document.getElementById('dBirth').textContent     = m.birth       || '-';
-					document.getElementById('dCreated').textContent = (typeof m.createdDate === 'string') 
-					    ? m.createdDate.substring(0, 10) 
-					    : (m.createdDate ? m.createdDate.join('-') : '-');
-					document.getElementById('dLastLogin').textContent = (typeof m.lastLoginDate === 'string') 
-						? m.lastLoginDate.substring(0, 10) 
-						: (m.lastLoginDate ? m.lastLoginDate.join('-') : '-');
-	                document.getElementById('dLevel').textContent     = 'Lv.' + (m.userLevel || 1);
-	                document.getElementById('dScoreText').textContent = (m.score      || 0) + '°';
-	                document.getElementById('dPoint').textContent     = ((m.batonpoint || 0)).toLocaleString();
-	                document.getElementById('dAuthority').value       = m.authority   || 'USER';
+        fetch(CTX + '/admin/member/detail/' + id, {
+            method: 'POST',
+            headers: {}
+        })
+        .then(function (r) {
+            if (!r.ok) throw new Error('서버 응답 오류 (' + r.status + ')');
+            return r.json();
+        })
+        .then(function (m) {
+            cId = m.userId;
 
-	                var b = document.getElementById('dStatusBadge');
-	                var bs = document.getElementById('btnSuspend');
-	                var ba = document.getElementById('btnActivate');
+            var i = m.nickname ? m.nickname.charAt(0) : '?';
+            var a = document.getElementById('dAvt');
+            a.style.animation = 'none';
+            void a.offsetWidth;
+            a.style.animation = null;
+            a.textContent = i;
 
-	                if (m.status == 1) {
-	                    b.textContent = '정상';  
-	                    b.className = 'detail-status-badge status-ok';
-	                    bs.style.display = ''; 
-	                    ba.style.display = 'none';
-	                } else if (m.status == 2) {
-	                    b.textContent = '제재중'; 
-	                    b.className = 'detail-status-badge status-ban';
-	                    bs.style.display = 'none'; 
-	                    ba.style.display = '';
-	                } else {
-	                    b.textContent = '탈퇴';  
-	                    b.className = 'detail-status-badge status-out';
-	                    bs.style.display = 'none'; 
-	                    ba.style.display = 'none';
-	                }
+            document.getElementById('dName').textContent      = m.nickname    || '-';
+            document.getElementById('dId').textContent        = '@' + (m.userId || '-');
+            document.getElementById('dEmail').textContent     = m.email       || '-';
+            document.getElementById('dTel').textContent       = m.tel         || '-';
+            document.getElementById('dBirth').textContent     = m.birth       || '-';
+            document.getElementById('dCreated').textContent   = fmtDate(m.createdDate);
+            document.getElementById('dLastLogin').textContent = fmtDate(m.lastLoginDate);
+            document.getElementById('dLevel').textContent     = 'Lv.' + (m.userLevel || 1);
 
-	                swP('paneInfo');
-	                document.getElementById('detailOverlay').classList.add('show');
-	            })
-	            .catch(function(e) {
-	                console.error("상세 정보 조회 실패:", e);
-	                alert("정보를 불러오지 못했습니다. \n원인: " + e.message + "\n콘솔창(F12)을 확인해주세요.");
-	            });
-	    }
+            var score = m.score || 36.5;
+            document.getElementById('dScoreText').textContent = score + '°';
+            var pct = Math.min(100, Math.max(0, ((score - 0) / 100) * 100));
+            var barColor = score >= 60 ? '#6EE7B7' : score >= 36 ? '#FCD34D' : '#FCA5A5';
+            var bar = document.getElementById('dScoreBar');
+            if (bar) {
+                bar.style.width = '0%';
+                bar.style.background = barColor;
+                // 애니메이션 딜레이
+                setTimeout(function () { bar.style.width = pct + '%'; }, 80);
+            }
+
+            document.getElementById('dPoint').textContent     = ((m.batonpoint || 0)).toLocaleString();
+            document.getElementById('dAuthority').value       = m.authority   || 'USER';
+
+            var b = document.getElementById('dStatusBadge');
+            var bs = document.getElementById('btnSuspend');
+            var ba = document.getElementById('btnActivate');
+
+            if (m.status == 1) {
+                b.textContent = '정상';
+                b.className = 'detail-status-badge status-ok';
+                bs.style.display = '';
+                ba.style.display = 'none';
+            } else if (m.status == 2) {
+                b.textContent = '제재중';
+                b.className = 'detail-status-badge status-ban';
+                bs.style.display = 'none';
+                ba.style.display = '';
+            } else {
+                b.textContent = '탈퇴';
+                b.className = 'detail-status-badge status-out';
+                bs.style.display = 'none';
+                ba.style.display = 'none';
+            }
+
+            swP('paneInfo');
+            document.getElementById('detailOverlay').classList.add('show');
+        })
+        .catch(function (e) {
+            console.error('상세 정보 조회 실패:', e);
+            showToast('정보를 불러오지 못했습니다. (콘솔 확인)', 'error');
+        });
+    }
     window.openDetail = oDt;
+
+    function fmtDate(v) {
+        if (!v) return '-';
+        if (typeof v === 'string') return v.substring(0, 10);
+        if (Array.isArray(v))      return v.slice(0, 3).join('-');
+        return String(v).substring(0, 10);
+    }
 
     document.getElementById('detailClose').addEventListener('click', function () {
         document.getElementById('detailOverlay').classList.remove('show');
     });
-
     document.getElementById('detailOverlay').addEventListener('click', function (e) {
         if (e.target === this) this.classList.remove('show');
     });
@@ -96,19 +126,27 @@
     });
 
     document.getElementById('btnActivate').addEventListener('click', function () {
-        if (!confirm('제재를 해제하고 정상 상태로 변경하시겠습니까?')) return;
-        fetch(CTX + '/admin/member/status', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userIdx: cIdx, status: 1 })
-        })
-        .then(function (r) { return r.json(); })
-        .then(function (d) {
-            if (d.success) { 
-                alert('정상화되었습니다.'); 
-                location.reload(); 
-            } else { 
-                alert('오류: ' + d.msg); 
+        showConfirm({
+            type   : 'info',
+            title  : '제재 해제',
+            desc   : '선택한 회원의 제재를 해제하고 정상 상태로 변경합니다.',
+            okText : '정상화',
+            onOk   : function () {
+                fetch(CTX + '/admin/member/status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userIdx: cIdx, status: 1 })
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (d) {
+                    if (d.success) {
+                        showToast('정상화 처리 완료!', 'success');
+                        setTimeout(function () { location.reload(); }, 1000);
+                    } else {
+                        showToast('오류: ' + d.msg, 'error');
+                    }
+                })
+                .catch(function () { showToast('요청 중 오류가 발생했습니다.', 'error'); });
             }
         });
     });
@@ -124,37 +162,55 @@
         document.querySelectorAll('.detail-tab-btn').forEach(function (b) { b.classList.remove('active'); });
         var pn = document.getElementById(pid);
         if (pn) pn.classList.add('active');
-        var bt  = document.querySelector('[data-pane="' + pid + '"]');
+        var bt = document.querySelector('[data-pane="' + pid + '"]');
         if (bt) bt.classList.add('active');
     }
     window.switchPane = swP;
 
     document.getElementById('sanctionType').addEventListener('change', function () {
-        document.getElementById('daysField').style.display = this.value === 'PERMANENT' ? 'none' : 'block';
+        var df = document.getElementById('daysField');
+        if (this.value === 'PERMANENT') {
+            df.classList.add('hidden');
+        } else {
+            df.classList.remove('hidden');
+        }
     });
 
     function sSan() {
         var t = document.getElementById('sanctionType').value;
         var d = document.getElementById('sanctionDays').value;
         var r = document.getElementById('sanctionReason').value.trim();
-        
-        if (!r) { 
-            alert('제재 사유를 입력하세요.'); 
-            return; 
-        }
+        var errEl = document.getElementById('reasonError');
 
-        fetch(CTX + '/admin/member/sanction/add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userIdx: cIdx, sanctionType: t, days: d, reason: r })
-        })
-        .then(function (rs) { return rs.json(); })
-        .then(function (dt) {
-            if (dt.success) { 
-                alert('제재가 적용되었습니다.'); 
-                location.reload(); 
-            } else { 
-                alert('오류: ' + dt.msg); 
+        if (!r) {
+            errEl.style.display = 'flex';
+            document.getElementById('sanctionReason').focus();
+            return;
+        }
+        errEl.style.display = 'none';
+
+        var typeLabel = t === 'PERMANENT' ? '영구 정지' : d + '일 기간 정지';
+        showConfirm({
+            type  : 'danger',
+            title : '제재 적용',
+            desc  : '해당 회원에게 [' + typeLabel + '] 제재를 적용합니다. 계속하시겠습니까?',
+            okText: '제재 적용',
+            onOk  : function () {
+                fetch(CTX + '/admin/member/sanction/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userIdx: cIdx, sanctionType: t, days: d, reason: r })
+                })
+                .then(function (rs) { return rs.json(); })
+                .then(function (dt) {
+                    if (dt.success) {
+                        showToast('제재가 적용되었습니다.', 'success');
+                        setTimeout(function () { location.reload(); }, 1000);
+                    } else {
+                        showToast('오류: ' + dt.msg, 'error');
+                    }
+                })
+                .catch(function () { showToast('요청 중 오류가 발생했습니다.', 'error'); });
             }
         });
     }
@@ -162,15 +218,24 @@
 
     function svAuth() {
         var a = document.getElementById('dAuthority').value;
-        fetch(CTX + '/admin/member/authority', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: cId, authority: a })
-        })
-        .then(function (rs) { return rs.json(); })
-        .then(function (dt) {
-            if (dt.success) alert('권한이 변경되었습니다.');
-            else alert('오류: ' + dt.msg);
+        showConfirm({
+            type  : 'warning',
+            title : '권한 변경',
+            desc  : '선택한 권한 [' + (a === 'ADMIN' ? '관리자' : '일반 회원') + '] 으로 변경합니다.',
+            okText: '변경',
+            onOk  : function () {
+                fetch(CTX + '/admin/member/authority', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: cId, authority: a })
+                })
+                .then(function (rs) { return rs.json(); })
+                .then(function (dt) {
+                    if (dt.success) showToast('권한이 변경되었습니다.', 'success');
+                    else            showToast('오류: ' + dt.msg, 'error');
+                })
+                .catch(function () { showToast('요청 중 오류가 발생했습니다.', 'error'); });
+            }
         });
     }
     window.saveAuthority = svAuth;

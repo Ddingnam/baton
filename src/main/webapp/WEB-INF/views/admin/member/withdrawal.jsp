@@ -12,6 +12,7 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_main.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_member.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_ui.css">
 </head>
 <body>
 <div class="agency-layout">
@@ -28,23 +29,29 @@
             </div>
 
             <div class="member-toolbar block-card">
-                <form class="toolbar-form" method="get">
+                <form class="toolbar-form" method="get"
+                      action="${pageContext.request.contextPath}/admin/member/withdrawal">
                     <div class="status-tabs">
-                        <a href="?kwd=${kwd}"                    class="status-tab ${empty wFilter ? 'active' : ''}">전체</a>
-                        <a href="?wFilter=PENDING&kwd=${kwd}"    class="status-tab ${wFilter == 'PENDING'  ? 'active' : ''}">
+                        <a href="?kwd=${kwd}"
+                           class="status-tab ${empty wFilter ? 'active' : ''}">전체</a>
+                        <a href="?wFilter=PENDING&kwd=${kwd}"
+                           class="status-tab ${wFilter == 'PENDING' ? 'active' : ''}">
                             <span class="tab-dot blue"></span>대기중
                         </a>
-                        <a href="?wFilter=APPROVED&kwd=${kwd}"   class="status-tab ${wFilter == 'APPROVED' ? 'active' : ''}">
+                        <a href="?wFilter=APPROVED&kwd=${kwd}"
+                           class="status-tab ${wFilter == 'APPROVED' ? 'active' : ''}">
                             <span class="tab-dot gray"></span>승인됨
                         </a>
-                        <a href="?wFilter=REJECTED&kwd=${kwd}"   class="status-tab ${wFilter == 'REJECTED' ? 'active' : ''}">
+                        <a href="?wFilter=REJECTED&kwd=${kwd}"
+                           class="status-tab ${wFilter == 'REJECTED' ? 'active' : ''}">
                             <span class="tab-dot red"></span>반려됨
                         </a>
                     </div>
                     <div class="search-group">
                         <div class="search-input-wrap">
                             <i class="ri-search-2-line"></i>
-                            <input type="text" name="kwd" class="fm-input" value="${kwd}" placeholder="아이디 또는 닉네임 검색">
+                            <input type="text" name="kwd" class="fm-input"
+                                   value="${kwd}" placeholder="아이디 또는 닉네임 검색">
                         </div>
                         <input type="hidden" name="wFilter" value="${wFilter}">
                         <button type="submit" class="btn-pill btn-gradient">검색</button>
@@ -106,8 +113,9 @@
                                                         onclick="openApproveModal(${w.WITHDRAWIDX}, ${w.USERIDX}, '${w.NICKNAME}')">
                                                     승인
                                                 </button>
+                                                <%-- rejectWithdrawal에 nickname 3번째 인자 추가 --%>
                                                 <button class="btn-reject"
-                                                        onclick="rejectWithdrawal(${w.WITHDRAWIDX}, ${w.USERIDX})">
+                                                        onclick="rejectWithdrawal(${w.WITHDRAWIDX}, ${w.USERIDX}, '${w.NICKNAME}')">
                                                     반려
                                                 </button>
                                             </div>
@@ -121,13 +129,18 @@
                 <c:if test="${totalPages > 1}">
                     <div class="pagination">
                         <c:if test="${page > 1}">
-                            <a href="?page=${page-1}&kwd=${kwd}&wFilter=${wFilter}" class="page-btn"><i class="ri-arrow-left-s-line"></i></a>
+                            <a href="?page=${page-1}&kwd=${kwd}&wFilter=${wFilter}" class="page-btn">
+                                <i class="ri-arrow-left-s-line"></i>
+                            </a>
                         </c:if>
                         <c:forEach begin="1" end="${totalPages}" var="p">
-                            <a href="?page=${p}&kwd=${kwd}&wFilter=${wFilter}" class="page-btn ${p == page ? 'active' : ''}">${p}</a>
+                            <a href="?page=${p}&kwd=${kwd}&wFilter=${wFilter}"
+                               class="page-btn ${p == page ? 'active' : ''}">${p}</a>
                         </c:forEach>
                         <c:if test="${page < totalPages}">
-                            <a href="?page=${page+1}&kwd=${kwd}&wFilter=${wFilter}" class="page-btn"><i class="ri-arrow-right-s-line"></i></a>
+                            <a href="?page=${page+1}&kwd=${kwd}&wFilter=${wFilter}" class="page-btn">
+                                <i class="ri-arrow-right-s-line"></i>
+                            </a>
                         </c:if>
                     </div>
                 </c:if>
@@ -159,13 +172,16 @@
         </div>
         <div class="mini-modal-foot">
             <button class="btn-pill btn-light" id="approveCancel">취소</button>
-            <button class="btn-pill" style="background:var(--color-red);color:white;padding:12px 24px;" id="approveConfirm">탈퇴 승인</button>
+            <button class="btn-pill" style="background:var(--color-red);color:white;padding:12px 24px;" id="approveConfirm">
+                탈퇴 승인
+            </button>
         </div>
     </div>
 </div>
 
 <script>var CTX = '${pageContext.request.contextPath}';</script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/admin/admin_ui.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/member_withdrawal.js"></script>
 </body>
 </html>

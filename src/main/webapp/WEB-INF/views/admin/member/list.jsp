@@ -12,6 +12,7 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_main.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_member.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_ui.css">
 </head>
 <body>
 <div class="agency-layout">
@@ -35,24 +36,27 @@
                         <span class="msc-lbl">전체 회원</span>
                     </div>
                 </div>
-                <div class="member-stat-card" onclick="filterByStatus(1)">
+                <div class="member-stat-card" onclick="filterByStatus(1)"
+                     data-count-normal="${countNormal}">
                     <div class="msc-icon green"><i class="ri-user-smile-fill"></i></div>
                     <div class="msc-info">
-                        <span class="msc-val" id="countNormal">-</span>
+                        <span class="msc-val" id="countNormal">${not empty countNormal ? countNormal : '-'}</span>
                         <span class="msc-lbl">정상</span>
                     </div>
                 </div>
-                <div class="member-stat-card" onclick="filterByStatus(2)">
+                <div class="member-stat-card" onclick="filterByStatus(2)"
+                     data-count-ban="${countBan}">
                     <div class="msc-icon red"><i class="ri-forbid-fill"></i></div>
                     <div class="msc-info">
-                        <span class="msc-val" id="countBan">-</span>
+                        <span class="msc-val" id="countBan">${not empty countBan ? countBan : '-'}</span>
                         <span class="msc-lbl">제재</span>
                     </div>
                 </div>
-                <div class="member-stat-card" onclick="filterByStatus(9)">
+                <div class="member-stat-card" onclick="filterByStatus(9)"
+                     data-count-out="${countOut}">
                     <div class="msc-icon gray"><i class="ri-user-unfollow-fill"></i></div>
                     <div class="msc-info">
-                        <span class="msc-val" id="countOut">-</span>
+                        <span class="msc-val" id="countOut">${not empty countOut ? countOut : '-'}</span>
                         <span class="msc-lbl">탈퇴</span>
                     </div>
                 </div>
@@ -141,9 +145,9 @@
                                         </c:choose>
                                     </td>
                                     <td>
-                                        <button class="action-btn" onclick="openDetail('${m.userIdx}')" title="상세보기">
-										    <i class="ri-eye-line"></i>
-										</button>
+                                        <button type="button" class="action-btn" onclick="openDetail('${m.userIdx}')" title="상세보기">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -181,15 +185,14 @@
         <div class="detail-left">
             <div class="detail-avt" id="dAvt"></div>
             <div class="detail-name" id="dName"></div>
-            <div class="detail-id" id="dId"></div>
+            <div class="detail-id"   id="dId"></div>
             <span class="detail-status-badge" id="dStatusBadge"></span>
             <div class="detail-stats">
                 <div class="detail-stat">
                     <span class="stat-val" id="dLevel"></span>
                     <span class="stat-lbl">레벨</span>
                 </div>
-                
-                <div class="detail-stat" style="flex: 1.5;">
+                <div class="detail-stat" style="flex:1.5;">
                     <span class="stat-lbl">매너온도</span>
                     <span class="stat-val" id="dScoreText" style="margin-top:2px;"></span>
                     <div class="manner-temp-wrap">
@@ -198,17 +201,16 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="detail-stat">
                     <span class="stat-val" id="dPoint"></span>
                     <span class="stat-lbl">포인트</span>
                 </div>
             </div>
             <div class="detail-actions">
-                <button class="btn-pill btn-danger" id="btnSuspend" style="display:none;">
+                <button type="button" class="btn-pill btn-danger"  id="btnSuspend"  style="display:none;">
                     <i class="ri-forbid-line"></i> 제재하기
                 </button>
-                <button class="btn-pill btn-success" id="btnActivate" style="display:none;">
+                <button type="button" class="btn-pill btn-success" id="btnActivate" style="display:none;">
                     <i class="ri-check-line"></i> 정상화
                 </button>
             </div>
@@ -217,17 +219,17 @@
         <div class="detail-right">
             <div class="detail-tabs">
                 <button class="detail-tab-btn active" data-pane="paneInfo">기본 정보</button>
-                <button class="detail-tab-btn" data-pane="paneSanction">제재 처리</button>
+                <button class="detail-tab-btn"        data-pane="paneSanction">제재 처리</button>
             </div>
 
             <div class="detail-pane active" id="paneInfo">
                 <h3 class="detail-section-title"><i class="ri-user-3-line"></i> 기본 정보</h3>
                 <div class="detail-info-grid">
-                    <div class="info-row"><span class="info-lbl">이메일</span><span class="info-val" id="dEmail"></span></div>
-                    <div class="info-row"><span class="info-lbl">전화번호</span><span class="info-val" id="dTel"></span></div>
-                    <div class="info-row"><span class="info-lbl">생년월일</span><span class="info-val" id="dBirth"></span></div>
-                    <div class="info-row"><span class="info-lbl">가입일</span><span class="info-val" id="dCreated"></span></div>
-                    <div class="info-row"><span class="info-lbl">최근 로그인</span><span class="info-val" id="dLastLogin"></span></div>
+                    <div class="info-row"><span class="info-lbl">이메일</span>      <span class="info-val" id="dEmail"></span></div>
+                    <div class="info-row"><span class="info-lbl">전화번호</span>    <span class="info-val" id="dTel"></span></div>
+                    <div class="info-row"><span class="info-lbl">생년월일</span>    <span class="info-val" id="dBirth"></span></div>
+                    <div class="info-row"><span class="info-lbl">가입일</span>      <span class="info-val" id="dCreated"></span></div>
+                    <div class="info-row"><span class="info-lbl">최근 로그인</span> <span class="info-val" id="dLastLogin"></span></div>
                     <div class="info-row">
                         <span class="info-lbl">권한</span>
                         <span class="info-val">
@@ -266,7 +268,7 @@
                         <div class="fm-field">
                             <label class="fm-label">제재 사유</label>
                             <textarea class="fm-input" id="sanctionReason" rows="3" placeholder="제재 사유를 구체적으로 입력하세요"></textarea>
-                            <div class="fm-helper error" id="reasonError">
+                            <div class="fm-helper error" id="reasonError" style="display:none;">
                                 <i class="ri-error-warning-line"></i> 제재 사유를 입력해주세요.
                             </div>
                         </div>
@@ -285,6 +287,7 @@
 
 <script>var CTX = '${pageContext.request.contextPath}';</script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/admin/admin_ui.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/member_list.js"></script>
 </body>
 </html>
