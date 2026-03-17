@@ -4,44 +4,56 @@
 
     <sql id="where-list">
         <if test="schType == 'all'">
-            (INSTR(p.userId, #{kwd}) &gt; 0 OR INSTR(p.orderId, #{kwd}) &gt; 0)
+            (INSTR(u.userId, #{kwd}) &gt; 0 OR INSTR(p.merchantUid, #{kwd}) &gt; 0)
         </if>
         <if test="schType == 'userId'">
-            INSTR(p.userId, #{kwd}) &gt; 0
+            INSTR(u.userId, #{kwd}) &gt; 0
         </if>
         <if test="schType == 'orderId'">
-            INSTR(p.orderId, #{kwd}) &gt; 0
+            INSTR(p.merchantUid, #{kwd}) &gt; 0
         </if>
     </sql>
 
     <select id="dataCount" parameterType="map" resultType="Integer">
         SELECT NVL(COUNT(*), 0)
-        FROM payment p
-        JOIN member1 m ON p.userId = m.userId
+        FROM PAYMENT p
+        JOIN users u ON p.USERIDX = u.userIdx
         <where>
             <if test="kwd != null and kwd != ''">
                 <include refid="where-list"/>
             </if>
             <if test="status != null and status != ''">
-                AND p.status = #{status}
+                <choose>
+                    <when test="status == 'charge'">AND p.PAYSTATUS = 'PAID'</when>
+                    <when test="status == 'refund'">AND p.PAYSTATUS = 'REFUND'</when>
+                    <otherwise>AND p.PAYSTATUS = #{status}</otherwise>
+                </choose>
             </if>
         </where>
     </select>
 
     <select id="listPayment" parameterType="map" resultType="map">
-        SELECT p.orderId, p.userId, m.nickname, p.payType, p.amount, 
-               TO_CHAR(p.payDate, 'YYYY-MM-DD HH24:MI') as payDate, p.status
-        FROM payment p
-        JOIN member1 m ON p.userId = m.userId
+        SELECT p.PAYMENTIDX as "paymentIdx", p.MERCHANTUID as "merchantUid", 
+               u.userId as "userId", u.nickname as "nickname", 
+               p.PAYMETHOD as "payMethod", p.CHARGEAMOUNT as "chargeAmount", 
+               TO_CHAR(p.PAIDAT, 'YYYY-MM-DD HH24:MI') as "paidAt", 
+               p.PAYSTATUS as "payStatus"
+        FROM PAYMENT p
+        JOIN users u ON p.USERIDX = u.userIdx
         <where>
             <if test="kwd != null and kwd != ''">
                 <include refid="where-list"/>
             </if>
             <if test="status != null and status != ''">
-                AND p.status = #{status}
+                <choose>
+                    <when test="status == 'charge'">AND p.PAYSTATUS = 'PAID'</when>
+                    <when test="status == 'refund'">AND p.PAYSTATUS = 'REFUND'</when>
+                    <otherwise>AND p.PAYSTATUS = #{status}</otherwise>
+                </choose>
             </if>
         </where>
-        ORDER BY p.payDate DESC
+        ORDER BY p.PAIDAT DESC
         OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
     </select>
+
 </mapper>

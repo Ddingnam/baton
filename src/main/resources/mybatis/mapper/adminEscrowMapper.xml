@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sp.app.admin.mapper.AdminEscrowMapper">
+
+    <sql id="where-list">
+        <if test="schType == 'all'">
+            (INSTR(b.userId, #{kwd}) &gt; 0 OR INSTR(s.userId, #{kwd}) &gt; 0 OR INSTR(TO_CHAR(t.productIdx), #{kwd}) &gt; 0)
+        </if>
+        <if test="schType == 'buyerId'">
+            INSTR(b.userId, #{kwd}) &gt; 0
+        </if>
+        <if test="schType == 'sellerId'">
+            INSTR(s.userId, #{kwd}) &gt; 0
+        </if>
+        <if test="schType == 'productIdx'">
+            INSTR(TO_CHAR(t.productIdx), #{kwd}) &gt; 0
+        </if>
+    </sql>
+
+    <select id="dataCount" parameterType="map" resultType="Integer">
+        SELECT NVL(COUNT(*), 0)
+        FROM TRADETRANSACTION t
+        JOIN users b ON t.BUYERIDX = b.USERIDX
+        JOIN users s ON t.SELLERIDX = s.USERIDX
+        <where>
+            <if test="kwd != null and kwd != ''">
+                <include refid="where-list"/>
+            </if>
+            <if test="status != null and status != ''">
+                AND t.TRADESTATUS = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="listEscrow" parameterType="map" resultType="map">
+        SELECT t.TRADEIDX as "tradeIdx", t.PRODUCTIDX as "productIdx",
+               b.USERID as "buyerId", b.NICKNAME as "buyerNickname",
+               s.USERID as "sellerId", s.NICKNAME as "sellerNickname",
+               t.TRADEPRICE as "tradePrice", t.SAFETYFEE as "safetyFee",
+               t.TOTALUSED_POINT as "totalUsedPoint",
+               TO_CHAR(t.TRADEDATE, 'YYYY-MM-DD HH24:MI') as "tradeDate",
+               t.TRADESTATUS as "tradeStatus"
+        FROM TRADETRANSACTION t
+        JOIN users b ON t.BUYERIDX = b.USERIDX
+        JOIN users s ON t.SELLERIDX = s.USERIDX
+        <where>
+            <if test="kwd != null and kwd != ''">
+                <include refid="where-list"/>
+            </if>
+            <if test="status != null and status != ''">
+                AND t.TRADESTATUS = #{status}
+            </if>
+        </where>
+        ORDER BY t.TRADEDATE DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+    </select>
+
+</mapper>
