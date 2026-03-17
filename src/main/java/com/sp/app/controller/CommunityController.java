@@ -30,7 +30,9 @@ import com.sp.app.common.RequestUtils;
 import com.sp.app.common.StorageService;
 import com.sp.app.domain.dto.CommunityDto;
 import com.sp.app.domain.dto.SessionInfo;
+import com.sp.app.domain.dto.UserRegionInfo;
 import com.sp.app.service.CommunityService;
+import com.sp.app.service.MemberService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -46,6 +48,7 @@ public class CommunityController {
     private final CommunityService service;
     private final PaginateUtil paginateUtil;
     private final StorageService storageService;
+    private final MemberService memberService;
 
     @Value("${file.upload-root}/community")
     private String uploadPath;
@@ -69,7 +72,55 @@ public class CommunityController {
                            : "like".equals(sort) ? Sort.by("likeCount").descending()
                            : Sort.by("id").descending();
             Pageable pageable = PageRequest.of(current_page - 1, size, sortOrder);
-            Page<CommunityDto> pages = service.getCommunityList(pageable, schType, kwd);
+
+            HttpSession session = req.getSession(false);
+            SessionInfo info = (session != null) ? (SessionInfo) session.getAttribute("member") : null;
+
+            String regionCode = null;
+            String dongName = null;
+            int currentRegionType = 0; // 1: 주동네, 2: 부동네
+
+            String regionTypeParam = req.getParameter("regionType");
+
+            if (info != null) {
+                UserRegionInfo regionInfo = memberService.getUserRegionInfo(info.getUserIdx());
+                if (regionInfo != null) {
+                    com.sp.app.domain.dto.RegionDto targetRegion = null;
+
+                    // 1. 유저가 탭을 클릭해서 이동한 경우
+                    if ("1".equals(regionTypeParam)) {
+                        targetRegion = regionInfo.getMainRegion();
+                        currentRegionType = 1;
+                    } else if ("2".equals(regionTypeParam)) {
+                        targetRegion = regionInfo.getSubRegion();
+                        currentRegionType = 2;
+                    } else {
+                        // 2. 파라미터가 없으면(처음 들어왔을 때) 기본 설정된 동네 사용
+                        targetRegion = regionInfo.getActiveRegion();
+                        if (targetRegion != null) {
+                            currentRegionType = targetRegion.getRegionType();
+                        }
+                    }
+
+                    if (targetRegion != null) {
+                        regionCode = targetRegion.getRegionCode();
+                        dongName = targetRegion.getDong();
+                    }
+                    
+                    // JSP에서 탭을 그리기 위해 모델에 전달
+                    model.addAttribute("userRegionInfo", regionInfo);
+                    model.addAttribute("currentRegionType", currentRegionType);
+                }
+            }
+
+            Page<CommunityDto> pages;
+            if (regionCode != null) {
+                pages = service.getCommunityListByRegion(pageable, regionCode, category, schType, kwd);
+            } else if (!category.isBlank()) {
+                pages = service.getCommunityListByCategory(pageable, category, schType, kwd);
+            } else {
+                pages = service.getCommunityList(pageable, schType, kwd);
+            }
 
             int total_page = pages.getTotalPages();
             long dataCount = pages.getTotalElements();
@@ -82,6 +133,11 @@ public class CommunityController {
             if (!category.isBlank()) params.append("&category=").append(URLEncoder.encode(category, "UTF-8"));
             if (!"latest".equals(sort)) params.append("&sort=").append(sort);
             if (!kwd.isBlank()) params.append("&schType=").append(schType).append("&kwd=").append(URLEncoder.encode(kwd, "UTF-8"));
+            
+            // 탭 상태 유지를 위한 파라미터 추가
+            if (currentRegionType > 0) {
+                params.append("&regionType=").append(currentRegionType);
+            }
 
             if (params.length() > 0) {
                 listUrl += "?" + params.substring(1);
@@ -100,6 +156,8 @@ public class CommunityController {
             model.addAttribute("kwd", kwd);
             model.addAttribute("category", category);
             model.addAttribute("sort", sort);
+            model.addAttribute("dongName", dongName);
+            model.addAttribute("regionCode", regionCode);
 
         } catch (Exception e) {
             log.info("list : ", e);
@@ -120,6 +178,7 @@ public class CommunityController {
             @RequestParam(value = "attachFiles", required = false) List<MultipartFile> attachFiles,
             @RequestParam(value = "isTemporary", required = false, defaultValue = "0") int isTemporary,
             HttpSession session) throws Exception {
+            
         SessionInfo info = (SessionInfo) session.getAttribute("member");
 
         dto.setMemberIdx(info.getUserIdx());
@@ -129,6 +188,21 @@ public class CommunityController {
         dto.setTemporary(isTemporary == 1);
 
         try {
+            UserRegionInfo regionInfo = memberService.getUserRegionInfo(info.getUserIdx());
+            if (regionInfo != null) {
+                // 🌟 1순위: 활성화된 동네 코드를 무조건 우선 적용
+                if (regionInfo.getActiveRegion() != null && regionInfo.getActiveRegion().getRegionCode() != null) {
+                    dto.setRegionCode(regionInfo.getActiveRegion().getRegionCode());
+                } 
+                // 🌟 2순위: 활성화된 동네가 없으면 1번 탭(주 동네) 코드를 멱살 잡고 끌고 옴
+                else if (regionInfo.getMainRegion() != null && regionInfo.getMainRegion().getRegionCode() != null) {
+                    dto.setRegionCode(regionInfo.getMainRegion().getRegionCode());
+                }
+            }
+            
+            // 💡 이 로그가 이클립스(인텔리제이) 콘솔에 찍히는지 꼭 확인하세요!
+            log.info("▶▶▶ 새 글 작성 - 적용된 동네코드: {}", dto.getRegionCode());
+            
             service.insertCommunity(dto, uploadPath);
         } catch (Exception e) {
             log.error("writeSubmit error", e);
@@ -139,9 +213,10 @@ public class CommunityController {
             return "redirect:/community/list?tab=temp";
         }
         session.setAttribute("msg", "게시글이 등록되었습니다.");
-        return "redirect:/community/list";
+        
+        // 글을 쓴 직후, 전체 목록이 아니라 해당 동네 탭(주 동네)으로 돌아가도록 파라미터 추가
+        return "redirect:/community/list?regionType=1";
     }
-
     @GetMapping("article/{id}")
     public String article(@PathVariable("id") long id,
             @RequestParam(name = "page", defaultValue = "1") String page,

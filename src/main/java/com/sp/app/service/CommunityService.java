@@ -16,6 +16,8 @@ public interface CommunityService {
 	
 	public CommunityDto getCommunity(long id);
 	public Page<CommunityDto> getCommunityList(Pageable pageable, String schType, String kwd);
+	public Page<CommunityDto> getCommunityListByCategory(Pageable pageable, String category, String schType, String kwd);
+	public Page<CommunityDto> getCommunityListByRegion(Pageable pageable, String regionCode, String category, String schType, String kwd);
 	
 	public void updateHitCount(long id) throws Exception;
 	public void deleteCommunityFile(long id, String filename, String uploadPath) throws Exception;

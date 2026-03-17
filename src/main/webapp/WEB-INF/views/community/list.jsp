@@ -26,7 +26,16 @@
             <div class="hero-text-box">
                 <span class="sub-title">BATON COMMUNITY</span>
                 <h1 class="main-title">우리 동네 <span class="highlight">커뮤니티</span></h1>
-                <p class="desc">이웃들과 다양한 동네 소식을 나누고 질문해보세요.</p>
+  
+                <c:choose>
+                    <c:when test="${not empty dongName}">
+                        <p class="desc"><strong>${dongName}</strong> 이웃들과 소식을 나누고 질문해보세요.</p>
+                    </c:when>
+              
+                    <c:otherwise>
+                        <p class="desc">이웃들과 다양한 동네 소식을 나누고 질문해보세요.</p>
+                    </c:otherwise>
+                </c:choose>
             </div>
 
             <form name="searchForm" class="hero-search-box" action="${pageContext.request.contextPath}/community/list" method="get">
@@ -41,7 +50,37 @@
 
     <div class="content-wrapper">
         <div class="cm-toolbar">
-            <div class="toolbar-top">
+            <div class="toolbar-top" style="flex-wrap: wrap; gap: 15px;">
+                
+                <div class="region-tabs" style="display: flex; gap: 8px;">
+                    <c:if test="${not empty userRegionInfo}">
+                        <c:if test="${not empty userRegionInfo.mainRegion}">
+                            <button type="button" class="region-badge ${currentRegionType == 1 ? 'active' : ''}" 
+                                    style="cursor: pointer; border: 1px solid ${currentRegionType == 1 ? 'var(--baton-primary)' : '#ddd'}; background-color: ${currentRegionType == 1 ? 'var(--baton-primary-light)' : '#fff'}; color: ${currentRegionType == 1 ? 'var(--baton-primary)' : '#666'};"
+                                    onclick="location.href='${pageContext.request.contextPath}/community/list?regionType=1'">
+                                <i class="ri-map-pin-2-fill"></i>
+                                <span>${userRegionInfo.mainRegion.dong}</span>
+                            </button>
+                        </c:if>
+                        
+                        <c:if test="${not empty userRegionInfo.subRegion}">
+                            <button type="button" class="region-badge ${currentRegionType == 2 ? 'active' : ''}"
+                                    style="cursor: pointer; border: 1px solid ${currentRegionType == 2 ? 'var(--baton-primary)' : '#ddd'}; background-color: ${currentRegionType == 2 ? 'var(--baton-primary-light)' : '#fff'}; color: ${currentRegionType == 2 ? 'var(--baton-primary)' : '#666'};"
+                                    onclick="location.href='${pageContext.request.contextPath}/community/list?regionType=2'">
+                                <i class="ri-map-pin-2-fill"></i>
+                                <span>${userRegionInfo.subRegion.dong}</span>
+                            </button>
+                        </c:if>
+
+                        <c:if test="${empty userRegionInfo.mainRegion && empty userRegionInfo.subRegion}">
+                            <button type="button" class="region-badge" style="cursor: pointer;"
+                                    onclick="location.href='${pageContext.request.contextPath}/member/regionAuth'">
+                                <i class="ri-add-line"></i>
+                                <span>동네 인증하기</span>
+                            </button>
+                        </c:if>
+                    </c:if>
+                </div>
                 <div class="filter-group">
                     <button type="button" class="filter-btn ${empty category ? 'active' : ''}" onclick="location.href='${pageContext.request.contextPath}/community/list'">전체</button>
                     <button type="button" class="filter-btn ${category == '일상' ? 'active' : ''}" onclick="filterByCategory('일상')">일상</button>
@@ -142,6 +181,9 @@
                             <c:if test="${not empty dto.placeName}">
                                 <span class="meta-item"><i class="ri-map-pin-2-line"></i>${dto.placeName}</span>
                             </c:if>
+                            <c:if test="${not empty dto.dong}">
+                                <span class="meta-item"><i class="ri-community-line"></i>${dto.dong}</span>
+                            </c:if>
                             <span class="meta-item">
                                 <i class="ri-time-line"></i>
                                 <c:set var="rawDate" value="${dto.regDate}" />
@@ -193,7 +235,6 @@
 
 <script>
     const contextPath = "${pageContext.request.contextPath}";
-
     function openProfileModal(memberIdx) {
         const modalEl   = document.getElementById('profileModal');
         const contentEl = document.getElementById('profileModalContent');

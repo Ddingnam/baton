@@ -70,6 +70,9 @@ public class Community {
     private Double latitude;
     private Double longitude;
 
+    @Column(length = 20)
+    private String regionCode;
+
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     @OrderBy("id ASC")

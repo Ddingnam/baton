@@ -17,46 +17,50 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommunityDto {
-    private Long id;
-    private Long memberIdx;
-    private String writerNickname;
-    private String subject;
-    private String content;
-    private String category;
-    private int hitCount;
-    private int likeCount;
-    private LocalDateTime regDate;
-    
-    private String placeName;
-    private String address;
-    private Double latitude;
-    private Double longitude;
-    
-    private List<MultipartFile> uploadFiles;
-    private List<MultipartFile> attachFiles;
-    private List<String> removeFiles;
-    
-    private List<String> imageFiles;
-    private List<String> tags;
-    
-    private List<AttachFileInfo> attachFileInfos;
-    
-    @Getter @Setter
-    @NoArgsConstructor @AllArgsConstructor
-    public static class AttachFileInfo {
-        private String originalFilename;
-        private String saveFilename;
-        private long fileSize;
-    }
-    
-    private boolean userLiked;
-    private boolean userScraped;
-    
-    private String pollTitle; 
-    private List<String> pollOptions;
-    private String pollEndDate;
-    private Boolean pollMultiple;
-    private Boolean pollAnonymous;
+	private Long id;
+	private Long memberIdx;
+	private String writerNickname;
+	private String subject;
+	private String content;
+	private String category;
+	private int hitCount;
+	private int likeCount;
+	private LocalDateTime regDate;
 
-    private boolean temporary;
+	private String placeName;
+	private String address;
+	private Double latitude;
+	private Double longitude;
+	private String regionCode;
+	private String dong;
+
+	private List<MultipartFile> uploadFiles;
+	private List<MultipartFile> attachFiles;
+	private List<String> removeFiles;
+
+	private List<String> imageFiles;
+	private List<String> tags;
+
+	private List<AttachFileInfo> attachFileInfos;
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class AttachFileInfo {
+		private String originalFilename;
+		private String saveFilename;
+		private long fileSize;
+	}
+
+	private boolean userLiked;
+	private boolean userScraped;
+
+	private String pollTitle;
+	private List<String> pollOptions;
+	private String pollEndDate;
+	private Boolean pollMultiple;
+	private Boolean pollAnonymous;
+
+	private boolean temporary;
 }

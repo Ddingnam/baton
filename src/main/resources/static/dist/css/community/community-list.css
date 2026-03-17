@@ -626,3 +626,19 @@ a { text-decoration: none; color: inherit; }
     .list-mode .cm-item-card { flex-direction: column; height: auto; }
     .list-mode .card-visual { width: 100%; height: 200px; }
 }
+.region-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+}
+
+.region-badge i {
+    font-size: 14px;
+}

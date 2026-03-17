@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sp.app.common.StorageService;
 import com.sp.app.domain.dto.CommunityDto;
+import com.sp.app.domain.dto.RegionDto;
 import com.sp.app.domain.entity.Community;
 import com.sp.app.domain.entity.CommunityHashTag;
 import com.sp.app.domain.entity.CommunityImage;
@@ -66,6 +67,7 @@ public class CommunityServiceImpl implements CommunityService {
 					.address(dto.getAddress())
 					.latitude(dto.getLatitude())
 					.longitude(dto.getLongitude())
+					.regionCode(dto.getRegionCode())
 					.hitCount(0)
 					.likeCount(0)
 					.temporary(dto.isTemporary()) 
@@ -167,6 +169,57 @@ public class CommunityServiceImpl implements CommunityService {
 	        } else {
 	            entities = communityRepository.findByTemporaryFalseAndSubjectContainingOrTemporaryFalseAndContentContaining(kwd, kwd, pageable);
 	        }
+	    }
+	    return entities.map(this::toDto);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<CommunityDto> getCommunityListByRegion(Pageable pageable, String regionCode, String category, String schType, String kwd) {
+	    Page<Community> entities;
+	    boolean hasKwd = kwd != null && !kwd.isBlank();
+	    boolean hasCat = category != null && !category.isBlank();
+
+	    if (hasCat) {
+	        if (hasKwd) {
+	            if ("subject".equals(schType)) {
+	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndCategoryAndSubjectContaining(regionCode, category, kwd, pageable);
+	            } else if ("content".equals(schType)) {
+	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndCategoryAndContentContaining(regionCode, category, kwd, pageable);
+	            } else {
+	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndCategoryAndSubjectContaining(regionCode, category, kwd, pageable);
+	            }
+	        } else {
+	            entities = communityRepository.findByTemporaryFalseAndRegionCodeAndCategory(regionCode, category, pageable);
+	        }
+	    } else {
+	        if (hasKwd) {
+	            if ("subject".equals(schType)) {
+	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndSubjectContaining(regionCode, kwd, pageable);
+	            } else if ("content".equals(schType)) {
+	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndContentContaining(regionCode, kwd, pageable);
+	            } else {
+	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndSubjectContainingOrTemporaryFalseAndRegionCodeAndContentContaining(regionCode, kwd, regionCode, kwd, pageable);
+	            }
+	        } else {
+	            entities = communityRepository.findByTemporaryFalseAndRegionCode(regionCode, pageable);
+	        }
+	    }
+	    return entities.map(this::toDto);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<CommunityDto> getCommunityListByCategory(Pageable pageable, String category, String schType, String kwd) {
+	    Page<Community> entities;
+	    if (kwd == null || kwd.isBlank()) {
+	        entities = communityRepository.findByTemporaryFalseAndCategory(category, pageable);
+	    } else if ("subject".equals(schType)) {
+	        entities = communityRepository.findByTemporaryFalseAndCategoryAndSubjectContaining(category, kwd, pageable);
+	    } else if ("content".equals(schType)) {
+	        entities = communityRepository.findByTemporaryFalseAndCategoryAndContentContaining(category, kwd, pageable);
+	    } else {
+	        entities = communityRepository.findByTemporaryFalseAndCategoryAndSubjectContaining(category, kwd, pageable);
 	    }
 	    return entities.map(this::toDto);
 	}
@@ -619,7 +672,9 @@ public class CommunityServiceImpl implements CommunityService {
 				.placeName(entity.getPlaceName())
 				.address(entity.getAddress())
 				.latitude(entity.getLatitude())
-	            .longitude(entity.getLongitude()) 
+	            .longitude(entity.getLongitude())
+	            .regionCode(entity.getRegionCode())
+	            .dong(entity.getRegionCode() != null ? getDongByRegionCode(entity.getRegionCode()) : null)
 				.imageFiles(entity.getImages().stream().map(CommunityImage::getSaveFilename).collect(Collectors.toList()))
 				.tags(entity.getHashTags().stream().map(CommunityHashTag::getTagName).collect(Collectors.toList()))
 				.attachFileInfos(attachFileInfos)
@@ -638,5 +693,14 @@ public class CommunityServiceImpl implements CommunityService {
 		}
 		
 		return dto;
+	}
+
+	private String getDongByRegionCode(String regionCode) {
+		try {
+			RegionDto region = memberService.findRegionByCode(regionCode);
+			return region != null ? region.getDong() : null;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }
