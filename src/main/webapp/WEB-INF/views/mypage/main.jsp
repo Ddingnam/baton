@@ -185,19 +185,18 @@
 				                                    <c:choose>
 												        <c:when test="${not empty item.imageList}">
 												            <img src="${pageContext.request.contextPath}/uploads/trade/${item.imageList[0].saveName}" 
-												                 alt="상품이미지" 
-												                 style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
+												                 alt="상품이미지">
 												        </c:when>
 												        <c:otherwise>
-												            <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f5f5f5; border-radius:8px;">
-												                <i class="ri-image-line" style="font-size: 24px; color: #ccc;"></i>
+												            <div>
+												                <i class="ri-image-line"></i>
 												            </div>
 												        </c:otherwise>
 												    </c:choose>
 				                                </div>
 				                                <div class="item-info">
 				                                    <h4>${item.title}</h4>
-				                                    <p class="info-metrics">${item.tradeStatus} · ${item.lastUpDate} · 조회 ${item.hitCount}</p>
+				                                    <p class="time-ago info-metrics">${item.tradeStatus} · ${item.lastUpDate} · 조회 ${item.hitCount}</p>
 				                                </div>
 				                                <div class="item-right">
 				                                    <span class="${item.tradeStatus == '판매완료' ? 'theme-badge-done' : 'theme-badge'}">${item.tradeStatus}</span>
@@ -220,73 +219,84 @@
 				        </div>
 				
 				        <div class="inner-section" id="trade-buy">
-				            <div class="lc-list">
-				                <c:choose>
-				                    <c:when test="${empty myPurchases}">
-				                        <div class="lc-empty">
-				                            <i class="ri-handbag-line"></i>
-				                            <p>구매 내역이 없습니다.</p>
-				                        </div>
-				                    </c:when>
-				                    <c:otherwise>
-				                        <c:forEach var="item" items="${myPurchases}">
-				                            <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/article/${item.id}'">
-				                                <div class="item-thumb">
-				                                    <c:choose>
-				                                        <c:when test="${not empty item.thumbnail}">
-				                                            <img src="${item.thumbnail}" alt="상품이미지" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
-				                                        </c:when>
-				                                        <c:otherwise><i class="ri-image-line"></i></c:otherwise>
-				                                    </c:choose>
-				                                </div>
-				                                <div class="item-info">
-				                                    <h4>${item.title}</h4>
-				                                    <p class="info-metrics">거래완료 · ${item.buyDate}</p>
-				                                </div>
-				                                <div class="item-right">
-				                                    <span class="theme-badge">거래완료</span>
-				                                    <strong class="price"><fmt:formatNumber value="${item.price}" pattern="#,###"/>원</strong>
-				                                </div>
-				                            </div>
-				                        </c:forEach>
-				                    </c:otherwise>
-				                </c:choose>
-				            </div>
-				        </div>
+						    <div class="lc-list">
+						        <c:choose>
+						            <c:when test="${empty buyList}">
+						                <div class="lc-empty">
+						                    <i class="ri-handbag-line"></i>
+						                    <p>구매 내역이 없습니다.</p>
+						                </div>
+						            </c:when>
+						            <c:otherwise>
+						                <c:forEach var="item" items="${buyList}">
+						                    <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/article?productIdx=${item.productIdx}'">
+						                        <div class="item-thumb">
+						                            <c:if test="${not empty item.imageList}">
+						                                <img src="${pageContext.request.contextPath}/uploads/trade/${item.imageList[0].saveName}" alt="상품이미지">
+						                            </c:if>
+						                        </div>
+						                        <div class="item-info">
+						                            <h4>${item.title}</h4>
+						                            <p class="info-metrics"> ${item.tradeStatus == 'CANCELED' ? '결제취소' : item.tradeStatus == 'PAY_COMPLETED' ? '결제완료' : item.tradeStatus == 'SHIPPING' ? '배송중' : '거래완료'} · ${item.dong} </p>
+						                        </div>
+						                        <div class="item-right">
+						                        	<span class="${item.tradeStatus == 'CANCELED' ? 'theme-badge-done' : 'theme-badge'}">${item.tradeStatus == 'CANCELED' ? '결제취소' : item.tradeStatus == 'PAY_COMPLETED' ? '결제완료' : item.tradeStatus == 'SHIPPING' ? '배송중' : '거래완료'}</span>
+						                            <strong class="price">
+						                                <fmt:formatNumber value="${item.price}" pattern="#,###"/>원
+						                            </strong>
+						                        </div>
+						                    </div>
+						                </c:forEach>
+						            </c:otherwise>
+						        </c:choose>
+						    </div>
+						</div>
 				
 				        <div class="inner-section" id="trade-wish">
-				            <div class="lc-list">
-				                <c:choose>
-				                    <c:when test="${empty myWishlist}">
-				                        <div class="lc-empty">
-				                            <i class="ri-heart-line"></i>
-				                            <p>찜한 상품이 없습니다.</p>
-				                        </div>
-				                    </c:when>
-				                    <c:otherwise>
-				                        <c:forEach var="item" items="${myWishlist}">
-				                            <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/article/${item.id}'">
-				                                <div class="item-thumb">
-				                                    <c:choose>
-				                                        <c:when test="${not empty item.thumbnail}">
-				                                            <img src="${item.thumbnail}" alt="상품이미지" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
-				                                        </c:when>
-				                                        <c:otherwise><i class="ri-image-line"></i></c:otherwise>
-				                                    </c:choose>
-				                                </div>
-				                                <div class="item-info">
-				                                    <h4>${item.title}</h4>
-				                                    <p class="info-metrics">${item.status} · ${item.location}</p>
-				                                </div>
-				                                <div class="item-right">
-				                                    <strong class="price"><fmt:formatNumber value="${item.price}" pattern="#,###"/>원</strong>
-				                                </div>
-				                            </div>
-				                        </c:forEach>
-				                    </c:otherwise>
-				                </c:choose>
-				            </div>
-				        </div>
+						    <div class="lc-list">
+						        <c:choose>
+						            <c:when test="${empty wishList}">
+						                <div class="lc-empty">
+						                    <i class="ri-heart-line"></i>
+						                    <p>찜한 상품이 없습니다.</p>
+						                </div>
+						            </c:when>
+						            <c:otherwise>
+						                <c:forEach var="item" items="${wishList}">
+						                    <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/article?productIdx=${item.productIdx}'">
+						                        <div class="item-thumb">
+						                            <c:choose>
+						                                <c:when test="${not empty item.imageList}">
+						                                    <img src="${pageContext.request.contextPath}/uploads/trade/${item.imageList[0].saveName}" alt="상품이미지">
+						                                </c:when>
+						                                <c:when test="${not empty item.imgUrl}">
+						                                    <img src="${item.imgUrl}" alt="상품이미지">
+						                                </c:when>
+						                                <c:otherwise>
+						                                    <i class="ri-image-line"></i>
+						                                </c:otherwise>
+						                            </c:choose>
+						                        </div>
+						
+						                        <div class="item-info">
+						                            <h4>${item.title}</h4>
+						                            <p class="info-metrics">
+						                                ${item.tradeStatus} · ${item.dong}
+						                            </p>
+						                        </div>
+						
+						                        <div class="item-right">
+						                        	<span class="${item.tradeStatus == '판매완료' ? 'theme-badge-done' : 'theme-badge'}">${item.tradeStatus}</span>
+						                            <strong class="price">
+						                                <fmt:formatNumber value="${item.price}" pattern="#,###"/>원
+						                            </strong>
+						                        </div>
+						                    </div>
+						                </c:forEach>
+						            </c:otherwise>
+						        </c:choose>
+						    </div>
+						</div>
 						
 						<div class="inner-section" id="trade-follower">
 						    <div class="lc-list">
@@ -590,6 +600,7 @@
 	<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_main.js"></script>
 	<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_follow.js"></script>
 	<script src="${pageContext.request.contextPath}/dist/js/payment/payment.js"></script>
+	<script src="${pageContext.request.contextPath}/dist/js/util/timeAgo.js"></script>
 	
 
 	<script>

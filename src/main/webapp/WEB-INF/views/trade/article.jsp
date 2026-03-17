@@ -215,7 +215,7 @@
                         <p class="seller-name">${trade.nickName}</p>
                         <p class="seller-region">
                             <c:choose>
-                                <c:when test="${not empty trade.coreAddress}">${trade.coreAddress}</c:when>
+                                <c:when test="${not empty trade.dong}">${trade.dong}</c:when>
                                 <c:otherwise>동네 정보 없음</c:otherwise>
                             </c:choose>
                         </p>

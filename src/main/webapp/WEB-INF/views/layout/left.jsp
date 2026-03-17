@@ -29,7 +29,7 @@
 				<li><a href="${pageContext.request.contextPath}/trade/list">
 						<i class="ri-shopping-bag-line"></i> 중고거래
 				</a></li>
-				<li><a href="${pageContext.request.contextPath}/crew/list">
+				<li><a href="${pageContext.request.contextPath}/crew/main">
 						<i class="ri-team-line"></i> 동네모임
 				</a></li>
 				<li><a href="${pageContext.request.contextPath}/alba/list">

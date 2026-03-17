@@ -37,7 +37,7 @@ public class Trade {
 	private String latitude;
 	private String longitude;
 	private String regionCode;
-	private String coreAddress;
+	private String dong;
 
 	private String lastUpDate;
 	private String createdDate;

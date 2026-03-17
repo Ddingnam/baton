@@ -23,6 +23,7 @@ import com.sp.app.service.FollowService;
 import com.sp.app.service.MemberService;
 import com.sp.app.service.MypageService;
 import com.sp.app.service.TradeService;
+import com.sp.app.service.WishListService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ public class MyPageController {
     private final MemberService memberService;
     private final TradeService tradeService;
     private final FollowService followService;
+    private final WishListService wishListService;
 
     @GetMapping({"", "/", "/main"})
     public String main(Model model, Authentication auth) {
@@ -64,7 +66,8 @@ public class MyPageController {
             }
             
             model.addAttribute("tradeList", tradeList);
-            
+            model.addAttribute("buyList", tradeService.findBuyList(userIdx));
+            model.addAttribute("wishList", wishListService.findWishList(userIdx));
         }
 
         return "mypage/main";
