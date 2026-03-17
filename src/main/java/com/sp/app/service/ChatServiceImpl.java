@@ -103,4 +103,41 @@ public class ChatServiceImpl implements ChatService {
         map.put("userIdx", userIdx);
         mapper.hideChatRoom(map);
     }
+    @Override
+    public Map<String, Object> getAlbaInfo(Long albaIdx) {
+        return mapper.getAlbaInfo(albaIdx);
+    }
+    
+    @Override
+    public List<ChatRoom> listAlbaChatRoom(Long albaIdx, Long myUserIdx) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("albaIdx", albaIdx);
+        map.put("myUserIdx", myUserIdx);
+        return mapper.listAlbaChatRoom(map);
+    }
+
+    @Override
+    public Long createOrGetAlbaRoom(Long albaIdx, Long sellerIdx, Long buyerIdx) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("albaIdx", albaIdx);
+        map.put("sellerIdx", sellerIdx);
+        map.put("buyerIdx", buyerIdx);
+
+        // 1. 방이 이미 있는지 확인
+        Long roomIdx = mapper.findAlbaChatRoom(map);
+        
+        // 2. 방이 없으면 새로 생성
+        if(roomIdx == null) {
+            mapper.insertAlbaChatRoom(map);
+            roomIdx = (Long) map.get("roomIdx");
+
+            map.put("roomIdx", roomIdx);
+            map.put("userIdx", sellerIdx);
+            mapper.insertChatMember(map);
+            
+            map.put("userIdx", buyerIdx);
+            mapper.insertChatMember(map); 
+        }
+        return roomIdx;
+    }
 }

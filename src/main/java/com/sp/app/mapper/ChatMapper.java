@@ -23,4 +23,9 @@ public interface ChatMapper {
     List<Long> getRoomMembers(Long roomIdx);
     void hideChatRoom(Map<String, Object> map);
     void updateRoomVisibleTrue(Long roomIdx);
+    Long findAlbaChatRoom(Map<String, Object> map);
+    void insertAlbaChatRoom(Map<String, Object> map);
+    Map<String, Object> getAlbaInfo(Long albaIdx);
+    List<ChatRoom> listAlbaChatRoom(Map<String, Object> map);
+    
 }

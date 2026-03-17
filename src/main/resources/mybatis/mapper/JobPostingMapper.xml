@@ -115,16 +115,13 @@
 
 	<select id="findById" resultType="com.sp.app.model.JobPosting">
 		SELECT
-		posting_idx AS
-		postingIdx,
+		posting_idx AS postingIdx,
 		user_idx AS userIdx,
 		region_idx AS regionIdx,
-		pay_type AS
-		payType,
+		pay_type AS payType,
 		work_period AS workPeriod,
 		work_days AS workDays,
-		start_time AS
-		startTime,
+		start_time AS startTime,
 		end_time AS endTime,
 		time_negotiable AS timeNegotiable,
 		title, employer, description, pay,
@@ -133,10 +130,9 @@
     	location_lat AS locationLat,
     	location_lng AS locationLng,
 		contact, benefits,
-		category,deadline,created_date
-		FROM job_posting
-		WHERE posting_idx =
-		#{postingIdx}
+		category, deadline, created_date,
+		hit_count AS hitCount FROM job_posting
+		WHERE posting_idx = #{postingIdx}
 	</select>
 
 	<update id="updateHitCount" parameterType="long">

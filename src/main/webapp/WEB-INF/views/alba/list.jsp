@@ -248,7 +248,10 @@ const serverData = [
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-
+	if (typeof applyFilters === 'function') {
+        applyFilters(); 
+    }
+	/*
     const userSido = "${empty loginMember ? '' : loginMember.userRegionInfo.mainRegion.sido}";
     const userGugun = "${empty loginMember ? '' : loginMember.userRegionInfo.mainRegion.sigungu}";
     const userDong = "${empty loginMember ? '' : loginMember.userRegionInfo.mainRegion.dong}";
@@ -259,7 +262,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof applyAreaFilterAuto === 'function') {
             applyAreaFilterAuto(userSido, userGugun, userDong);
         }
-    } 
+    }
+    
     else if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             const lat = position.coords.latitude;
@@ -280,6 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+	*/
 });
 </script>
 </body>

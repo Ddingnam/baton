@@ -103,4 +103,53 @@ public class ChatRoomController {
 
         return chatService.getUnreadTotalCount(userDetails.getUserIdx());
     }
+    
+    @GetMapping("/albaRoom")
+    public String enterRoomByAlba(@RequestParam("albaIdx") Long albaIdx,
+                                  @RequestParam("toUserIdx") Long toUserIdx,
+                                  @AuthenticationPrincipal CustomUserDetails userDetails,
+                                  Model model) {
+        if (userDetails == null) return "redirect:/member/login";
+        
+        Long myUserIdx = userDetails.getUserIdx();
+
+        if (myUserIdx.equals(toUserIdx)) {
+        	return "redirect:/alba/article/" + albaIdx;
+        }
+
+        // 알바 전용 방 생성 메서드 호출
+        Long roomIdx = chatService.createOrGetAlbaRoom(albaIdx, toUserIdx, myUserIdx);
+
+        String counterpartNickname = chatService.getCounterpartNickname(roomIdx, myUserIdx);
+        chatService.updateLastReadDate(roomIdx, myUserIdx);
+        List<ChatMessage> list = chatService.listChatMessage(roomIdx);
+
+        model.addAttribute("roomIdx", roomIdx);
+        model.addAttribute("userIdx", myUserIdx);
+        model.addAttribute("chatList", list);
+        model.addAttribute("counterpartName", counterpartNickname);
+        
+        // 알바 정보 가져오기
+        Map<String, Object> albaInfo = chatService.getAlbaInfo(albaIdx);
+        model.addAttribute("albaInfo", albaInfo);
+        
+        return "chat/room"; // JSP는 기존꺼 재활용
+    }
+    
+    @GetMapping("/albaList")
+    public String albaChatList(@RequestParam("albaIdx") Long albaIdx,
+                               @AuthenticationPrincipal CustomUserDetails userDetails,
+                               Model model) {
+        if (userDetails == null) return "redirect:/member/login";
+        
+        Long myUserIdx = userDetails.getUserIdx();
+        List<ChatRoom> list = chatService.listAlbaChatRoom(albaIdx, myUserIdx);
+        
+        model.addAttribute("list", list);
+        model.addAttribute("albaIdx", albaIdx);
+        model.addAttribute("myUserIdx", myUserIdx);
+        model.addAttribute("isAlba", true);
+        
+        return "chat/albaList"; 
+    }
 }

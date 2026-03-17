@@ -18,4 +18,7 @@ public interface ChatService {
     int getUnreadTotalCount(Long myUserIdx);
     List<Long> getRoomMembers(Long roomIdx);
     void deleteChatRoom(Long roomIdx, Long userIdx);
+    Long createOrGetAlbaRoom(Long albaIdx, Long sellerIdx, Long buyerIdx);
+    Map<String, Object> getAlbaInfo(Long albaIdx);
+    List<ChatRoom> listAlbaChatRoom(Long albaIdx, Long myUserIdx);
 }

@@ -60,7 +60,7 @@ function applyFilters() {
 	}
 
 	if (minPay > 0) {
-		jobs = jobs.filter(j => j.payTypeKey !== 'hour' || j.pay >= minPay);
+		jobs = jobs.filter(j => j.payType !== 'hour' || j.pay >= minPay);
 	}
 
 	if (sort === 'pay_high') {

@@ -57,55 +57,74 @@
     </div>
 
     <section id="section-conditions" class="scroll-section summary-section">
-       <div class="summary-section">
-           <div class="pay-highlight-container">
-                <div class="pay-top">
-                    <span class="pay-badge">${dto.payType}</span>
-                    <strong class="pay-amount"><fmt:formatNumber value="${dto.pay}" pattern="#,###"/>원</strong>
-                </div>
-                <div class="pay-info-tags">
-                    <span class="info-tag light">협의가능</span>
-                    <span class="info-tag blue">주휴포함</span>
-                </div>
-                <div class="min-wage-info">
-                    2026년 최저시급 10,320원 
-                    <button type="button" class="btn-calc-mini"><i class="ri-calculator-line"></i> 급여계산기</button>
-                </div>
-            </div>
-        </div>			
-        <ul class="summary-list">
-            <li>
-                <i class="ri-calendar-check-line"></i>
-                <div class="summary-text">
-                    <span class="label">근무기간</span>
-                    <span class="value">
-					    <c:choose>
-					        <c:when test="${dto.workPeriod == 'MORE_THAN_A_YEAR'}">1년 이상</c:when>
-					        <c:when test="${dto.workPeriod == 'MORE_THAN_A_MONTH'}">1개월~6개월</c:when>
-					        <c:when test="${dto.workPeriod == 'LESS_THAN_A_MONTH'}">1개월 미만(단기)</c:when>
-					        <c:otherwise>${dto.workPeriod}</c:otherwise>
-					    </c:choose>
-					</span>
-                </div>
-            </li>
-
-            <li>
-                <i class="ri-calendar-event-line"></i>
-                <div class="summary-text">
-                    <span class="label">근무요일</span>
-                    <span class="value">${koreanDays}</span>
-                </div>
-            </li>
-
-            <li>
-                <i class="ri-time-line"></i>
-                <div class="summary-text">
-                    <span class="label">근무시간</span>
-                    <span class="value">${dto.workTime}</span>
-                </div>
-            </li>
-        </ul>
-    </section>
+	   <div class="summary-section">
+	       <div class="pay-highlight-container">
+	            <div class="pay-top">
+	                <span class="pay-badge">${dto.payType}</span>
+	                <strong class="pay-amount"><fmt:formatNumber value="${dto.pay}" pattern="#,###"/>원</strong>
+	            </div>
+	            <div class="pay-info-tags">
+	                <span class="info-tag light">협의가능</span>
+	                <span class="info-tag blue">주휴포함</span>
+	            </div>
+	            <div class="min-wage-info">
+	                2026년 최저시급 10,320원 
+	                <button type="button" class="btn-calc-mini"><i class="ri-calculator-line"></i> 급여계산기</button>
+	            </div>
+	        </div>
+	    </div>			
+	    <ul class="summary-list">
+	        <li>
+	            <i class="ri-calendar-check-line"></i>
+	            <div class="summary-text">
+	                <span class="label">근무기간</span>
+	                <span class="value">
+	                    <c:choose>
+	                        <c:when test="${dto.workPeriod == 'MORE_THAN_A_YEAR'}">1년 이상</c:when>
+	                        <c:when test="${dto.workPeriod == 'MORE_THAN_A_MONTH'}">1개월~6개월</c:when>
+	                        <c:when test="${dto.workPeriod == 'LESS_THAN_A_MONTH'}">1개월 미만(단기)</c:when>
+	                        <c:otherwise>${dto.workPeriod}</c:otherwise>
+	                    </c:choose>
+	                </span>
+	            </div>
+	        </li>
+	
+	        <li>
+	            <i class="ri-calendar-event-line"></i>
+	            <div class="summary-text">
+	                <span class="label">근무요일</span>
+	                <span class="value">${koreanDays}</span>
+	            </div>
+	        </li>
+	
+	        <li>
+	            <i class="ri-time-line"></i>
+	            <div class="summary-text">
+	                <span class="label">근무시간</span>
+	                <span class="value">${dto.workTime}</span>
+	            </div>
+	        </li>
+	    </ul>
+	
+	    <div class="map-container-wrapper" style="margin-top: 30px;">
+	        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--text-main);">근무지 위치</h3>
+	        
+	        <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 12px 16px; border-radius: 10px; margin-bottom: 12px;">
+	            <span style="font-size: 14px; color: var(--text-sub); word-break: keep-all;">
+	                <i class="ri-map-pin-line" style="vertical-align: middle; margin-right: 4px; font-size: 16px;"></i> 
+	                ${dto.location}
+	            </span>
+	            <button type="button" onclick="copyAddress('${dto.location}')" style="white-space:nowrap; background: #fff; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; color: var(--text-main); cursor: pointer; transition: background 0.2s;">
+	                주소 복사
+	            </button>
+	        </div>
+	        
+	        <div id="map" style="width: 100%; height: 220px; border-radius: 10px; border: 1px solid var(--border-color); z-index: 1;"></div>
+	        
+	        <input type="hidden" id="mapAddress" value="${dto.location}">
+	        <input type="hidden" id="mapPlaceName" value="${dto.employer}">
+	    </div>
+	</section>
 
     <div class="divider"></div>
 
@@ -186,10 +205,10 @@
                 <i class="${isWished ? 'ri-heart-3-fill' : 'ri-heart-3-line'}"></i>
             </button>
         </div>
-        <div class="bottom-right">
+       <div class="bottom-right">
             <sec:authorize access="isAnonymous()">
-                <button class="btn-action btn-call" onclick="location.href='tel:${dto.contact}'">
-                    <i class="ri-phone-fill"></i> 전화/문자
+                <button class="btn-action btn-call" onclick="location.href='${pageContext.request.contextPath}/member/login'">
+                    <i class="ri-wechat-line"></i> 1:1 문의
                 </button>
                 <button class="btn-action btn-apply" onclick="location.href='${pageContext.request.contextPath}/member/login'">
                     <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
@@ -212,10 +231,12 @@
                         </button>
                     </c:when>
                     <c:otherwise>
-                        <button class="btn-action btn-call" onclick="location.href='tel:${dto.contact}'"><i class="ri-phone-fill"></i> 전화/문자</button>
-                        <button class="btn-action btn-apply" onclick="window.open('${pageContext.request.contextPath}/chat/room?albaIdx=${dto.postingIdx}&toUserIdx=${dto.userIdx}', 'chatRoom', 'width=450,height=850')">
+                        <button class="btn-action btn-call" onclick="window.open('${pageContext.request.contextPath}/chat/albaRoom?albaIdx=${dto.postingIdx}&toUserIdx=${dto.userIdx}', 'chatRoom', 'width=450,height=850')">
+                            <i class="ri-wechat-line"></i> 1:1 채팅하기
+                        </button>
+                        <button class="btn-action btn-apply" onclick="window.open('${pageContext.request.contextPath}/chat/albaRoom?albaIdx=${dto.postingIdx}&toUserIdx=${dto.userIdx}', 'chatRoom', 'width=450,height=850')">
                             <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
-                            <span>온라인 지원</span>
+                            <span>채팅으로 지원하기</span>
                         </button>
                     </c:otherwise>
                 </c:choose>
