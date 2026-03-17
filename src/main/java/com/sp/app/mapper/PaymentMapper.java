@@ -30,4 +30,8 @@ public interface PaymentMapper {
     public void insertPointHistoryForRefund(Map<String, Object> map) throws Exception;
     public String getUserAddress(long userIdx) throws Exception;
     public List<Map<String, Object>> getExpiredShippingTransactions() throws Exception;
+    public List<PointHistory> getPointHistoryByUser(long userIdx);
+    public Payment getLatestChargePayment(long userIdx);
+    public void updatePaymentCancel(long paymentIdx);
+    public void deductUserPointForRefund(Map<String, Object> map);
 }

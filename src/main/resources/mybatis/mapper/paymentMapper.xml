@@ -164,5 +164,35 @@
 	    WHERE TRADESTATUS = 'SHIPPING' 
 	    AND SHIPPINGDATE <![CDATA[ <= ]]> SYSDATE - 3
 	</select>
+	
+	<select id="getPointHistoryByUser" parameterType="long" resultType="com.sp.app.model.PointHistory">
+        SELECT HISTORYIDX, PAYMENTIDX, TRADEIDX, AMOUNT, HISTORYTYPE, USERIDX, TOTALPOINT
+        FROM POINTHISTORY
+        WHERE USERIDX = #{userIdx}
+        ORDER BY HISTORYIDX DESC
+    </select>
+
+    <select id="getLatestChargePayment" parameterType="long" resultType="com.sp.app.model.Payment">
+        SELECT * FROM (
+            SELECT PAYMENTIDX, IMPUID, MERCHANTUID, CHARGEAMOUNT, PAYMETHOD, PAYSTATUS, USERIDX
+            FROM PAYMENT
+            WHERE USERIDX = #{userIdx} 
+              AND PAYSTATUS = 'PAID'
+              AND PAYDATE >= SYSDATE - 3
+            ORDER BY PAYMENTIDX DESC
+        ) WHERE ROWNUM = 1
+    </select>
+
+    <update id="updatePaymentCancel" parameterType="long">
+        UPDATE PAYMENT
+        SET PAYSTATUS = 'CANCELED'
+        WHERE PAYMENTIDX = #{paymentIdx}
+    </update>
+
+    <update id="deductUserPointForRefund" parameterType="map">
+        UPDATE USERS
+        SET BATONPOINT = BATONPOINT - #{refundAmount}
+        WHERE USERIDX = #{userIdx}
+    </update>
     
 </mapper>

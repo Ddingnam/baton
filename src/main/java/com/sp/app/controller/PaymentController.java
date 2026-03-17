@@ -3,6 +3,7 @@ package com.sp.app.controller;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -54,5 +55,44 @@ public class PaymentController {
             e.printStackTrace(); 
             return ResponseEntity.badRequest().body("DB 저장 중 오류 발생");
         }
+    }
+    
+
+    @GetMapping("/history")
+    public ResponseEntity<java.util.List<com.sp.app.model.PointHistory>> getPointHistory() {
+        try {
+            SessionInfo info = LoginMemberUtil.getSessionInfo();
+            if (info == null) return ResponseEntity.status(401).build();
+            return ResponseEntity.ok(paymentService.getPointHistoryByUser(info.getUserIdx()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/refund")
+    public ResponseEntity<Map<String, Object>> refundPoint() {
+        Map<String, Object> result = new java.util.HashMap<>();
+        try {
+            SessionInfo info = LoginMemberUtil.getSessionInfo();
+            if (info == null) {
+                result.put("state", "false");
+                result.put("msg", "로그인이 필요합니다.");
+                return ResponseEntity.ok(result);
+            }
+            
+            String msg = paymentService.refundLatestCharge(info.getUserIdx());
+            if ("SUCCESS".equals(msg)) {
+                result.put("state", "true");
+                result.put("msg", "정상적으로 환불(결제 취소) 처리되어 금액이 반환되었습니다.");
+            } else {
+                result.put("state", "false");
+                result.put("msg", msg);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("state", "false");
+            result.put("msg", "환불 처리 중 서버 오류가 발생했습니다.");
+        }
+        return ResponseEntity.ok(result);
     }
 }
