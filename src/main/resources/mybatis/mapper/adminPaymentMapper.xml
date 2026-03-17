@@ -4,52 +4,47 @@
 
     <sql id="where-list">
         <if test="schType == 'all'">
-            (INSTR(u.userId, #{kwd}) &gt; 0 OR INSTR(p.merchantUid, #{kwd}) &gt; 0)
+            (INSTR(u.USERID, #{kwd}) &gt; 0 OR INSTR(p.MERCHANTUID, #{kwd}) &gt; 0)
         </if>
         <if test="schType == 'userId'">
-            INSTR(u.userId, #{kwd}) &gt; 0
+            INSTR(u.USERID, #{kwd}) &gt; 0
         </if>
         <if test="schType == 'orderId'">
-            INSTR(p.merchantUid, #{kwd}) &gt; 0
+            INSTR(p.MERCHANTUID, #{kwd}) &gt; 0
         </if>
     </sql>
 
     <select id="dataCount" parameterType="map" resultType="Integer">
         SELECT NVL(COUNT(*), 0)
         FROM PAYMENT p
-        JOIN users u ON p.USERIDX = u.userIdx
+        JOIN USERS u ON p.USERIDX = u.USERIDX
         <where>
             <if test="kwd != null and kwd != ''">
                 <include refid="where-list"/>
             </if>
             <if test="status != null and status != ''">
-                <choose>
-                    <when test="status == 'charge'">AND p.PAYSTATUS = 'PAID'</when>
-                    <when test="status == 'refund'">AND p.PAYSTATUS = 'REFUND'</when>
-                    <otherwise>AND p.PAYSTATUS = #{status}</otherwise>
-                </choose>
+                AND p.PAYSTATUS = #{status}
             </if>
         </where>
     </select>
 
     <select id="listPayment" parameterType="map" resultType="map">
-        SELECT p.PAYMENTIDX as "paymentIdx", p.MERCHANTUID as "merchantUid", 
-               u.userId as "userId", u.nickname as "nickname", 
-               p.PAYMETHOD as "payMethod", p.CHARGEAMOUNT as "chargeAmount", 
+        SELECT p.PAYMENTIDX as "paymentIdx", 
+               p.MERCHANTUID as "merchantUid", 
+               u.USERID as "userId", 
+               u.NICKNAME as "nickname", 
+               p.PAYMETHOD as "payMethod", 
+               p.CHARGEAMOUNT as "chargeAmount", 
                TO_CHAR(p.PAIDAT, 'YYYY-MM-DD HH24:MI') as "paidAt", 
                p.PAYSTATUS as "payStatus"
         FROM PAYMENT p
-        JOIN users u ON p.USERIDX = u.userIdx
+        JOIN USERS u ON p.USERIDX = u.USERIDX
         <where>
             <if test="kwd != null and kwd != ''">
                 <include refid="where-list"/>
             </if>
             <if test="status != null and status != ''">
-                <choose>
-                    <when test="status == 'charge'">AND p.PAYSTATUS = 'PAID'</when>
-                    <when test="status == 'refund'">AND p.PAYSTATUS = 'REFUND'</when>
-                    <otherwise>AND p.PAYSTATUS = #{status}</otherwise>
-                </choose>
+                AND p.PAYSTATUS = #{status}
             </if>
         </where>
         ORDER BY p.PAIDAT DESC

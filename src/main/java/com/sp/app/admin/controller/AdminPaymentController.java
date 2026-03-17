@@ -1,6 +1,5 @@
 package com.sp.app.admin.controller;
 
-// 필요한 클래스들을 모두 import 해줍니다.
 import com.sp.app.admin.service.AdminPaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -39,7 +38,7 @@ public class AdminPaymentController {
         map.put("pageSize", pageSize);
 
         List<Map<String, Object>> list = adminPaymentService.listPayment(map);
-        int totalCount = adminPaymentService.dataCount(map); 
+        int totalCount = adminPaymentService.dataCount(map);
         int totalPages = (int) Math.ceil((double) totalCount / pageSize);
 
         model.addAttribute("list", list);

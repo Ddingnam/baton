@@ -1,12 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>BATON Studio · 결제/포인트 관리</title>
+    <title>BATON Studio · 포인트 결제 내역</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
@@ -23,24 +24,7 @@
             <div class="hero-header">
                 <div class="hero-titles">
                     <h1 class="hero-title">Payment History</h1>
-                    <p class="hero-subtitle">포인트 충전, 환불 및 에스크로 결제 내역을 관리합니다.</p>
-                </div>
-            </div>
-
-            <div class="member-stat-row">
-                <div class="member-stat-card">
-                    <div class="msc-icon purple"><i class="ri-money-dollar-circle-fill"></i></div>
-                    <div class="msc-info">
-                        <span class="msc-val">12,050,000</span>
-                        <span class="msc-lbl">누적 결제액(원)</span>
-                    </div>
-                </div>
-                <div class="member-stat-card">
-                    <div class="msc-icon green"><i class="ri-secure-payment-fill"></i></div>
-                    <div class="msc-info">
-                        <span class="msc-val">4,200,000</span>
-                        <span class="msc-lbl">에스크로 보관금(원)</span>
-                    </div>
+                    <p class="hero-subtitle">포인트 충전 및 결제 내역을 조회하고 관리합니다.</p>
                 </div>
             </div>
 
@@ -48,11 +32,11 @@
                 <form class="toolbar-form" id="searchForm" method="get" action="${pageContext.request.contextPath}/admin/payment/list">
                     <div class="status-tabs">
                         <a href="?schType=${schType}&kwd=${kwd}" class="status-tab ${empty status ? 'active' : ''}">전체 내역</a>
-                        <a href="?status=charge&schType=${schType}&kwd=${kwd}" class="status-tab ${status == 'charge' ? 'active' : ''}">
-                            <span class="tab-dot green"></span>충전
+                        <a href="?status=PAID&schType=${schType}&kwd=${kwd}" class="status-tab ${status == 'PAID' ? 'active' : ''}">
+                            <span class="tab-dot green"></span>결제완료
                         </a>
-                        <a href="?status=refund&schType=${schType}&kwd=${kwd}" class="status-tab ${status == 'refund' ? 'active' : ''}">
-                            <span class="tab-dot red"></span>환불
+                        <a href="?status=CANCELLED&schType=${schType}&kwd=${kwd}" class="status-tab ${status == 'CANCELLED' ? 'active' : ''}">
+                            <span class="tab-dot red"></span>결제취소
                         </a>
                     </div>
                     <input type="hidden" name="status" value="${status}">
@@ -77,11 +61,11 @@
                     <table class="modern-table">
                         <thead>
                             <tr>
-                                <th>주문번호</th>
-                                <th>결제자(ID)</th>
-                                <th>결제유형</th>
-                                <th>금액</th>
-                                <th>결제/승인일</th>
+                                <th>주문번호(상점)</th>
+                                <th>결제자</th>
+                                <th>결제수단</th>
+                                <th>충전금액(원)</th>
+                                <th>결제일시</th>
                                 <th>상태</th>
                                 <th>관리</th>
                             </tr>
@@ -91,26 +75,48 @@
                                 <tr>
                                     <td colspan="7" class="empty-row">
                                         <i class="ri-file-search-line" style="font-size: 2rem; color: var(--color-gray-400); display: block; margin-bottom: 10px;"></i>
-                                        <span>결제 내역이 없습니다.</span>
+                                        <span>조회된 결제 내역이 없습니다.</span>
                                     </td>
                                 </tr>
                             </c:if>
-                            
+
                             <c:forEach var="pay" items="${list}">
                                 <tr>
-                                    <td class="font-medium">#ORD-20260317-001</td>
+                                    <td class="font-medium">${pay.merchantUid}</td>
                                     <td>
                                         <div class="member-cell">
-                                            <div class="member-avt">어</div>
+                                            <div class="member-avt">${fn:substring(pay.nickname, 0, 1)}</div>
                                             <div>
-                                                <div class="member-name">어진 (eojin)</div>
+                                                <div class="member-name">${pay.nickname}</div>
+                                                <div style="font-size:11px; color:#888;">${pay.userId}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="font-medium">포인트 충전</td>
-                                    <td class="font-medium" style="color: var(--color-green);">+50,000 원</td>
-                                    <td class="font-medium">2026-03-17 14:30</td>
-                                    <td><span class="tag tag-green">결제완료</span></td>
+                                    
+                                    <td class="font-medium" style="text-transform: uppercase;">
+                                        ${not empty pay.payMethod ? pay.payMethod : 'CARD'}
+                                    </td>
+                                    
+                                    <td class="font-medium" style="color: var(--color-green);">
+                                        +<fmt:formatNumber value="${pay.chargeAmount}" pattern="#,###"/> 원
+                                    </td>
+                                    
+                                    <td class="font-medium">${pay.paidAt}</td>
+                                    
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${pay.payStatus == 'PAID'}">
+                                                <span class="tag tag-green">결제완료</span>
+                                            </c:when>
+                                            <c:when test="${pay.payStatus == 'CANCELLED' or pay.payStatus == 'REFUND'}">
+                                                <span class="tag tag-red">취소/환불</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="tag tag-gray">${pay.payStatus}</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    
                                     <td>
                                         <button class="action-btn" title="상세보기"><i class="ri-eye-line"></i></button>
                                     </td>
