@@ -196,7 +196,7 @@
 				                                </div>
 				                                <div class="item-info">
 				                                    <h4>${item.title}</h4>
-				                                    <p class="time-ago info-metrics">${item.tradeStatus} · ${item.lastUpDate} · 조회 ${item.hitCount}</p>
+				                                    <p class="info-metrics"><span class="time-ago" data-time="${item.lastUpDate}">${item.lastUpDate}</span> · 조회 ${item.hitCount} · 찜 ${item.likeCount}</p>
 				                                </div>
 				                                <div class="item-right">
 				                                    <span class="${item.tradeStatus == '판매완료' ? 'theme-badge-done' : 'theme-badge'}">${item.tradeStatus}</span>
@@ -237,7 +237,7 @@
 						                        </div>
 						                        <div class="item-info">
 						                            <h4>${item.title}</h4>
-						                            <p class="info-metrics"> ${item.tradeStatus == 'CANCELED' ? '결제취소' : item.tradeStatus == 'PAY_COMPLETED' ? '결제완료' : item.tradeStatus == 'SHIPPING' ? '배송중' : '거래완료'} · ${item.dong} </p>
+						                            <p class="info-metrics"><span class="time-ago" data-time="${item.tradeDate}">${item.tradeDate} </span> 구매 · 조회 ${item.hitCount} · 찜 ${item.likeCount} </p>
 						                        </div>
 						                        <div class="item-right">
 						                        	<span class="${item.tradeStatus == 'CANCELED' ? 'theme-badge-done' : 'theme-badge'}">${item.tradeStatus == 'CANCELED' ? '결제취소' : item.tradeStatus == 'PAY_COMPLETED' ? '결제완료' : item.tradeStatus == 'SHIPPING' ? '배송중' : '거래완료'}</span>
@@ -281,7 +281,7 @@
 						                        <div class="item-info">
 						                            <h4>${item.title}</h4>
 						                            <p class="info-metrics">
-						                                ${item.tradeStatus} · ${item.dong}
+						                                <span class="time-ago" data-time="${item.lastUpDate}">${item.lastUpDate}</span> · 조회 ${item.hitCount} · 찜 ${item.likeCount}
 						                            </p>
 						                        </div>
 						

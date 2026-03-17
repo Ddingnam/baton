@@ -4,21 +4,15 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.sp.app.common.StorageService;
-import com.sp.app.domain.entity.Product;
-import com.sp.app.domain.entity.WishList;
-import com.sp.app.domain.entity.WishListId;
 import com.sp.app.mapper.TradeMapper;
 import com.sp.app.model.Trade;
 import com.sp.app.model.TradeImg;
-import com.sp.app.repository.ProductRepository;
-import com.sp.app.repository.WishListRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 public class TradeServiceImpl implements TradeService {
 	private final TradeMapper mapper;
 	private final StorageService storageService;
-	private final ProductRepository productRepository;
-    private final WishListRepository wishListRepository;
     private final NotificationService notificationService;
 
 	@Override

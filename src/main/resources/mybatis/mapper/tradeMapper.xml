@@ -243,7 +243,7 @@
     </select>
     
     <select id="findWishListByUserIdx" parameterType="long" resultType="com.sp.app.model.Trade">
-	    SELECT t.productIdx, t.title, t.price, t.tradeStatus, t.lastUpDate, t.hitCount, t.regionCode, r.dong
+	    SELECT t.productIdx, t.title, t.price, t.tradeStatus, t.lastUpDate, t.hitCount, t.likeCount, t.regionCode, r.dong
 	    FROM product t
 	    JOIN wishList w ON t.productIdx = w.productIdx
 	    JOIN region r ON t.regionCode = r.regionCode
@@ -252,7 +252,7 @@
 	</select>
 	
 	<select id="findBuyListByUserIdx" parameterType="long" resultType="com.sp.app.model.Trade">
-		SELECT t.productIdx, t.title, t.price, t.lastUpDate, t.hitCount, tr.tradeDate, tr.tradeStatus AS tradeStatus, r.dong
+		SELECT t.productIdx, t.title, t.price, t.lastUpDate, t.hitCount, t.likeCount, tr.tradeDate, tr.tradeStatus AS tradeStatus, r.dong
 	    FROM product t
 	    JOIN tradetransaction tr ON t.productIdx = tr.productIdx
 	    JOIN region r ON t.regionCode = r.regionCode

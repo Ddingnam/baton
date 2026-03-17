@@ -42,6 +42,7 @@ public class Trade {
 	private String lastUpDate;
 	private String createdDate;
 	private String updatedDate;
+	private String tradeDate;
 	
 	private long categoryIdx;
 	private String categoryName;
