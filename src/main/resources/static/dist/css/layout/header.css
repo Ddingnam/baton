@@ -239,6 +239,10 @@ html {
     order: 1 !important;
 }
 
+#crew-chat-trigger {
+    position: fixed;
+}
+
 .action-profile {
     display: flex !important;
     align-items: center !important;
