@@ -43,6 +43,7 @@ public class EscrowServiceImpl implements EscrowService {
         paramMap.put("totalPoint", currentPoint);
 
         paymentMapper.insertPointHistoryForEscrow(paramMap);
+        paymentMapper.updateArticleStatusToReserved(productIdx);
         
         notificationService.sendNotification(sellerIdx, "안전결제", "게시물에 안전결제가 접수되었습니다. 운송장을 입력해주세요.", "/trade/article?productIdx=" + productIdx);
     }

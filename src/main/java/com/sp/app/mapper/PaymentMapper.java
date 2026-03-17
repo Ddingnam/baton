@@ -23,6 +23,7 @@ public interface PaymentMapper {
     public void insertPointHistoryForSeller(Map<String, Object> map) throws Exception;
     public int checkTradeExist(long productIdx) throws Exception;
     public void updateArticleStatusToSoldOut(long productIdx) throws Exception;
+    public void updateArticleStatusToReserved(long productIdx) throws Exception;
     public int cancelTradeTransaction(long productIdx) throws Exception;
     public void updateArticleStatusToOnSale(long productIdx) throws Exception;
     public void refundBuyerPoint(Map<String, Object> map) throws Exception;

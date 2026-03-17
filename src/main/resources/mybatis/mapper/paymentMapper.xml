@@ -65,6 +65,12 @@
             SEQPOINTHISTORY.NEXTVAL, #{tradeIdx}, -#{totalUsedPoint}, 'USE_ESCROW', #{buyerIdx}, #{totalPoint}, SYSTIMESTAMP
         )
     </insert>
+    
+    <update id="updateArticleStatusToReserved" parameterType="long">
+	    UPDATE PRODUCT 
+	    SET TRADESTATUS = '예약중'
+	    WHERE PRODUCTIDX = #{productIdx}
+	</update>
 
 	<update id="updateShippingInfo" parameterType="map">
 	    UPDATE TRADETRANSACTION
