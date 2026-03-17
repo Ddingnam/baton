@@ -1,22 +1,16 @@
 @charset "UTF-8";
-/* ============================================================
-   admin_ui.css  —  토스트 & 커스텀 Confirm 모달
-   admin_main.css 다음에 포함
-============================================================ */
 
-/* ── 토스트 컨테이너 ───────────────────────────────────────── */
 #adminToastContainer {
     position: fixed;
-    bottom: 28px;
+    top: 28px;
     right: 28px;
     z-index: 99999;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; 
     gap: 10px;
     pointer-events: none;
 }
 
-/* ── 토스트 기본 ────────────────────────────────────────────── */
 .admin-toast {
     pointer-events: all;
     display: flex;
@@ -40,7 +34,6 @@
     transform: translateX(0) scale(1);
 }
 
-/* 타입별 테마 */
 .admin-toast--success { border-left-color: var(--color-green, #10B981); }
 .admin-toast--success .admin-toast__icon { color: var(--color-green, #10B981); }
 
@@ -82,7 +75,6 @@
     color: var(--text-main, #1E293B);
 }
 
-/* ── 커스텀 Confirm 오버레이 ─────────────────────────────────── */
 .admin-confirm-overlay {
     position: fixed;
     inset: 0;
@@ -102,7 +94,6 @@
     pointer-events: all;
 }
 
-/* ── Confirm 박스 ──────────────────────────────────────────── */
 .admin-confirm-box {
     background: var(--card-bg, #fff);
     border-radius: 22px;
@@ -122,7 +113,6 @@
     transform: translateY(0) scale(1);
 }
 
-/* 아이콘 래퍼 */
 .admin-confirm-icon-wrap {
     width: 60px;
     height: 60px;
