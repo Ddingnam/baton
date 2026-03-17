@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sp.app.admin.mapper.AdminReportMapper">
+
+    <select id="listReport" parameterType="map" resultType="com.sp.app.admin.domain.dto.ReportDto">
+        SELECT r.reportIdx, r.reporterIdx, r.reportedUserIdx,
+               r.domainType, r.targetIdx, r.reportType, r.reportContent,
+               TO_CHAR(r.reportDate, 'YYYY-MM-DD HH24:MI:SS') AS reportDate,
+               r.processStatus, 
+               TO_CHAR(r.processDate, 'YYYY-MM-DD HH24:MI:SS') AS processDate,
+               r.adminMemo,
+               u1.userId AS reporterId, u1.nickname AS reporterName,
+               u2.userId AS reportedUserId, u2.nickname AS reportedUserName
+        FROM adminReport r
+        JOIN users u1 ON r.reporterIdx = u1.userIdx
+        JOIN users u2 ON r.reportedUserIdx = u2.userIdx
+        <where>
+            <if test="processStatus != null and processStatus != ''">
+                r.processStatus = #{processStatus}
+            </if>
+            <if test="domainType != null and domainType != ''">
+                AND r.domainType = #{domainType}
+            </if>
+            <if test="kwd != null and kwd != ''">
+                AND (u1.userId LIKE '%' || #{kwd} || '%'
+                  OR u1.nickname LIKE '%' || #{kwd} || '%'
+                  OR u2.userId LIKE '%' || #{kwd} || '%'
+                  OR u2.nickname LIKE '%' || #{kwd} || '%')
+            </if>
+        </where>
+        ORDER BY r.reportIdx DESC
+        OFFSET #{offset} ROWS FETCH FIRST #{size} ROWS ONLY
+    </select>
+
+    <select id="dataCount" parameterType="map" resultType="Integer">
+        SELECT NVL(COUNT(*), 0)
+        FROM adminReport r
+        JOIN users u1 ON r.reporterIdx = u1.userIdx
+        JOIN users u2 ON r.reportedUserIdx = u2.userIdx
+        <where>
+            <if test="processStatus != null and processStatus != ''">
+                r.processStatus = #{processStatus}
+            </if>
+            <if test="domainType != null and domainType != ''">
+                AND r.domainType = #{domainType}
+            </if>
+            <if test="kwd != null and kwd != ''">
+                AND (u1.userId LIKE '%' || #{kwd} || '%'
+                  OR u1.nickname LIKE '%' || #{kwd} || '%'
+                  OR u2.userId LIKE '%' || #{kwd} || '%'
+                  OR u2.nickname LIKE '%' || #{kwd} || '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="getReport" parameterType="long" resultType="com.sp.app.admin.domain.dto.ReportDto">
+        SELECT r.reportIdx, r.reporterIdx, r.reportedUserIdx,
+               r.domainType, r.targetIdx, r.reportType, r.reportContent,
+               TO_CHAR(r.reportDate, 'YYYY-MM-DD HH24:MI:SS') AS reportDate,
+               r.processStatus,
+               TO_CHAR(r.processDate, 'YYYY-MM-DD HH24:MI:SS') AS processDate,
+               r.adminMemo,
+               u1.userId AS reporterId, u1.nickname AS reporterName,
+               u2.userId AS reportedUserId, u2.nickname AS reportedUserName
+        FROM adminReport r
+        JOIN users u1 ON r.reporterIdx = u1.userIdx
+        JOIN users u2 ON r.reportedUserIdx = u2.userIdx
+        WHERE r.reportIdx = #{reportIdx}
+    </select>
+
+    <update id="updateProcessStatus" parameterType="map">
+        UPDATE adminReport
+        SET processStatus = #{processStatus},
+            processDate   = CURRENT_TIMESTAMP,
+            adminMemo     = #{adminMemo}
+        WHERE reportIdx = #{reportIdx}
+    </update>
+
+</mapper>

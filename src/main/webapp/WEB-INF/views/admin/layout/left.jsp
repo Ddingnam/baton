@@ -14,8 +14,8 @@
             </a>
         </div>
 
-        <div class="nav-category">서비스 관리</div>
-          
+        <div class="nav-category">회원 관리</div>
+
         <div class="nav-box has-child">
             <a href="#" class="nav-btn">
                 <div class="nav-content">회원 관리</div>
@@ -27,28 +27,18 @@
                 <a href="${pageContext.request.contextPath}/admin/member/withdrawal" class="sub-item">탈퇴 요청 처리</a>
             </div>
         </div>
-        
+
+        <div class="nav-category">콘텐츠 관리</div>
+
         <div class="nav-box has-child">
             <a href="#" class="nav-btn">
                 <div class="nav-content">중고거래 관리</div>
                 <i class="ri-arrow-down-s-line nav-chev"></i>
             </a>
             <div class="sub-list">
-                <a href="${pageContext.request.contextPath}/admin/trade/list" class="sub-item">거래 게시글 관리</a>
-                <a href="${pageContext.request.contextPath}/admin/trade/report" class="sub-item">신고 게시글 처리</a>
+                <a href="${pageContext.request.contextPath}/admin/trade/list" class="sub-item">게시글 관리</a>
             </div>
         </div>
-        
-        <div class="nav-box has-child">
-		    <a href="#" class="nav-btn">
-		        <div class="nav-content">결제/포인트 관리</div>
-		        <i class="ri-arrow-down-s-line nav-chev"></i>
-		    </a>
-		    <div class="sub-list">
-		        <a href="${pageContext.request.contextPath}/admin/payment/list" class="sub-item">포인트 결제 내역</a>
-		        <a href="${pageContext.request.contextPath}/admin/escrow/list" class="sub-item">에스크로 거래 관리</a>
-		    </div>
-		</div>
 
         <div class="nav-box has-child">
             <a href="#" class="nav-btn">
@@ -61,6 +51,35 @@
                 <a href="${pageContext.request.contextPath}/admin/alba/list" class="sub-item">알바구인 관리</a>
             </div>
         </div>
+
+        <div class="nav-category">신고 관리</div>
+
+        <div class="nav-box has-child">
+            <a href="#" class="nav-btn">
+                <div class="nav-content">신고 처리</div>
+                <i class="ri-arrow-down-s-line nav-chev"></i>
+            </a>
+            <div class="sub-list">
+                <a href="${pageContext.request.contextPath}/admin/report/list?domainType=TRADE" class="sub-item">중고거래 신고</a>
+                <a href="${pageContext.request.contextPath}/admin/report/list?domainType=COMMUNITY" class="sub-item">커뮤니티 신고</a>
+                <a href="${pageContext.request.contextPath}/admin/report/list?domainType=USER" class="sub-item">사용자 신고</a>
+            </div>
+        </div>
+
+        <div class="nav-category">결제 · 포인트</div>
+
+        <div class="nav-box has-child">
+            <a href="#" class="nav-btn">
+                <div class="nav-content">결제 · 포인트</div>
+                <i class="ri-arrow-down-s-line nav-chev"></i>
+            </a>
+            <div class="sub-list">
+                <a href="${pageContext.request.contextPath}/admin/payment/list" class="sub-item">포인트 결제 내역</a>
+                <a href="${pageContext.request.contextPath}/admin/escrow/list" class="sub-item">에스크로 거래 관리</a>
+            </div>
+        </div>
+
+        <div class="nav-category">고객센터</div>
 
         <div class="nav-box has-child">
             <a href="#" class="nav-btn">
