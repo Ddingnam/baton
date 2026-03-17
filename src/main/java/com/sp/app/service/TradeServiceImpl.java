@@ -374,6 +374,22 @@ public class TradeServiceImpl implements TradeService {
 		}
 		return lastUpDate;
 	}
-	
+
+	@Override
+	public List<Trade> findBuyList(long userIdx) {
+		List<Trade> list = null;
+		try {
+			list = mapper.findBuyListByUserIdx(userIdx);
+			
+			for (Trade trade : list) {
+	            trade.setImageList(mapper.findImagesByIdx(trade.getProductIdx()));
+	        }
+			
+		} catch (Exception e) {
+			log.info("tradeBuyList : ", e);
+		}
+		
+		return list;
+	}
 
 }

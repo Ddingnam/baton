@@ -22,9 +22,12 @@ public interface TradeService {
 	public List<TradeImg> findImgsByIdx(long productIdx);
 	public List<String> findTagsByIdx(long productIdx);
 	public String findLastUpDateByIdx(long productIdx);
+	public List<Trade> findBuyList(long userIdx);
 	
 	public List<Trade> tradeList(Map<String, Object> map);
 	public List<Map<String, Object>> categoryList();
 	public int dataCount(Map<String, Object> map);
+	
+	
 	
 }

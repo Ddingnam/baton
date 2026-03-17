@@ -242,12 +242,21 @@
         SELECT userIdx FROM wishList WHERE productIdx = #{productIdx}
     </select>
     
-    <select id="findWishList" parameterType="long" resultType="com.sp.app.model.Trade">
+    <select id="findWishListByUserIdx" parameterType="long" resultType="com.sp.app.model.Trade">
 	    SELECT t.productIdx, t.title, t.price, t.tradeStatus, t.lastUpDate, t.hitCount, t.regionCode, r.dong
-	    FROM trade t
+	    FROM product t
 	    JOIN wishList w ON t.productIdx = w.productIdx
-	    JOIN region r ON t.regionIdx = r.regionIdx
+	    JOIN region r ON t.regionCode = r.regionCode
 	    WHERE w.userIdx = #{userIdx}
-	    ORDER BY t.productIdx DESC
+	    ORDER BY w.likeDate DESC
+	</select>
+	
+	<select id="findBuyListByUserIdx" parameterType="long" resultType="com.sp.app.model.Trade">
+		SELECT t.productIdx, t.title, t.price, t.lastUpDate, t.hitCount, tr.tradeDate, tr.tradeStatus AS tradeStatus, r.dong
+	    FROM product t
+	    JOIN tradetransaction tr ON t.productIdx = tr.productIdx
+	    JOIN region r ON t.regionCode = r.regionCode
+	    WHERE tr.BUYERIDX = #{userIdx}
+	    ORDER BY tr.tradeDate DESC
 	</select>
 </mapper>

@@ -45,4 +45,5 @@ public interface TradeMapper {
 	
 	public List<Long> getWishUserList(long productIdx);
 	public List<Trade> findWishListByUserIdx(long userIdx);
+	public List<Trade> findBuyListByUserIdx(long userIdx);
 }
