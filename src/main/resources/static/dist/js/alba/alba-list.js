@@ -344,12 +344,10 @@ function applyAreaFilter() {
 		.catch(err => console.error(err));
 }
 
-
-// 기존 코드 맨 아래에 추가해주세요.
-
-// 인증된 동네 혹은 GPS 동네 기반으로 초기 필터링을 세팅하고 리스트를 갱신하는 함수
 function applyAreaFilterAuto(sido, gugun, dong) {
-    // 1. 백엔드에서 필터링된 데이터 바로 가져오기
+	
+	sido = normalizeSido(sido);
+	console.log("변환 후 sido:", sido);
     fetch(`${CONTEXT_PATH}/alba/filter?sido=${sido}&gugun=${gugun}&dong=${dong}`)
         .then(res => res.json())
         .then(data => {
@@ -378,13 +376,11 @@ function applyAreaFilterAuto(sido, gugun, dong) {
 
     // 2. 필터 모달창 UI (시/도, 구/군, 동) 선택 상태 동기화
     const sidoList = document.querySelectorAll('#col-sido li');
-    sidoList.forEach(li => {
-        li.classList.remove('active');
-        // '서울특별시'와 '서울' 매칭 처리를 위해 includes 사용
-        if (sido.includes(li.textContent) || li.textContent.includes(sido)) {
-            li.classList.add('active');
-            loadGugunData(li.textContent); // 구/군 데이터 로드
-        }
+	sidoList.forEach(li => {
+		li.classList.remove('active');
+	    if (sido.includes(li.textContent) || li.textContent.includes(sido)) {
+	        li.click(); // 👈 li.classList.add('active') 대신 .click()으로 써야 구/군 목록이 나옵니다!
+	    }
     });
 
     // 구/군이 렌더링될 시간을 살짝 준 뒤 세팅
@@ -412,3 +408,13 @@ function applyAreaFilterAuto(sido, gugun, dong) {
         }, 300); 
     }, 100);
 }
+
+function normalizeSido(sido) {
+    if (!sido) return '';
+    return sido
+        .replace('특별시', '')
+        .replace('광역시', '')
+        .replace('특별자치시', '')
+        .replace('도', '');
+}
+

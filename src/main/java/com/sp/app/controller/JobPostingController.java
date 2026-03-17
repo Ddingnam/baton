@@ -33,6 +33,11 @@ public class JobPostingController {
 			@RequestParam(value = "gugun", required = false) String gugun,
 			@RequestParam(value = "dong", required = false) String dong,
 			@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+		
+		if (userDetails != null) {
+			model.addAttribute("loginMember", userDetails.getMember());
+		    model.addAttribute("member", userDetails.getMember());
+		}
 
 		int resumeCount = 0;
 		if (userDetails != null) {

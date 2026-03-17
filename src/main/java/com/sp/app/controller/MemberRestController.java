@@ -508,6 +508,8 @@ public class MemberRestController {
                 session.setAttribute("member", info);
             }
             
+            session.setAttribute("loginMember", userDetails.getMember()); // 슬쩍추가
+            
             model.put("state", "success");
             return ResponseEntity.ok(model);
 

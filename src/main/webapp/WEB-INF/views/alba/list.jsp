@@ -157,24 +157,32 @@
 								<i class="ri-map-pin-2-fill"></i> 현재 지역
 							</div>
 							<div class="location-name">
-								<%-- 💡 동네 인증 분기 처리 --%>
+							<div style="background:#222; color:#0f0; padding:10px; font-size:12px; margin-bottom:10px; border-radius:8px;">
+							    [데이터 확인용]<br>
+							    유저 정보: ${loginMember != null ? '정상' : '없음'}<br>
+							    지역 객체: ${loginMember.userRegionInfo != null ? '정상' : '없음'}<br>
+							    활성 지역: ${loginMember.userRegionInfo.activeRegion != null ? '정상' : '없음'}<br>
+							    시도: [${loginMember.userRegionInfo.activeRegion.sido}]<br>
+							    동: [${loginMember.userRegionInfo.activeRegion.dong}]
+							</div>
 								<c:choose>
-									<c:when test="${empty sessionScope.member}">
-										<a href="${pageContext.request.contextPath}/member/login" style="color: #3182f6; font-size: 15px; font-weight: 700; text-decoration: none;">
-											로그인이 필요합니다 <i class="ri-arrow-right-s-line"></i>
-										</a>
-									</c:when>
-									<c:when test="${empty sessionScope.member.userRegionInfo or empty sessionScope.member.userRegionInfo.activeRegion}">
-										<a href="${pageContext.request.contextPath}/member/townAuth" style="color: #ff6b6b; font-size: 15px; font-weight: 700; text-decoration: none;">
-											동네 인증하기 <i class="ri-map-pin-add-line"></i>
-										</a>
-									</c:when>
-									<c:otherwise>
-										${sessionScope.member.userRegionInfo.activeRegion.sido} 
-										${sessionScope.member.userRegionInfo.activeRegion.sigungu} 
-										<span>${sessionScope.member.userRegionInfo.activeRegion.dong}</span>
-										<a href="${pageContext.request.contextPath}/member/townAuth" style="margin-left: 6px; font-size: 11px; color: #adb5bd; text-decoration: underline;">변경</a>
-									</c:otherwise>
+								    <c:when test="${empty loginMember}">
+								        로그인 필요
+								    </c:when>
+								
+								   <c:when test="${not empty loginMember.userRegionInfo.activeRegion.sido}">
+								        ${loginMember.userRegionInfo.activeRegion.sido}
+    									${loginMember.userRegionInfo.activeRegion.sigungu}
+								        <span style="font-weight:700;">
+								            ${loginMember.userRegionInfo.activeRegion.dong}
+								        </span>
+								    </c:when>
+								
+								    <c:otherwise>
+								        <a href="${pageContext.request.contextPath}/member/regionAuth/main" style="color:#ff6b6b; text-decoration:underline;">
+                						동네 인증하기
+            							</a>
+								    </c:otherwise>
 								</c:choose>
 							</div>
 						</div>
@@ -236,15 +244,19 @@ const serverData = [
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const userSido = '${sessionScope.member.userRegionInfo.activeRegion.sido}' || ''; 
-    const userGugun = '${sessionScope.member.userRegionInfo.activeRegion.sigungu}' || '';
-    const userDong = '${sessionScope.member.userRegionInfo.activeRegion.dong}' || '';
+
+    const userSido = "${empty loginMember ? '' : loginMember.userRegionInfo.mainRegion.sido}";
+    const userGugun = "${empty loginMember ? '' : loginMember.userRegionInfo.mainRegion.sigungu}";
+    const userDong = "${empty loginMember ? '' : loginMember.userRegionInfo.mainRegion.dong}";
+
+    console.log(userSido, userGugun, userDong);
 
     if (userSido && userGugun && userDong) {
         if (typeof applyAreaFilterAuto === 'function') {
             applyAreaFilterAuto(userSido, userGugun, userDong);
         }
-    } else if (navigator.geolocation) {
+    } 
+    else if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
@@ -254,7 +266,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (status === kakao.maps.services.Status.OK) {
                     const addr = result.find(r => r.region_type === 'B');
                     if (addr && typeof applyAreaFilterAuto === 'function') {
-                        applyAreaFilterAuto(addr.region_1depth_name, addr.region_2depth_name, addr.region_3depth_name);
+                        applyAreaFilterAuto(
+                            addr.region_1depth_name,
+                            addr.region_2depth_name,
+                            addr.region_3depth_name
+                        );
                     }
                 }
             });
