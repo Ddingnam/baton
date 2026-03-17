@@ -157,7 +157,25 @@
 								<i class="ri-map-pin-2-fill"></i> 현재 지역
 							</div>
 							<div class="location-name">
-								서울 중구 <span>신당동</span>
+								<%-- 💡 동네 인증 분기 처리 --%>
+								<c:choose>
+									<c:when test="${empty sessionScope.member}">
+										<a href="${pageContext.request.contextPath}/member/login" style="color: #3182f6; font-size: 15px; font-weight: 700; text-decoration: none;">
+											로그인이 필요합니다 <i class="ri-arrow-right-s-line"></i>
+										</a>
+									</c:when>
+									<c:when test="${empty sessionScope.member.userRegionInfo or empty sessionScope.member.userRegionInfo.activeRegion}">
+										<a href="${pageContext.request.contextPath}/member/townAuth" style="color: #ff6b6b; font-size: 15px; font-weight: 700; text-decoration: none;">
+											동네 인증하기 <i class="ri-map-pin-add-line"></i>
+										</a>
+									</c:when>
+									<c:otherwise>
+										${sessionScope.member.userRegionInfo.activeRegion.sido} 
+										${sessionScope.member.userRegionInfo.activeRegion.sigungu} 
+										<span>${sessionScope.member.userRegionInfo.activeRegion.dong}</span>
+										<a href="${pageContext.request.contextPath}/member/townAuth" style="margin-left: 6px; font-size: 11px; color: #adb5bd; text-decoration: underline;">변경</a>
+									</c:otherwise>
+								</c:choose>
 							</div>
 						</div>
 						<div class="filter-section" data-filter-type="period">
@@ -218,50 +236,30 @@ const serverData = [
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const userSido = '${sessionScope.member.userRegionInfo.activeRegion.sido}' || ''; 
+    const userGugun = '${sessionScope.member.userRegionInfo.activeRegion.sigungu}' || '';
+    const userDong = '${sessionScope.member.userRegionInfo.activeRegion.dong}' || '';
 
-    const locationNameDiv = document.querySelector('.location-name');
-
-    if (navigator.geolocation) {
-
+    if (userSido && userGugun && userDong) {
+        if (typeof applyAreaFilterAuto === 'function') {
+            applyAreaFilterAuto(userSido, userGugun, userDong);
+        }
+    } else if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
-
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
-
             const geocoder = new kakao.maps.services.Geocoder();
 
             geocoder.coord2RegionCode(lon, lat, function(result, status) {
-
                 if (status === kakao.maps.services.Status.OK) {
-
                     const addr = result.find(r => r.region_type === 'B');
-
-                    if (addr) {
-
-                        const province = addr.region_1depth_name;
-                        const city = addr.region_2depth_name;
-                        const dong = addr.region_3depth_name;
-
-                        locationNameDiv.innerHTML = province + ' ' + city + ' <span>' + dong + '</span>';
-
-                        // 🔥 자동 지역 필터
-                        applyAreaFilterAuto(province, city, dong);
+                    if (addr && typeof applyAreaFilterAuto === 'function') {
+                        applyAreaFilterAuto(addr.region_1depth_name, addr.region_2depth_name, addr.region_3depth_name);
                     }
                 }
             });
-
-        }, function(error) {
-
-            console.warn("위치 정보를 가져올 수 없습니다.");
-
         });
-
-    } else {
-
-        console.warn("이 브라우저는 위치 정보를 지원하지 않습니다.");
-
     }
-
 });
 </script>
 </body>
