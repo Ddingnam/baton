@@ -312,3 +312,17 @@ function turnOffAlarmDots() {
     if(dot2) dot2.style.display = 'none';
 }
 
+function switchRegion(regionType) {
+    fetch(window.contextPath + '/member/api/switchActiveRegion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'regionType=' + regionType
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.state === 'success') {
+            location.reload();
+        }
+    })
+    .catch(err => console.error('switchRegion error:', err));
+}

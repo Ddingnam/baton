@@ -39,15 +39,18 @@
                 <sec:authorize access="isAuthenticated()">
 					<div class="user-action-group">
                         <div class="profile-dropdown-wrapper" id="profileDropdownWrapper">
+
+                            
                             <button type="button" class="action-profile" id="profileDropdownBtn">
                                 <div class="profile-thumb">
                                     <i class="ri-user-smile-fill"></i>
-                                </div> 
+                                </div>
                                 <span class="user-name"><sec:authentication property="principal.member.userId" />님</span>
                                 <i class="ri-arrow-down-s-line dropdown-arrow"></i>
                             </button>
-                            
+
                             <div class="profile-dropdown-menu" id="profileDropdownMenu">
+                                
                                 <div class="dropdown-header">
                                     <div class="dh-thumb"><i class="ri-user-smile-fill"></i></div>
                                     <div class="dh-info">
@@ -55,6 +58,42 @@
                                         <span>환영합니다!</span>
                                     </div>
                                 </div>
+
+                                
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-region-title">
+                                    <i class="ri-map-pin-2-fill"></i> 내 동네
+                                </div>
+                                <c:choose>
+                                    <c:when test="${not empty sessionScope.member.userRegionInfo
+                                                    && (not empty sessionScope.member.userRegionInfo.mainRegion
+                                                        || not empty sessionScope.member.userRegionInfo.subRegion)}">
+                                        <div class="region-tab-list">
+                                            <c:if test="${not empty sessionScope.member.userRegionInfo.mainRegion}">
+                                                <button type="button"
+                                                        class="region-tab-item ${sessionScope.member.userRegionInfo.activeType != 2 ? 'active' : ''}"
+                                                        onclick="switchRegion(1)">
+                                                    <span class="region-tab-name">${sessionScope.member.userRegionInfo.mainRegion.dong}</span>
+                                                </button>
+                                            </c:if>
+                                            <c:if test="${not empty sessionScope.member.userRegionInfo.subRegion}">
+                                                <button type="button"
+                                                        class="region-tab-item ${sessionScope.member.userRegionInfo.activeType == 2 ? 'active' : ''}"
+                                                        onclick="switchRegion(2)">
+                                                    <span class="region-tab-name">${sessionScope.member.userRegionInfo.subRegion.dong}</span>
+                                                </button>
+                                            </c:if>
+                                        </div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div style="padding: 8px 20px 10px; font-size: 13px; color: #8B95A1;">인증된 동네가 없어요</div>
+                                    </c:otherwise>
+                                </c:choose>
+                                <a href="${pageContext.request.contextPath}/member/townAuth" class="dropdown-item">
+                                    <i class="ri-map-pin-add-line"></i> 동네 설정
+                                </a>
+
+                                
                                 <div class="dropdown-divider"></div>
                                 <a href="${pageContext.request.contextPath}/mypage" class="dropdown-item mypage-link">
                                     <i class="ri-user-line"></i> 마이페이지
@@ -65,14 +104,13 @@
                                 <a href="${pageContext.request.contextPath}/chat/list" class="dropdown-item">
                                     <i class="ri-chat-1-line"></i> 채팅 및 알림 <span class="badge-dot-inline" style="display: none;"></span>
                                 </a>
-                                
                                 <div class="dropdown-divider"></div>
                                 <a href="${pageContext.request.contextPath}/member/logout" class="dropdown-item text-danger">
                                     <i class="ri-logout-box-r-line"></i> 로그아웃
                                 </a>
                             </div>
                         </div>
-                        
+
                         <sec:authorize access="hasAnyRole('ADMIN')">
                             <a href="${pageContext.request.contextPath}/admin" class="action-icon admin-icon" title="관리자 페이지">
                                 <i class="ri-settings-3-line"></i>

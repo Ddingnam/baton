@@ -97,13 +97,6 @@ public class MemberRestController {
 
         try {
         	guestInfo.clearAll();
-        	
-        	/*
-        	if(service.isEmailDuplicated(email)) {
-        		model.put("state", "duplicated");
-        		return ResponseEntity.ok(model);
-        	}
-        	*/
             
             String subject = "[BATON] 회원가입을 위한 이메일 인증번호입니다.";
             String authCode = MyUtil.generateAuthCode();
@@ -508,7 +501,7 @@ public class MemberRestController {
                 session.setAttribute("member", info);
             }
             
-            session.setAttribute("loginMember", userDetails.getMember()); // 슬쩍추가
+            session.setAttribute("loginMember", userDetails.getMember());
             
             model.put("state", "success");
             return ResponseEntity.ok(model);
@@ -518,5 +511,36 @@ public class MemberRestController {
             model.put("state", "serverError");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
         }
+    }
+
+    @PostMapping("api/switchActiveRegion")
+    public ResponseEntity<?> switchActiveRegion(
+            @RequestParam("regionType") int regionType,
+            HttpSession session) {
+        Map<String, Object> model = new HashMap<>();
+
+        SessionInfo info = (SessionInfo) session.getAttribute("member");
+        if (info == null) {
+            model.put("state", "unauthorized");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(model);
+        }
+
+        UserRegionInfo regionInfo = info.getUserRegionInfo();
+        if (regionInfo == null) {
+            model.put("state", "noRegion");
+            return ResponseEntity.ok(model);
+        }
+
+        if (regionType == 2 && regionInfo.getSubRegion() == null) {
+            model.put("state", "noSubRegion");
+            return ResponseEntity.ok(model);
+        }
+
+        regionInfo.setActiveType(regionType);
+        info.setUserRegionInfo(regionInfo);
+        session.setAttribute("member", info);
+
+        model.put("state", "success");
+        return ResponseEntity.ok(model);
     }
 }
