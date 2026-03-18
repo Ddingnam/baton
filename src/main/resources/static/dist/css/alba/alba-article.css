@@ -487,3 +487,117 @@
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+.location-info-area {
+    padding: 24px 0;
+}
+
+.address-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px;
+    background: var(--bg-color);
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.address-text {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-main);
+    line-height: 1.5;
+    word-break: keep-all;
+}
+
+.btn-copy-addr {
+    white-space: nowrap;
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-sub);
+    cursor: pointer;
+}
+
+.location-map-wrapper {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+#map {
+    width: 100%;
+    height: 250px; 
+}
+
+.map-overlay-buttons {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+}
+
+.map-btn {
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-main);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-decoration: none;
+}
+
+.nearby-info-card {
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+}
+
+.info-row {
+    display: flex;
+    padding: 10px 0;
+    align-items: flex-start;
+}
+
+.info-row:not(:last-child) { border-bottom: 1px solid var(--border-light); }
+
+.info-label {
+    width: 75px;
+    font-size: 13px;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.info-contents {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.nearby-item {
+    font-size: 13px;
+    color: var(--text-main);
+}
+
+.nearby-item strong {
+    color: var(--primary);
+    margin-right: 4px;
+}
+
+.map-notice {
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--text-light);
+    list-style: none;
+    padding: 0;
+}

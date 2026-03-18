@@ -105,25 +105,42 @@
 	            </div>
 	        </li>
 	    </ul>
-	
-	    <div class="map-container-wrapper" style="margin-top: 30px;">
-	        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--text-main);">근무지 위치</h3>
-	        
-	        <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 12px 16px; border-radius: 10px; margin-bottom: 12px;">
-	            <span style="font-size: 14px; color: var(--text-sub); word-break: keep-all;">
-	                <i class="ri-map-pin-line" style="vertical-align: middle; margin-right: 4px; font-size: 16px;"></i> 
-	                ${dto.location}
-	            </span>
-	            <button type="button" onclick="copyAddress('${dto.location}')" style="white-space:nowrap; background: #fff; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; color: var(--text-main); cursor: pointer; transition: background 0.2s;">
-	                주소 복사
-	            </button>
-	        </div>
-	        
-	        <div id="map" style="width: 100%; height: 220px; border-radius: 10px; border: 1px solid var(--border-color); z-index: 1;"></div>
-	        
-	        <input type="hidden" id="mapAddress" value="${dto.location}">
-	        <input type="hidden" id="mapPlaceName" value="${dto.employer}">
-	    </div>
+		<div class="location-info-area">
+    <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--text-main);">근무지역</h3>
+    
+    <div class="address-box">
+        <i class="ri-map-pin-2-fill" style="color: var(--primary); font-size: 18px;"></i>
+        <span class="address-text" id="fullAddress">${dto.location}</span>
+        <button type="button" class="btn-copy-addr" onclick="copyAddress('${dto.location}')">복사</button>
+    </div>
+    
+    <div class="location-map-wrapper">
+        <div id="map"></div>
+        <div class="map-overlay-buttons">
+            <button type="button" class="map-btn" onclick="relayoutMap()">지도 초기화</button>
+            <a href="https://map.kakao.com/link/to/${dto.employer},${dto.locationLat},${dto.locationLng}" 
+               target="_blank" class="map-btn" style="background: var(--primary); color: #fff; border:none;">길찾기</a>
+        </div>
+    </div>
+
+    <div class="nearby-info-card">
+			 <div class="info-row">
+				    <span class="info-label">인근지하철</span>
+				    <div class="info-contents" id="subway-list">
+				        <div class="nearby-item">지하철 정보를 불러오는 중...</div>
+				    </div>
+				</div>
+				        <ul class="map-notice">
+				            <li>· 지도는 근무지 위치를 나타내며 실제 소재지와 다를 수 있습니다.</li>
+				        </ul>
+				    </div>
+				    
+				    <input type="hidden" id="mapAddress" value="${dto.location}">
+				    <input type="hidden" id="mapPlaceName" value="${dto.employer}">
+				    <input type="hidden" id="mapLat" value="${dto.locationLat}">
+				    <input type="hidden" id="mapLng" value="${dto.locationLng}">
+			</div>
+	    
 	</section>
 
     <div class="divider"></div>

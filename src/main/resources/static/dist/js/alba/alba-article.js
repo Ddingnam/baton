@@ -174,27 +174,40 @@ function confirmDelete(albaIdx) {
     }
 }
 
+function relayoutMap() {
+    if (window.kakaoMap && window.markerCoords) {
+        window.kakaoMap.setCenter(window.markerCoords);
+        window.kakaoMap.setLevel(3);
+    }
+}
+
 function initMap() {
     const address = document.getElementById('mapAddress')?.value;
     const placeName = document.getElementById('mapPlaceName')?.value || '근무 위치';
     const mapContainer = document.getElementById('map');
-
+    
     if (!address || !mapContainer) return;
 
-    try {
-        const geocoder = new kakao.maps.services.Geocoder();
-        geocoder.addressSearch(address, function(result, status) {
-            if (status === kakao.maps.services.Status.OK) {
-                const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                const map = new kakao.maps.Map(mapContainer, { center: coords, level: 3 });
-                const marker = new kakao.maps.Marker({ map, position: coords });
-                const infowindow = new kakao.maps.InfoWindow({
-                    content: `<div style="padding:5px;font-size:13px;text-align:center;white-space:nowrap;">${placeName}</div>`
-                });
-                infowindow.open(map, marker);
-            }
-        });
-    } catch(e) {}
+    const geocoder = new kakao.maps.services.Geocoder();
+    geocoder.addressSearch(address, function(result, status) {
+        if (status === kakao.maps.services.Status.OK) {
+            const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+            const map = new kakao.maps.Map(mapContainer, { center: coords, level: 3 });
+            const marker = new kakao.maps.Marker({ map, position: coords });
+            
+            window.kakaoMap = map;
+            window.markerCoords = coords;
+
+            const infowindow = new kakao.maps.InfoWindow({
+                content: `<div style="padding:5px;font-size:12px;text-align:center;white-space:nowrap;">${placeName}</div>`
+            });
+            infowindow.open(map, marker);
+
+            searchNearbySubway(coords); 
+        } else {
+            document.getElementById('subway-list').innerHTML = '<div class="nearby-item">위치 정보를 찾을 수 없습니다.</div>';
+        }
+    });
 }
 
 window.addEventListener('DOMContentLoaded', function () {
@@ -244,3 +257,39 @@ document.addEventListener("DOMContentLoaded", function() {
           }
       });
   });
+  
+  function searchNearbySubway(coords) {
+      const container = document.getElementById('subway-list');
+      if (!container) return;
+
+      const ps = new kakao.maps.services.Places();
+
+      const options = {
+          location: coords,
+          radius: 2000, 
+          sort: kakao.maps.services.SortBy.DISTANCE
+      };
+
+      ps.categorySearch('SW8', function(data, status) {
+          console.log("API 응답 상태:", status);
+          console.log("받아온 데이터 개수:", data ? data.length : 0);
+
+          if (status === kakao.maps.services.Status.OK && data.length > 0) {
+              let html = '';
+              
+              data.forEach(place => {
+                  const distance = parseInt(place.distance);
+                  const walkTime = Math.ceil(distance / 80);
+                  
+                  html += `
+                      <div class="nearby-item">
+                          <strong>${place.place_name}</strong> 
+                          도보 ${walkTime}분 (${distance}m)
+                      </div>`;
+              });
+              container.innerHTML = html;
+          } else {
+              container.innerHTML = '<div class="nearby-item">인근 지하철역 정보를 찾을 수 없습니다. (2km 내)</div>';
+          }
+      }, options);
+  }

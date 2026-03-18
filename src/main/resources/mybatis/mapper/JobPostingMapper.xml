@@ -10,8 +10,8 @@
     INSERT INTO job_posting (
         posting_idx,  title, employer, description, pay, pay_type,
         work_period, work_days, start_time, end_time, time_negotiable,
-        location, location_detail, location_lat, location_lng, contact, benefits, user_idx, region_idx, category, 
-        deadline, created_date )
+        location, location_detail, location_lat, location_lng, subway_info, contact, benefits, user_idx, region_idx, category, 
+        deadline, created_date,  )
     VALUES (
         #{postingIdx}, #{title},
         #{employer},
@@ -27,6 +27,7 @@
         #{locationDetail, jdbcType=VARCHAR}, 
         #{locationLat, jdbcType=VARCHAR}, 
         #{locationLng, jdbcType=VARCHAR},
+        #{subwayInfo, jdbcType=VARCHAR},
         #{contact, jdbcType=VARCHAR},
         #{benefits, jdbcType=VARCHAR},
         #{userIdx},
@@ -129,6 +130,7 @@
 		location_detail AS locationDetail,
     	location_lat AS locationLat,
     	location_lng AS locationLng,
+    	subway_info AS subwayInfo,
 		contact, benefits,
 		category, deadline, created_date,
 		hit_count AS hitCount FROM job_posting

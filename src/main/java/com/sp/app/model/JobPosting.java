@@ -29,6 +29,7 @@ public class JobPosting {
     private String workTime;
     private String startDate;
     private String endDate;
+    private String subwayInfo;
     
     private String location;
     private String locationDetail;

@@ -47,8 +47,9 @@
 	.alba-theme .unread-count { color: #3182f6; } 
 	.alba-theme .trade-banner { background: #f0f7ff; border-bottom: 1px solid #dce9f9; } 
 	.alba-theme .trade-info { flex-direction: row; align-items: center; justify-content: space-between; } 
-	.alba-theme .alba-badge { background: #3182f6; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; margin-right: 8px; } 
-	</style>
+	.alba-theme .alba-badge { background: #3182f6; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; margin-right: 8px; }
+	 
+</style>
 </head>
 <body>
     <div class="chat-container ${not empty albaInfo ? 'alba-theme' : ''}">
