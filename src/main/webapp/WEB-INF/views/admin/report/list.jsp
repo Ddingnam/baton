@@ -51,9 +51,10 @@
                     <div class="search-group">
                         <select name="domainType" class="fm-input search-select">
                             <option value="">전체 유형</option>
-                            <option value="TRADE"     ${param.domainType == 'TRADE'     ? 'selected' : ''}>중고거래</option>
-                            <option value="COMMUNITY" ${param.domainType == 'COMMUNITY' ? 'selected' : ''}>커뮤니티</option>
-                            <option value="USER"      ${param.domainType == 'USER'      ? 'selected' : ''}>사용자</option>
+                            <option value="TRADE"          ${param.domainType == 'TRADE'          ? 'selected' : ''}>중고거래</option>
+                            <option value="COMMUNITY"      ${param.domainType == 'COMMUNITY'      ? 'selected' : ''}>커뮤니티 게시글</option>
+                            <option value="COMMUNITY_REPLY" ${param.domainType == 'COMMUNITY_REPLY' ? 'selected' : ''}>커뮤니티 댓글</option>
+                            <option value="USER"           ${param.domainType == 'USER'           ? 'selected' : ''}>사용자</option>
                         </select>
                         <div class="search-input-wrap">
                             <i class="ri-search-2-line"></i>

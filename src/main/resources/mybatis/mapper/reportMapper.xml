@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sp.app.mapper.ReportMapper">
+
+    <insert id="insertReport" parameterType="map">
+        INSERT INTO adminReport (
+            reporterIdx, reportedUserIdx,
+            domainType, targetIdx,
+            reportType, reportContent,
+            reportDate, processStatus
+        ) VALUES (
+            #{reporterIdx}, #{reportedUserIdx},
+            #{domainType}, #{targetIdx},
+            #{reportType}, #{reportContent},
+            CURRENT_TIMESTAMP, 0
+        )
+    </insert>
+
+    <select id="checkDuplicate" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM adminReport
+        WHERE reporterIdx    = #{reporterIdx}
+          AND domainType     = #{domainType}
+          AND targetIdx      = #{targetIdx}
+          AND processStatus  = 0
+    </select>
+
+</mapper>

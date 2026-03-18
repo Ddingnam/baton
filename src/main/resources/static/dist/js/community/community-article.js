@@ -415,7 +415,10 @@ function renderReplies(list) {
                 </div>
                 <div class="reply-actions">
                     <button type="button" class="btn-reply-re" onclick="openReplyBox(${reply.id})">답글</button>
-                    ${isMyReply ? `<button type="button" class="btn-reply-del" onclick="deleteReply(${reply.id})">삭제</button>` : ''}
+                    ${isMyReply
+                        ? `<button type="button" class="btn-reply-del" onclick="deleteReply(${reply.id})">삭제</button>`
+                        : `<button type="button" class="btn-reply-report" onclick="openReportModal('COMMUNITY_REPLY', ${reply.id}, ${reply.memberIdx})" title="신고"><i class="ri-alarm-warning-line"></i></button>`
+                    }
                 </div>
             </div>
             <div class="reply-content">${escapeHtml(reply.content)}</div>

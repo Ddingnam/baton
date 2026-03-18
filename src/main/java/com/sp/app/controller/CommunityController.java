@@ -1,10 +1,10 @@
 package com.sp.app.controller;
 
+import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +32,6 @@ import com.sp.app.domain.dto.CommunityDto;
 import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.domain.dto.UserRegionInfo;
 import com.sp.app.service.CommunityService;
-import com.sp.app.service.MemberService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -48,7 +47,6 @@ public class CommunityController {
     private final CommunityService service;
     private final PaginateUtil paginateUtil;
     private final StorageService storageService;
-    private final MemberService memberService;
 
     @Value("${file.upload-root}/community")
     private String uploadPath;
@@ -165,6 +163,21 @@ public class CommunityController {
         dto.setTemporary(isTemporary == 1);
 
         try {
+            // 숫자 카테고리 → 한글 정규화 (write.jsp가 숫자 value를 전송하는 경우 대비)
+            String cat = dto.getCategory();
+            if (cat != null) {
+                switch (cat.trim()) {
+                    case "1": dto.setCategory("일상"); break;
+                    case "2": dto.setCategory("동네질문"); break;
+                    case "3": dto.setCategory("동네맛집"); break;
+                    case "4": dto.setCategory("같이해요"); break;
+                    case "5": dto.setCategory("분실/실종"); break;
+                    case "6": dto.setCategory("동네사건사고"); break;
+                    case "7": dto.setCategory("생활정보"); break;
+                    case "8": dto.setCategory("취미생활"); break;
+                }
+            }
+
             UserRegionInfo regionInfo = info.getUserRegionInfo();
             if (regionInfo != null) {
                 com.sp.app.domain.dto.RegionDto targetRegion = regionInfo.getActiveRegion();
@@ -279,6 +292,21 @@ public class CommunityController {
             dto.setUploadFiles(uploadFiles);
             dto.setAttachFiles(attachFiles);
             dto.setRemoveFiles(removedFiles);
+
+            String cat = dto.getCategory();
+            if (cat != null) {
+                switch (cat.trim()) {
+                    case "1": dto.setCategory("일상"); break;
+                    case "2": dto.setCategory("동네질문"); break;
+                    case "3": dto.setCategory("동네맛집"); break;
+                    case "4": dto.setCategory("같이해요"); break;
+                    case "5": dto.setCategory("분실/실종"); break;
+                    case "6": dto.setCategory("동네사건사고"); break;
+                    case "7": dto.setCategory("생활정보"); break;
+                    case "8": dto.setCategory("취미생활"); break;
+                }
+            }
+
             service.updateCommunity(dto, uploadPath);
             session.setAttribute("msg", "게시글이 수정되었습니다.");
         } catch (Exception e) {

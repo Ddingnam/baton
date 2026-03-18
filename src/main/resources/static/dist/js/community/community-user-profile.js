@@ -13,15 +13,15 @@ function initUserProfileModal(memberIdx) {
     _postsLoading = false;
     _postsEnd = false;
 
-    const container = document.querySelector('.up-modal-wrap') || document;
+    const container = document.querySelector('.upm-wrap') || document;
 
     renderDates(container);
     animateStats(container);
 
-    container.querySelectorAll('.up-tab').forEach(tab => {
+    container.querySelectorAll('.upm-tab').forEach(tab => {
         tab.addEventListener('click', function () {
-            container.querySelectorAll('.up-tab').forEach(t => t.classList.remove('on'));
-            container.querySelectorAll('.up-panel').forEach(p => p.classList.remove('on'));
+            container.querySelectorAll('.upm-tab').forEach(t => t.classList.remove('on'));
+            container.querySelectorAll('.upm-panel').forEach(p => p.classList.remove('on'));
             this.classList.add('on');
 
             const target = container.querySelector('#' + this.dataset.panel);
@@ -99,8 +99,8 @@ function loadReplies(container) {
     const box = container.querySelector('#replyList');
     if (!box) return;
 
-    box.innerHTML = `<div class="up-loading">
-        <div class="up-spinner"></div>
+    box.innerHTML = `<div class="upm-loading">
+        <div class="upm-spinner"></div>
         <span>불러오는 중</span>
     </div>`;
 
@@ -117,15 +117,15 @@ function loadReplies(container) {
                 return;
             }
             box.innerHTML = data.map(item => `
-                <div class="up-row"
+                <div class="upm-row"
                      onclick="location.href='${basePath}/community/article/${esc(item.communityId)}'">
-                    <div class="up-row-info">
-                        <div class="up-origin">
+                    <div class="upm-row-info">
+                        <div class="upm-origin">
                             <i class="ri-corner-up-right-line"></i>
                             <span>${esc(item.postTitle || '게시글')}</span>
                         </div>
-                        <p class="up-row-title">${esc(item.content)}</p>
-                        <div class="up-row-stats">
+                        <p class="upm-row-title">${esc(item.content)}</p>
+                        <div class="upm-row-meta">
                             <span data-date="${esc(item.regDate)}"></span>
                         </div>
                     </div>
@@ -150,7 +150,7 @@ function loadMorePosts(container) {
     const list = container.querySelector('#postList');
 
     const spinner = document.createElement('div');
-    spinner.className = 'up-loading up-scroll-spinner';
+    spinner.className = 'upm-loading upm-scroll-spinner';
     spinner.innerHTML = '<div class="up-spinner"></div>';
     if (list) list.appendChild(spinner);
 
@@ -171,15 +171,15 @@ function loadMorePosts(container) {
 
             data.forEach(item => {
                 const div = document.createElement('div');
-                div.className = 'up-row';
+                div.className = 'upm-row';
                 div.addEventListener('click', () => {
                     location.href = `${basePath}/community/article/${item.id}`;
                 });
                 div.innerHTML = `
-                    <div class="up-row-info">
-                        <span class="up-row-cat">${catLabel(item.category)}</span>
-                        <p class="up-row-title">${esc(item.subject)}</p>
-                        <div class="up-row-stats">
+                    <div class="upm-row-info">
+                        <span class="upm-cat">${catLabel(item.category)}</span>
+                        <p class="upm-row-title">${esc(item.subject)}</p>
+                        <div class="upm-row-meta">
                             <span><i class="ri-eye-line"></i> ${item.hitCount}</span>
                             <span><i class="ri-heart-3-line"></i> ${item.likeCount}</span>
                             <span>${fmtRelative(item.regDate)}</span>
@@ -198,7 +198,7 @@ function loadMorePosts(container) {
 }
 
 function emptyHTML(icon, msg) {
-    return `<div class="up-empty">
+    return `<div class="upm-empty">
         <i class="${icon}"></i>
         <p>${msg}</p>
     </div>`;

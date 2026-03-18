@@ -14,6 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/community/community-article.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/community/community-user-profile.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/report/report-modal.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoMapKey}&libraries=services&autoload=false"></script>
 </head>
@@ -26,15 +27,15 @@
         <div class="article-header">
             <div class="category-badge">
                 <c:choose>
-                    <c:when test="${dto.category == '1' || dto.category == '일상'}">일상</c:when>
-                    <c:when test="${dto.category == '2' || dto.category == '동네질문'}">동네질문</c:when>
-                    <c:when test="${dto.category == '3' || dto.category == '동네맛집'}">동네맛집</c:when>
-                    <c:when test="${dto.category == '4' || dto.category == '같이해요'}">같이해요</c:when>
-                    <c:when test="${dto.category == '5' || dto.category == '분실/실종'}">분실/실종</c:when>
-                    <c:when test="${dto.category == '6' || dto.category == '동네사건사고'}">동네사건사고</c:when>
-                    <c:when test="${dto.category == '7' || dto.category == '생활정보'}">생활정보</c:when>
-                    <c:when test="${dto.category == '8' || dto.category == '취미생활'}">취미생활</c:when>
-                    <c:otherwise>${dto.category}</c:otherwise>
+                    <c:when test="${dto.category == 1 || dto.category == '1' || dto.category == '일상'}">일상</c:when>
+                    <c:when test="${dto.category == 2 || dto.category == '2' || dto.category == '동네질문'}">동네질문</c:when>
+                    <c:when test="${dto.category == 3 || dto.category == '3' || dto.category == '동네맛집'}">동네맛집</c:when>
+                    <c:when test="${dto.category == 4 || dto.category == '4' || dto.category == '같이해요'}">같이해요</c:when>
+                    <c:when test="${dto.category == 5 || dto.category == '5' || dto.category == '분실/실종'}">분실/실종</c:when>
+                    <c:when test="${dto.category == 6 || dto.category == '6' || dto.category == '동네사건사고'}">동네사건사고</c:when>
+                    <c:when test="${dto.category == 7 || dto.category == '7' || dto.category == '생활정보'}">생활정보</c:when>
+                    <c:when test="${dto.category == 8 || dto.category == '8' || dto.category == '취미생활'}">취미생활</c:when>
+                    <c:otherwise>일상</c:otherwise>
                 </c:choose>
             </div>
             <h1 class="article-subject">${dto.subject}</h1>
@@ -62,6 +63,13 @@
                             <button type="button" class="danger" onclick="deleteArticle('${dto.id}')">삭제</button>
                         </div>
                     </div>
+                </c:if>
+                <c:if test="${sessionScope.member.userIdx != dto.memberIdx}">
+                    <button type="button" class="btn-report-article"
+                            onclick="openReportModal('COMMUNITY', ${dto.id}, ${dto.memberIdx})"
+                            title="신고하기">
+                        <i class="ri-alarm-warning-line"></i>
+                    </button>
                 </c:if>
             </div>
         </div>
@@ -198,6 +206,7 @@
 
 <script>
     const contextPath = "${pageContext.request.contextPath}";
+    window.contextPath = contextPath;
     const communityId = "${dto.id}";
     const currentMemberIdx = "${sessionScope.member.userIdx}";
     const currentPage = "${page}";
@@ -245,6 +254,38 @@
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/community/community-user-profile.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/community/community-article.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/report/report-modal.js"></script>
+
+<div id="reportModal" class="report-modal-overlay" style="display:none;">
+    <div class="report-modal-sheet">
+        <div class="report-modal-head">
+            <span class="report-modal-title"><i class="ri-alarm-warning-line"></i> 신고하기</span>
+            <button type="button" class="report-modal-close" onclick="closeReportModal()"><i class="ri-close-line"></i></button>
+        </div>
+        <div class="report-modal-body">
+            <p class="report-modal-desc">신고 사유를 선택해주세요. 허위 신고는 제재를 받을 수 있습니다.</p>
+            <div class="report-type-list">
+                <label class="report-type-item"><input type="radio" name="reportType" value="스팸"><span class="report-type-label"><i class="ri-spam-line"></i> 스팸 / 광고</span></label>
+                <label class="report-type-item"><input type="radio" name="reportType" value="욕설/비방"><span class="report-type-label"><i class="ri-emotion-unhappy-line"></i> 욕설 / 비방</span></label>
+                <label class="report-type-item"><input type="radio" name="reportType" value="음란물"><span class="report-type-label"><i class="ri-eye-off-line"></i> 음란물 / 불건전</span></label>
+                <label class="report-type-item"><input type="radio" name="reportType" value="사기"><span class="report-type-label"><i class="ri-error-warning-line"></i> 사기 / 허위 정보</span></label>
+                <label class="report-type-item"><input type="radio" name="reportType" value="개인정보침해"><span class="report-type-label"><i class="ri-user-forbid-line"></i> 개인정보 침해</span></label>
+                <label class="report-type-item"><input type="radio" name="reportType" value="기타"><span class="report-type-label"><i class="ri-more-line"></i> 기타</span></label>
+            </div>
+            <div class="report-content-wrap">
+                <textarea id="reportContent" class="report-content-input" placeholder="추가로 전달할 내용이 있으면 입력해주세요. (선택)" maxlength="300"></textarea>
+                <span class="report-content-count"><span id="reportContentCount">0</span>/300</span>
+            </div>
+        </div>
+        <div class="report-modal-foot">
+            <button type="button" class="report-btn-cancel" onclick="closeReportModal()">취소</button>
+            <button type="button" class="report-btn-submit" onclick="submitReport()">신고 접수</button>
+        </div>
+        <input type="hidden" id="reportDomainType" value="">
+        <input type="hidden" id="reportTargetIdx" value="">
+        <input type="hidden" id="reportedUserIdx" value="">
+    </div>
+</div>
 
 </body>
 </html>
