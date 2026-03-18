@@ -179,7 +179,7 @@
             FROM PAYMENT
             WHERE USERIDX = #{userIdx} 
               AND PAYSTATUS = 'PAID'
-              AND PAYDATE >= SYSDATE - 3
+              AND PAIDAT >= SYSDATE - 3
             ORDER BY PAYMENTIDX DESC
         ) WHERE ROWNUM = 1
     </select>
