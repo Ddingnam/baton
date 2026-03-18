@@ -42,54 +42,24 @@
 							<i class="ri-arrow-left-line"></i>
 						</button>
 						<h1 class="page-title">${mode=='update' ? '글 수정' : '글쓰기'}</h1>
-						<c:if test="${mode != 'update' && not empty userRegionInfo}">
-							<c:choose>
-								<c:when test="${regionType == 2 && not empty userRegionInfo.subRegion}">
-									<span class="write-region-badge">
-										<i class="ri-map-pin-2-fill"></i>${userRegionInfo.subRegion.dong}
-									</span>
-								</c:when>
-								<c:when test="${not empty userRegionInfo.mainRegion}">
-									<span class="write-region-badge">
-										<i class="ri-map-pin-2-fill"></i>${userRegionInfo.mainRegion.dong}
-									</span>
-								</c:when>
-							</c:choose>
-						</c:if>
 					</div>
 					<div class="editor-header-right">
 						<button type="button" class="btn-icon-only" onclick="openTempListModal()" title="임시저장 목록">
 							<i class="ri-draft-line"></i>
 							<span id="tempCountBadge" class="temp-badge" style="display:none;"></span>
 						</button>
-						<button type="button" class="btn-ghost-save" onclick="saveTemp()" title="임시저장">
-							임시저장
-						</button>
+						<button type="button" class="btn-ghost-save" onclick="saveTemp()">임시저장</button>
 						<button type="button" class="btn-submit" onclick="sendOk();">${mode=='update' ? '수정' : '등록'}</button>
 					</div>
 				</div>
 
 				<div class="editor-body">
 
-					<div class="category-section">
-						<span class="category-label">카테고리</span>
-						<div class="category-pills">
-							<label class="cat-pill"><input type="radio" name="category" value="1" ${mode=='write' || dto.category == 1 ? 'checked' : ''}><span>일상</span></label>
-							<label class="cat-pill"><input type="radio" name="category" value="2" ${dto.category == 2 ? 'checked' : ''}><span>동네질문</span></label>
-							<label class="cat-pill"><input type="radio" name="category" value="3" ${dto.category == 3 ? 'checked' : ''}><span>동네맛집</span></label>
-							<label class="cat-pill"><input type="radio" name="category" value="4" ${dto.category == 4 ? 'checked' : ''}><span>같이해요</span></label>
-							<label class="cat-pill"><input type="radio" name="category" value="5" ${dto.category == 5 ? 'checked' : ''}><span>분실/실종</span></label>
-							<label class="cat-pill"><input type="radio" name="category" value="6" ${dto.category == 6 ? 'checked' : ''}><span>동네사건사고</span></label>
-							<label class="cat-pill"><input type="radio" name="category" value="7" ${dto.category == 7 ? 'checked' : ''}><span>생활정보</span></label>
-							<label class="cat-pill"><input type="radio" name="category" value="8" ${dto.category == 8 ? 'checked' : ''}><span>취미생활</span></label>
-						</div>
-					</div>
-
 					<div class="content-group">
 						<input type="text" id="subject" name="subject" class="input-title"
 							placeholder="제목을 입력해주세요" autocomplete="off" value="${dto.subject}">
 						<div class="divider"></div>
-						<div id="quillEditor" style="min-height:300px; font-size:16px;"></div>
+						<div id="quillEditor" style="min-height:340px; font-size:16px;"></div>
 						<input type="hidden" id="content" name="content" value="">
 					</div>
 
@@ -106,21 +76,21 @@
 					</div>
 
 					<div id="attachListWrapper" style="display:${not empty dto.attachFileInfos ? 'block' : 'none'}">
-					<ul class="attach-file-list" id="attachFileList">
-						<c:if test="${mode=='update' && not empty dto.attachFileInfos}">
-							<c:forEach var="af" items="${dto.attachFileInfos}">
-								<li class="attach-file-item" data-filename="${af.saveFilename}">
-									<i class="ri-file-line"></i>
-									<span class="attach-file-name">${af.originalFilename}</span>
-									<button type="button" class="btn-remove-attach"
-										onclick="removeExistingAttach('${af.saveFilename}', this)">
-										<i class="ri-close-line"></i>
-									</button>
-									<input type="hidden" name="existingFiles" value="${af.saveFilename}">
-								</li>
-							</c:forEach>
-						</c:if>
-					</ul>
+						<ul class="attach-file-list" id="attachFileList">
+							<c:if test="${mode=='update' && not empty dto.attachFileInfos}">
+								<c:forEach var="af" items="${dto.attachFileInfos}">
+									<li class="attach-file-item" data-filename="${af.saveFilename}">
+										<i class="ri-file-line"></i>
+										<span class="attach-file-name">${af.originalFilename}</span>
+										<button type="button" class="btn-remove-attach"
+											onclick="removeExistingAttach('${af.saveFilename}', this)">
+											<i class="ri-close-line"></i>
+										</button>
+										<input type="hidden" name="existingFiles" value="${af.saveFilename}">
+									</li>
+								</c:forEach>
+							</c:if>
+						</ul>
 					</div>
 
 					<input type="hidden" id="pollVotedLocked" value="${pollVotedLocked == true ? 'true' : 'false'}">
@@ -189,6 +159,7 @@
 							</div>
 						</div>
 					</div>
+
 					<div class="tag-group">
 						<div class="tag-input-wrapper">
 							<span class="hash-symbol">#</span>
@@ -199,7 +170,7 @@
 					</div>
 
 				</div>
-				
+
 				<div class="editor-footer">
 					<div class="toolbar">
 						<button type="button" class="tool-btn" id="btnLocation" title="위치 추가">
@@ -222,14 +193,48 @@
 		</div>
 
 		<div class="write-sidebar">
-			<div class="sidebar-box">
-				<h3>글쓰기 팁</h3>
-				<ul class="tip-list">
-					<li>청결한 커뮤니티를 위해 바르고 고운 말을 사용해주세요.</li>
-					<li>사진을 첨부하면 더 많은 이웃들이 관심을 가질 수 있어요.</li>
-					<li>판매/홍보 목적의 글은 <strong>중고거래</strong> 게시판을 이용해주세요.</li>
+
+			<c:if test="${mode != 'update' && not empty userRegionInfo}">
+				<div class="sidebar-neighborhood">
+					<div class="sidebar-neighborhood-inner">
+						<div class="sn-icon"><i class="ri-map-pin-2-fill"></i></div>
+						<div class="sn-text">
+							<span class="sn-label">게시 동네</span>
+							<strong class="sn-dong">
+								<c:choose>
+									<c:when test="${regionType == 2 && not empty userRegionInfo.subRegion}">${userRegionInfo.subRegion.dong}</c:when>
+									<c:otherwise>${not empty userRegionInfo.mainRegion ? userRegionInfo.mainRegion.dong : '동네 미설정'}</c:otherwise>
+								</c:choose>
+							</strong>
+						</div>
+					</div>
+				</div>
+			</c:if>
+
+			<div class="sidebar-box sidebar-category-box">
+				<p class="sidebar-section-label">카테고리 선택</p>
+				<div class="sidebar-category-grid">
+					<label class="sc-item"><input type="radio" name="category" value="1" ${mode=='write' || dto.category == 1 ? 'checked' : ''}><span><i class="ri-sun-line"></i>일상</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="2" ${dto.category == 2 ? 'checked' : ''}><span><i class="ri-question-line"></i>동네질문</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="3" ${dto.category == 3 ? 'checked' : ''}><span><i class="ri-restaurant-line"></i>동네맛집</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="4" ${dto.category == 4 ? 'checked' : ''}><span><i class="ri-group-line"></i>같이해요</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="5" ${dto.category == 5 ? 'checked' : ''}><span><i class="ri-search-eye-line"></i>분실/실종</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="6" ${dto.category == 6 ? 'checked' : ''}><span><i class="ri-alarm-warning-line"></i>동네사건사고</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="7" ${dto.category == 7 ? 'checked' : ''}><span><i class="ri-information-line"></i>생활정보</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="8" ${dto.category == 8 ? 'checked' : ''}><span><i class="ri-palette-line"></i>취미생활</span></label>
+				</div>
+			</div>
+
+			<div class="sidebar-box sidebar-guide-box">
+				<p class="sidebar-section-label">게시 가이드</p>
+				<ul class="guide-list">
+					<li><i class="ri-heart-line"></i>따뜻하고 바른 말을 사용해주세요.</li>
+					<li><i class="ri-image-line"></i>사진을 첨부하면 더 많은 이웃이 봐요.</li>
+					<li><i class="ri-store-line"></i>판매·홍보 글은 중고거래를 이용해주세요.</li>
+					<li><i class="ri-shield-check-line"></i>개인정보 노출에 주의해주세요.</li>
 				</ul>
 			</div>
+
 		</div>
 	</div>
 

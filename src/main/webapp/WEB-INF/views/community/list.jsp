@@ -82,7 +82,7 @@
                     </div>
                 </div>
                 <a href="${pageContext.request.contextPath}/member/townAuth" class="neighborhood-change-link">
-                    <i class="ri-refresh-line"></i> 동네 변경
+                    <i class="ri-map-pin-add-line"></i> 동네 변경
                 </a>
             </div>
 
