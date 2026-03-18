@@ -313,11 +313,13 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function applyAreaFilter() {
-	const sido = document.querySelector('#col-sido li.active')?.textContent || '';
-	const gugun = document.querySelector('#col-gugun li.active')?.textContent || '';
-	const dong = document.querySelector('#col-dong li.active')?.textContent || '';
+		const sido = normalizeSido(
+			document.querySelector('#col-sido li.active')?.textContent || ''
+		);
+		const gugun = document.querySelector('#col-gugun li.active')?.textContent || '';
+		const dong = document.querySelector('#col-dong li.active')?.textContent || '';
 
-	fetch(`${CONTEXT_PATH}/alba/filter?sido=${sido}&gugun=${gugun}&dong=${dong}`)
+		fetch(`${CONTEXT_PATH}/alba/filter?sido=${sido}&gugun=${gugun}&dong=${dong}`)
 		.then(res => res.json())
 		.then(data => {
 			filteredJobs = data.map(job => ({
@@ -378,9 +380,7 @@ function applyAreaFilterAuto(sido, gugun, dong) {
     const sidoList = document.querySelectorAll('#col-sido li');
 	sidoList.forEach(li => {
 		li.classList.remove('active');
-	    if (sido.includes(li.textContent) || li.textContent.includes(sido)) {
-	        li.click(); // 👈 li.classList.add('active') 대신 .click()으로 써야 구/군 목록이 나옵니다!
-	    }
+	    
     });
 
     // 구/군이 렌더링될 시간을 살짝 준 뒤 세팅

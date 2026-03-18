@@ -305,8 +305,30 @@
   </button>
 </div>
 
-<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
+<div id="regionModal" class="baton-modal-overlay">
+    <div class="baton-modal-content modal-lg">
+        <div class="modal-header">
+            <h3>근무지 직접 선택</h3>
+            <button type="button" class="btn-close-modal" onclick="closeRegionModal()">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="region-selector-wrap">
+                <div class="region-col"><ul class="region-list" id="listSido"></ul></div>
+                <div class="region-col"><ul class="region-list" id="listSigungu"><li class="region-empty">시/도를<br>선택해주세요</li></ul></div>
+                <div class="region-col"><ul class="region-list" id="listDong"><li class="region-empty">시/군/구를<br>선택해주세요</li></ul></div>
+            </div>
+            <div class="modal-selected-text" id="modalSelectedText">지역을 선택해주세요.</div>
+        </div>
+        <div class="modal-footer" style="display: flex; gap: 12px;">
+            <button type="button" class="btn-baton-secondary" style="flex: 1; height: 54px; font-size: 15px;" onclick="resetModalSelection()">초기화</button>
+            <button type="button" class="btn-baton-login" style="flex: 2; height: 54px; font-size: 16px;" onclick="confirmRegionSelection()">선택 완료</button>
+        </div>
+    </div>
+</div>
 
+<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/alba/alba-write.js"></script>
 </body>
