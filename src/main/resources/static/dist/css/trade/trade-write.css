@@ -5,7 +5,7 @@
     --primary-dark: #008D6A;
     --primary-light: #F2FAF8;
     --surface: #ffffff;
-    --bg: #F7F8FA;
+    --bg: #F9FAFB;
     --border: #E8EAED;
     --text-main: #1A1A1A;
     --text-sub: #72787F;
@@ -17,7 +17,7 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text-main); line-height: 1.5; }
+body { font-family: 'Noto Sans KR', sans-serif; color: var(--text-main); line-height: 1.5; }
 
 .header-content {
 	display: flex;

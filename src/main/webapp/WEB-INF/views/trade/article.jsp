@@ -27,7 +27,7 @@
             <h1>우리 동네 물건 보기</h1>
             <p>우리 동네 따뜻한 거래 정보를 확인해보세요.</p>
         </div>
-    </div>
+   </div>
 
     <div class="article-layout">
         <div class="main-side">
@@ -35,7 +35,7 @@
                 <div class="main-image-wrap">
                     <c:choose>
                         <c:when test="${not empty imageList}">
-				            <img id="mainImage" src="${pageContext.request.contextPath}${imageList[0].imgUrl}" alt="${trade.title}">
+				             <img id="mainImage" src="${pageContext.request.contextPath}${imageList[0].imgUrl}" alt="${trade.title}">
 				        </c:when>
 				        <c:when test="${not empty trade.imgUrl}">
 				             <img id="mainImage" src="${pageContext.request.contextPath}${trade.imgUrl}" alt="${trade.title}">
@@ -43,19 +43,27 @@
 				        <c:otherwise>
 				            <img id="mainImage" src="${pageContext.request.contextPath}/dist/images/noimage.png" alt="이미지 없음">
 				        </c:otherwise>
+                 
                     </c:choose>
 
                     <c:if test="${trade.tradeStatus == '판매완료' || trade.tradeStatus == '예약중' || trade.tradeStatus == '숨기기'}">
                         <div class="status-overlay">
                             <span class="status-overlay-badge">
                                 <c:choose>
+        
                                     <c:when test="${trade.tradeStatus == '판매완료'}">판매완료</c:when>
                                     <c:when test="${trade.tradeStatus == '예약중'}">예약 중</c:when>
+                             
                                     <c:when test="${trade.tradeStatus == '숨기기'}">숨겨진 상품</c:when>
                                 </c:choose>
                             </span>
                         </div>
+     
                     </c:if>
+
+                    <button type="button" class="nav-btn prev-btn"><i class="ri-arrow-left-s-line"></i></button>
+                    <button type="button" class="nav-btn next-btn"><i class="ri-arrow-right-s-line"></i></button>
+
                 </div>
 
                 <c:if test="${not empty imageList && imageList.size() > 1}">
@@ -65,6 +73,7 @@
                                 <img src="${pageContext.request.contextPath}${item.imgUrl}" alt="이미지 ${st.index + 1}">
                             </div>
                         </c:forEach>
+         
                     </div>
                 </c:if>
             </div>
@@ -72,31 +81,38 @@
             <div class="card">
                 <div class="product-badges">
                     <c:if test="${not empty trade.categoryName}">
-                        <span class="badge badge-category">${trade.categoryName}</span>
+        
+                         <span class="badge badge-category">${trade.categoryName}</span>
                     </c:if>
 
                     <c:choose>
                         <c:when test="${trade.productStatus == '새상품'}">
-                            <span class="badge badge-status-new">새상품</span>
+               
+                             <span class="badge badge-status-new">새상품</span>
                         </c:when>
                         <c:when test="${trade.productStatus == '고장/파손'}">
                             <span class="badge badge-status-broken">고장/파손</span>
+    
                         </c:when>
                         <c:otherwise>
                             <span class="badge badge-status-used">${trade.productStatus}</span>
                         </c:otherwise>
-                    </c:choose>
+  
+                   </c:choose>
 
                     <c:choose>
                         <c:when test="${trade.tradeType == '직거래'}">
                             <span class="badge badge-trade-direct">직거래</span>
+     
                         </c:when>
                         <c:when test="${trade.tradeType == '택배'}">
                             <span class="badge badge-trade-parcel">택배</span>
+                        
                         </c:when>
                         <c:when test="${trade.tradeType == '둘다가능'}">
                             <span class="badge badge-trade-both">직거래·택배</span>
                         </c:when>
+                   
                     </c:choose>
                 </div>
 
@@ -106,16 +122,19 @@
                     <c:choose>
                         <c:when test="${trade.price == 0}">나눔</c:when>
                         <c:otherwise>
-                            <fmt:formatNumber value="${trade.price}" pattern="#,###"/>
+                           
+                             <fmt:formatNumber value="${trade.price}" pattern="#,###"/>
                             <span class="product-price-won">원</span>
                         </c:otherwise>
                     </c:choose>
                 </p>
 
-                <div class="product-meta">
+        
+                 <div class="product-meta">
                     <c:if test="${not empty tagList}">
                     <div class="tag-list">
                         <c:forEach var="tag" items="${tagList}">
+                     
                             <span class="tag-chip-view">#${tag}</span>
                         </c:forEach>
                     </div>
@@ -123,34 +142,40 @@
                 </div>
             </div>
 
-            <div class="card">
+    
+             <div class="card">
                 <p class="card-title">상품 설명</p>
                 <p class="product-desc">${trade.content}</p>
             </div>
 
             <div class="card">
                 <p class="card-title">거래 정보</p>
+             
                 <div class="info-grid">
                 
                     <div class="info-item">
                         <p class="info-label">거래 방식</p>
                         <p class="info-value">
-                        	<c:choose>
+        
+                                	<c:choose>
                         		<c:when test="${trade.tradeType == '둘다가능'}">직거래·택배</c:when>
                         		<c:when test="${trade.tradeType == '택배'}">택배</c:when>
                         		<c:when test="${trade.tradeType == '직거래'}">직거래</c:when>
-                        	</c:choose>
+   
+                                  	</c:choose>
                         </p>
                     </div>
 
                     <div class="info-item">
-                        <p class="info-label">판매 상태</p>
+              
+                           <p class="info-label">판매 상태</p>
                         <p class="info-value">
                             <c:choose>
                                 <c:when test="${trade.tradeStatus == '판매중'}">판매 중</c:when>
                                 <c:when test="${trade.tradeStatus == '예약중'}">예약 중</c:when>
                                 <c:when test="${trade.tradeStatus == '판매완료'}">판매 완료</c:when>
-                                <c:otherwise>${trade.tradeStatus}</c:otherwise>
+                           
+                                  <c:otherwise>${trade.tradeStatus}</c:otherwise>
                             </c:choose>
                         </p>
                     </div>
@@ -159,24 +184,30 @@
                         <div class="info-item full-width">
                             <p class="info-label">거래 희망 장소</p>
                             <p class="info-value">${trade.tradePlace}</p>
-                            <div id="map"></div>
+          
+                               <div id="map"></div>
                         </div>
                     </c:if>
                     
-                    <c:if test="${trade.tradeType == '택배' || trade.tradeType == '둘다가능'}">
+                 
+                <c:if test="${trade.tradeType == '택배' || trade.tradeType == '둘다가능'}">
                         <div class="info-item full-width">
                             <p class="info-label">배송비</p>
 
                             <c:choose>
-                                <c:when test="${not empty trade.shippingFee && trade.shippingFee > 0}">
+       
+                                  <c:when test="${not empty trade.shippingFee && trade.shippingFee > 0}">
                                     <p class="info-value">
-                                        <fmt:formatNumber value="${trade.shippingFee}" pattern="#,###"/>원
+                               
+                                     <fmt:formatNumber value="${trade.shippingFee}" pattern="#,###"/>원
                                     </p>
                                 </c:when>
-                                 
+                     
+                         
                                 <c:otherwise>
                                     <p class="info-value">추후 협의</p>
-                                </c:otherwise>
+                  
+                               </c:otherwise>
 							</c:choose> 
                             
                         </div>
@@ -187,16 +218,19 @@
                                 착불은 수령 시 택배비를 지불하며, 선불은 발송 전 판매자에게 송금하는 방식입니다.</span>
                             </div>
                         </div>
-                    </c:if>
+    
+                                 </c:if>
 
                     <div class="info-item">
                         <p class="info-label">등록일</p>
                         <p class="info-value time-ago" data-time="${trade.lastUpDate}">${trade.lastUpDate}</p>
-                    </div>
+           
+                     </div>
 
                     <div class="info-item">
                         <p class="info-label">끌어올리기</p>
                         <p class="info-value">${trade.pullCount}회</p>
+                    
                     </div>
 
                 </div>
@@ -208,15 +242,18 @@
             <div class="card">
                 <p class="card-title">판매자 정보</p>
                 <div class="seller-row">
-                    <div class="seller-avatar">
+       
+                         <div class="seller-avatar">
                         👤
                     </div>
                     <div class="seller-info">
+                     
                         <p class="seller-name">${trade.nickName}</p>
                         <p class="seller-region">
                             <c:choose>
                                 <c:when test="${not empty trade.dong}">${trade.dong}</c:when>
-                                <c:otherwise>동네 정보 없음</c:otherwise>
+        
+                                     <c:otherwise>동네 정보 없음</c:otherwise>
                             </c:choose>
                         </p>
                     </div>
@@ -231,7 +268,8 @@
                     	<c:otherwise>
                     		<button class="seller-profile-btn"
 			            		onclick="location.href='${pageContext.request.contextPath}/mypage/tradeUserMain?userIdx=${trade.userIdx}'">
-			                    프로필 보기
+			  
+                                프로필 보기
 							</button>
                     	</c:otherwise>
                     </c:choose>
@@ -248,7 +286,8 @@
 			            <p class="stat-value" id="statWishSide">${trade.likeCount}</p>
 			            <p class="stat-label">찜</p>
 			        </div>
-			        <div class="stat-item">
+			       
+                      <div class="stat-item">
 			            <p class="stat-value">${trade.chatCount}</p>
 			            <p class="stat-label">채팅</p>
 			        </div>
@@ -258,14 +297,16 @@
 			        <c:choose>
 			            <c:when test="${trade.tradeStatus == '판매완료'}">
 			                <button class="chat-btn" disabled>판매 완료된 상품입니다</button>
-			            </c:when>
+			            
+                        </c:when>
 			            <c:otherwise>
 			                <button class="chat-btn"
 			                    onclick="location.href='${pageContext.request.contextPath}/member/login'">
 			                    로그인하고 채팅하기
 			                </button>
 			            </c:otherwise>
-			        </c:choose>
+			  
+                        </c:choose>
 			
 			        <div class="secondary-actions">
 			            <button class="wish-btn-large"
@@ -277,7 +318,8 @@
 			    </sec:authorize>
 			
 			
-			    <sec:authorize access="isAuthenticated()">
+			  
+                <sec:authorize access="isAuthenticated()">
 			        <sec:authentication property="principal.member.userIdx" var="loggedInUserId" />
 			        
 			        <c:choose>
@@ -288,7 +330,8 @@
 					        </button>
 					
 					        <c:choose>
-					            <c:when test="${not empty escrowInfo and escrowInfo.TRADESTATUS == 'PAY_COMPLETED'}">
+					     
+                            <c:when test="${not empty escrowInfo and escrowInfo.TRADESTATUS == 'PAY_COMPLETED'}">
 					                <button class="pay-btn" onclick="openShippingModal()">
 					                    운송장 입력하기
 					                </button>
@@ -299,7 +342,8 @@
 					            <c:when test="${not empty escrowInfo and escrowInfo.TRADESTATUS == 'SHIPPING'}">
 					                <button class="pay-btn" disabled>
 					                    배송 중 (구매자 확정 대기)
-					                </button>
+					          
+                                   </button>
 					            </c:when>
 					            <c:when test="${not empty escrowInfo and escrowInfo.TRADESTATUS == 'CONFIRMED'}">
 								    <button class="chat-btn" style="cursor: not-allowed;" disabled>
@@ -314,7 +358,8 @@
 					    </c:when>
 					
 					    <c:otherwise>
-					        <button class="chat-btn"
+					  
+                                 <button class="chat-btn"
 					            onclick="window.open('${pageContext.request.contextPath}/chat/room?tradeIdx=${trade.productIdx}&toUserIdx=${trade.userIdx}', 'chatRoom', 'width=450, height=850, left=200, top=100, scrollbars=yes, resizable=yes')">
 					            채팅으로 거래하기
 					        </button>
@@ -322,11 +367,13 @@
 					        <c:if test="${trade.price > 0}">
 					            <c:choose>
 					                <c:when test="${empty escrowInfo or escrowInfo.TRADESTATUS == 'CANCELED'}">
-					                    <button type="button" class="pay-btn"
+					        
+                                         <button type="button" class="pay-btn"
 					                        onclick="location.href='${pageContext.request.contextPath}/escrow/checkout?productIdx=${trade.productIdx}'">
 					                        <i class="ri-wallet-3-line"></i> 안전 결제하기
 					                    </button>
-					                </c:when>
+					               
+                                      </c:when>
 					
 					                <c:when test="${not empty escrowInfo and escrowInfo.BUYERIDX == loggedInUserId}">
 					                    <c:choose>
@@ -350,17 +397,20 @@
 											</c:when>
 					                        <c:when test="${escrowInfo.TRADESTATUS == 'CONFIRMED'}">
 					                            <button class="pay-btn" style="background-color: #00C471;" disabled>
-					                                구매 확정 완료
+					             
+                                                구매 확정 완료
 					                            </button>
 					                        </c:when>
 					                    </c:choose>
-					                </c:when>
+					       
+                                     </c:when>
 					
 					                <c:otherwise>
 					                    <button class="pay-btn" style="background-color: #999;" disabled>
 					                        다른 사용자가 안전결제를 진행 중입니다
 					                    </button>
-					                </c:otherwise>
+					   
+                                         </c:otherwise>
 					            </c:choose>
 					        </c:if>
 					    </c:otherwise>
@@ -380,7 +430,8 @@
 					        <div class="owner-actions-grid">
 							    <button type="button" class="btn-manage status-style" onclick="StatusModule.open()">
 							        <i class="ri-loop-left-line"></i> 상태 변경
-							    </button>
+							    
+                                 </button>
 							    
 							    <button type="button" class="btn-manage pull-style" onclick="PullUpModule.execute(${trade.productIdx})">
 							        <i class="ri-rocket-2-line"></i> 끌어올리기
@@ -392,7 +443,8 @@
 								                onclick="showBatonToast('판매 완료된 게시글은 수정할 수 없습니다.')">
 								            <i class="ri-edit-line"></i> 수정
 								        </button>
-								    </c:when>
+								   
+                                      </c:when>
 								    <c:otherwise>
 								        <button type="button" class="btn-manage edit-style" 
 								            onclick="location.href='${pageContext.request.contextPath}/trade/update?productIdx=${trade.productIdx}&page=${page}'">
@@ -407,7 +459,8 @@
 							    </button>
 							</div>
 					    </div>
-			        </c:if>
+			       
+                                     </c:if>
 			    </sec:authorize>
 			</div>
 
@@ -435,7 +488,8 @@
 <div id="statusModal" class="modal-overlay" onclick="StatusModule.close()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <div class="modal-header">
-            <h3>상태 변경</h3>
+  
+                                 <h3>상태 변경</h3>
             <button type="button" class="close-modal" onclick="StatusModule.close()">✕</button>
         </div>
         <div class="status-options">
@@ -456,7 +510,8 @@
             <button type="button" class="close-modal" onclick="closeShippingModal()">✕</button>
         </div>
         
-        <div style="padding: 15px 0;">
+ 
+                 <div style="padding: 15px 0;">
             <div style="margin-bottom: 15px;">
                 <label style="display:block; margin-bottom: 5px; font-weight: 600;">택배사</label>
                 <select id="deliveryCompany" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
@@ -464,13 +519,15 @@
                     <option value="우체국택배">우체국택배</option>
                     <option value="한진택배">한진택배</option>
                     <option value="롯데택배">롯데택배</option>
+         
                     <option value="로젠택배">로젠택배</option>
                     <option value="GS25편의점택배">GS25편의점택배</option>
                     <option value="CU편의점택배">CU편의점택배</option>
                 </select>
             </div>
             
-            <div>
+      
+             <div>
                 <label style="display:block; margin-bottom: 5px; font-weight: 600;">운송장 번호</label>
                 <input type="text" id="trackingNumber" placeholder="- 없이 숫자만 입력" 
                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">

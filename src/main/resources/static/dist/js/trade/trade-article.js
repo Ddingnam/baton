@@ -1,43 +1,73 @@
 const Gallery = (function () {
     let images = [];
     let currentIdx = 0;
+    let mainImg = null;
 
     function init() {
-        const thumbItems = document.querySelectorAll('.thumb-item');
-        const mainImg    = document.getElementById('mainImage');
+        mainImg = document.getElementById('mainImage');
         if (!mainImg) return;
 
-        thumbItems.forEach(function (el, i) {
-            const img = el.querySelector('img');
-            if (img) {
-				images.push(img.src);
-				console.log("로드된 이미지 주소:", img.src);
-			}
-            el.addEventListener('click', function () { selectThumb(i); });
-        });
-        if (images.length === 0) {
-            const src = mainImg.src;
-            if (src) images.push(src);
+        const thumbItems = document.querySelectorAll('.thumb-item');
+        
+        if (thumbItems.length > 0) {
+            thumbItems.forEach(function (el) {
+                const img = el.querySelector('img');
+                if (img) images.push(img.src);
+            });
+        } else if (mainImg.src) {
+            images.push(mainImg.src);
         }
-        mainImg.addEventListener('click', function () { Lightbox.open(currentIdx); });
+
+        if (images.length <= 1) {
+            const navBtns = mainImg.parentElement.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => btn.style.display = 'none');
+        } else {
+            const prevBtn = mainImg.parentElement.querySelector('.prev-btn');
+            const nextBtn = mainImg.parentElement.querySelector('.next-btn');
+
+            if (prevBtn) prevBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                prev();
+            });
+            if (nextBtn) nextBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                next();
+            });
+        }
+
+        showImage(0);
+		
         mainImg.parentElement.style.cursor = 'zoom-in';
+        mainImg.addEventListener('click', function () { Lightbox.open(currentIdx); });
     }
 
-    function selectThumb(idx) {
-        currentIdx = idx;
-        const mainImg   = document.getElementById('mainImage');
-        const thumbItems = document.querySelectorAll('.thumb-item');
+	function showImage(idx) {
+	    if (!images[idx]) return;
+	    
+	    currentIdx = idx;
+		
+	    mainImg.src = images[currentIdx];
 
-        if (mainImg && images[idx]) mainImg.src = images[idx];
-        thumbItems.forEach(function (el, i) {
-            el.classList.toggle('active', i === idx);
-        });
+	    const thumbItems = document.querySelectorAll('.thumb-item');
+	    thumbItems.forEach(function (el, i) {
+	        el.classList.toggle('active', i === idx);
+	    });
+	}
+
+    function prev() {
+        const idx = (currentIdx - 1 + images.length) % images.length;
+        showImage(idx);
+    }
+
+    function next() {
+        const idx = (currentIdx + 1) % images.length;
+        showImage(idx);
     }
 
     function getCurrent() { return currentIdx; }
     function getImages()  { return images; }
 
-    return { init, selectThumb, getCurrent, getImages };
+    return { init, getCurrent, getImages, showImage, prev, next };
 })();
 
 const Lightbox = (function () {
@@ -60,12 +90,14 @@ const Lightbox = (function () {
     function prev() {
         const images = Gallery.getImages();
         idx = (idx - 1 + images.length) % images.length;
+		Gallery.showImage(idx);
         render();
     }
 
     function next() {
         const images = Gallery.getImages();
         idx = (idx + 1) % images.length;
+		Gallery.showImage(idx);
         render();
     }
 

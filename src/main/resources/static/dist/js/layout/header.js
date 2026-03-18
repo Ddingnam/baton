@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (path.includes('/trade/')) {
         domainColor = '#00B98D';
         domainBgColor = '#E6F8F3';
-        pageBg = '#F7FCFA';
+        pageBg = '#F9FAFB';
         currentDomain = 'trade';
     } else if (path.includes('/crew/')) {
         domainColor = '#F86D7D';
