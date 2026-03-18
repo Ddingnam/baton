@@ -235,10 +235,10 @@
                         <button class="btn-action btn-call" onclick="window.open('${pageContext.request.contextPath}/chat/albaRoom?albaIdx=${dto.postingIdx}&toUserIdx=${dto.userIdx}', 'chatRoom', 'width=450,height=850')">
                             <i class="ri-wechat-line"></i> 1:1 채팅하기
                         </button>
-                        <button class="btn-action btn-apply">
-                            <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
-                            <span>이력서 지원하기</span>
-                        </button>
+                        <button class="btn-action btn-apply" onclick="openResumeModal()">
+						    <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
+						    <span>이력서 지원하기</span>
+						</button>
                         <button type="button" class="btn-action btn-report-alba"
                                 onclick="openReportModal('ALBA', ${dto.postingIdx}, ${dto.userIdx})"
                                 title="신고하기">
@@ -247,6 +247,45 @@
                     </c:otherwise>
                 </c:choose>
             </sec:authorize>
+        </div>
+    </div>
+</div>
+
+<div id="resumeModal" class="report-modal-overlay" style="display:none;">
+    <div class="report-modal-sheet">
+        <div class="report-modal-head">
+            <span class="report-modal-title"><i class="ri-file-user-line" style="color: var(--primary);"></i> 이력서 지원하기</span>
+            <button type="button" class="report-modal-close" onclick="closeResumeModal()"><i class="ri-close-line"></i></button>
+        </div>
+        
+        <div class="report-modal-body" style="padding-bottom: 20px;">
+            <p class="report-modal-desc" style="margin-bottom: 15px;">이 공고에 지원할 이력서를 선택해주세요.</p>
+            
+            <div style="margin-bottom: 20px;">
+                <select id="resumeSelect" style="width: 100%; padding: 12px; border: 1px solid var(--border-color, #ddd); border-radius: 8px; font-size: 14px; outline: none;">
+                    <option value="">선택해주세요</option>
+                    <c:choose>
+                        <c:when test="${not empty resumeList}">
+                            <c:forEach var="resume" items="${resumeList}">
+                                <option value="${resume.resumeIdx}">${resume.title}</option>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <option value="" disabled>등록된 이력서가 없습니다. 마이페이지에서 작성해주세요.</option>
+                        </c:otherwise>
+                    </c:choose>
+                </select>
+            </div>
+
+            <div class="report-content-wrap">
+                <textarea id="applyMessage" class="report-content-input" placeholder="사장님께 남길 인사말이나 각오를 간단히 적어보세요. (선택)" maxlength="200"></textarea>
+                <span class="report-content-count"><span id="applyMessageCount">0</span>/200</span>
+            </div>
+        </div>
+        
+        <div class="report-modal-foot">
+            <button type="button" class="report-btn-cancel" onclick="closeResumeModal()">취소</button>
+            <button type="button" class="report-btn-submit" style="background-color: #1a237e; border-color: #1a237e; color: #fff;" onclick="submitResume()">지원 완료</button>
         </div>
     </div>
 </div>
