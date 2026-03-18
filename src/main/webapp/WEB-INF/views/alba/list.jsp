@@ -247,35 +247,28 @@ const serverData = [
 <script src="${pageContext.request.contextPath}/dist/js/alba/alba-list.js"></script>
 
 <script>
-//--- 지역 필터 API 연동 ---
 const REGION_API_URL = "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes";
 
-// 페이지 로드 시 시/도 리스트부터 불러오기
 document.addEventListener('DOMContentLoaded', function() {
     loadFilterSido();
 });
 
-// 1. 시/도 불러오기
 function loadFilterSido() {
     fetch(REGION_API_URL + "?regcode_pattern=*00000000")
         .then(response => response.json())
         .then(data => {
             const sidoUl = document.getElementById('col-sido');
-            sidoUl.innerHTML = ""; // 기존 하드코딩된 li 제거
+            sidoUl.innerHTML = ""; 
             
-            // 이름이 짧은 단위(예: 서울특별시 -> 서울)로 처리하려면 별도 매핑이 필요하지만,
-            // 일단 API 원본 데이터 기준으로 렌더링
             const validData = data.regcodes.filter(code => code.name.split(" ").length === 1);
             
             validData.forEach(item => {
                 const li = document.createElement('li');
                 li.innerText = item.name;
                 li.onclick = function() {
-                    // 활성화 클래스 처리
                     document.querySelectorAll('#col-sido li').forEach(el => el.classList.remove('active'));
                     this.classList.add('active');
                     
-                    // 하위 목록 초기화
                     document.getElementById('col-gugun').innerHTML = "";
                     document.getElementById('col-dong').innerHTML = "";
                     
@@ -286,7 +279,6 @@ function loadFilterSido() {
         });
 }
 
-// 2. 시/구/군 불러오기
 function loadFilterGugun(sidoCode) {
     const pattern = sidoCode.substring(0, 2) + "*00000";
     fetch(REGION_API_URL + "?regcode_pattern=" + pattern + "&is_ignore_zero=true")
@@ -315,7 +307,6 @@ function loadFilterGugun(sidoCode) {
         });
 }
 
-// 3. 동/읍/면 불러오기
 function loadFilterDong(gugunCode) {
     const pattern = gugunCode.substring(0, 4) + "*&is_ignore_zero=true";
     fetch(REGION_API_URL + "?regcode_pattern=" + pattern)
@@ -337,9 +328,6 @@ function loadFilterDong(gugunCode) {
                     document.querySelectorAll('#col-dong li').forEach(el => el.classList.remove('active'));
                     this.classList.add('active');
                     
-                    // ★ 여기서 최종 선택된 지역을 변수에 저장하거나 필터 적용 함수 호출
-                    // 예: selectedDong = dongName;
-                    // applyFilters(); 
                 };
                 dongUl.appendChild(li);
             });
