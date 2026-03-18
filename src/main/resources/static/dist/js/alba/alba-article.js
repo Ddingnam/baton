@@ -293,3 +293,55 @@ document.addEventListener("DOMContentLoaded", function() {
           }
       }, options);
   }
+  
+  const SalaryCalc = (function() {
+      const getModal = () => document.getElementById('salaryModal');
+      
+      function open() {
+          getModal().classList.add('open');
+          document.body.style.overflow = 'hidden';
+          calculate(); // 열자마자 계산
+      }
+
+      function close() {
+          getModal().classList.remove('open');
+          document.body.style.overflow = '';
+      }
+
+      function calculate() {
+          const hourly = parseInt(document.getElementById('calc-hourly-pay').value) || 0;
+          const hours = parseFloat(document.getElementById('calc-daily-hours').value) || 0;
+          const days = parseInt(document.getElementById('calc-monthly-days').value) || 0;
+
+          // 한달 총 근로시간 (단순계산)
+          const totalHours = hours * days;
+          
+          // 주휴수당 대략적 계산 (1주 15시간 이상일 때, 보통 월급의 약 20% 추가)
+          let weekHours = hours * (days / 4); // 주당 평균 시간
+          let result = hourly * totalHours;
+
+          if (weekHours >= 15) {
+              // 주휴수당 = (1주 총 근로시간 / 40) * 8 * 시급 (40시간 한도)
+              const weeklyBonus = (Math.min(weekHours, 40) / 40) * 8 * hourly;
+              result += (weeklyBonus * 4.345); // 한달 평균 주차(4.345주) 반영
+          }
+
+          document.getElementById('result-month-pay').textContent = Math.round(result).toLocaleString() + '원';
+      }
+
+      return { open, close, calculate };
+  })();
+
+  // 기존 DOMContentLoaded 내부 또는 하단에 이벤트 연결
+  document.addEventListener("DOMContentLoaded", function() {
+      const calcBtn = document.querySelector('.btn-calc-mini');
+      if(calcBtn) {
+          calcBtn.onclick = SalaryCalc.open;
+      }
+
+      // 입력값 변경 시 자동 계산
+      ['calc-hourly-pay', 'calc-daily-hours', 'calc-monthly-days'].forEach(id => {
+          const el = document.getElementById(id);
+          if(el) el.oninput = SalaryCalc.calculate;
+      });
+  });

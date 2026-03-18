@@ -601,3 +601,136 @@
     list-style: none;
     padding: 0;
 }
+
+.salary-calc-modal {
+    max-width: 380px;
+    width: 90%;
+    border-radius: 24px;
+    padding: 24px;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.calc-body {
+    padding: 8px 0;
+}
+
+.calc-row {
+    margin-bottom: 20px;
+}
+
+.calc-row label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: #444;
+    margin-bottom: 10px;
+    padding-left: 4px;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    background: #f4f6f8;
+    border-radius: 12px;
+    padding: 14px 18px;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.input-group:focus-within {
+    border-color: #333;
+    background: #fff;
+}
+
+.input-group input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 20px;
+    font-weight: 800;
+    color: #111;
+    outline: none;
+    text-align: right;
+    width: 100%;
+    padding: 0 12px 0 0;
+}
+
+.input-group span {
+    font-size: 15px;
+    color: #888;
+    font-weight: 600;
+    flex-shrink: 0;
+    min-width: 30px;
+    text-align: right;
+}
+
+.input-group input::-webkit-outer-spin-button,
+.input-group input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.calc-divider {
+    height: 1px;
+    background: #eee;
+    margin: 24px 0;
+}
+
+.calc-result {
+    background: #fff5f5;
+    border-radius: 18px;
+    padding: 24px 16px;
+    text-align: center;
+}
+
+.result-item span {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.result-item strong {
+    font-size: 30px;
+    color: #ff4b4b;
+    font-weight: 900;
+    letter-spacing: -0.8px;
+}
+
+.calc-notice {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 18px;
+    line-height: 1.4;
+    word-break: keep-all;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #222;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #ccc;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.close-modal:hover {
+    color: #666;
+}
+

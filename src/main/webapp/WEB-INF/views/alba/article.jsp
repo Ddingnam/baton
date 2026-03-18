@@ -69,7 +69,9 @@
 	            </div>
 	            <div class="min-wage-info">
 	                2026년 최저시급 10,320원 
-	                <button type="button" class="btn-calc-mini"><i class="ri-calculator-line"></i> 급여계산기</button>
+	                <button type="button" class="btn-calc-mini" onclick="SalaryCalc.open()">
+    					<i class="ri-calculator-line"></i> 급여계산기
+					</button>
 	            </div>
 	        </div>
 	    </div>			
@@ -261,6 +263,47 @@
                     </c:otherwise>
                 </c:choose>
             </sec:authorize>
+        </div>
+    </div>
+</div>
+
+<!-- 급여 계산기 모달 -->
+<div id="salaryModal" class="modal-overlay" onclick="SalaryCalc.close()">
+    <div class="modal-content salary-calc-modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3>급여 계산기</h3>
+            <button type="button" class="close-modal" onclick="SalaryCalc.close()"><i class="ri-close-line"></i></button>
+        </div>
+        <div class="calc-body">
+            <div class="calc-row">
+                <label>시급</label>
+                <div class="input-group">
+                    <input type="number" id="calc-hourly-pay" value="${dto.pay}">
+                    <span>원</span>
+                </div>
+            </div>
+            <div class="calc-row">
+                <label>하루 근무시간</label>
+                <div class="input-group">
+                    <input type="number" id="calc-daily-hours" value="8">
+                    <span>시간</span>
+                </div>
+            </div>
+            <div class="calc-row">
+                <label>한달 근무일수</label>
+                <div class="input-group">
+                    <input type="number" id="calc-monthly-days" value="20">
+                    <span>일</span>
+                </div>
+            </div>
+            <div class="calc-divider"></div>
+            <div class="calc-result">
+                <div class="result-item">
+                    <span>예상 월급 (주휴포함)</span>
+                    <strong id="result-month-pay">0원</strong>
+                </div>
+                <p class="calc-notice">* 주휴수당은 주 15시간 이상 근무 시 발생합니다.</p>
+            </div>
         </div>
     </div>
 </div>
