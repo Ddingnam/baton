@@ -166,9 +166,26 @@ public class CommunityController {
     }
 
     @GetMapping("write")
-    public String writeForm(Model model) {
+    public String writeForm(
+            @RequestParam(name = "regionType", defaultValue = "1") int regionType,
+            HttpSession session,
+            Model model) {
         model.addAttribute("mode", "write");
         model.addAttribute("kakaoMapKey", kakaoMapKey);
+        model.addAttribute("regionType", regionType);
+
+        // 글쓰기 화면에서 현재 선택된 동네명 표시용
+        SessionInfo info = (SessionInfo) session.getAttribute("member");
+        if (info != null) {
+            try {
+                UserRegionInfo regionInfo = memberService.getUserRegionInfo(info.getUserIdx());
+                if (regionInfo != null) {
+                    model.addAttribute("userRegionInfo", regionInfo);
+                }
+            } catch (Exception e) {
+                log.warn("writeForm - getUserRegionInfo 실패", e);
+            }
+        }
         return "community/write";
     }
 
@@ -177,6 +194,7 @@ public class CommunityController {
             @RequestParam(value = "uploadFiles", required = false) List<MultipartFile> uploadFiles,
             @RequestParam(value = "attachFiles", required = false) List<MultipartFile> attachFiles,
             @RequestParam(value = "isTemporary", required = false, defaultValue = "0") int isTemporary,
+            @RequestParam(value = "regionType", required = false, defaultValue = "1") int regionType,
             HttpSession session) throws Exception {
             
         SessionInfo info = (SessionInfo) session.getAttribute("member");
@@ -190,18 +208,21 @@ public class CommunityController {
         try {
             UserRegionInfo regionInfo = memberService.getUserRegionInfo(info.getUserIdx());
             if (regionInfo != null) {
-                // 🌟 1순위: 활성화된 동네 코드를 무조건 우선 적용
-                if (regionInfo.getActiveRegion() != null && regionInfo.getActiveRegion().getRegionCode() != null) {
-                    dto.setRegionCode(regionInfo.getActiveRegion().getRegionCode());
-                } 
-                // 🌟 2순위: 활성화된 동네가 없으면 1번 탭(주 동네) 코드를 멱살 잡고 끌고 옴
-                else if (regionInfo.getMainRegion() != null && regionInfo.getMainRegion().getRegionCode() != null) {
-                    dto.setRegionCode(regionInfo.getMainRegion().getRegionCode());
+                // 사용자가 선택한 탭(regionType) 기준으로 동네 코드 저장
+                com.sp.app.domain.dto.RegionDto targetRegion = null;
+                if (regionType == 2 && regionInfo.getSubRegion() != null) {
+                    targetRegion = regionInfo.getSubRegion();
+                } else if (regionInfo.getMainRegion() != null) {
+                    targetRegion = regionInfo.getMainRegion();
+                    regionType = 1;
+                }
+
+                if (targetRegion != null && targetRegion.getRegionCode() != null) {
+                    dto.setRegionCode(targetRegion.getRegionCode());
                 }
             }
             
-            // 💡 이 로그가 이클립스(인텔리제이) 콘솔에 찍히는지 꼭 확인하세요!
-            log.info("▶▶▶ 새 글 작성 - 적용된 동네코드: {}", dto.getRegionCode());
+            log.info("▶▶▶ 새 글 작성 - regionType: {}, 적용된 동네코드: {}", regionType, dto.getRegionCode());
             
             service.insertCommunity(dto, uploadPath);
         } catch (Exception e) {
@@ -210,12 +231,12 @@ public class CommunityController {
 
         if (isTemporary == 1) {
             session.setAttribute("msg", "임시저장되었습니다.");
-            return "redirect:/community/list?tab=temp";
+            return "redirect:/community/list?tab=temp&regionType=" + regionType;
         }
         session.setAttribute("msg", "게시글이 등록되었습니다.");
         
-        // 글을 쓴 직후, 전체 목록이 아니라 해당 동네 탭(주 동네)으로 돌아가도록 파라미터 추가
-        return "redirect:/community/list?regionType=1";
+        // 글 작성 후 작성한 동네 탭으로 돌아가기
+        return "redirect:/community/list?regionType=" + regionType;
     }
     @GetMapping("article/{id}")
     public String article(@PathVariable("id") long id,

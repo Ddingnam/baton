@@ -146,13 +146,124 @@ a { text-decoration: none; color: inherit; }
     opacity: 0;
 }
 
+
+/* ── 동네 선택 바 ── */
+.neighborhood-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 12px 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.neighborhood-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.neighborhood-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.neighborhood-label i {
+    font-size: 14px;
+}
+
+.neighborhood-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-color);
+    border-radius: 10px;
+    padding: 4px;
+}
+
+.neighborhood-tab {
+    padding: 7px 18px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.neighborhood-tab:hover {
+    background: #fff;
+    color: var(--text-sub);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.neighborhood-tab.active {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(138, 99, 255, 0.3);
+}
+
+.neighborhood-tab.active:hover {
+    background: var(--primary-dark);
+}
+
+.neighborhood-empty {
+    font-size: 13px;
+    color: var(--text-light);
+    font-style: italic;
+}
+
+.neighborhood-change-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-light);
+    text-decoration: none;
+    white-space: nowrap;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.18s ease;
+    flex-shrink: 0;
+}
+
+.neighborhood-change-link:hover {
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+.neighborhood-change-link i {
+    font-size: 14px;
+}
+
+
+/* ── 필터 + 글쓰기 버튼 행 ── */
 .toolbar-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
     margin-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
     padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
 }
 
 .filter-group {
@@ -626,19 +737,8 @@ a { text-decoration: none; color: inherit; }
     .list-mode .cm-item-card { flex-direction: column; height: auto; }
     .list-mode .card-visual { width: 100%; height: 200px; }
 }
-.region-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: var(--primary-light);
-    color: var(--primary);
-    font-size: 13px;
-    font-weight: 700;
-    padding: 6px 14px;
-    border-radius: 999px;
-    margin-bottom: 12px;
-}
 
-.region-badge i {
-    font-size: 14px;
+@media (max-width: 768px) {
+    .neighborhood-bar { flex-wrap: wrap; gap: 10px; }
+    .neighborhood-tab { font-size: 13px; padding: 6px 14px; }
 }

@@ -346,6 +346,7 @@
 	<select id="findUserRegionbyType" parameterType="map" resultType="com.sp.app.domain.dto.RegionDto">
         SELECT u.regionIdx, u.userIdx, u.regionCode, u.regionType,
         	   u.is_active, u.is_authenticated, u.authDate,
+        	   r.sido, r.sigungu, r.dong,
         	   (r.sido || ' ' || r.sigungu || ' ' || r.dong) AS fullAddress,
         	   r.dong AS coreAddress
         FROM userRegion u 

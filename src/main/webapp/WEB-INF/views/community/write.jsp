@@ -24,6 +24,7 @@
 			<form name="communityForm" method="post" enctype="multipart/form-data">
 
 				<input type="hidden" name="mode" value="${mode}">
+				<input type="hidden" name="regionType" id="writeRegionType" value="${regionType > 0 ? regionType : 1}">
 				<c:if test="${mode=='update'}">
 					<input type="hidden" name="id" value="${dto.id}">
 					<input type="hidden" name="page" value="${page}">
@@ -41,16 +42,28 @@
 							<i class="ri-arrow-left-line"></i>
 						</button>
 						<h1 class="page-title">${mode=='update' ? '글 수정' : '글쓰기'}</h1>
+						<c:if test="${mode != 'update' && not empty userRegionInfo}">
+							<c:choose>
+								<c:when test="${regionType == 2 && not empty userRegionInfo.subRegion}">
+									<span class="write-region-badge">
+										<i class="ri-map-pin-2-fill"></i>${userRegionInfo.subRegion.dong}
+									</span>
+								</c:when>
+								<c:when test="${not empty userRegionInfo.mainRegion}">
+									<span class="write-region-badge">
+										<i class="ri-map-pin-2-fill"></i>${userRegionInfo.mainRegion.dong}
+									</span>
+								</c:when>
+							</c:choose>
+						</c:if>
 					</div>
 					<div class="editor-header-right">
-						<button type="button" class="btn-temp-list" onclick="openTempListModal()" title="임시저장 목록">
+						<button type="button" class="btn-icon-only" onclick="openTempListModal()" title="임시저장 목록">
 							<i class="ri-draft-line"></i>
-							<span>임시저장함</span>
 							<span id="tempCountBadge" class="temp-badge" style="display:none;"></span>
 						</button>
-						<button type="button" class="btn-temp-save-sm" onclick="saveTemp()" title="임시저장">
-							<i class="ri-save-3-line"></i>
-							<span>임시저장</span>
+						<button type="button" class="btn-ghost-save" onclick="saveTemp()" title="임시저장">
+							임시저장
 						</button>
 						<button type="button" class="btn-submit" onclick="sendOk();">${mode=='update' ? '수정' : '등록'}</button>
 					</div>
@@ -58,15 +71,18 @@
 
 				<div class="editor-body">
 
-					<div class="category-pills">
-						<label class="cat-pill"><input type="radio" name="category" value="1" ${mode=='write' || dto.category == 1 ? 'checked' : ''}><span>일상</span></label>
-						<label class="cat-pill"><input type="radio" name="category" value="2" ${dto.category == 2 ? 'checked' : ''}><span>동네질문</span></label>
-						<label class="cat-pill"><input type="radio" name="category" value="3" ${dto.category == 3 ? 'checked' : ''}><span>동네맛집</span></label>
-						<label class="cat-pill"><input type="radio" name="category" value="4" ${dto.category == 4 ? 'checked' : ''}><span>같이해요</span></label>
-						<label class="cat-pill"><input type="radio" name="category" value="5" ${dto.category == 5 ? 'checked' : ''}><span>분실/실종</span></label>
-						<label class="cat-pill"><input type="radio" name="category" value="6" ${dto.category == 6 ? 'checked' : ''}><span>동네사건사고</span></label>
-						<label class="cat-pill"><input type="radio" name="category" value="7" ${dto.category == 7 ? 'checked' : ''}><span>생활정보</span></label>
-						<label class="cat-pill"><input type="radio" name="category" value="8" ${dto.category == 8 ? 'checked' : ''}><span>취미생활</span></label>
+					<div class="category-section">
+						<span class="category-label">카테고리</span>
+						<div class="category-pills">
+							<label class="cat-pill"><input type="radio" name="category" value="1" ${mode=='write' || dto.category == 1 ? 'checked' : ''}><span>일상</span></label>
+							<label class="cat-pill"><input type="radio" name="category" value="2" ${dto.category == 2 ? 'checked' : ''}><span>동네질문</span></label>
+							<label class="cat-pill"><input type="radio" name="category" value="3" ${dto.category == 3 ? 'checked' : ''}><span>동네맛집</span></label>
+							<label class="cat-pill"><input type="radio" name="category" value="4" ${dto.category == 4 ? 'checked' : ''}><span>같이해요</span></label>
+							<label class="cat-pill"><input type="radio" name="category" value="5" ${dto.category == 5 ? 'checked' : ''}><span>분실/실종</span></label>
+							<label class="cat-pill"><input type="radio" name="category" value="6" ${dto.category == 6 ? 'checked' : ''}><span>동네사건사고</span></label>
+							<label class="cat-pill"><input type="radio" name="category" value="7" ${dto.category == 7 ? 'checked' : ''}><span>생활정보</span></label>
+							<label class="cat-pill"><input type="radio" name="category" value="8" ${dto.category == 8 ? 'checked' : ''}><span>취미생활</span></label>
+						</div>
 					</div>
 
 					<div class="content-group">
