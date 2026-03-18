@@ -671,35 +671,39 @@
 	        if(data.length === 0) {
 	            html = '<div style="text-align:center; padding:60px 0; color:#999;"><i class="ri-coins-line" style="font-size:40px; color:#ddd; margin-bottom:15px; display:block;"></i>이용 내역이 없습니다.</div>';
 	        } else {
-	            data.forEach(item => {
-	                let typeText = '', amountColor = '#333', amountPrefix = '', icon = '';
-	                
-	                if(item.historyType === 'CHARGE') { typeText = '포인트 충전'; amountColor = '#00B98D'; amountPrefix = '+'; icon = '<i class="ri-add-circle-fill" style="color:#00B98D; font-size:24px; margin-right:15px;"></i>'; }
-	                else if(item.historyType === 'USE_ESCROW') { typeText = '안전결제 사용'; amountColor = '#F86D7D'; amountPrefix = '-'; icon = '<i class="ri-shopping-bag-3-fill" style="color:#F86D7D; font-size:24px; margin-right:15px;"></i>'; }
-	                else if(item.historyType === 'REFUND_ESCROW') { typeText = '안전결제 취소 (포인트 반환)'; amountColor = '#00B98D'; amountPrefix = '+'; icon = '<i class="ri-refund-2-fill" style="color:#00B98D; font-size:24px; margin-right:15px;"></i>'; }
-	                else if(item.historyType === 'REFUND') { typeText = '충전 환불 (실제 돈 반환)'; amountColor = '#F86D7D'; amountPrefix = '-'; icon = '<i class="ri-bank-card-fill" style="color:#F86D7D; font-size:24px; margin-right:15px;"></i>'; }
-	                else if(item.historyType === 'SELL_ESCROW') { typeText = '판매 정산금 적립'; amountColor = '#3182F6'; amountPrefix = '+'; icon = '<i class="ri-hand-coin-fill" style="color:#3182F6; font-size:24px; margin-right:15px;"></i>'; }
-	                else { 
-	                    typeText = '기타 내역 (' + (item.historyType || '타입값 없음') + ')'; 
-	                    amountColor = '#555'; 
-	                    amountPrefix = (item.amount > 0 ? '+' : ''); 
-	                    icon = '<i class="ri-question-fill" style="color:#aaa; font-size:24px; margin-right:15px;"></i>'; 
-	                }
-	                
-	                html += '<div style="display:flex; justify-content:space-between; align-items:center; padding:20px 0; border-bottom:1px solid #f0f0f0;">' +
-	                            '<div style="display:flex; align-items:center;">' +
-	                                icon +
-	                                '<div>' +
-	                                    '<div style="font-size:15px; font-weight:700; color:#333; margin-bottom:4px;">' + typeText + '</div>' +
-	                                    '<div style="font-size:12px; color:#999;">' + (item.createdAt || '') + '</div>' +
-	                                '</div>' +
-	                            '</div>' +
-	                            '<div style="text-align:right;">' +
-	                                '<div style="font-size:16px; font-weight:800; color:' + amountColor + ';">' + amountPrefix + item.amount.toLocaleString() + ' P</div>' +
-	                                '<div style="font-size:13px; color:#888; margin-top:4px;">잔액 ' + item.totalPoint.toLocaleString() + ' P</div>' +
-	                            '</div>' +
-	                        '</div>';
-	            });
+	        	data.forEach(item => {
+                    let typeText = '', amountColor = '#333', amountPrefix = '', icon = '';
+ 
+                    if(item.historyType === 'CHARGE') { typeText = '포인트 충전'; amountColor = '#00B98D'; amountPrefix = '+ '; icon = '<i class="ri-add-circle-fill" style="color:#00B98D; font-size:24px; margin-right:15px;"></i>'; }
+                    else if(item.historyType === 'USE_ESCROW') { typeText = '안전결제 사용'; amountColor = '#F86D7D'; amountPrefix = '- '; icon = '<i class="ri-shopping-bag-3-fill" style="color:#F86D7D; font-size:24px; margin-right:15px;"></i>'; }
+                    else if(item.historyType === 'REFUND_ESCROW') { typeText = '안전결제 취소 (포인트 반환)'; amountColor = '#00B98D'; amountPrefix = '+ '; icon = '<i class="ri-refund-2-fill" style="color:#00B98D; font-size:24px; margin-right:15px;"></i>'; }
+                    else if(item.historyType === 'REFUND') { typeText = '충전 환불 (실제 돈 반환)'; amountColor = '#F86D7D'; amountPrefix = '- '; icon = '<i class="ri-bank-card-fill" style="color:#F86D7D; font-size:24px; margin-right:15px;"></i>'; }
+                    else if(item.historyType === 'SELL_ESCROW') { typeText = '판매 정산금 적립'; amountColor = '#3182F6'; amountPrefix = '+ '; icon = '<i class="ri-hand-coin-fill" style="color:#3182F6; font-size:24px; margin-right:15px;"></i>'; }
+                    else { 
+                        typeText = '기타 내역 (' + (item.historyType || '알수없음') + ')'; 
+                        amountColor = '#555'; 
+                        amountPrefix = (item.amount > 0 ? '+ ' : (item.amount < 0 ? '- ' : '')); 
+                        icon = '<i class="ri-question-fill" style="color:#aaa; font-size:24px; margin-right:15px;"></i>'; 
+                    }
+
+                    let displayAmount = Math.abs(item.amount).toLocaleString();
+                    
+                    html += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:20px 0; border-bottom:1px solid #f0f0f0;">
+                            <div style="display:flex; align-items:center;">
+                                \${icon}
+                                <div>
+                                    <div style="font-size:15px; font-weight:700; color:#333; margin-bottom:4px;">\${typeText}</div>
+                                    <div style="font-size:12px; color:#888;">\${item.createdAt || '시간 정보 없음'}</div>
+                                </div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:16px; font-weight:800; color:\${amountColor};">\${amountPrefix}\${displayAmount} P</div>
+                                <div style="font-size:13px; color:#888; margin-top:4px;">잔액 \${item.totalPoint.toLocaleString()} P</div>
+                            </div>
+                        </div>
+                    `;
+                });
 	        }
 	        document.getElementById('pointHistoryListContainer').innerHTML = html;
 	    });

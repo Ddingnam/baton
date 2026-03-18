@@ -166,7 +166,8 @@
 	</select>
 	
 	<select id="getPointHistoryByUser" parameterType="long" resultType="com.sp.app.model.PointHistory">
-        SELECT HISTORYIDX, PAYMENTIDX, TRADEIDX, AMOUNT, HISTORYTYPE, USERIDX, TOTALPOINT
+        SELECT HISTORYIDX, PAYMENTIDX, TRADEIDX, AMOUNT, HISTORYTYPE, USERIDX, TOTALPOINT,
+               TO_CHAR(CREATEDAT, 'YYYY-MM-DD HH24:MI') AS createdAt
         FROM POINTHISTORY
         WHERE USERIDX = #{userIdx}
         ORDER BY HISTORYIDX DESC
