@@ -42,19 +42,20 @@ public class ReportApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
         }
 
-        if (info.getUserIdx() == reportedUserIdx) {
+        // long(primitive) vs Long(wrapper) 비교 - .longValue() 사용
+        if (reportedUserIdx != null && info.getUserIdx() == reportedUserIdx.longValue()) {
             result.put("state", "selfReport");
             return ResponseEntity.ok(result);
         }
 
         try {
             Map<String, Object> param = new HashMap<>();
-            param.put("reporterIdx",    info.getUserIdx());
+            param.put("reporterIdx",     info.getUserIdx());
             param.put("reportedUserIdx", reportedUserIdx);
-            param.put("domainType",     domainType.toUpperCase());
-            param.put("targetIdx",      targetIdx);
-            param.put("reportType",     reportType);
-            param.put("reportContent",  reportContent);
+            param.put("domainType",      domainType.toUpperCase());
+            param.put("targetIdx",       targetIdx);
+            param.put("reportType",      reportType);
+            param.put("reportContent",   reportContent != null ? reportContent : "");
 
             int duplicate = reportMapper.checkDuplicate(param);
             if (duplicate > 0) {
@@ -67,7 +68,7 @@ public class ReportApiController {
             return ResponseEntity.ok(result);
 
         } catch (Exception e) {
-            log.error("report submit error", e);
+            log.error("report submit error: {}", e.getMessage(), e);
             result.put("state", "error");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
         }

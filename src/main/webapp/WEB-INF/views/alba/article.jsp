@@ -124,6 +124,15 @@
 	        
 	        <input type="hidden" id="mapAddress" value="${dto.location}">
 	        <input type="hidden" id="mapPlaceName" value="${dto.employer}">
+
+	        <div class="nearby-info-card">
+	            <div class="info-row">
+	                <span class="info-label">인근 지하철</span>
+	                <div class="info-contents" id="subway-list">
+	                    <span class="nearby-item" style="color: var(--text-light); font-size: 13px;">위치 정보를 불러오는 중...</span>
+	                </div>
+	            </div>
+	        </div>
 	    </div>
 	</section>
 
@@ -286,6 +295,46 @@
         <div class="report-modal-foot">
             <button type="button" class="report-btn-cancel" onclick="closeResumeModal()">취소</button>
             <button type="button" class="report-btn-submit" style="background-color: #1a237e; border-color: #1a237e; color: #fff;" onclick="submitResume()">지원 완료</button>
+        </div>
+    </div>
+</div>
+
+<div id="salaryModal" class="modal-overlay" style="align-items:center; justify-content:center;" onclick="if(event.target===this) SalaryCalc.close()">
+    <div class="salary-calc-modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3>💰 급여 계산기</h3>
+            <button class="close-modal" onclick="SalaryCalc.close()">✕</button>
+        </div>
+        <div class="calc-body">
+            <div class="calc-row">
+                <label>시급</label>
+                <div class="input-group">
+                    <input type="number" id="calc-hourly-pay" value="${dto.pay}" min="0">
+                    <span>원</span>
+                </div>
+            </div>
+            <div class="calc-row">
+                <label>하루 근무시간</label>
+                <div class="input-group">
+                    <input type="number" id="calc-daily-hours" value="8" min="0" max="24" step="0.5">
+                    <span>시간</span>
+                </div>
+            </div>
+            <div class="calc-row">
+                <label>한 달 근무일수</label>
+                <div class="input-group">
+                    <input type="number" id="calc-monthly-days" value="20" min="0" max="31">
+                    <span>일</span>
+                </div>
+            </div>
+            <div class="calc-divider"></div>
+            <div class="calc-result">
+                <div class="result-item">
+                    <span>예상 월급 (주휴수당 포함)</span>
+                    <strong id="result-month-pay">0원</strong>
+                </div>
+                <p class="calc-notice">※ 주 15시간 이상 근무 시 주휴수당이 포함됩니다. 실제 급여는 근무 조건에 따라 달라질 수 있습니다.</p>
+            </div>
         </div>
     </div>
 </div>
