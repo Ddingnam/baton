@@ -38,6 +38,8 @@
 		</section>
 
 		<div class="content-wrapper">
+		
+		
 
 			<div class="alba-toolbar">
 				<div class="toolbar-top">
@@ -224,6 +226,15 @@
 
 	<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 
+
+<script>
+const myRegion = {
+    sido: "${loginMember.userRegionInfo.activeRegion.sido}",
+    gugun: "${loginMember.userRegionInfo.activeRegion.sigungu}",
+    dong: "${loginMember.userRegionInfo.activeRegion.dong}"
+};
+</script>
+
 <script>
 const CONTEXT_PATH = "${pageContext.request.contextPath}";
 const serverData = [
@@ -250,10 +261,18 @@ const serverData = [
 const REGION_API_URL = "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes";
 
 document.addEventListener('DOMContentLoaded', function() {
-    loadFilterSido();
+    loadFilterSido(() => {
+        if (myRegion && myRegion.sido) {
+            applyAreaFilterAuto(
+                myRegion.sido,
+                myRegion.gugun,
+                myRegion.dong
+            );
+        }
+    });
 });
 
-function loadFilterSido() {
+function loadFilterSido(callback) {
     fetch(REGION_API_URL + "?regcode_pattern=*00000000")
         .then(response => response.json())
         .then(data => {
@@ -265,17 +284,22 @@ function loadFilterSido() {
             validData.forEach(item => {
                 const li = document.createElement('li');
                 li.innerText = item.name;
+                li.dataset.name = item.name;
+
                 li.onclick = function() {
                     document.querySelectorAll('#col-sido li').forEach(el => el.classList.remove('active'));
                     this.classList.add('active');
-                    
+
                     document.getElementById('col-gugun').innerHTML = "";
                     document.getElementById('col-dong').innerHTML = "";
-                    
+
                     loadFilterGugun(item.code);
                 };
+
                 sidoUl.appendChild(li);
             });
+
+            if (callback) callback();
         });
 }
 
@@ -291,10 +315,12 @@ function loadFilterGugun(sidoCode) {
             
             filteredData.forEach(item => {
                 const nameParts = item.name.split(" ");
-                const gugunName = nameParts.slice(1).join(" "); // 시/도 이름 제외
+                const gugunName = nameParts.slice(1).join(" ");
                 
                 const li = document.createElement('li');
                 li.innerText = gugunName;
+                li.dataset.name = gugunName;
+
                 li.onclick = function() {
                     document.querySelectorAll('#col-gugun li').forEach(el => el.classList.remove('active'));
                     this.classList.add('active');
@@ -302,6 +328,7 @@ function loadFilterGugun(sidoCode) {
                     document.getElementById('col-dong').innerHTML = "";
                     loadFilterDong(item.code);
                 };
+
                 gugunUl.appendChild(li);
             });
         });
@@ -324,14 +351,48 @@ function loadFilterDong(gugunCode) {
                 
                 const li = document.createElement('li');
                 li.innerText = dongName;
+                li.dataset.name = dongName;
+
                 li.onclick = function() {
                     document.querySelectorAll('#col-dong li').forEach(el => el.classList.remove('active'));
                     this.classList.add('active');
-                    
                 };
+
                 dongUl.appendChild(li);
             });
         });
+}
+
+function applyAreaFilterAuto(sido, gugun, dong) {
+    const sidoList = document.querySelectorAll('#col-sido li');
+
+    sidoList.forEach(li => {
+        if (li.dataset.name === sido) {
+            li.click();
+
+            setTimeout(() => {
+                const gugunList = document.querySelectorAll('#col-gugun li');
+
+                gugunList.forEach(gli => {
+                    if (gli.dataset.name === gugun) {
+                        gli.click();
+
+                        setTimeout(() => {
+                            const dongList = document.querySelectorAll('#col-dong li');
+
+                            dongList.forEach(dli => {
+                                if (dli.dataset.name === dong) {
+                                    dli.click();
+                                }
+                            });
+
+                        }, 200);
+                    }
+                });
+
+            }, 200);
+        }
+    });
 }
 </script>
 </body>
