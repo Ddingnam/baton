@@ -734,3 +734,25 @@
     color: #666;
 }
 
+.btn-report-alba {
+    position: relative;
+    overflow: hidden;
+    transition: color 0.25s, border-color 0.25s;
+}
+
+.btn-report-alba::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #FF4D4F;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 0;
+}
+
+.btn-report-alba:hover::before { transform: scaleX(1); }
+.btn-report-alba:hover { color: #fff; border-color: #FF4D4F; }
+
+.btn-report-alba i,
+.btn-report-alba span { position: relative; z-index: 1; }

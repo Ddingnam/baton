@@ -52,6 +52,7 @@ public class ChatRoomController {
 
         model.addAttribute("roomIdx", roomIdx);
         model.addAttribute("userIdx", myUserIdx);
+        model.addAttribute("counterpartIdx", toUserIdx);
         model.addAttribute("chatList", list);
         model.addAttribute("counterpartName", counterpartNickname);
         
@@ -126,14 +127,14 @@ public class ChatRoomController {
 
         model.addAttribute("roomIdx", roomIdx);
         model.addAttribute("userIdx", myUserIdx);
+        model.addAttribute("counterpartIdx", toUserIdx);
         model.addAttribute("chatList", list);
         model.addAttribute("counterpartName", counterpartNickname);
         
-        // 알바 정보 가져오기
         Map<String, Object> albaInfo = chatService.getAlbaInfo(albaIdx);
         model.addAttribute("albaInfo", albaInfo);
         
-        return "chat/room"; // JSP는 기존꺼 재활용
+        return "chat/room";
     }
     
     @GetMapping("/albaList")

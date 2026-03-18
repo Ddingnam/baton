@@ -7,8 +7,10 @@
 <meta charset="UTF-8">
 <title>바톤 채팅방</title>
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/report/report-modal.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
 <style>
     body, html { margin: 0; padding: 0; height: 100%; background: #fff; font-family: 'Noto Sans KR', sans-serif; }
     .chat-container { width: 100%; height: 100vh; display: flex; flex-direction: column; background: #fff; }
@@ -21,7 +23,6 @@
     .trade-info { flex: 1; display: flex; flex-direction: column; }
     .trade-title { font-size: 14px; font-weight: bold; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;}
     .trade-date { font-size: 12px; color: #888; margin-top: 3px; }
-    .alba-badge { display: inline-block; background: #e3f2fd; color: #1976d2; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; font-weight: 600; width: fit-content; }
     .chat-messages { flex: 1; overflow-y: auto; padding: 20px; background: #fff; } 
     .date-divider { text-align: center; margin: 20px 0; }
     .date-divider span { background: #f0f0f0; color: #666; font-size: 12px; padding: 5px 15px; border-radius: 15px; }
@@ -41,18 +42,10 @@
     .chat-input-box textarea { flex: 1; padding: 12px 15px; border: 1px solid #f0f0f0; background: #f8f9fa; border-radius: 20px; outline: none; resize: none; overflow: hidden; height: 44px; line-height: 20px; font-family: inherit; font-size: 14px;}
     .chat-input-box textarea:focus { border-color: #00B050; background: #fff; }
     .chat-input-box button { width: 44px; height: 44px; margin-left: 10px; border: none; background: #00B050; color: white; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
-  
-	.alba-theme .msg-me .msg-bubble { background: #3182f6; color: #fff; } 
-	.alba-theme .chat-input-box button { background: #3182f6; } 
-	.alba-theme .unread-count { color: #3182f6; } 
-	.alba-theme .trade-banner { background: #f0f7ff; border-bottom: 1px solid #dce9f9; } 
-	.alba-theme .trade-info { flex-direction: row; align-items: center; justify-content: space-between; } 
-	.alba-theme .alba-badge { background: #3182f6; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; margin-right: 8px; }
-	 
 </style>
 </head>
 <body>
-    <div class="chat-container ${not empty albaInfo ? 'alba-theme' : ''}">
+    <div class="chat-container">
         <div class="chat-header">
             <div class="header-left" onclick="goBack()">
                 <i class="ri-arrow-left-s-line"></i>
@@ -60,44 +53,32 @@
             <div class="header-center">${counterpartName}</div>
             <div class="header-right" style="position:relative;">
                 <i class="ri-more-2-fill" style="font-size: 24px; cursor: pointer; color: #333;" onclick="toggleMenu()"></i>
-                <div id="roomMenu" style="display:none; position:absolute; right:0; top:35px; background:#fff; border:1px solid #ddd; box-shadow:0 2px 10px rgba(0,0,0,0.1); border-radius:8px; z-index:100; width:120px;">
-                    <div onclick="leaveRoom()" style="padding:12px 15px; color:#e74c3c; cursor:pointer; font-size:14px; text-align:center;">삭제하기</div>
+                <div id="roomMenu" style="display:none; position:absolute; right:0; top:35px; background:#fff; border:1px solid #eee; box-shadow:0 4px 16px rgba(0,0,0,0.10); border-radius:12px; z-index:100; width:130px; overflow:hidden;">
+                    <div onclick="leaveRoom()" style="padding:13px 16px; color:#555; cursor:pointer; font-size:14px; font-weight:600; text-align:center; transition:background 0.15s;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='transparent'">삭제하기</div>
+                    <c:if test="${not empty counterpartIdx}">
+                    <div style="height:1px; background:#f0f0f0; margin:0 12px;"></div>
+                    <div onclick="openReportModal('CHAT', ${counterpartIdx}, ${counterpartIdx})" style="padding:13px 16px; color:#FF4D4F; cursor:pointer; font-size:14px; font-weight:600; text-align:center; transition:background 0.15s;" onmouseover="this.style.background='#FFF1F0'" onmouseout="this.style.background='transparent'">신고하기</div>
+                    </c:if>
                 </div>
             </div>
         </div>
-
-        <c:choose>
-            <c:when test="${not empty tradeInfo}">
-                <div class="trade-banner">
-                    <c:choose>
-                        <c:when test="${not empty tradeInfo.SAVENAME}">
-                            <img src="${pageContext.request.contextPath}/uploads/trade/${tradeInfo.SAVENAME}" class="trade-thumb" onerror="this.src='${pageContext.request.contextPath}/dist/images/noimage.png'">
-                        </c:when>
-                        <c:otherwise>
-                            <img src="${pageContext.request.contextPath}/dist/images/noimage.png" class="trade-thumb">
-                        </c:otherwise>
-                    </c:choose>
-                    <div class="trade-info">
-                        <span class="trade-title">${tradeInfo.TITLE}</span>
-                        <span class="trade-date">작성일: ${tradeInfo.CREATEDDATE}</span>
-                    </div>
+        
+        <c:if test="${not empty tradeInfo}">
+            <div class="trade-banner">
+                <c:choose>
+                    <c:when test="${not empty tradeInfo.SAVENAME}">
+                        <img src="${pageContext.request.contextPath}/uploads/trade/${tradeInfo.SAVENAME}" class="trade-thumb" onerror="this.src='${pageContext.request.contextPath}/dist/images/noimage.png'">
+                    </c:when>
+                    <c:otherwise>
+                        <img src="${pageContext.request.contextPath}/dist/images/noimage.png" class="trade-thumb">
+                    </c:otherwise>
+                </c:choose>
+                <div class="trade-info">
+                    <span class="trade-title">${tradeInfo.TITLE}</span>
+                    <span class="trade-date">작성일: ${tradeInfo.CREATEDDATE}</span>
                 </div>
-            </c:when>
-            <c:when test="${not empty albaInfo}">
-			    <div class="trade-banner">
-			        <div class="trade-info">
-			            <span class="alba-badge">알바 문의</span>
-			            <span class="trade-title" style="font-size: 16px;">${albaInfo.TITLE}</span>
-			            <div style="margin-top: 5px;">
-			                <span style="color: #3182f6; font-weight: 700;">
-			                    <i class="ri-money-dollar-circle-line"></i> ${albaInfo.PAY}원
-			                </span>
-			                <span class="trade-date" style="margin-left: 10px;">등록일: ${albaInfo.CREATEDDATE}</span>
-			            </div>
-			        </div>
-			    </div>
-			</c:when>
-        </c:choose>
+            </div>
+        </c:if>
 
         <div class="chat-messages" id="chatArea">
             <div class="system-msg"><b>${counterpartName}</b>님과 대화를 시작합니다.</div>
@@ -151,10 +132,6 @@
     let stompClient = null;
     let currentDisplayDate = "${lastDate}";
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const tradeIdx = urlParams.get('tradeIdx');
-    const albaIdx = urlParams.get('albaIdx');
-
     function connect() {
         let socket = new SockJS('${pageContext.request.contextPath}/ws/chat');
         stompClient = Stomp.over(socket);
@@ -187,11 +164,15 @@
         let content = input.value.trim();
         if(!content) return;
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const tradeIdx = urlParams.get('tradeIdx');
+
         let messageModel = { 
             roomIdx: currentRoomIdx, 
             userIdx: myUserIdx, 
             content: content, 
-            msgType: 1
+            msgType: 1,
+            tradeIdx: tradeIdx
         };
         
         stompClient.send("/app/chat/send", {}, JSON.stringify(messageModel));
@@ -210,7 +191,7 @@
         
         let now = new Date();
         let dateStr = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,'0') + "-" + String(now.getDate()).padStart(2,'0');
-        let timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2,'0');
+        let timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 
         if(currentDisplayDate !== dateStr) {
             let dateHtml = '<div class="date-divider"><span>' + dateStr + '</span></div>';
@@ -248,9 +229,11 @@
     }
     
     function goBack() {
-        if(albaIdx) {
-            location.href = '${pageContext.request.contextPath}/chat/albaList?albaIdx=' + albaIdx;
-        } else if(tradeIdx) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tradeIdx = urlParams.get('tradeIdx');
+        let ref = document.referrer;
+        
+        if (ref.indexOf('/chat/tradeList') !== -1) {
             location.href = '${pageContext.request.contextPath}/chat/tradeList?tradeIdx=' + tradeIdx;
         } else {
             location.href = '${pageContext.request.contextPath}/chat/list?mode=popup';
@@ -275,11 +258,49 @@
         })
         .then(response => response.json())
         .then(data => {
-            if(data.state === 'true') goBack();
+            if(data.state === 'true') {
+                goBack();
+            }
         });
     }
 
     window.onload = function() { connect(); };
 </script>
+<script>
+    window.contextPath = "${pageContext.request.contextPath}";
+</script>
+<script src="${pageContext.request.contextPath}/dist/js/report/report-modal.js"></script>
+
+<div id="reportModal" class="report-modal-overlay" style="display:none;">
+    <div class="report-modal-sheet">
+        <div class="report-modal-head">
+            <span class="report-modal-title"><i class="ri-alarm-warning-line"></i> 신고하기</span>
+            <button type="button" class="report-modal-close" onclick="closeReportModal()"><i class="ri-close-line"></i></button>
+        </div>
+        <div class="report-modal-body">
+            <p class="report-modal-desc">신고 사유를 선택해주세요. 허위 신고는 제재를 받을 수 있습니다.</p>
+            <div class="report-type-list">
+                <label class="report-type-item"><input type="radio" name="reportType" value="스팸"><span class="report-type-label"><i class="ri-spam-line"></i> 스팸 / 광고</span></label>
+                <label class="report-type-item"><input type="radio" name="reportType" value="욕설/비방"><span class="report-type-label"><i class="ri-emotion-unhappy-line"></i> 욕설 / 비방</span></label>
+                <label class="report-type-item"><input type="radio" name="reportType" value="음란물"><span class="report-type-label"><i class="ri-eye-off-line"></i> 음란물 / 불건전</span></label>
+                <label class="report-type-item"><input type="radio" name="reportType" value="사기"><span class="report-type-label"><i class="ri-error-warning-line"></i> 사기 / 허위 정보</span></label>
+                <label class="report-type-item"><input type="radio" name="reportType" value="개인정보침해"><span class="report-type-label"><i class="ri-user-forbid-line"></i> 개인정보 침해</span></label>
+                <label class="report-type-item"><input type="radio" name="reportType" value="기타"><span class="report-type-label"><i class="ri-more-line"></i> 기타</span></label>
+            </div>
+            <div class="report-content-wrap">
+                <textarea id="reportContent" class="report-content-input" placeholder="추가로 전달할 내용이 있으면 입력해주세요. (선택)" maxlength="300"></textarea>
+                <span class="report-content-count"><span id="reportContentCount">0</span>/300</span>
+            </div>
+        </div>
+        <div class="report-modal-foot">
+            <button type="button" class="report-btn-cancel" onclick="closeReportModal()">취소</button>
+            <button type="button" class="report-btn-submit" onclick="submitReport()">신고 접수</button>
+        </div>
+        <input type="hidden" id="reportDomainType" value="">
+        <input type="hidden" id="reportTargetIdx" value="">
+        <input type="hidden" id="reportedUserIdx" value="">
+    </div>
+</div>
+
 </body>
 </html>

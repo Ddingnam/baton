@@ -14,6 +14,7 @@
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/alba/alba-article.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/report/report-modal.css">
 
 <jsp:include page="/WEB-INF/views/api/api.jsp"/>
 
@@ -69,9 +70,7 @@
 	            </div>
 	            <div class="min-wage-info">
 	                2026년 최저시급 10,320원 
-	                <button type="button" class="btn-calc-mini" onclick="SalaryCalc.open()">
-    					<i class="ri-calculator-line"></i> 급여계산기
-					</button>
+	                <button type="button" class="btn-calc-mini"><i class="ri-calculator-line"></i> 급여계산기</button>
 	            </div>
 	        </div>
 	    </div>			
@@ -107,42 +106,25 @@
 	            </div>
 	        </li>
 	    </ul>
-		<div class="location-info-area">
-    <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--text-main);">근무지역</h3>
-    
-    <div class="address-box">
-        <i class="ri-map-pin-2-fill" style="color: var(--primary); font-size: 18px;"></i>
-        <span class="address-text" id="fullAddress">${dto.location}</span>
-        <button type="button" class="btn-copy-addr" onclick="copyAddress('${dto.location}')">복사</button>
-    </div>
-    
-    <div class="location-map-wrapper">
-        <div id="map"></div>
-        <div class="map-overlay-buttons">
-            <button type="button" class="map-btn" onclick="relayoutMap()">지도 초기화</button>
-            <a href="https://map.kakao.com/link/to/${dto.employer},${dto.locationLat},${dto.locationLng}" 
-               target="_blank" class="map-btn" style="background: var(--primary); color: #fff; border:none;">길찾기</a>
-        </div>
-    </div>
-
-    <div class="nearby-info-card">
-			 <div class="info-row">
-				    <span class="info-label">인근지하철</span>
-				    <div class="info-contents" id="subway-list">
-				        <div class="nearby-item">지하철 정보를 불러오는 중...</div>
-				    </div>
-				</div>
-				        <ul class="map-notice">
-				            <li>· 지도는 근무지 위치를 나타내며 실제 소재지와 다를 수 있습니다.</li>
-				        </ul>
-				    </div>
-				    
-				    <input type="hidden" id="mapAddress" value="${dto.location}">
-				    <input type="hidden" id="mapPlaceName" value="${dto.employer}">
-				    <input type="hidden" id="mapLat" value="${dto.locationLat}">
-				    <input type="hidden" id="mapLng" value="${dto.locationLng}">
-			</div>
-	    
+	
+	    <div class="map-container-wrapper" style="margin-top: 30px;">
+	        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--text-main);">근무지 위치</h3>
+	        
+	        <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 12px 16px; border-radius: 10px; margin-bottom: 12px;">
+	            <span style="font-size: 14px; color: var(--text-sub); word-break: keep-all;">
+	                <i class="ri-map-pin-line" style="vertical-align: middle; margin-right: 4px; font-size: 16px;"></i> 
+	                ${dto.location}
+	            </span>
+	            <button type="button" onclick="copyAddress('${dto.location}')" style="white-space:nowrap; background: #fff; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; color: var(--text-main); cursor: pointer; transition: background 0.2s;">
+	                주소 복사
+	            </button>
+	        </div>
+	        
+	        <div id="map" style="width: 100%; height: 220px; border-radius: 10px; border: 1px solid var(--border-color); z-index: 1;"></div>
+	        
+	        <input type="hidden" id="mapAddress" value="${dto.location}">
+	        <input type="hidden" id="mapPlaceName" value="${dto.employer}">
+	    </div>
 	</section>
 
     <div class="divider"></div>
@@ -238,14 +220,11 @@
             <sec:authorize access="isAuthenticated()">
                 <c:choose>
                     <c:when test="${loggedInUserId == dto.userIdx}">
-					    <button class="btn-action btn-call" onclick="window.open('${pageContext.request.contextPath}/chat/albaList?albaIdx=${dto.postingIdx}', 'chatList', 'width=450,height=850')">
-					        <i class="ri-message-3-line"></i> 채팅 관리
-					    </button>
-					    <button class="btn-action btn-apply" onclick="window.open('${pageContext.request.contextPath}/chat/albaList?albaIdx=${dto.postingIdx}', 'chatList', 'width=450,height=850')">
-					        <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
-					        <span>지원 내역 (${dto.chatCount})</span>
-					    </button>
-					</c:when>
+                        <button class="btn-action btn-apply full-width" onclick="window.open('${pageContext.request.contextPath}/chat/albaList?albaIdx=${dto.postingIdx}', 'chatList', 'width=450,height=850')">
+                            <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
+                            <span>지원 내역 보기 (${dto.chatCount})</span>
+                        </button>
+                    </c:when>
                     <c:when test="${dto.recruitStatus == '모집완료'}">
                         <button class="btn-action btn-apply disabled full-width" disabled>
                             <span class="chip-dday">마감</span>
@@ -260,50 +239,14 @@
                             <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
                             <span>채팅으로 지원하기</span>
                         </button>
+                        <button type="button" class="btn-action btn-report-alba"
+                                onclick="openReportModal('ALBA', ${dto.postingIdx}, ${dto.userIdx})"
+                                title="신고하기">
+                            <i class="ri-alarm-warning-line"></i><span>신고하기</span>
+                        </button>
                     </c:otherwise>
                 </c:choose>
             </sec:authorize>
-        </div>
-    </div>
-</div>
-
-<!-- 급여 계산기 모달 -->
-<div id="salaryModal" class="modal-overlay" onclick="SalaryCalc.close()">
-    <div class="modal-content salary-calc-modal" onclick="event.stopPropagation()">
-        <div class="modal-header">
-            <h3>급여 계산기</h3>
-            <button type="button" class="close-modal" onclick="SalaryCalc.close()"><i class="ri-close-line"></i></button>
-        </div>
-        <div class="calc-body">
-            <div class="calc-row">
-                <label>시급</label>
-                <div class="input-group">
-                    <input type="number" id="calc-hourly-pay" value="${dto.pay}">
-                    <span>원</span>
-                </div>
-            </div>
-            <div class="calc-row">
-                <label>하루 근무시간</label>
-                <div class="input-group">
-                    <input type="number" id="calc-daily-hours" value="8">
-                    <span>시간</span>
-                </div>
-            </div>
-            <div class="calc-row">
-                <label>한달 근무일수</label>
-                <div class="input-group">
-                    <input type="number" id="calc-monthly-days" value="20">
-                    <span>일</span>
-                </div>
-            </div>
-            <div class="calc-divider"></div>
-            <div class="calc-result">
-                <div class="result-item">
-                    <span>예상 월급 (주휴포함)</span>
-                    <strong id="result-month-pay">0원</strong>
-                </div>
-                <p class="calc-notice">* 주휴수당은 주 15시간 이상 근무 시 발생합니다.</p>
-            </div>
         </div>
     </div>
 </div>
@@ -338,6 +281,42 @@
   }
 </script>
 
+<script>
+    window.contextPath = "${pageContext.request.contextPath}";
+</script>
 <script src="${pageContext.request.contextPath}/dist/js/alba/alba-article.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/report/report-modal.js"></script>
+
+<div id="reportModal" class="report-modal-overlay" style="display:none;">
+    <div class="report-modal-sheet">
+        <div class="report-modal-head">
+            <span class="report-modal-title"><i class="ri-alarm-warning-line"></i> 신고하기</span>
+            <button type="button" class="report-modal-close" onclick="closeReportModal()"><i class="ri-close-line"></i></button>
+        </div>
+        <div class="report-modal-body">
+            <p class="report-modal-desc">신고 사유를 선택해주세요. 허위 신고는 제재를 받을 수 있습니다.</p>
+            <div class="report-type-list">
+                <label class="report-type-item"><input type="radio" name="reportType" value="스팸"><span class="report-type-label"><i class="ri-spam-line"></i> 스팸 / 광고</span></label>
+                <label class="report-type-item"><input type="radio" name="reportType" value="욕설/비방"><span class="report-type-label"><i class="ri-emotion-unhappy-line"></i> 욕설 / 비방</span></label>
+                <label class="report-type-item"><input type="radio" name="reportType" value="음란물"><span class="report-type-label"><i class="ri-eye-off-line"></i> 음란물 / 불건전</span></label>
+                <label class="report-type-item"><input type="radio" name="reportType" value="사기"><span class="report-type-label"><i class="ri-error-warning-line"></i> 사기 / 허위 정보</span></label>
+                <label class="report-type-item"><input type="radio" name="reportType" value="개인정보침해"><span class="report-type-label"><i class="ri-user-forbid-line"></i> 개인정보 침해</span></label>
+                <label class="report-type-item"><input type="radio" name="reportType" value="기타"><span class="report-type-label"><i class="ri-more-line"></i> 기타</span></label>
+            </div>
+            <div class="report-content-wrap">
+                <textarea id="reportContent" class="report-content-input" placeholder="추가로 전달할 내용이 있으면 입력해주세요. (선택)" maxlength="300"></textarea>
+                <span class="report-content-count"><span id="reportContentCount">0</span>/300</span>
+            </div>
+        </div>
+        <div class="report-modal-foot">
+            <button type="button" class="report-btn-cancel" onclick="closeReportModal()">취소</button>
+            <button type="button" class="report-btn-submit" onclick="submitReport()">신고 접수</button>
+        </div>
+        <input type="hidden" id="reportDomainType" value="">
+        <input type="hidden" id="reportTargetIdx" value="">
+        <input type="hidden" id="reportedUserIdx" value="">
+    </div>
+</div>
+
 </body>
 </html>
