@@ -1,16 +1,3 @@
-const CrewList = { 
-    template: '#crew-list-template',
-    data() {
-        return {
-        }
-    },
-    methods: {
-        toggleWish(id) {
-            console.log(id + "번 게시글 찜하기!");
-        }
-    }
-};
-
 const CrewHero = { template: '#crew-hero-template' };
 
 const router = VueRouter.createRouter({
@@ -27,6 +14,12 @@ const router = VueRouter.createRouter({
             path: '/article/:id', 
             components: {
                 default: CrewDetail 
+            }
+        },
+        { 
+            path: '/write', 
+            components: {
+                default: CrewForm
             }
         }
     ]

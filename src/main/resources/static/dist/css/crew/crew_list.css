@@ -1,569 +1,534 @@
 @charset "UTF-8";
 
-:root {
-    --crew-pink: #F86D7D;
-    --bg-color: #F9FAFB;
-    --text-main: #191F28;
-    --text-sub: #4E5968;
-    --text-light: #8B95A1;
-    --border-color: #E5E8EB;
-}
+/* ==============================================
+   Crew List Component Styles
+   Prefix: cl-
+   ============================================== */
 
-@keyframes fadeInUp {
-    0% { opacity: 0; transform: translateY(30px); }
-    100% { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fillProgress {
-    0% { width: 0; }
-}
-
-@keyframes heartPop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.3); }
-    100% { transform: scale(1); }
-}
-
-body {
-    font-family: 'Noto Sans KR', sans-serif;
-    color: var(--text-main);
-    margin: 0; 
-    padding: 0;
-}
-
-.crew-main-container {
-	padding-top: 76px;
-	background-color: var(--bg-color);
-	min-height: 100vh;
-	padding-bottom: 80px;
-	overflow: hidden;
-}
-
-.crew-hero-section {
-	background: #fff;
-	padding: 50px 0;
-	border-bottom: 1px solid var(--border-color);
-	animation: fadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
-}
-
-.hero-inner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+/* --- 0. 컨테이너 --- */
+.cl-content-wrapper {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-.hero-text-box {
-    margin-right: 0;
-}
-
-.hero-text-box .sub-title {
-	color: var(--crew-pink);
-	font-weight: 800;
-	font-size: 14px;
-	letter-spacing: 1px;
-}
-
-.hero-text-box .main-title {
-	font-size: 36px;
-	font-weight: 800;
-	color: var(--text-main);
-	margin: 12px 0;
-	line-height: 1.3;
-}
-
-.main-title .highlight {
-	color: var(--crew-pink);
-}
-
-.hero-text-box .desc {
-	font-size: 16px;
-	color: var(--text-sub);
-}
-
-.hero-search-box {
+/* --- 1. 신규 유저 가이드라인 카드 (Ultra Glassmorphism) --- */
+.cl-welcome-card {
+    position: relative;
+    /* 1. 배경: 반투명 화이트 + 아주 미세한 노이즈 질감 느낌 */
+    background: rgba(255, 255, 255, 0.45); 
+    border-radius: 32px;
+    padding: 50px 60px;
+    margin-bottom: 30px;
+    
+    /* 2. 글래스모피즘의 핵심: 강력한 블러 효과 */
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    
+    /* 3. 테두리: 안쪽으로 빛이 맺히는 하이라이트 효과 (중요) */
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.05),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.4); /* 안쪽 광택 라인 */
+    
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    background: #fff;
-    border: 1px solid var(--border-color);
-    border-radius: 50px;
-    padding: 6px 6px 6px 20px;
-    width: 100%;
-    max-width: 560px;
-    margin: 30px auto 0;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
+    overflow: hidden; 
+    animation: clFadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 
-.hero-search-box:focus-within {
-    border-color: var(--crew-pink);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+/* 4. 유리알 뒤에 비치는 '컬러 오라' (이게 있어야 유리 느낌이 납니다) */
+.cl-welcome-card::before {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(248, 109, 125, 0.2) 0%, rgba(248, 109, 125, 0) 70%);
+    top: -100px;
+    right: -50px;
+    z-index: -1;
+    border-radius: 50%;
 }
 
-.hero-search-box i {
-	font-size: 20px;
-	color: var(--text-light);
-	margin-right: 12px;
+/* 텍스트 스택 */
+.cl-welcome-content {
+    position: relative;
+    z-index: 2;
 }
 
-.hero-search-box:focus-within i {
-	color: var(--crew-pink);
+.cl-welcome-sub {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--crew-pink);
+    letter-spacing: 2px;
+    display: block;
+    margin-bottom: 12px;
+    opacity: 0.9;
 }
 
-.hero-search-box input {
-    flex: 1;
-    border: none !important; 
-    outline: none !important;
-    background: transparent;
-    height: 48px;
-    font-size: 15px;
-    color: var(--text-main);
-    padding: 0;
+.cl-welcome-title {
+    font-size: 32px;
+    font-weight: 900; /* 더 묵직하게 */
+    color: #191F28;
+    margin-bottom: 15px;
+    line-height: 1.2;
+    letter-spacing: -1px;
 }
 
-.search-btn {
-    background: var(--text-main);
-    color: #fff;
-    border: none;
-    padding: 10px 24px;
-    border-radius: 30px;
+.cl-highlight {
+    color: var(--crew-pink);
+    position: relative;
+}
+
+.cl-welcome-desc {
+    color: #4E5968;
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+/* 버튼 그룹 */
+.cl-welcome-actions {
+    display: flex;
+    gap: 15px;
+    position: relative;
+    z-index: 2;
+}
+
+.cl-guide-btn {
+    padding: 16px 28px;
+    border-radius: 18px;
     font-weight: 700;
+    font-size: 15px;
     cursor: pointer;
-    transition: all 0.3s;
-    white-space: nowrap;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: none;
 }
 
-.search-btn:hover {
-	background: var(--crew-pink);
-	transform: scale(1.05);
+.cl-guide-btn.primary {
+    background: #191F28;
+    color: #fff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
-
-.content-wrapper {
-	max-width: 1200px;
-	margin: 40px auto 0;
-	padding: 0 20px;
+.cl-guide-btn.secondary {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    color: #4E5968;
 }
 
-.crew-toolbar {
-	margin-bottom: 30px;
-	animation: fadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) 0.1s
-		forwards;
-	opacity: 0;
+.cl-guide-btn:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
 }
 
-.toolbar-top {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 20px;
-	border-bottom: 1px solid var(--border-color);
-	padding-bottom: 20px;
+/* --- 2. 툴바 및 필터 (Toolbar & Carousel) --- */
+.cl-toolbar {
+    margin-bottom: 20px;
 }
 
-.filter-group {
-	display: flex;
-	gap: 10px;
+.cl-toolbar-top {
+    position: relative;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
 }
 
-.filter-btn {
-	padding: 8px 18px;
-	border-radius: 100px;
-	border: 1px solid var(--border-color);
-	background: #fff;
-	font-weight: 600;
-	color: var(--text-sub);
-	cursor: pointer;
-	transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-	font-size: 15px;
-}
-
-.filter-btn.active, .filter-btn:hover {
-	background: var(--crew-pink);
-	color: #fff;
-	border-color: var(--crew-pink);
-	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(248, 109, 125, 0.2);
-}
-
-.btn-create-crew {
-	background: var(--crew-pink);
-	color: #fff;
-	border: none;
-	padding: 10px 20px;
-	border-radius: 10px;
-	font-weight: 700;
-	cursor: pointer;
-	display: inline-flex;
-	align-items: center;
-    justify-content: center;
-	gap: 6px;
-	font-size: 15px;
-	transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    white-space: nowrap; 
-}
-
-.btn-create-crew i {
+/* 캐러셀 감싸는 영역 */
+.cl-carousel-wrapper {
+    position: relative;
     display: flex;
     align-items: center;
-    font-size: 18px;
+    padding: 15px 0;
+    overflow: visible;
 }
 
-.btn-create-crew:hover {
-	transform: translateY(-3px) scale(1.02);
-	box-shadow: 0 8px 20px rgba(248, 109, 125, 0.3);
+/* ⭐ 수정: 태그 컨테이너 - 버튼 영역을 침범하지 않도록 물리적 마진 부여 */
+.cl-filter-container {
+    flex: 1; /* 가용한 중앙 공간 모두 차지 */
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    
+    /* 버튼 크기(38px) + 여백(12px)만큼 양옆을 완전히 비움 */
+    margin: 0 50px; 
+    
+    /* 이 안에서만 글자가 보이고 잘리도록 설정 */
+    overflow: hidden; 
 }
 
-.toolbar-bottom {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+.cl-filter-container::-webkit-scrollbar {
+    display: none;
 }
 
-.region-select-group {
-	display: flex;
-	gap: 10px;
+.cl-filter-group {
+    display: flex;
+    gap: 10px;
+    white-space: nowrap;
+    /* 스크롤 영역 내부에서 부드럽게 움직이도록 함 */
+    padding: 5px 0; 
 }
 
-.detail-select {
-	padding: 8px 28px 8px 12px;
-	border-radius: 8px;
-	border: 1px solid var(--border-color);
-	outline: none;
-	font-size: 14px;
-	font-weight: 600;
-	color: var(--text-sub);
-	appearance: none;
-	background: #fff
-		url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5" stroke="%238B95A1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>')
-		no-repeat right 8px center;
-	background-size: 16px;
-	cursor: pointer;
-	transition: border-color 0.2s;
+.cl-filter-btn {
+    padding: 8px 18px;
+    border-radius: 100px;
+    border: 1px solid var(--border-color);
+    background: #fff;
+    font-weight: 600;
+    color: var(--text-sub);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-size: 15px;
 }
 
-.detail-select:hover {
-	border-color: var(--text-main);
+.cl-filter-btn.active, 
+.cl-filter-btn:hover {
+    background: var(--crew-pink);
+    color: #fff;
+    border-color: var(--crew-pink);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 15px rgba(248, 109, 125, 0.25);
 }
 
-.action-group {
-	display: flex;
-	align-items: center;
-	gap: 16px;
+/* ⭐ 수정: 텍스트 기반 미니멀 내비게이션 버튼 */
+.cl-carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    z-index: 100;
+    color: var(--text-light); /* 평소에는 연한 컬러 */
+    font-size: 26px;
+    font-weight: 300;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.divider {
-	color: #D1D6DB;
+.cl-carousel-nav:hover {
+    color: var(--text-main); /* 호버 시 진하게 */
+    transform: translateY(-50%) scale(1.1);
 }
 
-.toggle-switch-wrap {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	cursor: pointer;
+.cl-carousel-nav.left { left: 0; }
+.cl-carousel-nav.right { right: 0; }
+
+/* 비활성화 상태 (스크롤 끝에 도달했을 때 - 옵션) */
+.cl-carousel-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
-.toggle-label {
-	font-size: 14px;
-	font-weight: 600;
-	color: var(--text-main);
-	user-select: none;
+.cl-toolbar-bottom {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 }
 
-.pink-switch {
-	appearance: none;
-	width: 40px;
-	height: 22px;
-	background: var(--border-color);
-	border-radius: 20px;
-	position: relative;
-	cursor: pointer;
-	outline: none;
-	transition: 0.3s ease;
-	margin: 0;
+.cl-action-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
-.pink-switch::after {
-	content: '';
-	position: absolute;
-	top: 2px;
-	left: 2px;
-	width: 18px;
-	height: 18px;
-	background: #fff;
-	border-radius: 50%;
-	transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.cl-detail-select {
+    padding: 8px 28px 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    outline: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-sub);
+    appearance: none;
+    background: #fff url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5" stroke="%238B95A1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat right 8px center;
+    background-size: 16px;
+    cursor: pointer;
 }
 
-.pink-switch:checked {
-	background: var(--crew-pink);
+.cl-divider {
+    color: var(--border-color);
 }
 
-.pink-switch:checked::after {
-	transform: translateX(18px);
+.cl-toggle-switch-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
 }
 
-.crew-grid {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 24px;
-	margin-bottom: 40px;
-	perspective: 1000px;
+.cl-toggle-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    user-select: none;
 }
 
-.crew-card {
-	background: #fff;
-	border-radius: 20px;
-	border: 1px solid var(--border-color);
-	overflow: hidden;
-	transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-	cursor: pointer;
-	display: flex;
-	flex-direction: column;
-	opacity: 0;
-	animation: fadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+.cl-pink-switch {
+    appearance: none;
+    width: 40px;
+    height: 22px;
+    background: var(--border-color);
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    transition: 0.3s ease;
+    margin: 0;
 }
 
-.crew-card:hover {
-	transform: translateY(-10px);
-	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-	border-color: rgba(248, 109, 125, 0.3);
+.cl-pink-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.card-image-box {
-	position: relative;
-	height: 180px;
-	overflow: hidden;
+.cl-pink-switch:checked { background: var(--crew-pink); }
+.cl-pink-switch:checked::after { transform: translateX(18px); }
+
+/* --- 3. 카드 그리드 영역 (A안) --- */
+.cl-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+    padding: 20px 0;
+    margin-bottom: 40px;
 }
 
-.card-image-box.no-image {
-	background: #F2F4F6;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+.cl-card {
+    background: #ffffff;
+    border-radius: 32px;
+    border: 1px solid var(--border-color);
+    overflow: visible; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    animation: clFadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 
-.placeholder-icon {
-	font-size: 40px;
-	color: #D1D6DB;
-	transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+.cl-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    border-color: var(--crew-pink);
 }
 
-.badge-group {
-	position: absolute;
-	top: 12px;
-	left: 12px;
-	display: flex;
-	gap: 6px;
-	z-index: 2;
+.cl-image-section {
+    position: relative;
+    height: 160px;
+    background: var(--bg-color);
+    border-radius: 32px 32px 0 0;
+    overflow: visible; 
+    z-index: 10;
 }
 
-.badge {
-	padding: 4px 10px;
-	border-radius: 6px;
-	font-size: 11px;
-	font-weight: 800;
-	letter-spacing: 0.3px;
+.cl-thumbnail {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 45px;
+    color: #d1d6db;
+    border-radius: 32px 32px 0 0;
+    overflow: hidden;
 }
 
-.badge.recruiting {
-	background: var(--crew-pink);
-	color: #fff;
-	box-shadow: 0 2px 6px rgba(248, 109, 125, 0.3);
+.cl-badge-wrapper {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 2;
 }
 
-.badge.d-day {
-	background: var(--text-main);
-	color: #fff;
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+.cl-status-badge {
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    background: var(--crew-pink);
+    color: #fff;
 }
 
-.wish-btn {
-	position: absolute;
-	top: 12px;
-	right: 12px;
-	background: rgba(255, 255, 255, 0.9);
-	border: none;
-	width: 32px;
-	height: 32px;
-	border-radius: 50%;
-	font-size: 18px;
-	color: var(--text-light);
-	cursor: pointer;
-	backdrop-filter: blur(4px);
-	transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-	z-index: 2;
+.cl-wish-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    border: none;
+    color: #d1d6db;
+    cursor: pointer;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
 }
 
-.wish-btn:hover {
-	color: var(--crew-pink);
-	transform: scale(1.2);
+.cl-wish-btn:hover {
+    color: var(--crew-pink);
+    transform: scale(1.15);
 }
 
-.card-info {
-	padding: 20px;
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
+.cl-host-profile {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    z-index: 20;
 }
 
-.card-meta {
-	font-size: 12px;
-	font-weight: 600;
-	color: var(--text-light);
-	margin-bottom: 8px;
+.cl-host-img {
+    width: 100px;
+    height: 100px;
+    background: #ffffff;
+    border-radius: 50%;
+    border: 6px solid #ffffff; 
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
-.card-title {
-	font-size: 17px;
-	font-weight: 700;
-	color: var(--text-main);
-	margin-bottom: 12px;
-	line-height: 1.4;
-	word-break: keep-all;
-	transition: color 0.3s;
+.cl-host-img i { font-size: 45px; color: #e5e8eb; }
+
+/* 카드 콘텐츠 섹션 */
+.cl-content-section {
+    padding: 55px 24px 18px 24px; 
+    background: #ffffff;
+    border-radius: 0 0 32px 32px;
+    text-align: center;
 }
 
-.card-tags {
-	display: flex;
-	gap: 6px;
-	margin-bottom: 16px;
-	flex-wrap: wrap;
+.cl-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.3;
+    margin-bottom: 6px; 
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-all;
 }
 
-.card-tags span {
-	background: #FFF0F2;
-	color: var(--crew-pink);
-	font-size: 12px;
-	font-weight: 600;
-	padding: 4px 8px;
-	border-radius: 6px;
-	transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+.cl-meta-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-light);
+    margin-bottom: 14px;
 }
 
-.card-details {
-	background: var(--bg-color);
-	padding: 12px;
-	border-radius: 8px;
-	margin-bottom: 20px;
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	transition: background 0.3s;
+.cl-date-dot {
+    width: 3px;
+    height: 3px;
+    background: var(--border-color);
+    border-radius: 50%;
+    margin: 0 8px;
 }
 
-.detail-item {
-	font-size: 13px;
-	color: var(--text-sub);
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	font-weight: 500;
+.cl-tags {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 18px;
 }
 
-.detail-item i {
-	color: var(--text-light);
-	font-size: 15px;
-	transition: color 0.3s;
+.cl-tags span {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-sub);
+    background: var(--bg-color);
+    padding: 3px 10px;
+    border-radius: 6px;
 }
 
-.member-gauge {
-	margin-bottom: auto;
+.cl-member-status {
+    background: var(--bg-color);
+    padding: 12px 16px;
+    border-radius: 16px;
+    margin-bottom: 18px;
 }
 
-.gauge-text {
-	font-size: 12px;
-	color: var(--text-sub);
-	font-weight: 600;
-	margin-bottom: 6px;
-	display: flex;
-	justify-content: space-between;
+.cl-member-count {
+    font-size: 13px;
+    color: var(--text-sub);
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
 }
 
-.gauge-text strong {
-	color: var(--crew-pink);
-	font-size: 13px;
+.cl-member-count strong {
+    color: var(--crew-pink);
+    font-weight: 700;
 }
 
-.gauge-text span {
-	color: var(--text-light);
-	font-weight: 500;
+.cl-progress-bg {
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 3px;
+    overflow: hidden;
 }
 
-.gauge-bar {
-	width: 100%;
-	height: 5px;
-	background: var(--border-color);
-	border-radius: 10px;
-	overflow: hidden;
+.cl-progress-fill {
+    height: 100%;
+    background: var(--crew-pink);
+    border-radius: 3px;
 }
 
-.gauge-fill {
-	height: 100%;
-	background: var(--crew-pink);
-	border-radius: 10px;
-	animation: fillProgress 1.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+.cl-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
 }
 
-.card-footer {
-	margin-top: 20px;
-	padding-top: 16px;
-	border-top: 1px solid var(--border-color);
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+.cl-host-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
 }
 
-.host-info {
-	display: flex;
-	align-items: center;
-	gap: 8px;
+.cl-activity {
+    font-size: 11px;
+    color: #2da65a;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 2px;
 }
 
-.host-avatar {
-	width: 24px;
-	height: 24px;
-	border-radius: 50%;
-	background: var(--border-color);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: var(--text-light);
-	font-size: 14px;
+.cl-pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
 }
 
-.host-name {
-	font-size: 13px;
-	font-weight: 600;
-	color: var(--text-main);
-}
-
-.interaction-info {
-	font-size: 12px;
-	color: var(--text-light);
-	font-weight: 500;
-	display: flex;
-	gap: 10px;
-}
-
-.interaction-info span {
-	display: flex;
-	align-items: center;
-	gap: 4px;
-}
-
-.interaction-info i.ri-heart-3-fill {
-	color: var(--crew-pink);
-}
-
-.pagination-container {
-	text-align: center;
-	margin-top: 40px;
-	animation: fadeInUp 0.8s ease forwards 0.8s;
-	opacity: 0;
+/* --- 애니메이션 --- */
+@keyframes clFadeInUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
 }

@@ -33,7 +33,7 @@
     </div>
     
     <aside class="right-chat-panel" :class="{ 'chat-closed': !isChatOpen }">
-        <crew-chat-component @close-chat="console.log('신호 받음!'); isChatOpen = false"></crew-chat-component>
+        <crew-chat-component @close-chat="isChatOpen = false"></crew-chat-component>
     </aside>
 
     <footer id="global-footer">
@@ -46,10 +46,13 @@
 <jsp:include page="/WEB-INF/views/crew/components/crewList.jsp" />
 <jsp:include page="/WEB-INF/views/crew/components/crewDetail.jsp" />
 <jsp:include page="/WEB-INF/views/crew/components/crewChat.jsp" />
+<jsp:include page="/WEB-INF/views/crew/components/crewForm.jsp" />
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/crew/crew_form.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_detail.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/crew/crew_list.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_chat.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_app.js"></script>
 </body>
