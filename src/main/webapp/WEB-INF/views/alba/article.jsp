@@ -235,9 +235,9 @@
                         <button class="btn-action btn-call" onclick="window.open('${pageContext.request.contextPath}/chat/albaRoom?albaIdx=${dto.postingIdx}&toUserIdx=${dto.userIdx}', 'chatRoom', 'width=450,height=850')">
                             <i class="ri-wechat-line"></i> 1:1 채팅하기
                         </button>
-                        <button class="btn-action btn-apply" onclick="window.open('${pageContext.request.contextPath}/chat/albaRoom?albaIdx=${dto.postingIdx}&toUserIdx=${dto.userIdx}', 'chatRoom', 'width=450,height=850')">
+                        <button class="btn-action btn-apply">
                             <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
-                            <span>채팅으로 지원하기</span>
+                            <span>이력서 지원하기</span>
                         </button>
                         <button type="button" class="btn-action btn-report-alba"
                                 onclick="openReportModal('ALBA', ${dto.postingIdx}, ${dto.userIdx})"
