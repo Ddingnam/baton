@@ -10,8 +10,8 @@
 	<nav class="sb-nav">
 		<div class="sb-group">
 			<span class="sb-label">관심 및 보관함</span> 
-			<a href="${pageContext.request.contextPath}/mypage/trade/wish" class="sb-link"><i class="ri-heart-3-line"></i> 찜한 상품</a> 
-			<a href="#" class="sb-link"><i class="ri-bookmark-line"></i> 저장한 글</a>
+			<a href="${pageContext.request.contextPath}/mypage/main?tab=trade&inner=wish" class="sb-link"><i class="ri-heart-3-line"></i> 찜한 상품</a> 
+			<a href="${pageContext.request.contextPath}/mypage/main?tab=community&inner=saved" class="sb-link"><i class="ri-bookmark-line"></i> 저장한 글</a>
 		</div>
 
 		<div class="sb-group">
