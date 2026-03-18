@@ -2,6 +2,7 @@ package com.sp.app.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sp.app.domain.dto.CommunityDto;
 import com.sp.app.domain.dto.MypageCommunityDto;
 import com.sp.app.domain.entity.Community;
+import com.sp.app.mapper.TradeMapper;
 import com.sp.app.repository.CommunityReplyRepository;
 import com.sp.app.repository.CommunityRepository;
 import com.sp.app.repository.CommunityScrapRepository;
@@ -27,6 +29,7 @@ public class MypageServiceImpl implements MypageService {
     private final CommunityReplyRepository communityReplyRepository;
     private final CommunityScrapRepository communityScrapRepository;
     private final PollVoteRepository pollVoteRepository;
+    private final TradeMapper tradeMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -134,5 +137,11 @@ public class MypageServiceImpl implements MypageService {
             case "8":  return "취미생활";
             default:   return categoryCode;
         }
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getMyTradeHistory(long memberIdx) {
+        return tradeMapper.getMyTradeHistory(memberIdx);
     }
 } 

@@ -259,4 +259,17 @@
 	    WHERE tr.BUYERIDX = #{userIdx}
 	    ORDER BY tr.tradeDate DESC
 	</select>
+	
+	<select id="getMyTradeHistory" parameterType="long" resultType="map">
+	    SELECT p.productIdx, p.title, p.price, tr.tradeStatus as status, TO_CHAR(tr.tradeDate, 'YYYY-MM-DD HH24:MI') as actionDate, 'BUY' as historyType
+	    FROM product p
+	    JOIN tradeTransaction tr ON p.productIdx = tr.productIdx
+	    WHERE tr.buyerIdx = #{userIdx}
+	    UNION ALL
+	    SELECT p.productIdx, p.title, p.price, p.tradeStatus as status, TO_CHAR(p.lastUpDate, 'YYYY-MM-DD HH24:MI') as actionDate, 'SELL' as historyType
+	    FROM product p
+	    WHERE p.userIdx = #{userIdx} AND p.tradeStatus != '숨기기'
+	    ORDER BY actionDate DESC
+	</select>
+	
 </mapper>
