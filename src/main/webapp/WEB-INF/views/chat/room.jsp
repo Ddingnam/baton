@@ -7,7 +7,6 @@
 <meta charset="UTF-8">
 <title>바톤 채팅방</title>
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/report/report-modal.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
@@ -53,12 +52,8 @@
             <div class="header-center">${counterpartName}</div>
             <div class="header-right" style="position:relative;">
                 <i class="ri-more-2-fill" style="font-size: 24px; cursor: pointer; color: #333;" onclick="toggleMenu()"></i>
-                <div id="roomMenu" style="display:none; position:absolute; right:0; top:35px; background:#fff; border:1px solid #eee; box-shadow:0 4px 16px rgba(0,0,0,0.10); border-radius:12px; z-index:100; width:130px; overflow:hidden;">
-                    <div onclick="leaveRoom()" style="padding:13px 16px; color:#555; cursor:pointer; font-size:14px; font-weight:600; text-align:center; transition:background 0.15s;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='transparent'">삭제하기</div>
-                    <c:if test="${not empty counterpartIdx}">
-                    <div style="height:1px; background:#f0f0f0; margin:0 12px;"></div>
-                    <div onclick="openReportModal('CHAT', ${counterpartIdx}, ${counterpartIdx})" style="padding:13px 16px; color:#FF4D4F; cursor:pointer; font-size:14px; font-weight:600; text-align:center; transition:background 0.15s;" onmouseover="this.style.background='#FFF1F0'" onmouseout="this.style.background='transparent'">신고하기</div>
-                    </c:if>
+                <div id="roomMenu" style="display:none; position:absolute; right:0; top:35px; background:#fff; border:1px solid #ddd; box-shadow:0 2px 10px rgba(0,0,0,0.1); border-radius:8px; z-index:100; width:120px;">
+                    <div onclick="leaveRoom()" style="padding:12px 15px; color:#e74c3c; cursor:pointer; font-size:14px; text-align:center;">삭제하기</div>
                 </div>
             </div>
         </div>
@@ -246,11 +241,13 @@
     }
 
     function leaveRoom() {
-        if(!confirm('채팅방을 삭제하시겠습니까?')) return;
-        
+        document.getElementById('chatDeleteModal').style.display = 'flex';
+    }
+
+    function confirmLeaveRoom() {
+        document.getElementById('chatDeleteModal').style.display = 'none';
         const params = new URLSearchParams();
         params.append('roomIdx', currentRoomIdx);
-        
         fetch('${pageContext.request.contextPath}/chat/delete', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -258,47 +255,98 @@
         })
         .then(response => response.json())
         .then(data => {
-            if(data.state === 'true') {
-                goBack();
-            }
+            if(data.state === 'true') { goBack(); }
         });
+    }
+
+    function cancelLeaveRoom() {
+        document.getElementById('chatDeleteModal').style.display = 'none';
     }
 
     window.onload = function() { connect(); };
 </script>
-<script>
-    window.contextPath = "${pageContext.request.contextPath}";
-</script>
-<script src="${pageContext.request.contextPath}/dist/js/report/report-modal.js"></script>
+<style>
+#chatDeleteModal {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(6px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    animation: fadeInModal 0.18s ease;
+}
+@keyframes fadeInModal {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+.chat-delete-dialog {
+    background: #fff;
+    border-radius: 20px;
+    padding: 28px 24px 20px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    animation: slideUpDialog 0.22s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes slideUpDialog {
+    from { transform: translateY(16px) scale(0.97); opacity: 0; }
+    to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+.chat-delete-dialog .dialog-icon {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: #FFF1F0;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 24px;
+    color: #FF4D4F;
+}
+.chat-delete-dialog .dialog-title {
+    font-size: 16px; font-weight: 800;
+    color: #111827; margin-bottom: 8px;
+    letter-spacing: -0.3px;
+}
+.chat-delete-dialog .dialog-desc {
+    font-size: 13px; color: #6B7280;
+    line-height: 1.6; margin-bottom: 22px;
+}
+.chat-delete-dialog .dialog-btns {
+    display: flex; gap: 8px;
+}
+.chat-delete-dialog .btn-cancel-dialog {
+    flex: 1; padding: 12px;
+    border-radius: 12px;
+    border: 1.5px solid #E5E7EB;
+    background: #F9FAFB;
+    font-size: 14px; font-weight: 600;
+    color: #6B7280; cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+.chat-delete-dialog .btn-cancel-dialog:hover { background: #F3F4F6; }
+.chat-delete-dialog .btn-confirm-dialog {
+    flex: 1; padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: #FF4D4F;
+    font-size: 14px; font-weight: 700;
+    color: #fff; cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+.chat-delete-dialog .btn-confirm-dialog:hover { background: #E53935; transform: translateY(-1px); }
+</style>
 
-<div id="reportModal" class="report-modal-overlay" style="display:none;">
-    <div class="report-modal-sheet">
-        <div class="report-modal-head">
-            <span class="report-modal-title"><i class="ri-alarm-warning-line"></i> 신고하기</span>
-            <button type="button" class="report-modal-close" onclick="closeReportModal()"><i class="ri-close-line"></i></button>
+<div id="chatDeleteModal" onclick="if(event.target===this) cancelLeaveRoom()">
+    <div class="chat-delete-dialog">
+        <div class="dialog-icon"><i class="ri-delete-bin-line"></i></div>
+        <p class="dialog-title">채팅방을 삭제할까요?</p>
+        <p class="dialog-desc">삭제한 채팅방은 복구할 수 없어요.<br>대화 내용도 함께 사라집니다.</p>
+        <div class="dialog-btns">
+            <button class="btn-cancel-dialog" onclick="cancelLeaveRoom()">취소</button>
+            <button class="btn-confirm-dialog" onclick="confirmLeaveRoom()">삭제하기</button>
         </div>
-        <div class="report-modal-body">
-            <p class="report-modal-desc">신고 사유를 선택해주세요. 허위 신고는 제재를 받을 수 있습니다.</p>
-            <div class="report-type-list">
-                <label class="report-type-item"><input type="radio" name="reportType" value="스팸"><span class="report-type-label"><i class="ri-spam-line"></i> 스팸 / 광고</span></label>
-                <label class="report-type-item"><input type="radio" name="reportType" value="욕설/비방"><span class="report-type-label"><i class="ri-emotion-unhappy-line"></i> 욕설 / 비방</span></label>
-                <label class="report-type-item"><input type="radio" name="reportType" value="음란물"><span class="report-type-label"><i class="ri-eye-off-line"></i> 음란물 / 불건전</span></label>
-                <label class="report-type-item"><input type="radio" name="reportType" value="사기"><span class="report-type-label"><i class="ri-error-warning-line"></i> 사기 / 허위 정보</span></label>
-                <label class="report-type-item"><input type="radio" name="reportType" value="개인정보침해"><span class="report-type-label"><i class="ri-user-forbid-line"></i> 개인정보 침해</span></label>
-                <label class="report-type-item"><input type="radio" name="reportType" value="기타"><span class="report-type-label"><i class="ri-more-line"></i> 기타</span></label>
-            </div>
-            <div class="report-content-wrap">
-                <textarea id="reportContent" class="report-content-input" placeholder="추가로 전달할 내용이 있으면 입력해주세요. (선택)" maxlength="300"></textarea>
-                <span class="report-content-count"><span id="reportContentCount">0</span>/300</span>
-            </div>
-        </div>
-        <div class="report-modal-foot">
-            <button type="button" class="report-btn-cancel" onclick="closeReportModal()">취소</button>
-            <button type="button" class="report-btn-submit" onclick="submitReport()">신고 접수</button>
-        </div>
-        <input type="hidden" id="reportDomainType" value="">
-        <input type="hidden" id="reportTargetIdx" value="">
-        <input type="hidden" id="reportedUserIdx" value="">
     </div>
 </div>
 
