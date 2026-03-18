@@ -51,10 +51,12 @@
                     <div class="search-group">
                         <select name="domainType" class="fm-input search-select">
                             <option value="">전체 유형</option>
-                            <option value="TRADE"          ${param.domainType == 'TRADE'          ? 'selected' : ''}>중고거래</option>
-                            <option value="COMMUNITY"      ${param.domainType == 'COMMUNITY'      ? 'selected' : ''}>커뮤니티 게시글</option>
+                            <option value="TRADE"            ${param.domainType == 'TRADE'            ? 'selected' : ''}>중고거래</option>
+                            <option value="COMMUNITY"       ${param.domainType == 'COMMUNITY'       ? 'selected' : ''}>커뮤니티 게시글</option>
                             <option value="COMMUNITY_REPLY" ${param.domainType == 'COMMUNITY_REPLY' ? 'selected' : ''}>커뮤니티 댓글</option>
-                            <option value="USER"           ${param.domainType == 'USER'           ? 'selected' : ''}>사용자</option>
+                            <option value="ALBA"            ${param.domainType == 'ALBA'            ? 'selected' : ''}>알바구인</option>
+                            <option value="CHAT"            ${param.domainType == 'CHAT'            ? 'selected' : ''}>채팅</option>
+                            <option value="USER"            ${param.domainType == 'USER'            ? 'selected' : ''}>사용자</option>
                         </select>
                         <div class="search-input-wrap">
                             <i class="ri-search-2-line"></i>
@@ -99,6 +101,15 @@
                                             </c:when>
                                             <c:when test="${r.domainType == 'COMMUNITY'}">
                                                 <span class="tag tag-purple">커뮤니티</span>
+                                            </c:when>
+                                            <c:when test="${r.domainType == 'COMMUNITY_REPLY'}">
+                                                <span class="tag tag-purple">커뮤니티 댓글</span>
+                                            </c:when>
+                                            <c:when test="${r.domainType == 'ALBA'}">
+                                                <span class="tag tag-green">알바구인</span>
+                                            </c:when>
+                                            <c:when test="${r.domainType == 'CHAT'}">
+                                                <span class="tag tag-blue">채팅</span>
                                             </c:when>
                                             <c:when test="${r.domainType == 'USER'}">
                                                 <span class="tag tag-gray">사용자</span>
@@ -181,66 +192,91 @@
 </div>
 
 <div class="fullscreen-overlay" id="detailOverlay">
-    <div class="mini-modal" style="width:520px; max-width:95vw;">
-        <div class="mini-modal-head">
-            <span class="mini-modal-title">
-                <i class="ri-alarm-warning-line" style="color:var(--color-red);margin-right:6px;"></i>신고 상세
+    <div class="rpt-modal">
+        <!-- 헤더 -->
+        <div class="rpt-modal-header">
+            <div class="rpt-modal-header-left">
+                <div class="rpt-header-icon">
+                    <i class="ri-alarm-warning-fill"></i>
+                </div>
+                <div>
+                    <p class="rpt-header-label">REPORT DETAIL</p>
+                    <h3 class="rpt-header-title">신고 상세 내역</h3>
+                </div>
+            </div>
+            <button class="rpt-close-btn" id="detailClose">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+
+        <!-- 메타 배지 영역 -->
+        <div class="rpt-meta-bar">
+            <span class="rpt-meta-item">
+                <span class="rpt-meta-label">신고 유형</span>
+                <span id="dDomainType"></span>
             </span>
-            <button class="mini-modal-close" id="detailClose"><i class="ri-close-line"></i></button>
+            <span class="rpt-meta-sep"></span>
+            <span class="rpt-meta-item">
+                <span class="rpt-meta-label">처리 상태</span>
+                <span id="dProcessStatus"></span>
+            </span>
+            <span class="rpt-meta-sep"></span>
+            <span class="rpt-meta-item">
+                <span class="rpt-meta-label">신고일시</span>
+                <span class="rpt-meta-date" id="dReportDate"></span>
+            </span>
         </div>
-        <div class="mini-modal-body">
 
-            <div class="detail-info-grid">
-                <div class="info-row">
-                    <span class="info-lbl">신고 유형</span>
-                    <span class="info-val" id="dDomainType"></span>
+        <!-- 바디 -->
+        <div class="rpt-modal-body">
+            <!-- 사용자 행 -->
+            <div class="rpt-user-row">
+                <div class="rpt-user-card">
+                    <div class="rpt-user-avatar reporter"><i class="ri-user-line"></i></div>
+                    <div>
+                        <p class="rpt-user-role">신고자</p>
+                        <p class="rpt-user-name" id="dReporter">-</p>
+                    </div>
                 </div>
-                <div class="info-row">
-                    <span class="info-lbl">신고 사유</span>
-                    <span class="info-val" id="dReportType"></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-lbl">신고자</span>
-                    <span class="info-val" id="dReporter"></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-lbl">피신고자</span>
-                    <span class="info-val" id="dReportedUser"></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-lbl">신고일시</span>
-                    <span class="info-val" id="dReportDate"></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-lbl">처리상태</span>
-                    <span class="info-val" id="dProcessStatus"></span>
+                <div class="rpt-arrow"><i class="ri-arrow-right-line"></i></div>
+                <div class="rpt-user-card">
+                    <div class="rpt-user-avatar reported"><i class="ri-user-forbid-line"></i></div>
+                    <div>
+                        <p class="rpt-user-role">피신고자</p>
+                        <p class="rpt-user-name" id="dReportedUser">-</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="fm-field" style="margin-top:16px;">
-                <label class="fm-label">신고 내용</label>
-                <div id="dReportContent"
-                     style="background:var(--base-bg);border-radius:var(--radius-md);padding:14px 16px;
-                            font-size:13px;color:var(--text-sub);min-height:60px;line-height:1.6;"></div>
+            <div class="rpt-section">
+                <span class="rpt-section-label"><i class="ri-error-warning-line"></i>신고 사유</span>
+                <span class="rpt-section-value" id="dReportType">-</span>
             </div>
 
-            <div class="fm-field" id="adminMemoField" style="margin-top:12px;">
-                <label class="fm-label">관리자 메모</label>
-                <textarea class="fm-input" id="dAdminMemo" rows="3"
-                          placeholder="처리 메모를 입력하세요"></textarea>
+            <div class="rpt-section">
+                <span class="rpt-section-label"><i class="ri-chat-3-line"></i>신고 내용</span>
+                <div class="rpt-content-box" id="dReportContent">내용 없음</div>
+            </div>
+
+            <div class="rpt-section">
+                <span class="rpt-section-label"><i class="ri-edit-line"></i>관리자 메모</span>
+                <textarea class="fm-input" id="dAdminMemo" rows="3" placeholder="처리 메모를 입력하세요"></textarea>
             </div>
         </div>
-        <div class="mini-modal-foot" id="detailFooter">
-            <button class="btn-pill btn-light" id="detailCancel">닫기</button>
-            <button class="btn-pill btn-gradient" id="btnProcess"
-                    onclick="submitProcess(1)">
-                <i class="ri-check-line"></i> 처리 완료
+
+        <!-- 푸터 -->
+        <div class="rpt-modal-footer" id="detailFooter">
+            <button class="rpt-btn-cancel" id="detailCancel">
+                닫기
             </button>
-            <button class="btn-pill" style="background:var(--color-red);color:white;padding:12px 24px;"
-                    id="btnReject"
-                    onclick="submitProcess(2)">
-                <i class="ri-close-line"></i> 반려
-            </button>
+            <div class="rpt-footer-actions">
+                <button class="rpt-btn-reject" id="btnReject" onclick="submitProcess(2)">
+                    <i class="ri-close-circle-line"></i> 반려
+                </button>
+                <button class="rpt-btn-approve" id="btnProcess" onclick="submitProcess(1)">
+                    <i class="ri-check-double-line"></i> 처리 완료
+                </button>
+            </div>
         </div>
     </div>
 </div>

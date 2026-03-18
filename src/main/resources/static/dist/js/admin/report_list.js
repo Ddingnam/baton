@@ -17,7 +17,7 @@
     var dAdminMemo      = document.getElementById('dAdminMemo');
     var detailFooter    = document.getElementById('detailFooter');
 
-    var DOMAIN_LABEL = { TRADE: '중고거래', COMMUNITY: '커뮤니티', USER: '사용자' };
+    var DOMAIN_LABEL = { TRADE: '중고거래', COMMUNITY: '커뮤니티', COMMUNITY_REPLY: '커뮤니티 댓글', ALBA: '알바구인', CHAT: '채팅', USER: '사용자' };
     var STATUS_LABEL = { 0: '미처리', 1: '처리완료', 2: '반려' };
     var STATUS_CLASS = { 0: 'tag-red', 1: 'tag-green', 2: 'tag-gray' };
 
@@ -56,8 +56,11 @@
     window.openDetail = openDetail;
 
     function domainTagClass(type) {
-        if (type === 'TRADE')     return 'tag-blue';
-        if (type === 'COMMUNITY') return 'tag-purple';
+        if (type === 'TRADE')            return 'tag-blue';
+        if (type === 'COMMUNITY')        return 'tag-purple';
+        if (type === 'COMMUNITY_REPLY')  return 'tag-purple';
+        if (type === 'ALBA')             return 'tag-green';
+        if (type === 'CHAT')             return 'tag-blue';
         return 'tag-gray';
     }
 
