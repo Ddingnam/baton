@@ -9,7 +9,6 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-
 <style>
     body, html { margin: 0; padding: 0; height: 100%; background: #fff; font-family: 'Noto Sans KR', sans-serif; }
     .chat-container { width: 100%; height: 100vh; display: flex; flex-direction: column; background: #fff; }
@@ -22,6 +21,7 @@
     .trade-info { flex: 1; display: flex; flex-direction: column; }
     .trade-title { font-size: 14px; font-weight: bold; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;}
     .trade-date { font-size: 12px; color: #888; margin-top: 3px; }
+    .alba-badge { display: inline-block; background: #e3f2fd; color: #1976d2; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; font-weight: 600; width: fit-content; }
     .chat-messages { flex: 1; overflow-y: auto; padding: 20px; background: #fff; } 
     .date-divider { text-align: center; margin: 20px 0; }
     .date-divider span { background: #f0f0f0; color: #666; font-size: 12px; padding: 5px 15px; border-radius: 15px; }
@@ -41,10 +41,17 @@
     .chat-input-box textarea { flex: 1; padding: 12px 15px; border: 1px solid #f0f0f0; background: #f8f9fa; border-radius: 20px; outline: none; resize: none; overflow: hidden; height: 44px; line-height: 20px; font-family: inherit; font-size: 14px;}
     .chat-input-box textarea:focus { border-color: #00B050; background: #fff; }
     .chat-input-box button { width: 44px; height: 44px; margin-left: 10px; border: none; background: #00B050; color: white; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
-</style>
+  
+	.alba-theme .msg-me .msg-bubble { background: #3182f6; color: #fff; } 
+	.alba-theme .chat-input-box button { background: #3182f6; } 
+	.alba-theme .unread-count { color: #3182f6; } 
+	.alba-theme .trade-banner { background: #f0f7ff; border-bottom: 1px solid #dce9f9; } 
+	.alba-theme .trade-info { flex-direction: row; align-items: center; justify-content: space-between; } 
+	.alba-theme .alba-badge { background: #3182f6; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; margin-right: 8px; } 
+	</style>
 </head>
 <body>
-    <div class="chat-container">
+    <div class="chat-container ${not empty albaInfo ? 'alba-theme' : ''}">
         <div class="chat-header">
             <div class="header-left" onclick="goBack()">
                 <i class="ri-arrow-left-s-line"></i>
@@ -57,23 +64,39 @@
                 </div>
             </div>
         </div>
-        
-        <c:if test="${not empty tradeInfo}">
-            <div class="trade-banner">
-                <c:choose>
-                    <c:when test="${not empty tradeInfo.SAVENAME}">
-                        <img src="${pageContext.request.contextPath}/uploads/trade/${tradeInfo.SAVENAME}" class="trade-thumb" onerror="this.src='${pageContext.request.contextPath}/dist/images/noimage.png'">
-                    </c:when>
-                    <c:otherwise>
-                        <img src="${pageContext.request.contextPath}/dist/images/noimage.png" class="trade-thumb">
-                    </c:otherwise>
-                </c:choose>
-                <div class="trade-info">
-                    <span class="trade-title">${tradeInfo.TITLE}</span>
-                    <span class="trade-date">작성일: ${tradeInfo.CREATEDDATE}</span>
+
+        <c:choose>
+            <c:when test="${not empty tradeInfo}">
+                <div class="trade-banner">
+                    <c:choose>
+                        <c:when test="${not empty tradeInfo.SAVENAME}">
+                            <img src="${pageContext.request.contextPath}/uploads/trade/${tradeInfo.SAVENAME}" class="trade-thumb" onerror="this.src='${pageContext.request.contextPath}/dist/images/noimage.png'">
+                        </c:when>
+                        <c:otherwise>
+                            <img src="${pageContext.request.contextPath}/dist/images/noimage.png" class="trade-thumb">
+                        </c:otherwise>
+                    </c:choose>
+                    <div class="trade-info">
+                        <span class="trade-title">${tradeInfo.TITLE}</span>
+                        <span class="trade-date">작성일: ${tradeInfo.CREATEDDATE}</span>
+                    </div>
                 </div>
-            </div>
-        </c:if>
+            </c:when>
+            <c:when test="${not empty albaInfo}">
+			    <div class="trade-banner">
+			        <div class="trade-info">
+			            <span class="alba-badge">알바 문의</span>
+			            <span class="trade-title" style="font-size: 16px;">${albaInfo.TITLE}</span>
+			            <div style="margin-top: 5px;">
+			                <span style="color: #3182f6; font-weight: 700;">
+			                    <i class="ri-money-dollar-circle-line"></i> ${albaInfo.PAY}원
+			                </span>
+			                <span class="trade-date" style="margin-left: 10px;">등록일: ${albaInfo.CREATEDDATE}</span>
+			            </div>
+			        </div>
+			    </div>
+			</c:when>
+        </c:choose>
 
         <div class="chat-messages" id="chatArea">
             <div class="system-msg"><b>${counterpartName}</b>님과 대화를 시작합니다.</div>
@@ -127,6 +150,10 @@
     let stompClient = null;
     let currentDisplayDate = "${lastDate}";
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const tradeIdx = urlParams.get('tradeIdx');
+    const albaIdx = urlParams.get('albaIdx');
+
     function connect() {
         let socket = new SockJS('${pageContext.request.contextPath}/ws/chat');
         stompClient = Stomp.over(socket);
@@ -159,15 +186,11 @@
         let content = input.value.trim();
         if(!content) return;
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const tradeIdx = urlParams.get('tradeIdx');
-
         let messageModel = { 
             roomIdx: currentRoomIdx, 
             userIdx: myUserIdx, 
             content: content, 
-            msgType: 1,
-            tradeIdx: tradeIdx
+            msgType: 1
         };
         
         stompClient.send("/app/chat/send", {}, JSON.stringify(messageModel));
@@ -186,7 +209,7 @@
         
         let now = new Date();
         let dateStr = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,'0') + "-" + String(now.getDate()).padStart(2,'0');
-        let timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        let timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2,'0');
 
         if(currentDisplayDate !== dateStr) {
             let dateHtml = '<div class="date-divider"><span>' + dateStr + '</span></div>';
@@ -224,11 +247,9 @@
     }
     
     function goBack() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const tradeIdx = urlParams.get('tradeIdx');
-        let ref = document.referrer;
-        
-        if (ref.indexOf('/chat/tradeList') !== -1) {
+        if(albaIdx) {
+            location.href = '${pageContext.request.contextPath}/chat/albaList?albaIdx=' + albaIdx;
+        } else if(tradeIdx) {
             location.href = '${pageContext.request.contextPath}/chat/tradeList?tradeIdx=' + tradeIdx;
         } else {
             location.href = '${pageContext.request.contextPath}/chat/list?mode=popup';
@@ -253,9 +274,7 @@
         })
         .then(response => response.json())
         .then(data => {
-            if(data.state === 'true') {
-                goBack();
-            }
+            if(data.state === 'true') goBack();
         });
     }
 

@@ -219,11 +219,14 @@
             <sec:authorize access="isAuthenticated()">
                 <c:choose>
                     <c:when test="${loggedInUserId == dto.userIdx}">
-                        <button class="btn-action btn-apply full-width" onclick="window.open('${pageContext.request.contextPath}/chat/albaList?albaIdx=${dto.postingIdx}', 'chatList', 'width=450,height=850')">
-                            <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
-                            <span>지원 내역 보기 (${dto.chatCount})</span>
-                        </button>
-                    </c:when>
+					    <button class="btn-action btn-call" onclick="window.open('${pageContext.request.contextPath}/chat/albaList?albaIdx=${dto.postingIdx}', 'chatList', 'width=450,height=850')">
+					        <i class="ri-message-3-line"></i> 채팅 관리
+					    </button>
+					    <button class="btn-action btn-apply" onclick="window.open('${pageContext.request.contextPath}/chat/albaList?albaIdx=${dto.postingIdx}', 'chatList', 'width=450,height=850')">
+					        <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
+					        <span>지원 내역 (${dto.chatCount})</span>
+					    </button>
+					</c:when>
                     <c:when test="${dto.recruitStatus == '모집완료'}">
                         <button class="btn-action btn-apply disabled full-width" disabled>
                             <span class="chip-dday">마감</span>

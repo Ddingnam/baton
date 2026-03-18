@@ -115,4 +115,44 @@
         UPDATE chatMember SET visible = 1 WHERE roomIdx = #{roomIdx}
     </update>
     
+    
+    <!-- alba  -->
+    <select id="findAlbaChatRoom" parameterType="map" resultType="Long">
+        SELECT c.roomIdx FROM chatRoom c
+        JOIN chatMember m1 ON c.roomIdx = m1.roomIdx AND m1.userIdx = #{buyerIdx}
+        JOIN chatMember m2 ON c.roomIdx = m2.roomIdx AND m2.userIdx = #{sellerIdx}
+        WHERE c.tradeIdx = #{albaIdx} AND c.roomType = 3 </select>
+
+    <insert id="insertAlbaChatRoom" parameterType="map">
+        <selectKey keyProperty="roomIdx" resultType="Long" order="BEFORE">
+            SELECT chatRoomSeq.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO chatRoom(roomIdx, roomType, tradeIdx, roomName) VALUES (#{roomIdx}, 3, #{albaIdx}, '알바채팅')
+    </insert>
+
+    <select id="getAlbaInfo" parameterType="Long" resultType="map">
+        SELECT 
+            posting_idx AS postingIdx, 
+            title, 
+            pay,
+            TO_CHAR(created_date, 'YYYY-MM-DD') AS createdDate
+        FROM job_posting
+        WHERE posting_idx = #{albaIdx}
+    </select>
+
+    <select id="listAlbaChatRoom" parameterType="map" resultType="com.sp.app.model.ChatRoom">
+        SELECT 
+            c.roomIdx, c.tradeIdx AS tradeIdx, u.userIdx, u.nickname, u.profile_photo AS profilePhoto,
+            (SELECT content FROM (SELECT content FROM chatMessage WHERE roomIdx = c.roomIdx ORDER BY msgIdx DESC) WHERE ROWNUM = 1) AS recentMessage,
+            (SELECT TO_CHAR(sendDate, 'MM-DD HH24:MI') FROM (SELECT sendDate FROM chatMessage WHERE roomIdx = c.roomIdx ORDER BY msgIdx DESC) WHERE ROWNUM = 1) AS recentDate,
+            (SELECT COUNT(*) FROM chatMessage m 
+             WHERE m.roomIdx = c.roomIdx AND m.userIdx != #{myUserIdx} 
+             AND <![CDATA[ m.sendDate > (SELECT lastReadDate FROM chatMember WHERE roomIdx = c.roomIdx AND userIdx = #{myUserIdx}) ]]>) AS unreadCount
+        FROM chatRoom c
+        JOIN chatMember m ON c.roomIdx = m.roomIdx AND m.userIdx != #{myUserIdx}
+        JOIN users u ON m.userIdx = u.userIdx
+        WHERE c.tradeIdx = #{albaIdx} AND c.roomType = 3 AND EXISTS (SELECT 1 FROM chatMember WHERE roomIdx = c.roomIdx AND userIdx = #{myUserIdx} AND visible = 1)
+        ORDER BY recentDate DESC NULLS LAST
+    </select>
+        
 </mapper>
