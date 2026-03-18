@@ -53,9 +53,6 @@ public class JobPostingServiceImpl implements JobPostingService {
         }
     }
 
-    /**
-     * 게시글 수정
-     */
     @Override
     @Transactional
     public void updatePosting(JobPosting dto) throws Exception {
@@ -68,9 +65,6 @@ public class JobPostingServiceImpl implements JobPostingService {
         }
     }
 
-    /**
-     * 게시글 삭제
-     */
     @Override
     @Transactional
     public void deletePosting(long postingIdx) throws Exception {
@@ -83,18 +77,12 @@ public class JobPostingServiceImpl implements JobPostingService {
         }
     }
 
-    /**
-     * 게시글 수
-     */
     @Override
     @Transactional(readOnly = true)
     public int dataCount(Map<String, Object> map) {
         return mapper.dataCount(map);
     }
 
-    /**
-     * 게시글 리스트
-     */
     @Override
     @Transactional(readOnly = true)
     public List<JobPosting> listPosting(Map<String, Object> map) {
@@ -111,18 +99,12 @@ public class JobPostingServiceImpl implements JobPostingService {
         return list;
     }
 
-    /**
-     * 게시글 상세
-     */
     @Override
     @Transactional(readOnly = true)
     public JobPosting findById(long postingIdx) {
         return mapper.findById(postingIdx);
     }
 
-    /**
-     * 조회수 증가
-     */
     @Override
     @Transactional
     public void updateHitCount(long postingIdx) throws Exception {
@@ -145,5 +127,16 @@ public class JobPostingServiceImpl implements JobPostingService {
     public List<String> listDong(Map<String, Object> map) {
         return mapper.listDong(map);
     }
+
+	@Override
+	public List<JobPosting> postListByUserId(long userIdx) {
+		List<JobPosting> list = null;
+		try {
+			list = mapper.postListByUserIdx(userIdx);
+		} catch (Exception e) {
+			log.info("postListByUserId : ", e);
+		}
+		return list;
+	}
     
 }

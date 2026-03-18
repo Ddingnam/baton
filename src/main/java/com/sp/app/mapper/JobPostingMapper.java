@@ -25,4 +25,6 @@ public interface JobPostingMapper {
     List<JobPosting> listPostingByArea(Map<String,Object> map);
     
     List<String> listDong(Map<String, Object> map);
+    
+    public List<JobPosting> postListByUserIdx(long userIdx);
 }

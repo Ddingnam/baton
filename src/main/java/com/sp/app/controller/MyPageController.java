@@ -20,6 +20,7 @@ import com.sp.app.model.Trade;
 import com.sp.app.model.TradeImg;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.FollowService;
+import com.sp.app.service.JobPostingService;
 import com.sp.app.service.MemberService;
 import com.sp.app.service.MypageService;
 import com.sp.app.service.TradeService;
@@ -40,6 +41,7 @@ public class MyPageController {
     private final TradeService tradeService;
     private final FollowService followService;
     private final WishListService wishListService;
+    private final JobPostingService jobPostingService;
 
     @GetMapping({"", "/", "/main"})
     public String main(Model model, Authentication auth) {
@@ -65,9 +67,16 @@ public class MyPageController {
                 trade.setImageList(images);
             }
             
+            Map<String, Object> rMap = new HashMap<>();
+            rMap.put("userIdx", userIdx);
+            rMap.put("regionType", 1);
+            
+            model.addAttribute("userDto", memberService.findById(userIdx));
+            model.addAttribute("region", memberService.findUserRegionbyType(rMap));
             model.addAttribute("tradeList", tradeList);
             model.addAttribute("buyList", tradeService.findBuyList(userIdx));
             model.addAttribute("wishList", wishListService.findWishList(userIdx));
+            model.addAttribute("albaPostList", jobPostingService.postListByUserId(userIdx));
         }
 
         return "mypage/main";

@@ -24,4 +24,6 @@ public interface JobPostingService {
     List<JobPosting> listPostingByArea(Map<String,Object> map);
 
     List<String> listDong(Map<String,Object> map);
+    
+    public List<JobPosting> postListByUserId(long userIdx);
 }

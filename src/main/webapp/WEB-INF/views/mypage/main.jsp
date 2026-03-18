@@ -380,7 +380,8 @@
 
 							<div class="inner-tabs">
 								<button class="inner-tab active" data-inner="alba-apply">지원현황</button>
-								<button class="inner-tab"        data-inner="alba-post">내 공고</button>
+								<button class="inner-tab" data-inner="alba-post">내 공고</button>
+								<button class="inner-tab" data-inner="alba-wish">관심 공고</button>
 							</div>
 
 							<div class="inner-section active" id="alba-apply">
@@ -420,16 +421,36 @@
 
 							<div class="inner-section" id="alba-post">
 								<div class="lc-list">
-									<div class="lc-item">
-										<div class="item-info">
-											<h4>강남 카페 주말 알바 구합니다</h4>
-											<p class="info-metrics">시급 12,000원 · 지원자 3명 · 2월 20일 등록</p>
-										</div>
-										<div class="item-right">
-											<span class="theme-badge">모집중</span>
-											<button class="btn-sm">지원자 보기</button>
-										</div>
-									</div>
+									<c:choose>
+							            <c:when test="${empty albaPostList}">
+							                <div class="lc-empty">
+							                    <i class="ri-file-list-3-line"></i>
+							                    <p>등록한 공고가 없습니다.</p>
+							                </div>
+							            </c:when>
+							            <c:otherwise>
+							                <c:forEach var="alba" items="${albaPostList}">
+							                    <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/alba/article/${alba.postingIdx}'">
+							                        <div class="item-info">
+							                            <h4>${alba.title}</h4>
+							                            <p class="info-metrics">
+							                                ${alba.payType} <fmt:formatNumber value="${alba.pay}" pattern="#,###"/>원 · 
+							                                지원자 ${alba.applyCount}명 · 
+							                                <span class="time-ago" data-time="${alba.createdDate}"></span>
+							                            </p>
+							                        </div>
+							                        <div class="item-right">
+							                            <span class="${alba.recruitStatus == '모집중' ? 'theme-badge' : 'theme-badge-done'}">
+							                                ${alba.recruitStatus}
+							                            </span>
+							                            <button class="btn-sm" onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/alba/manage?postingIdx=${alba.postingIdx}'">
+							                                지원자 보기
+							                            </button>
+							                        </div>
+							                    </div>
+							                </c:forEach>
+							            </c:otherwise>
+							        </c:choose>
 								</div>
 							</div>
 						</div>
