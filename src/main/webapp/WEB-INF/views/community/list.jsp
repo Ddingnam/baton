@@ -42,7 +42,6 @@
                 <input type="hidden" name="category" value="${category}">
                 <input type="hidden" name="sort" value="${sort}">
                 <input type="hidden" name="page" value="1">
-                <input type="hidden" name="regionType" id="searchRegionType" value="${currentRegionType > 0 ? currentRegionType : 1}">
                 <input type="text" name="kwd" id="cmSearchInput" placeholder="관심있는 소식이나 내용을 검색해보세요" value="${kwd}" autocomplete="off">
                 <button type="button" class="search-btn" onclick="submitSearch()">검색</button>
             </form>
@@ -50,41 +49,7 @@
     </section>
 
     <div class="content-wrapper">
-        <input type="hidden" id="currentRegionType" value="${currentRegionType > 0 ? currentRegionType : 1}">
-
         <div class="cm-toolbar">
-
-            <div class="neighborhood-bar">
-                <div class="neighborhood-bar-left">
-                    <span class="neighborhood-label"><i class="ri-map-pin-2-fill"></i> 내 동네</span>
-                    <div class="neighborhood-tabs">
-                        <c:choose>
-                            <c:when test="${not empty userRegionInfo && (not empty userRegionInfo.mainRegion || not empty userRegionInfo.subRegion)}">
-                                <c:if test="${not empty userRegionInfo.mainRegion}">
-                                    <button type="button"
-                                            class="neighborhood-tab ${currentRegionType == 1 || currentRegionType == 0 ? 'active' : ''}"
-                                            onclick="changeRegionTab(1)">
-                                        ${userRegionInfo.mainRegion.dong}
-                                    </button>
-                                </c:if>
-                                <c:if test="${not empty userRegionInfo.subRegion}">
-                                    <button type="button"
-                                            class="neighborhood-tab ${currentRegionType == 2 ? 'active' : ''}"
-                                            onclick="changeRegionTab(2)">
-                                        ${userRegionInfo.subRegion.dong}
-                                    </button>
-                                </c:if>
-                            </c:when>
-                            <c:otherwise>
-                                <span class="neighborhood-empty">인증된 동네가 없어요</span>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
-                </div>
-                <a href="${pageContext.request.contextPath}/member/townAuth" class="neighborhood-change-link">
-                    <i class="ri-map-pin-add-line"></i> 동네 변경
-                </a>
-            </div>
 
             <div class="toolbar-top">
                 <div class="filter-group">

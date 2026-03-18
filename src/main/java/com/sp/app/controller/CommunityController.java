@@ -78,38 +78,15 @@ public class CommunityController {
 
             String regionCode = null;
             String dongName = null;
-            int currentRegionType = 0; // 1: 주동네, 2: 부동네
-
-            String regionTypeParam = req.getParameter("regionType");
 
             if (info != null) {
-                UserRegionInfo regionInfo = memberService.getUserRegionInfo(info.getUserIdx());
+                UserRegionInfo regionInfo = info.getUserRegionInfo();
                 if (regionInfo != null) {
-                    com.sp.app.domain.dto.RegionDto targetRegion = null;
-
-                    // 1. 유저가 탭을 클릭해서 이동한 경우
-                    if ("1".equals(regionTypeParam)) {
-                        targetRegion = regionInfo.getMainRegion();
-                        currentRegionType = 1;
-                    } else if ("2".equals(regionTypeParam)) {
-                        targetRegion = regionInfo.getSubRegion();
-                        currentRegionType = 2;
-                    } else {
-                        // 2. 파라미터가 없으면(처음 들어왔을 때) 기본 설정된 동네 사용
-                        targetRegion = regionInfo.getActiveRegion();
-                        if (targetRegion != null) {
-                            currentRegionType = targetRegion.getRegionType();
-                        }
-                    }
-
+                    com.sp.app.domain.dto.RegionDto targetRegion = regionInfo.getActiveRegion();
                     if (targetRegion != null) {
                         regionCode = targetRegion.getRegionCode();
                         dongName = targetRegion.getDong();
                     }
-                    
-                    // JSP에서 탭을 그리기 위해 모델에 전달
-                    model.addAttribute("userRegionInfo", regionInfo);
-                    model.addAttribute("currentRegionType", currentRegionType);
                 }
             }
 
@@ -133,11 +110,6 @@ public class CommunityController {
             if (!category.isBlank()) params.append("&category=").append(URLEncoder.encode(category, "UTF-8"));
             if (!"latest".equals(sort)) params.append("&sort=").append(sort);
             if (!kwd.isBlank()) params.append("&schType=").append(schType).append("&kwd=").append(URLEncoder.encode(kwd, "UTF-8"));
-            
-            // 탭 상태 유지를 위한 파라미터 추가
-            if (currentRegionType > 0) {
-                params.append("&regionType=").append(currentRegionType);
-            }
 
             if (params.length() > 0) {
                 listUrl += "?" + params.substring(1);
@@ -166,25 +138,13 @@ public class CommunityController {
     }
 
     @GetMapping("write")
-    public String writeForm(
-            @RequestParam(name = "regionType", defaultValue = "1") int regionType,
-            HttpSession session,
-            Model model) {
+    public String writeForm(HttpSession session, Model model) {
         model.addAttribute("mode", "write");
         model.addAttribute("kakaoMapKey", kakaoMapKey);
-        model.addAttribute("regionType", regionType);
 
-        // 글쓰기 화면에서 현재 선택된 동네명 표시용
         SessionInfo info = (SessionInfo) session.getAttribute("member");
-        if (info != null) {
-            try {
-                UserRegionInfo regionInfo = memberService.getUserRegionInfo(info.getUserIdx());
-                if (regionInfo != null) {
-                    model.addAttribute("userRegionInfo", regionInfo);
-                }
-            } catch (Exception e) {
-                log.warn("writeForm - getUserRegionInfo 실패", e);
-            }
+        if (info != null && info.getUserRegionInfo() != null) {
+            model.addAttribute("userRegionInfo", info.getUserRegionInfo());
         }
         return "community/write";
     }
@@ -194,7 +154,6 @@ public class CommunityController {
             @RequestParam(value = "uploadFiles", required = false) List<MultipartFile> uploadFiles,
             @RequestParam(value = "attachFiles", required = false) List<MultipartFile> attachFiles,
             @RequestParam(value = "isTemporary", required = false, defaultValue = "0") int isTemporary,
-            @RequestParam(value = "regionType", required = false, defaultValue = "1") int regionType,
             HttpSession session) throws Exception {
             
         SessionInfo info = (SessionInfo) session.getAttribute("member");
@@ -206,24 +165,13 @@ public class CommunityController {
         dto.setTemporary(isTemporary == 1);
 
         try {
-            UserRegionInfo regionInfo = memberService.getUserRegionInfo(info.getUserIdx());
+            UserRegionInfo regionInfo = info.getUserRegionInfo();
             if (regionInfo != null) {
-                // 사용자가 선택한 탭(regionType) 기준으로 동네 코드 저장
-                com.sp.app.domain.dto.RegionDto targetRegion = null;
-                if (regionType == 2 && regionInfo.getSubRegion() != null) {
-                    targetRegion = regionInfo.getSubRegion();
-                } else if (regionInfo.getMainRegion() != null) {
-                    targetRegion = regionInfo.getMainRegion();
-                    regionType = 1;
-                }
-
+                com.sp.app.domain.dto.RegionDto targetRegion = regionInfo.getActiveRegion();
                 if (targetRegion != null && targetRegion.getRegionCode() != null) {
                     dto.setRegionCode(targetRegion.getRegionCode());
                 }
             }
-            
-            log.info("▶▶▶ 새 글 작성 - regionType: {}, 적용된 동네코드: {}", regionType, dto.getRegionCode());
-            
             service.insertCommunity(dto, uploadPath);
         } catch (Exception e) {
             log.error("writeSubmit error", e);
@@ -231,12 +179,12 @@ public class CommunityController {
 
         if (isTemporary == 1) {
             session.setAttribute("msg", "임시저장되었습니다.");
-            return "redirect:/community/list?tab=temp&regionType=" + regionType;
+            return "redirect:/community/list?tab=temp";
         }
         session.setAttribute("msg", "게시글이 등록되었습니다.");
         
         // 글 작성 후 작성한 동네 탭으로 돌아가기
-        return "redirect:/community/list?regionType=" + regionType;
+        return "redirect:/community/list";
     }
     @GetMapping("article/{id}")
     public String article(@PathVariable("id") long id,
