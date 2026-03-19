@@ -37,7 +37,7 @@
 
                 <div class="cf-group">
                     <label class="cf-label">모임 카테고리 <span class="cf-label-sub">(최대 3개)</span></label>
-                    <div class="cf-tag-container" @click="isCategoryModalOpen = true">
+                    <div class="cf-tag-container" @click="openCategoryModal">
                         <span v-if="selectedCategories.length === 0" class="cf-placeholder">카테고리를 선택해주세요</span>
                         <div v-for="(cat, index) in selectedCategories" :key="cat.idx" class="cf-badge">
                             <i :class="cat.icon" class="cf-badge-icon"></i>
@@ -77,12 +77,11 @@
                         <label class="cf-label">최대 인원</label>
                         <div class="cf-number-wrapper">
                             <input type="number" v-model="crewData.maxMember" class="cf-input" min="2">
-                            <span class="cf-unit">명</span>
                         </div>
                     </div>
                     
                     <div class="cf-group">
-                        <label class="cf-label">활동 지역 <span class="cf-label-sub">(최대 3곳)</span></label>
+                        <label class="cf-label">활동 지역<span class="cf-label-sub">(최대 3곳)</span></label>
                         <div class="cf-region-box" @click.stop="openRegionModal">
                             <span class="cf-placeholder">지역 추가하기</span>
                             <i class="ri-map-pin-add-line"></i>
@@ -112,21 +111,27 @@
         </div>
 
         <div class="cf-modal-overlay" v-if="isCategoryModalOpen" @click.self="isCategoryModalOpen = false">
-            <div class="cf-modal-content">
-                <div class="cf-modal-header">
-                    <h3>카테고리 선택</h3>
-                    <button type="button" @click="isCategoryModalOpen = false"><i class="ri-close-line"></i></button>
-                </div>
-                <div class="cf-category-grid">
-                    <div v-for="cat in categories" :key="cat.idx" 
-                         class="cf-cat-item" 
-                         @click="selectCategory(cat)">
-                        <i :class="cat.icon"></i>
-                        <span>{{ cat.name }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+		    <div class="cf-modal-content">
+		        <div class="cf-modal-header">
+		            <h3>카테고리 선택 <span class="cf-label-sub">({{ tempSelectedCategories.length }}/3)</span></h3>
+		            <button type="button" @click="isCategoryModalOpen = false"><i class="ri-close-line"></i></button>
+		        </div>
+		        
+		        <div class="cf-category-grid">
+		            <div v-for="cat in categories" :key="cat.idx" 
+		                 class="cf-cat-item" 
+		                 :class="{ 'is-active': tempSelectedCategories.some(item => item.idx === cat.idx) }"
+		                 @click="toggleTempCategory(cat)">
+		                <i :class="cat.icon"></i>
+		                <span>{{ cat.name }}</span>
+		            </div>
+		        </div>
+		
+		        <div class="cf-modal-footer">
+		            <button type="button" class="cf-btn-confirm" @click="confirmCategorySelection">확인</button>
+		        </div>
+		    </div>
+		</div>
 
         <div class="cf-modal-overlay" v-if="isRegionModalOpen" @click.self="closeRegionModal">
             <div class="cf-modal-content cf-region-modal">
