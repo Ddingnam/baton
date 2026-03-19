@@ -89,11 +89,13 @@ function renderCurrentPage() {
 function renderList(jobs) {
 	const container = document.getElementById('listView');
 	if (!container) return;
-
+	
+	
 	if (!jobs || !jobs.length) {
 		container.innerHTML = `<div class="no-result"><strong>검색 결과가 없어요</strong></div>`;
 		return;
 	}
+	
 
 	container.innerHTML = jobs.map(job => {
 		const relTime = getRelativeTime(job.createdDate);
@@ -283,9 +285,19 @@ function setupColumnSelection(colId) {
 	});
 }
 
+// 아까아까
 document.addEventListener('DOMContentLoaded', function() {
-
-	setTimeout(applyFilters, 100);
+	
+	if (myRegion && myRegion.sido) {
+	    applyAreaFilterAuto(myRegion.sido, myRegion.gugun, myRegion.dong)
+	        .then(() => {
+	            if (filteredJobs.length === 0) {
+	                applyFilters();
+	            }
+	        });
+	} else {
+	    setTimeout(applyFilters, 100);
+	}
 
 	document.querySelectorAll('.filter-section .filter-chips, .filter-section[data-filter-type="category"]').forEach(group => {
 		group.querySelectorAll('.chip').forEach(chip => {
