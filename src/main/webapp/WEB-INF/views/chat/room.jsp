@@ -270,6 +270,69 @@
 
     window.onload = function() { connect(); };
 </script>
+<script>
+    window.contextPath = "${pageContext.request.contextPath}";
+    if (typeof showBatonToast === 'undefined') {
+        (function() {
+            const style = document.createElement('style');
+            style.textContent = `
+                #chat-toast-container {
+                    position: fixed;
+                    top: 24px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    z-index: 9999999;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 10px;
+                    pointer-events: none;
+                }
+                .chat-toast-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 14px 28px;
+                    background: rgba(25, 31, 40, 0.95);
+                    backdrop-filter: blur(10px);
+                    color: #fff;
+                    border-radius: 100px;
+                    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+                    border: 1px solid rgba(255,255,255,0.1);
+                    min-width: 200px;
+                    justify-content: center;
+                    font-size: 15px;
+                    font-weight: 600;
+                    letter-spacing: -0.3px;
+                    animation: chatToastIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
+                }
+                .chat-toast-item .ct-icon { font-size: 18px; color: #3182F6; }
+                .chat-toast-item.hide { animation: chatToastOut 0.4s cubic-bezier(0.16,1,0.3,1) forwards !important; }
+                @keyframes chatToastIn  { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+                @keyframes chatToastOut { from { opacity:1; transform:translateY(0); }   to { opacity:0; transform:translateY(-10px); } }
+            `;
+            document.head.appendChild(style);
+
+            function getContainer() {
+                let c = document.getElementById('chat-toast-container');
+                if (!c) { c = document.createElement('div'); c.id = 'chat-toast-container'; document.body.appendChild(c); }
+                return c;
+            }
+
+            window.showBatonToast = function(message) {
+                const container = getContainer();
+                const item = document.createElement('div');
+                item.className = 'chat-toast-item';
+                item.innerHTML = '<i class="ri-information-line ct-icon"></i><span>' + message + '</span>';
+                container.appendChild(item);
+                setTimeout(() => {
+                    item.classList.add('hide');
+                    setTimeout(() => { if (item.parentNode) item.remove(); }, 400);
+                }, 2500);
+            };
+        })();
+    }
+</script>
 <script src="${pageContext.request.contextPath}/dist/js/report/report-modal.js"></script>
 
 <div id="reportModal" class="report-modal-overlay" style="display:none;">
@@ -303,9 +366,7 @@
     </div>
 </div>
 
-<script>
-    window.contextPath = "${pageContext.request.contextPath}";
-</script>
+
 
 <style>
 #chatDeleteModal {
