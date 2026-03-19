@@ -2,122 +2,71 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.MemberMapper">
+
 	<select id="loginSnsUser" parameterType="map" resultType="com.sp.app.domain.dto.SnsUserDto">
 		SELECT authIdx, userIdx, provider, oauthId, linkedDate
 		FROM sns_users
 		WHERE provider = #{provider, jdbcType=VARCHAR} AND oauthId = #{oauthId, jdbcType=VARCHAR}
 	</select>
-	
+
 	<select id="loginUser" parameterType="map" resultType="com.sp.app.domain.dto.UserDto">
 		SELECT m1.userIdx, m1.userId, pwd, name, nickname, email, tel,
 			status, createdDate, updatedDate, lastLoginDate,
-			TO_CHAR(birth, 'YYYY-MM-DD') birth, 
+			TO_CHAR(birth, 'YYYY-MM-DD') birth,
 			profile_photo, score, userLevel, pwdFailCount,
 			m2.authority, batonpoint
 		FROM users m1
 		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
 		WHERE m1.userId = #{userId}
 	</select>
-	
+
 	<select id="userSeq" resultType="Long">
 		SELECT user_seq.NEXTVAL
 		FROM dual
 	</select>
-	
+
 	<insert id="insertUser" parameterType="com.sp.app.domain.dto.UserDto">
 	    INSERT INTO users (
-	        userIdx, 
-	        userId, 
-	        pwd, 
-	        name, 
-	        nickname, 
-	        email, 
-	        tel, 
-	        birth, 
-	        profile_photo, 
-	        score, 
-	        userLevel, 
-	        createdDate, 
-	        updatedDate, 
-	        lastLoginDate, 
-	        pwdFailCount, 
+	        userIdx,
+	        userId,
+	        pwd,
+	        name,
+	        nickname,
+	        email,
+	        tel,
+	        birth,
+	        profile_photo,
 	        status
 	    ) VALUES (
-	    	#{userIdx}, 
-	        #{userId}, 
-	        #{pwd}, 
-	        #{name, jdbcType=VARCHAR}, 
-	        #{nickname}, 
-	        #{email}, 
-	        #{tel, jdbcType=VARCHAR}, 
-	        #{birth, jdbcType=VARCHAR}, 
-	        #{profile_photo, jdbcType=VARCHAR}, 
-	        0, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 1)
+	    	#{userIdx},
+	        #{userId},
+	        #{pwd},
+	        #{name, jdbcType=VARCHAR},
+	        #{nickname},
+	        #{email},
+	        #{tel, jdbcType=VARCHAR},
+	        TO_DATE(#{birth, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
+	        #{profile_photo, jdbcType=VARCHAR},
+	        1
+	    )
 	</insert>
-	
-	<insert id="insertSnsUser" parameterType="com.sp.app.domain.dto.SnsUserDto">
-	    INSERT INTO sns_users (
-	        authIdx, 
-	        userIdx, 
-	        provider,
-	        oauthId, 
-	        linkedDate
-	    ) VALUES (
-	        sns_user_seq.NEXTVAL,
-	        #{userIdx}, 
-	        #{provider}, 
-	        #{oauthId},
-	        CURRENT_TIMESTAMP
-	    ) 
-	</insert>
-	
-	<select id="isLinkedSnsUser" parameterType="map" resultType="com.sp.app.domain.dto.SnsUserDto">
-		SELECT authIdx, userIdx, provider, oauthId, linkedDate
-		FROM sns_users
-		WHERE provider = #{provider, jdbcType=VARCHAR} AND oauthId = #{oauthId, jdbcType=VARCHAR}
-	</select>
-	
-    <insert id="insertMember1" parameterType="com.sp.app.domain.dto.MemberDto">
-		INSERT INTO member1(member_id, login_id, password, sns_provider, sns_id,  
-			enabled, created_at, update_at, failure_cnt)
-		VALUES (#{member_id}, #{login_id, jdbcType=VARCHAR}, #{password, jdbcType=VARCHAR}, 
-			#{sns_provider, jdbcType=VARCHAR}, #{sns_id, jdbcType=VARCHAR}, 
-			1, SYSDATE, SYSDATE, 0) 
-    </insert>
 
-    <insert id="insertMember2" parameterType="com.sp.app.domain.dto.MemberDto">
-		INSERT INTO member2(member_id, name, birth, email, receive_email, tel, 
-			profile_photo, zip, addr1, addr2, ipAddr)
-		VALUES (#{member_id}, #{name}, TO_DATE(#{birth}, 'YYYY-MM-DD'), 
-			#{email}, #{receive_email}, #{tel}, 
-			#{profile_photo, jdbcType=VARCHAR}, #{zip, jdbcType=VARCHAR},
-			#{addr1, jdbcType=VARCHAR}, #{addr2, jdbcType=VARCHAR},
-			#{ipAddr})
-    </insert>
-	
-    <update id="insertMember12" parameterType="com.sp.app.domain.dto.MemberDto">
-		INSERT ALL
-		INTO member1(member_id, login_id, password, sns_provider, sns_id, 
-			enabled, created_at, update_at, failure_cnt)
-		VALUES (member_seq.NEXTVAL, #{login_id, jdbcType=VARCHAR}, #{password, jdbcType=VARCHAR}, 
-			#{sns_provider, jdbcType=VARCHAR}, #{sns_id, jdbcType=VARCHAR}, 
-			1, SYSDATE, SYSDATE, 0)
-		INTO member2(member_id, name, birth, email, receive_email, tel, 
-			profile_photo, zip, addr1, addr2, ipAddr)
-		VALUES (member_seq.CURRVAL, #{name}, TO_DATE(#{birth}, 'YYYY-MM-DD'), 
-			#{email}, #{receive_email}, #{tel}, 
-			#{profile_photo, jdbcType=VARCHAR}, #{zip, jdbcType=VARCHAR},
-			#{addr1, jdbcType=VARCHAR}, #{addr2, jdbcType=VARCHAR},
-			#{ipAddr})
-		SELECT * FROM dual
-    </update>
+	<insert id="insertSnsUser" parameterType="com.sp.app.domain.dto.SnsUserDto">
+		INSERT INTO sns_users (authIdx, userIdx, provider, oauthId, linkedDate)
+		VALUES (sns_users_seq.NEXTVAL, #{userIdx}, #{provider}, #{oauthId}, SYSDATE)
+	</insert>
+
+	<insert id="insertMember12" parameterType="com.sp.app.domain.dto.MemberDto">
+		INSERT INTO memberStatus(num, member_id, status_code, reg_date)
+		VALUES (memberStatus_seq.NEXTVAL, #{member_id}, #{status_code}, SYSDATE)
+	</insert>
 
 	<insert id="insertMemberStatus" parameterType="com.sp.app.domain.dto.MemberDto">
 		INSERT INTO memberStatus(num, member_id, status_code, memo, register_id, reg_date)
 		VALUES (memberStatus_seq.NEXTVAL, #{member_id}, #{status_code}, #{memo}, #{register_id}, SYSDATE)
 	</insert>
 
-    <update id="updateUserEnabled" parameterType="map">
+	<update id="updateUserEnabled" parameterType="map">
 		UPDATE users SET status = #{status}
 		<where>
 			<choose>
@@ -129,74 +78,67 @@
 				</otherwise>
 			</choose>
 		</where>
-    </update>
+	</update>
 
-    <update id="updateMemberPassword" parameterType="com.sp.app.domain.dto.MemberDto">
-		UPDATE member1 SET password = #{password}, update_at = SYSDATE
-		WHERE login_id = #{login_id}
-    </update>
+	<update id="updateMemberPassword" parameterType="com.sp.app.domain.dto.MemberDto">
+		UPDATE users SET pwd = #{pwd}
+		WHERE userIdx = #{userIdx}
+	</update>
 
-    <update id="updateMember1" parameterType="com.sp.app.domain.dto.MemberDto">
-		UPDATE member1 SET login_id = #{login_id, jdbcType=VARCHAR}, 
-			sns_provider = #{sns_provider, jdbcType=VARCHAR}, sns_id = #{sns_id, jdbcType=VARCHAR}, 
-			password = #{password}, update_at = SYSDATE
-		WHERE member_id = #{member_id}
-    </update>
-	
-    <update id="updateMember2" parameterType="com.sp.app.domain.dto.MemberDto">
-		UPDATE member2 SET email = #{email}, 
-			birth = TO_DATE(#{birth}, 'YYYY-MM-DD'), 
-			tel = #{tel, jdbcType=VARCHAR}, 
-			profile_photo = #{profile_photo, jdbcType=VARCHAR}, 
-			zip = #{zip, jdbcType=VARCHAR},
-			addr1 = #{addr1, jdbcType=VARCHAR}, addr2 = #{addr2, jdbcType=VARCHAR},
-			receive_email = #{receive_email}
-		WHERE member_id = #{member_id}
-    </update>
+	<update id="updateMember1" parameterType="com.sp.app.domain.dto.MemberDto">
+		UPDATE users SET
+			name     = #{name, jdbcType=VARCHAR},
+			nickname = #{nickname},
+			email    = #{email},
+			tel      = #{tel, jdbcType=VARCHAR}
+		WHERE userIdx = #{userIdx}
+	</update>
 
-    <update id="deleteProfilePhoto" parameterType="map">
-		UPDATE member2 SET profile_photo = ''
-		WHERE member_id = #{member_id}
-    </update>
+	<update id="updateMember2" parameterType="com.sp.app.domain.dto.MemberDto">
+		UPDATE users SET profile_photo = #{profile_photo, jdbcType=VARCHAR}
+		WHERE userIdx = #{userIdx}
+	</update>
 
-	<!-- 로그인 시간 변경 -->
+	<update id="deleteProfilePhoto" parameterType="map">
+		UPDATE users SET profile_photo = NULL WHERE userIdx = #{userIdx}
+	</update>
+
 	<update id="updateLastLogin" parameterType="Long">
-		UPDATE member1 SET last_login = SYSDATE, failure_cnt = 0
-		WHERE member_id = #{member_id}
+		UPDATE users SET lastLoginDate = CURRENT_TIMESTAMP, pwdFailCount = 0
+		WHERE userIdx = #{userIdx}
 	</update>
 
 	<update id="updateLastLoginId" parameterType="String">
-		UPDATE member1 SET last_login = SYSDATE, failure_cnt = 0
-		WHERE login_id = #{login_id}
+		UPDATE users SET lastLoginDate = CURRENT_TIMESTAMP, pwdFailCount = 0
+		WHERE userId = #{login_id}
 	</update>
 
-	<!-- 회원 정보 -->
 	<select id="findById" parameterType="Long" resultType="com.sp.app.domain.dto.UserDto">
 		SELECT m1.userIdx, m1.userId, pwd, name, nickname, email, tel,
 			status, createdDate, updatedDate, lastLoginDate,
-			TO_CHAR(birth, 'YYYY-MM-DD') birth, 
+			TO_CHAR(birth, 'YYYY-MM-DD') birth,
 			profile_photo, score, userLevel, pwdFailCount,
 			m2.authority, batonpoint
 		FROM users m1
 		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
-		WHERE m1.userIdx = #{userIdx}
+		WHERE m1.userIdx = #{member_id}
 	</select>
 
 	<select id="findByLoginId" parameterType="String" resultType="com.sp.app.domain.dto.UserDto">
 		SELECT m1.userIdx, m1.userId, pwd, name, nickname, email, tel,
 			status, createdDate, updatedDate, lastLoginDate,
-			TO_CHAR(birth, 'YYYY-MM-DD') birth, 
+			TO_CHAR(birth, 'YYYY-MM-DD') birth,
 			profile_photo, score, userLevel, pwdFailCount,
 			m2.authority, batonpoint
 		FROM users m1
 		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
 		WHERE m1.userId = #{login_id}
 	</select>
-	
+
 	<select id="findByEmail" parameterType="String" resultType="com.sp.app.domain.dto.UserDto">
 		SELECT m1.userIdx, m1.userId, pwd, name, nickname, email, tel,
 			status, createdDate, updatedDate, lastLoginDate,
-			TO_CHAR(birth, 'YYYY-MM-DD') birth, 
+			TO_CHAR(birth, 'YYYY-MM-DD') birth,
 			profile_photo, score, userLevel, pwdFailCount,
 			m2.authority, batonpoint
 		FROM users m1
@@ -205,71 +147,35 @@
 	</select>
 
 	<select id="getMemberId" parameterType="String" resultType="Long">
-		SELECT member_id
-		FROM member1
-		WHERE login_id = #{login_id}
+		SELECT userIdx FROM users WHERE userId = #{login_id}
 	</select>
 
-	<!-- 패스워드 실패 횟수 -->
-	<select id="checkFailureCount" parameterType="String" resultType="Integer">
-		SELECT NVL(pwdFailCount, 0) pwdFailCount
-		FROM users
-		WHERE userId = #{login_id}
+	<select id="checkFailureCount" parameterType="String" resultType="int">
+		SELECT NVL(pwdFailCount, 0) FROM users WHERE userId = #{login_id}
 	</select>
-	
-	<!-- 패스워드 실패 횟수 초기화 -->
+
 	<update id="updateFailureCountReset" parameterType="String">
-		UPDATE users SET pwdFailCount = 0
-		WHERE userId = #{login_id}
+		UPDATE users SET pwdFailCount = 0 WHERE userId = #{login_id}
 	</update>
-	
-	<!-- 패스워드 실패 횟수 증가 -->
+
 	<update id="updateFailureCount" parameterType="String">
-		UPDATE users SET pwdFailCount = pwdFailCount + 1
-		WHERE userId = #{login_id}
+		UPDATE users SET pwdFailCount = NVL(pwdFailCount, 0) + 1 WHERE userId = #{login_id}
 	</update>
-	
-	<!-- 회원 정보 삭제 -->
-    <delete id="deleteMember1" parameterType="map">
-		DELETE FROM member1
-		WHERE member_id = #{member_id}
-    </delete>
-    
-    <delete id="deleteMember2" parameterType="map">
-		DELETE FROM member2
-		WHERE member_id = #{member_id}
-    </delete>
 
-	<!-- 회원 검색 -->
-    <select id="listFindMember" parameterType="map" resultType="com.sp.app.domain.dto.MemberDto">
-		SELECT m1.member_id, NVL(login_id, sns_id) login_id, name
-		FROM member1 m1
-		JOIN member2 m2 ON m1.member_id = m2.member_id
-		<where>
-			m1.member_id != #{member_id}
-			AND
-			<if test="kwd != null and kwd != '' ">
-				<choose>
-					<when test="schType == 'login_id'">
-						( NSTR(m1.login_id, #{kwd}) &gt;= 1 OR INSTR(m1.sns_id, #{kwd}) &gt;= 1 )
-					</when>
-					<otherwise>
-						INSTR(${schType}, #{kwd}) &gt;= 1
-					</otherwise>
-				</choose>
-			</if>
-		</where>
-    </select>
+	<delete id="deleteMember1" parameterType="map">
+		DELETE FROM users WHERE userIdx = #{userIdx}
+	</delete>
 
-	<!-- 어쏘러티(권한) 테이블 --> 
+	<delete id="deleteMember2" parameterType="map">
+		DELETE FROM userAuthority WHERE userId = #{userId}
+	</delete>
+
 	<insert id="insertAuthority" parameterType="com.sp.app.domain.dto.UserDto">
-		INSERT INTO userAuthority(userId, authority)
-		VALUES (#{userId}, #{authority})
+		INSERT INTO userAuthority (userId, authority) VALUES (#{userId}, 'USER')
 	</insert>
 
 	<delete id="deleteAuthority" parameterType="map">
-		DELETE FROM userAuthority
-		WHERE userId = #{userId}
+		DELETE FROM userAuthority WHERE userId = #{userId}
 	</delete>
 
 	<select id="findByAuthority" parameterType="String" resultType="String">
@@ -277,83 +183,66 @@
 		FROM userAuthority
 		WHERE userId = #{login_id}
 	</select>
-	
+
 	<insert id="insertRefreshToken" parameterType="com.sp.app.domain.dto.MemberDto">
-		INSERT INTO refreshToken(login_id, rt_value)
-		VALUES (#{login_id}, #{rt_value})
+		INSERT INTO refreshToken (tokenIdx, member_id, token, createdAt)
+		VALUES (refreshToken_seq.NEXTVAL, #{member_id}, #{token}, SYSDATE)
 	</insert>
 
 	<update id="updateRefreshToken" parameterType="com.sp.app.domain.dto.MemberDto">
-		UPDATE refreshToken SET rt_value = #{rt_value} 
-		WHERE login_id = #{login_id}
+		UPDATE refreshToken SET token = #{token}, createdAt = SYSDATE
+		WHERE member_id = #{member_id}
 	</update>
-    
+
 	<delete id="deleteRefreshToken" parameterType="String">
-		DELETE FROM refreshToken
-		WHERE login_id = #{login_id}
+		DELETE FROM refreshToken WHERE member_id = #{login_id}
 	</delete>
-	
-	<select id="findByToken" parameterType="String" resultType="com.sp.app.domain.dto.MemberDto">
-		SELECT login_id, rt_value
-		FROM refreshToken
-		WHERE login_id = #{login_id}
+
+	<select id="isUserIdDuplicated" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM users WHERE userId = #{userId}
 	</select>
 
-	<select id="isUserIdDuplicated" resultType="int">
-		SELECT COUNT(userId)
-		FROM users
-		WHERE userId = #{userId}
+	<select id="isNicknameDuplicated" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM users WHERE nickname = #{nickname}
 	</select>
-	
-	<select id="isNicknameDuplicated" resultType="int">
-		SELECT COUNT(nickname)
-		FROM users
-		WHERE nickname = #{nickname}
-	</select>
-	
-	<select id="isEmailDuplicated" resultType="int">
-		SELECT COUNT(email)
-		FROM users
-		WHERE email = #{email}
+
+	<select id="isEmailDuplicated" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM users WHERE email = #{email}
 	</select>
 
 	<select id="findUserId" parameterType="map" resultType="String">
-		SELECT userId
-		FROM users
-		WHERE name = #{name} AND email = #{email}
+		SELECT userId FROM users WHERE name = #{name} AND email = #{email}
 	</select>
-	
-	<select id="findByUserIdAndEmail" parameterType="map" resultType="Long">
-		SELECT userIdx
-		FROM users
-		WHERE userId = #{userId} AND email = #{email}
+
+	<select id="findByUserIdAndEmail" parameterType="map" resultType="long">
+		SELECT userIdx FROM users WHERE userId = #{userId} AND email = #{email}
 	</select>
-	
+
 	<update id="updateUserPwd" parameterType="map">
-		UPDATE users SET pwd = #{pwd} 
-		WHERE useridx = #{userIdx}
+		UPDATE users SET pwd = #{newPwd} WHERE userIdx = #{userIdx}
 	</update>
-	
+
 	<insert id="insertRegion" parameterType="com.sp.app.domain.dto.RegionDto">
-		INSERT INTO region (regionCode, sido, sigungu, dong, represent_lat, represent_lng)
-		SELECT #{regionCode}, #{sido}, #{sigungu}, #{dong}, #{lat}, #{lng}
-		FROM DUAL
-		WHERE NOT EXISTS (
-		    SELECT 1 FROM region WHERE regionCode = #{regionCode}
-		)
+		MERGE INTO region r
+		USING (SELECT #{regionCode} AS regionCode FROM DUAL) d
+		ON (r.regionCode = d.regionCode)
+		WHEN NOT MATCHED THEN
+		    INSERT (regionCode, sido, sigungu, dong, represent_lat, represent_lng)
+		    VALUES (#{regionCode}, #{sido, jdbcType=VARCHAR}, #{sigungu, jdbcType=VARCHAR},
+		            #{dong, jdbcType=VARCHAR}, #{represent_lat, jdbcType=NUMERIC}, #{represent_lng, jdbcType=NUMERIC})
 	</insert>
-	
+
 	<select id="findUserRegionbyType" parameterType="map" resultType="com.sp.app.domain.dto.RegionDto">
         SELECT u.regionIdx, u.userIdx, u.regionCode, u.regionType,
         	   u.is_active, u.is_authenticated, u.authDate,
         	   r.sido, r.sigungu, r.dong,
         	   (r.sido || ' ' || r.sigungu || ' ' || r.dong) AS fullAddress,
         	   r.dong AS coreAddress
-        FROM userRegion u 
+        FROM userRegion u
         JOIN region r ON u.regionCode = r.regionCode
         WHERE u.userIdx = #{userIdx} AND u.regionType = #{regionType}
     </select>
-    
+
     <select id="findRegionbyCode" parameterType="String" resultType="com.sp.app.domain.dto.RegionDto">
         SELECT regionCode, sido, sigungu, dong, represent_lat, represent_lng,
         	   (sido || ' ' || sigungu || ' ' || dong) AS fullAddress,
@@ -361,28 +250,28 @@
         FROM region
         WHERE regionCode = #{regionCode}
     </select>
-    
+
     <update id="saveUserRegion" parameterType="com.sp.app.domain.dto.RegionDto">
 	    MERGE INTO userRegion u
 	    USING (
-	        SELECT 
-	            #{userIdx} AS userIdx, 
-	            #{regionType} AS regionType 
+	        SELECT
+	            #{userIdx} AS userIdx,
+	            #{regionType} AS regionType
 	        FROM DUAL
 	    ) d
 	    ON (u.userIdx = d.userIdx AND u.regionType = d.regionType)
 	    WHEN MATCHED THEN
-	        UPDATE SET 
+	        UPDATE SET
 	            regionCode = #{regionCode},
 	            authDate = SYSDATE,
 	            is_authenticated = 1
 	    WHEN NOT MATCHED THEN
 	        INSERT (
-	            regionIdx, userIdx, regionCode, regionType, 
+	            regionIdx, userIdx, regionCode, regionType,
 	            is_active, is_authenticated, authDate
 	        )
 	        VALUES (
-	            userRegion_seq.NEXTVAL, d.userIdx, #{regionCode}, d.regionType, 
+	            userRegion_seq.NEXTVAL, d.userIdx, #{regionCode}, d.regionType,
 	            CASE WHEN d.regionType = 1 THEN 1 ELSE 0 END, 1, SYSDATE
 	        )
 	</update>
@@ -393,11 +282,32 @@
 
     <update id="updateActiveStatus" parameterType="map">
         UPDATE userRegion
-        SET is_active = CASE 
+        SET is_active = CASE
             WHEN regionType = #{regionType} THEN 1
             ELSE 0
         END
         WHERE userIdx = #{userIdx}
     </update>
-	
+
+    <select id="hasPendingWithdraw" parameterType="Long" resultType="int">
+        SELECT COUNT(*) FROM withdrawRequest
+        WHERE userIdx = #{userIdx} AND withdrawStatus = 'PENDING'
+    </select>
+
+    <insert id="insertWithdrawRequest" parameterType="map">
+        INSERT INTO withdrawRequest (withdrawIdx, userIdx, reason, requestDate, withdrawStatus)
+        VALUES (withdrawRequest_seq.NEXTVAL, #{userIdx}, #{reason, jdbcType=VARCHAR}, CURRENT_TIMESTAMP, 'PENDING')
+    </insert>
+
+    <select id="countActiveTrades" parameterType="Long" resultType="int">
+        SELECT COUNT(*) FROM TRADETRANSACTION
+        WHERE (BUYERIDX = #{userIdx} OR SELLERIDX = #{userIdx})
+        AND TRADESTATUS NOT IN ('COMPLETED', 'CANCELLED')
+    </select>
+
+    <select id="countPendingReports" parameterType="Long" resultType="int">
+        SELECT COUNT(*) FROM adminReport
+        WHERE reportedUserIdx = #{userIdx} AND processStatus = 0
+    </select>
+
 </mapper>

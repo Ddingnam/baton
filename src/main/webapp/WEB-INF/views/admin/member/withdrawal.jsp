@@ -69,6 +69,8 @@
                                 <th>가입일</th>
                                 <th>요청일</th>
                                 <th>탈퇴 사유</th>
+                                <th>진행거래</th>
+                                <th>미처리신고</th>
                                 <th>상태</th>
                                 <th>처리</th>
                             </tr>
@@ -76,7 +78,7 @@
                         <tbody>
                             <c:if test="${empty list}">
                                 <tr>
-                                    <td colspan="7" class="empty-row">
+                                    <td colspan="9" class="empty-row">
                                         <i class="ri-user-follow-line"></i>
                                         <span>탈퇴 요청이 없습니다.</span>
                                     </td>
@@ -101,6 +103,22 @@
                                     </td>
                                     <td>
                                         <c:choose>
+                                            <c:when test="${w.ACTIVETRADES > 0}">
+                                                <span class="tag tag-red">${w.ACTIVETRADES}건</span>
+                                            </c:when>
+                                            <c:otherwise><span style="color:var(--text-light);font-size:13px;">없음</span></c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${w.PENDINGREPORTS > 0}">
+                                                <span class="tag tag-red">${w.PENDINGREPORTS}건</span>
+                                            </c:when>
+                                            <c:otherwise><span style="color:var(--text-light);font-size:13px;">없음</span></c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>
+                                        <c:choose>
                                             <c:when test="${w.WITHDRAWSTATUS == 'PENDING'}">  <span class="tag tag-blue">대기중</span></c:when>
                                             <c:when test="${w.WITHDRAWSTATUS == 'APPROVED'}"> <span class="tag tag-gray">승인됨</span></c:when>
                                             <c:when test="${w.WITHDRAWSTATUS == 'REJECTED'}"> <span class="tag tag-red">반려됨</span></c:when>
@@ -113,7 +131,6 @@
                                                         onclick="openApproveModal(${w.WITHDRAWIDX}, ${w.USERIDX}, '${w.NICKNAME}')">
                                                     승인
                                                 </button>
-                                                <%-- rejectWithdrawal에 nickname 3번째 인자 추가 --%>
                                                 <button class="btn-reject"
                                                         onclick="rejectWithdrawal(${w.WITHDRAWIDX}, ${w.USERIDX}, '${w.NICKNAME}')">
                                                     반려
@@ -163,7 +180,7 @@
                 <div class="member-avt" id="approveAvt"></div>
                 <div>
                     <div class="member-name" id="approveTargetName"></div>
-                    <div class="member-sub">탈퇴 처리 시 계정이 비활성화됩니다.</div>
+                    <div class="member-sub">탈퇴 처리 시 계정이 영구 삭제됩니다.</div>
                 </div>
             </div>
             <p style="font-size:13px;color:var(--color-red);font-weight:600;background:#FEE2E2;padding:12px 14px;border-radius:var(--radius-sm);">

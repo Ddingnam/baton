@@ -15,7 +15,8 @@ const CrewForm = {
             },
             
             isCategoryModalOpen: false,
-            selectedCategories: [], 
+            selectedCategories: [],
+			tempSelectedCategories: [],
             previewUrl: null,       
             
             isRegionModalOpen: false,
@@ -52,12 +53,37 @@ const CrewForm = {
             if (fileInput) fileInput.value = '';
         },
 
+		openCategoryModal() {
+			this.tempSelectedCategories = [...this.selectedCategories];
+			this.isCategoryModalOpen = true;
+		},
+
+		toggleTempCategory(category) {
+			const index = this.tempSelectedCategories.findIndex(item => item.idx === category.idx);
+
+			if (index > -1) {
+				this.tempSelectedCategories.splice(index, 1);
+			} else {
+				if (this.tempSelectedCategories.length >= 3) {
+					return alert("최대 3개까지 선택할 수 있습니다.");
+				}
+				this.tempSelectedCategories.push(category);
+			}
+		},
+
+		confirmCategorySelection() {
+			this.selectedCategories = [...this.tempSelectedCategories];
+			this.crewData.categoryIdxs = this.selectedCategories.map(cat => cat.idx);
+			this.isCategoryModalOpen = false;
+		},
+
         selectCategory(category) {
             if (this.selectedCategories.some(item => item.idx === category.idx)) return alert("이미 추가된 카테고리입니다.");
             if (this.selectedCategories.length >= 3) return alert("최대 3개까지 선택할 수 있습니다.");
             this.selectedCategories.push(category);
             this.crewData.categoryIdxs.push(category.idx);
         },
+		
         removeCategory(index) {
             this.selectedCategories.splice(index, 1);
             this.crewData.categoryIdxs.splice(index, 1);
@@ -169,24 +195,58 @@ const CrewForm = {
             this.crewData.regionCodes.splice(index, 1);
         },
 
-        async submitForm() {
-            if (!this.crewData.name) return alert("모임 이름을 입력해주세요.");
-            if (this.selectedCategories.length === 0) return alert("카테고리를 선택해주세요.");
-            if (this.selectedRegions.length === 0) return alert("활동 지역을 선택해주세요.");
+		async submitForm() {
+		    if (!this.crewData.name) return alert("모임 이름을 입력해주세요.");
+		    if (this.selectedCategories.length === 0) return alert("카테고리를 선택해주세요.");
+		    if (this.selectedRegions.length === 0) return alert("활동 지역을 선택해주세요.");
 
-            const formData = new FormData();
-            formData.append('name', this.crewData.name);
-            formData.append('description', this.crewData.description);
-            formData.append('maxMember', this.crewData.maxMember);
-            formData.append('joinType', this.crewData.joinType);
-            
-            this.crewData.categoryIdxs.forEach(idx => formData.append('categoryIdxs', idx));
-            this.crewData.regionCodes.forEach(code => formData.append('regionCodes', code));
+		    const formData = new FormData();
+		    formData.append('name', this.crewData.name);
+		    formData.append('description', this.crewData.description);
+		    formData.append('maxMember', this.crewData.maxMember);
+		    formData.append('joinType', this.crewData.joinType);
+		    
+			if (this.selectedCategories && this.selectedCategories.length > 0) {
+			    this.selectedCategories.forEach(item => {
+			        formData.append('categoryIdxs', item.idx);
+			    });
+			}
 
-            if (this.crewData.logoImageFile) formData.append('logoImageFile', this.crewData.logoImageFile);
+			if (this.selectedRegions && this.selectedRegions.length > 0) {
+			    this.selectedRegions.forEach(item => {
+			        formData.append('regionCodes', item.code);
+			    });
+			}
 
-            console.log("제출 데이터 객체 확인:", this.crewData);
-            alert("모임이 개설되었습니다!");
-        }
+		    if (this.crewData.logoImageFile) {
+		        formData.append('logoImageFile', this.crewData.logoImageFile);
+		    }
+
+		    try {
+		        const response = await fetch('/crew/formSubmit', {
+		            method: 'POST',
+		            body: formData
+		        });
+
+		        if (!response.ok) {
+		            throw new Error(`서버 에러: ${response.status}`);
+		        }
+
+		        const result = await response.json();
+
+		        if (result.state === "success") {
+		            alert("모임이 개설되었습니다!");
+		            location.href = `/crew/main`; 
+		        } else if (result.state === "login_required") {
+		            location.href = "/member/login";
+		        } else {
+		            alert("모임 개설 중 오류가 발생했습니다.");
+		        }
+
+		    } catch (error) {
+		        console.error("제출 오류:", error);
+		        alert("서버와 통신 중 문제가 발생했습니다.");
+		    }
+		}
     }
 };
