@@ -886,3 +886,83 @@ ul, li { list-style: none; }
     color: var(--text-sub);
 }
 .perm-row i { color: var(--color-green); font-size: 16px; font-weight: 900; }
+
+.adm-dropdown {
+    position: relative;
+    z-index: 10;
+}
+.adm-dropdown-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 14px;
+    background: var(--card-bg);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    min-width: 130px;
+    transition: all 0.15s;
+}
+.adm-dropdown-btn:hover,
+.adm-dropdown.open .adm-dropdown-btn {
+    border-color: var(--color-purple);
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.08);
+}
+.adm-dropdown-arrow {
+    margin-left: auto;
+    font-size: 16px;
+    color: var(--text-light);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+}
+.adm-dropdown.open .adm-dropdown-arrow { transform: rotate(180deg); }
+
+.adm-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 160px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.14);
+    padding: 6px;
+    z-index: 9999;
+    border: 1px solid var(--border-color);
+}
+.adm-dropdown.open .adm-dropdown-menu { display: block; }
+
+.adm-dropdown-item {
+    padding: 10px 14px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-sub);
+    cursor: pointer;
+    background: #fff;
+    transition: all 0.12s;
+    white-space: nowrap;
+}
+.adm-dropdown-item:hover { background: var(--base-bg); color: var(--text-main); }
+.adm-dropdown-item.active {
+    background: var(--color-purple-light);
+    color: var(--color-purple);
+    font-weight: 700;
+}
+
+.member-toolbar { overflow: visible !important; position: relative; z-index: 10; }
+.member-toolbar.block-card { overflow: visible !important; position: relative; z-index: 10; }
+.table-block { overflow: visible !important; }
+.toolbar-form { overflow: visible !important; }
+.search-group { overflow: visible !important; position: relative; z-index: 50; }
+
+.trade-user-col { display: flex; align-items: center; gap: 8px; }
+.trade-role-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+.role-buyer { background: #e3f2fd; color: #1976d2; }
+.role-seller { background: #fce4ec; color: #c2185b; }

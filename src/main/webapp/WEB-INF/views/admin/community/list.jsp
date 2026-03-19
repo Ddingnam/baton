@@ -37,27 +37,26 @@
                            class="status-tab ${empty category ? 'active' : ''}">전체</a>
                         <a href="?category=일상&schType=${schType}&kwd=${kwd}"
                            class="status-tab ${category == '일상' ? 'active' : ''}">일상</a>
-                        <a href="?category=동네질문&schType=${schType}&kwd=${kwd}"
-                           class="status-tab ${category == '동네질문' ? 'active' : ''}">동네질문</a>
-                        <a href="?category=동네맛집&schType=${schType}&kwd=${kwd}"
-                           class="status-tab ${category == '동네맛집' ? 'active' : ''}">동네맛집</a>
-                        <a href="?category=같이해요&schType=${schType}&kwd=${kwd}"
-                           class="status-tab ${category == '같이해요' ? 'active' : ''}">같이해요</a>
-                        <a href="?category=분실/실종&schType=${schType}&kwd=${kwd}"
-                           class="status-tab ${category == '분실/실종' ? 'active' : ''}">분실/실종</a>
-                        <a href="?category=동네사건사고&schType=${schType}&kwd=${kwd}"
-                           class="status-tab ${category == '동네사건사고' ? 'active' : ''}">동네사건사고</a>
-                        <a href="?category=생활정보&schType=${schType}&kwd=${kwd}"
-                           class="status-tab ${category == '생활정보' ? 'active' : ''}">생활정보</a>
-                        <a href="?category=취미생활&schType=${schType}&kwd=${kwd}"
-                           class="status-tab ${category == '취미생활' ? 'active' : ''}">취미생활</a>
+                        <a href="?category=질문&schType=${schType}&kwd=${kwd}"
+                           class="status-tab ${category == '질문' ? 'active' : ''}">질문</a>
+                        <a href="?category=정보&schType=${schType}&kwd=${kwd}"
+                           class="status-tab ${category == '정보' ? 'active' : ''}">정보</a>
+                        <a href="?category=동네소식&schType=${schType}&kwd=${kwd}"
+                           class="status-tab ${category == '동네소식' ? 'active' : ''}">동네소식</a>
                     </div>
                     <div class="search-group">
-                        <select name="schType" class="fm-input search-select">
-                            <option value="all"     ${schType == 'all'     ? 'selected' : ''}>통합검색</option>
-                            <option value="subject" ${schType == 'subject' ? 'selected' : ''}>제목</option>
-                            <option value="content" ${schType == 'content' ? 'selected' : ''}>내용</option>
-                        </select>
+                        <input type="hidden" name="schType" id="commSchTypeInput" value="${schType}">
+                        <div class="adm-dropdown" id="commSchType">
+                            <button type="button" class="adm-dropdown-btn" onclick="admToggle('commSchType')">
+                                <span id="commSchTypeLabel">통합검색</span>
+                                <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
+                            </button>
+                            <div class="adm-dropdown-menu">
+                                <div class="adm-dropdown-item active" data-value="all" onclick="admSelect(this,'commSchType')">통합검색</div>
+                                <div class="adm-dropdown-item" data-value="subject" onclick="admSelect(this,'commSchType')">제목</div>
+                                <div class="adm-dropdown-item" data-value="content" onclick="admSelect(this,'commSchType')">내용</div>
+                            </div>
+                        </div>
                         <div class="search-input-wrap">
                             <i class="ri-search-2-line"></i>
                             <input type="text" name="kwd" class="fm-input"
@@ -69,7 +68,7 @@
                 </form>
             </div>
 
-            <div class="block-card table-block" style="padding:0; border-radius:var(--radius-lg); overflow:hidden;">
+            <div class="block-card table-block" style="padding:0; border-radius:var(--radius-lg);">
                 <div class="modern-table-wrap">
                     <table class="modern-table">
                         <thead>
@@ -98,19 +97,7 @@
                                 <tr>
                                     <td class="font-medium">${item.id}</td>
                                     <td>
-                                        <span class="tag tag-blue">
-                                            <c:choose>
-                                                <c:when test="${item.category == '1' || item.category == '일상'}">일상</c:when>
-                                                <c:when test="${item.category == '2' || item.category == '동네질문'}">동네질문</c:when>
-                                                <c:when test="${item.category == '3' || item.category == '동네맛집'}">동네맛집</c:when>
-                                                <c:when test="${item.category == '4' || item.category == '같이해요'}">같이해요</c:when>
-                                                <c:when test="${item.category == '5' || item.category == '분실/실종'}">분실/실종</c:when>
-                                                <c:when test="${item.category == '6' || item.category == '동네사건사고'}">동네사건사고</c:when>
-                                                <c:when test="${item.category == '7' || item.category == '생활정보'}">생활정보</c:when>
-                                                <c:when test="${item.category == '8' || item.category == '취미생활'}">취미생활</c:when>
-                                                <c:otherwise>${not empty item.category ? item.category : '기타'}</c:otherwise>
-                                            </c:choose>
-                                        </span>
+                                        <span class="tag tag-blue">${not empty item.category ? item.category : '기타'}</span>
                                     </td>
                                     <td>
                                         <span class="reason-cell" title="${item.subject}">${item.subject}</span>
@@ -203,5 +190,30 @@
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_ui.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/community_list.js"></script>
+<script>
+function admToggle(id) {
+    var dd = document.getElementById(id);
+    var isOpen = dd.classList.contains('open');
+    document.querySelectorAll('.adm-dropdown.open').forEach(function(d) { d.classList.remove('open'); });
+    if (!isOpen) dd.classList.add('open');
+}
+function admSelect(el, ddId) {
+    document.getElementById(ddId + 'Input').value = el.dataset.value;
+    document.getElementById(ddId + 'Label').textContent = el.textContent.trim();
+    document.querySelectorAll('#' + ddId + ' .adm-dropdown-item').forEach(function(i) { i.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById(ddId).classList.remove('open');
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var map = {'all': '통합검색', 'subject': '제목', 'content': '내용'};
+    var inp = document.getElementById('commSchTypeInput');
+    if (inp && map[inp.value]) document.getElementById('commSchTypeLabel').textContent = map[inp.value];
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.adm-dropdown.open').forEach(function(dd) {
+            if (!dd.contains(e.target)) dd.classList.remove('open');
+        });
+    });
+});
+</script>
 </body>
 </html>

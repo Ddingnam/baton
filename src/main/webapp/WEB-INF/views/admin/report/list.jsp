@@ -76,7 +76,7 @@
                 </form>
             </div>
 
-            <div class="block-card table-block" style="padding:0; border-radius:var(--radius-lg); overflow:hidden;">
+            <div class="block-card table-block" style="padding:0; border-radius:var(--radius-lg);">
                 <div class="modern-table-wrap">
                     <table class="modern-table">
                         <thead>
@@ -200,6 +200,7 @@
 
 <div class="fullscreen-overlay" id="detailOverlay">
     <div class="rpt-modal">
+        
         <div class="rpt-modal-header">
             <div class="rpt-header-left">
                 <div class="rpt-header-icon"><i class="ri-alarm-warning-fill"></i></div>
@@ -211,6 +212,7 @@
             <button class="rpt-close-btn" id="detailClose"><i class="ri-close-line"></i></button>
         </div>
 
+        
         <div class="rpt-modal-body">
             <div class="rpt-info-list">
                 <div class="rpt-info-row">
@@ -252,6 +254,7 @@
             </div>
         </div>
 
+        
         <div class="rpt-modal-footer" id="detailFooter">
             <button class="rpt-btn-cancel" id="detailCancel">닫기</button>
             <div class="rpt-footer-actions">
@@ -268,7 +271,9 @@
 
 <script>var CTX = '${pageContext.request.contextPath}';</script>
 <script>
+
 (function() {
+
     var labelMap = {
         '': '전체 유형',
         'TRADE': '중고거래',

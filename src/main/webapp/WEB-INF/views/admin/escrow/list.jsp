@@ -51,12 +51,19 @@
                     <input type="hidden" name="status" value="${status}">
 
                     <div class="search-group">
-                        <select name="schType" class="fm-input search-select">
-                            <option value="all" ${schType == 'all' ? 'selected' : ''}>통합검색</option>
-                            <option value="productIdx" ${schType == 'productIdx' ? 'selected' : ''}>상품 번호</option>
-                            <option value="buyerId" ${schType == 'buyerId' ? 'selected' : ''}>구매자 ID</option>
-                            <option value="sellerId" ${schType == 'sellerId' ? 'selected' : ''}>판매자 ID</option>
-                        </select>
+                        <input type="hidden" name="schType" id="escrowSchTypeInput" value="${schType}">
+                        <div class="adm-dropdown" id="escrowSchType">
+                            <button type="button" class="adm-dropdown-btn" onclick="admToggle('escrowSchType')">
+                                <span id="escrowSchTypeLabel">통합검색</span>
+                                <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
+                            </button>
+                            <div class="adm-dropdown-menu">
+                                <div class="adm-dropdown-item active" data-value="all" onclick="admSelect(this,'escrowSchType')">통합검색</div>
+                                <div class="adm-dropdown-item" data-value="productIdx" onclick="admSelect(this,'escrowSchType')">상품 번호</div>
+                                <div class="adm-dropdown-item" data-value="buyerId" onclick="admSelect(this,'escrowSchType')">구매자 ID</div>
+                                <div class="adm-dropdown-item" data-value="sellerId" onclick="admSelect(this,'escrowSchType')">판매자 ID</div>
+                            </div>
+                        </div>
                         <div class="search-input-wrap">
                             <i class="ri-search-2-line"></i>
                             <input type="text" name="kwd" class="fm-input" value="${kwd}" placeholder="거래 내역 검색...">
@@ -66,7 +73,7 @@
                 </form>
             </div>
 
-            <div class="block-card table-block" style="padding:0; border-radius:var(--radius-lg); overflow:hidden;">
+            <div class="block-card table-block" style="padding:0; border-radius:var(--radius-lg);">
                 <div class="modern-table-wrap">
                     <table class="modern-table">
                         <thead>
@@ -161,5 +168,30 @@
 
 <script>var CTX = '${pageContext.request.contextPath}';</script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>
+<script>
+function admToggle(id) {
+    var dd = document.getElementById(id);
+    var isOpen = dd.classList.contains('open');
+    document.querySelectorAll('.adm-dropdown.open').forEach(function(d) { d.classList.remove('open'); });
+    if (!isOpen) dd.classList.add('open');
+}
+function admSelect(el, ddId) {
+    document.getElementById(ddId + 'Input').value = el.dataset.value;
+    document.getElementById(ddId + 'Label').textContent = el.textContent.trim();
+    document.querySelectorAll('#' + ddId + ' .adm-dropdown-item').forEach(function(i) { i.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById(ddId).classList.remove('open');
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var map = {'all': '통합검색', 'productIdx': '상품 번호', 'buyerId': '구매자 ID', 'sellerId': '판매자 ID'};
+    var inp = document.getElementById('escrowSchTypeInput');
+    if (inp && map[inp.value]) document.getElementById('escrowSchTypeLabel').textContent = map[inp.value];
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.adm-dropdown.open').forEach(function(dd) {
+            if (!dd.contains(e.target)) dd.classList.remove('open');
+        });
+    });
+});
+</script>
 </body>
 </html>

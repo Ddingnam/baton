@@ -5,7 +5,7 @@
     margin-bottom: 24px;
     border-radius: var(--radius-lg);
     position: relative;
-    z-index: 100;
+    z-index: 10;
 }
 
 .toolbar-form {
@@ -410,7 +410,6 @@
     display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
 
-
 .sanction-form-box {
     background: #FFF5F5;
     border: 1px solid #FEE2E2;
@@ -609,15 +608,13 @@
 .modern-table tbody tr:nth-child(10) { animation-delay: 0.85s; }
 .modern-table tbody tr:nth-child(n+11) { animation-delay: 0.90s; }
 
-/* 추가 태그 컬러 */
 .tag-green { background: var(--color-green-light, #D1FAE5); color: var(--color-green, #10B981); }
 .tag-blue  { background: var(--color-blue-light,  #DBEAFE); color: var(--color-blue,  #3B82F6); }
 .tag-gray  { background: var(--base-bg, #F4F5F8);           color: var(--text-light,  #94A3B8); }
 
-/* ── 커스텀 드롭다운 ── */
 .rpt-dropdown {
     position: relative;
-    z-index: 500;
+    z-index: 10;
 }
 .rpt-dropdown-btn {
     display: flex;
@@ -684,7 +681,6 @@
     font-weight: 700;
 }
 
-/* ── 신고 상세 모달 ── */
 .rpt-modal {
     background: #fff;
     border-radius: 20px;
@@ -697,7 +693,6 @@
 }
 .fullscreen-overlay.show .rpt-modal { transform: translateY(0) scale(1); }
 
-/* 다크 헤더 */
 .rpt-modal-header {
     display: flex;
     align-items: center;
@@ -735,7 +730,6 @@
 }
 .rpt-close-btn:hover { background: rgba(239,68,68,0.22); color: #FCA5A5; }
 
-/* 바디 — 흰 배경에 깔끔한 행 목록 */
 .rpt-modal-body {
     padding: 6px 24px 8px;
     max-height: 62vh;
@@ -744,7 +738,6 @@
 .rpt-modal-body::-webkit-scrollbar { width: 3px; }
 .rpt-modal-body::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 4px; }
 
-/* 정보 목록 */
 .rpt-info-list { margin-bottom: 4px; }
 .rpt-info-row {
     display: flex;
@@ -768,7 +761,6 @@
 }
 .rpt-info-val.bold { font-weight: 700; }
 
-/* 필드 */
 .rpt-field { padding: 12px 0; }
 .rpt-field + .rpt-field { border-top: 1px solid var(--border-color); }
 .rpt-field-label {
@@ -798,14 +790,12 @@
 }
 .rpt-textarea::placeholder { color: #CBD5E1; }
 
-/* 필드와 목록 사이 구분 */
 .rpt-divider {
     height: 1px;
     background: var(--border-color);
     margin: 4px 0;
 }
 
-/* 푸터 */
 .rpt-modal-footer {
     display: flex;
     align-items: center;

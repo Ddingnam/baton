@@ -36,24 +36,21 @@
                         <span class="msc-lbl">전체 회원</span>
                     </div>
                 </div>
-                <div class="member-stat-card" onclick="filterByStatus(1)"
-                     data-count-normal="${countNormal}">
+                <div class="member-stat-card" onclick="filterByStatus(1)" data-count-normal="${countNormal}">
                     <div class="msc-icon green"><i class="ri-user-smile-fill"></i></div>
                     <div class="msc-info">
                         <span class="msc-val" id="countNormal">${not empty countNormal ? countNormal : '-'}</span>
                         <span class="msc-lbl">정상</span>
                     </div>
                 </div>
-                <div class="member-stat-card" onclick="filterByStatus(2)"
-                     data-count-ban="${countBan}">
+                <div class="member-stat-card" onclick="filterByStatus(2)" data-count-ban="${countBan}">
                     <div class="msc-icon red"><i class="ri-forbid-fill"></i></div>
                     <div class="msc-info">
                         <span class="msc-val" id="countBan">${not empty countBan ? countBan : '-'}</span>
                         <span class="msc-lbl">제재</span>
                     </div>
                 </div>
-                <div class="member-stat-card" onclick="filterByStatus(9)"
-                     data-count-out="${countOut}">
+                <div class="member-stat-card" onclick="filterByStatus(9)" data-count-out="${countOut}">
                     <div class="msc-icon gray"><i class="ri-user-unfollow-fill"></i></div>
                     <div class="msc-info">
                         <span class="msc-val" id="countOut">${not empty countOut ? countOut : '-'}</span>
@@ -78,12 +75,19 @@
                     </div>
                     <input type="hidden" name="status" value="${status}">
                     <div class="search-group">
-                        <select name="schType" class="fm-input search-select">
-                            <option value="all"      ${schType == 'all'      ? 'selected' : ''}>통합검색</option>
-                            <option value="userId"   ${schType == 'userId'   ? 'selected' : ''}>아이디</option>
-                            <option value="nickname" ${schType == 'nickname' ? 'selected' : ''}>닉네임</option>
-                            <option value="email"    ${schType == 'email'    ? 'selected' : ''}>이메일</option>
-                        </select>
+                        <input type="hidden" name="schType" id="memberSchTypeInput" value="${schType}">
+                        <div class="adm-dropdown" id="memberSchType">
+                            <button type="button" class="adm-dropdown-btn" onclick="admToggle('memberSchType')">
+                                <span id="memberSchTypeLabel">통합검색</span>
+                                <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
+                            </button>
+                            <div class="adm-dropdown-menu">
+                                <div class="adm-dropdown-item ${empty schType || schType == 'all' ? 'active' : ''}" data-value="all" onclick="admSelect(this,'memberSchType')">통합검색</div>
+                                <div class="adm-dropdown-item ${schType == 'userId' ? 'active' : ''}" data-value="userId" onclick="admSelect(this,'memberSchType')">아이디</div>
+                                <div class="adm-dropdown-item ${schType == 'nickname' ? 'active' : ''}" data-value="nickname" onclick="admSelect(this,'memberSchType')">닉네임</div>
+                                <div class="adm-dropdown-item ${schType == 'email' ? 'active' : ''}" data-value="email" onclick="admSelect(this,'memberSchType')">이메일</div>
+                            </div>
+                        </div>
                         <div class="search-input-wrap">
                             <i class="ri-search-2-line"></i>
                             <input type="text" name="kwd" class="fm-input" value="${kwd}" placeholder="회원 검색...">
@@ -93,7 +97,7 @@
                 </form>
             </div>
 
-            <div class="block-card table-block" style="padding:0; border-radius:var(--radius-lg); overflow:hidden;">
+            <div class="block-card table-block" style="padding:0; border-radius:var(--radius-lg);">
                 <div class="modern-table-wrap">
                     <table class="modern-table">
                         <thead>
@@ -233,10 +237,17 @@
                     <div class="info-row">
                         <span class="info-lbl">권한</span>
                         <span class="info-val">
-                            <select class="fm-input" id="dAuthority" style="height:38px;padding:0 12px;font-size:13px;width:130px;">
-                                <option value="USER">일반 회원</option>
-                                <option value="ADMIN">관리자</option>
-                            </select>
+                            <div class="adm-dropdown" id="dAuthorityDd" style="display:inline-block;">
+                                <button type="button" class="adm-dropdown-btn" style="height:38px;min-width:110px;font-size:13px;" onclick="admToggle('dAuthorityDd')">
+                                    <span id="dAuthorityLabel">일반 회원</span>
+                                    <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
+                                </button>
+                                <div class="adm-dropdown-menu">
+                                    <div class="adm-dropdown-item active" data-value="USER" onclick="admSelectAuthority(this,'USER','일반 회원')">일반 회원</div>
+                                    <div class="adm-dropdown-item" data-value="ADMIN" onclick="admSelectAuthority(this,'ADMIN','관리자')">관리자</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="dAuthority" value="USER">
                             <button class="btn-pill btn-gradient" style="height:38px;padding:0 16px;font-size:12px;" onclick="saveAuthority()">
                                 저장
                             </button>
@@ -251,19 +262,33 @@
                     <div class="fm-section">
                         <div class="fm-field">
                             <label class="fm-label">제재 유형</label>
-                            <select class="fm-input" id="sanctionType">
-                                <option value="TEMPORARY">기간 정지</option>
-                                <option value="PERMANENT">영구 정지</option>
-                            </select>
+                            <div class="adm-dropdown" id="sanctionTypeDd">
+                                <button type="button" class="adm-dropdown-btn" onclick="admToggle('sanctionTypeDd')">
+                                    <span id="sanctionTypeLabel">기간 정지</span>
+                                    <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
+                                </button>
+                                <div class="adm-dropdown-menu">
+                                    <div class="adm-dropdown-item active" data-value="TEMPORARY" onclick="admSelectSanctionType(this,'TEMPORARY','기간 정지')">기간 정지</div>
+                                    <div class="adm-dropdown-item" data-value="PERMANENT" onclick="admSelectSanctionType(this,'PERMANENT','영구 정지')">영구 정지</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="sanctionType" value="TEMPORARY">
                         </div>
                         <div class="fm-field" id="daysField">
                             <label class="fm-label">정지 기간</label>
-                            <select class="fm-input" id="sanctionDays">
-                                <option value="3">3일</option>
-                                <option value="7">7일</option>
-                                <option value="14">14일</option>
-                                <option value="30">30일</option>
-                            </select>
+                            <div class="adm-dropdown" id="sanctionDaysDd">
+                                <button type="button" class="adm-dropdown-btn" onclick="admToggle('sanctionDaysDd')">
+                                    <span id="sanctionDaysLabel">7일</span>
+                                    <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
+                                </button>
+                                <div class="adm-dropdown-menu">
+                                    <div class="adm-dropdown-item" data-value="3" onclick="admSelectDays(this,'3','3일')">3일</div>
+                                    <div class="adm-dropdown-item active" data-value="7" onclick="admSelectDays(this,'7','7일')">7일</div>
+                                    <div class="adm-dropdown-item" data-value="14" onclick="admSelectDays(this,'14','14일')">14일</div>
+                                    <div class="adm-dropdown-item" data-value="30" onclick="admSelectDays(this,'30','30일')">30일</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="sanctionDays" value="7">
                         </div>
                         <div class="fm-field">
                             <label class="fm-label">제재 사유</label>
@@ -288,6 +313,54 @@
 <script>var CTX = '${pageContext.request.contextPath}';</script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_ui.js"></script>
+<script>
+function admToggle(id) {
+    var dd = document.getElementById(id);
+    var isOpen = dd.classList.contains('open');
+    document.querySelectorAll('.adm-dropdown.open').forEach(function(d) { d.classList.remove('open'); });
+    if (!isOpen) dd.classList.add('open');
+}
+function admSelect(el, ddId) {
+    document.getElementById(ddId + 'Input').value = el.dataset.value;
+    document.getElementById(ddId + 'Label').textContent = el.textContent.trim();
+    document.querySelectorAll('#' + ddId + ' .adm-dropdown-item').forEach(function(i) { i.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById(ddId).classList.remove('open');
+}
+function admSelectAuthority(el, val, label) {
+    document.getElementById('dAuthority').value = val;
+    document.getElementById('dAuthorityLabel').textContent = label;
+    document.querySelectorAll('#dAuthorityDd .adm-dropdown-item').forEach(function(i) { i.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById('dAuthorityDd').classList.remove('open');
+}
+function admSelectSanctionType(el, val, label) {
+    document.getElementById('sanctionType').value = val;
+    document.getElementById('sanctionTypeLabel').textContent = label;
+    document.querySelectorAll('#sanctionTypeDd .adm-dropdown-item').forEach(function(i) { i.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById('sanctionTypeDd').classList.remove('open');
+    var df = document.getElementById('daysField');
+    if (df) val === 'PERMANENT' ? df.classList.add('hidden') : df.classList.remove('hidden');
+}
+function admSelectDays(el, val, label) {
+    document.getElementById('sanctionDays').value = val;
+    document.getElementById('sanctionDaysLabel').textContent = label;
+    document.querySelectorAll('#sanctionDaysDd .adm-dropdown-item').forEach(function(i) { i.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById('sanctionDaysDd').classList.remove('open');
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var map = { all: '통합검색', userId: '아이디', nickname: '닉네임', email: '이메일' };
+    var inp = document.getElementById('memberSchTypeInput');
+    if (inp && map[inp.value]) document.getElementById('memberSchTypeLabel').textContent = map[inp.value];
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.adm-dropdown.open').forEach(function(dd) {
+            if (!dd.contains(e.target)) dd.classList.remove('open');
+        });
+    });
+});
+</script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/member_list.js"></script>
 </body>
 </html>

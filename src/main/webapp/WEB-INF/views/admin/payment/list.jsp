@@ -42,11 +42,18 @@
                     <input type="hidden" name="status" value="${status}">
 
                     <div class="search-group">
-                        <select name="schType" class="fm-input search-select">
-                            <option value="all" ${schType == 'all' ? 'selected' : ''}>통합검색</option>
-                            <option value="userId" ${schType == 'userId' ? 'selected' : ''}>결제자 아이디</option>
-                            <option value="orderId" ${schType == 'orderId' ? 'selected' : ''}>주문번호</option>
-                        </select>
+                        <input type="hidden" name="schType" id="paymentSchTypeInput" value="${schType}">
+                        <div class="adm-dropdown" id="paymentSchType">
+                            <button type="button" class="adm-dropdown-btn" onclick="admToggle('paymentSchType')">
+                                <span id="paymentSchTypeLabel">통합검색</span>
+                                <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
+                            </button>
+                            <div class="adm-dropdown-menu">
+                                <div class="adm-dropdown-item ${empty schType || schType == 'all' ? 'active' : ''}" data-value="all" onclick="admSelect(this,'paymentSchType')">통합검색</div>
+                                <div class="adm-dropdown-item ${schType == 'userId' ? 'active' : ''}" data-value="userId" onclick="admSelect(this,'paymentSchType')">결제자 아이디</div>
+                                <div class="adm-dropdown-item ${schType == 'orderId' ? 'active' : ''}" data-value="orderId" onclick="admSelect(this,'paymentSchType')">주문번호</div>
+                            </div>
+                        </div>
                         <div class="search-input-wrap">
                             <i class="ri-search-2-line"></i>
                             <input type="text" name="kwd" class="fm-input" value="${kwd}" placeholder="결제 내역 검색...">
@@ -56,7 +63,7 @@
                 </form>
             </div>
 
-            <div class="block-card table-block" style="padding:0; border-radius:var(--radius-lg); overflow:hidden;">
+            <div class="block-card table-block" style="padding:0; border-radius:var(--radius-lg);">
                 <div class="modern-table-wrap">
                     <table class="modern-table">
                         <thead>
@@ -147,5 +154,30 @@
 
 <script>var CTX = '${pageContext.request.contextPath}';</script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>
+<script>
+function admToggle(id) {
+    var dd = document.getElementById(id);
+    var isOpen = dd.classList.contains('open');
+    document.querySelectorAll('.adm-dropdown.open').forEach(function(d) { d.classList.remove('open'); });
+    if (!isOpen) dd.classList.add('open');
+}
+function admSelect(el, ddId) {
+    document.getElementById(ddId + 'Input').value = el.dataset.value;
+    document.getElementById(ddId + 'Label').textContent = el.textContent.trim();
+    document.querySelectorAll('#' + ddId + ' .adm-dropdown-item').forEach(function(i) { i.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById(ddId).classList.remove('open');
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var map = {all:'통합검색', userId:'결제자 아이디', orderId:'주문번호'};
+    var inp = document.getElementById('paymentSchTypeInput');
+    if (inp && map[inp.value]) document.getElementById('paymentSchTypeLabel').textContent = map[inp.value];
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.adm-dropdown.open').forEach(function(dd) {
+            if (!dd.contains(e.target)) dd.classList.remove('open');
+        });
+    });
+});
+</script>
 </body>
 </html>

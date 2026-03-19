@@ -69,7 +69,7 @@
             if (bar) {
                 bar.style.width = '0%';
                 bar.style.background = barColor;
-                // 애니메이션 딜레이
+
                 setTimeout(function () { bar.style.width = pct + '%'; }, 80);
             }
 
@@ -166,15 +166,6 @@
         if (bt) bt.classList.add('active');
     }
     window.switchPane = swP;
-
-    document.getElementById('sanctionType').addEventListener('change', function () {
-        var df = document.getElementById('daysField');
-        if (this.value === 'PERMANENT') {
-            df.classList.add('hidden');
-        } else {
-            df.classList.remove('hidden');
-        }
-    });
 
     function sSan() {
         var t = document.getElementById('sanctionType').value;
