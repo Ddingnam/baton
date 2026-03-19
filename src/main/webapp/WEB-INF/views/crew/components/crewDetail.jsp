@@ -1,42 +1,135 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/crew/crew_detail.css">
 
 <template id="crew-detail-template">
-    <div class="content-wrapper" style="margin-top: 40px; padding-bottom: 80px;">
-        <div style="background: #fff; border-radius: 20px; padding: 40px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.02);">
-            <div class="card-tags" style="margin-bottom: 12px;">
-                <span>#운동</span><span>#러닝</span>
-            </div>
-            <h1 style="font-size: 28px; font-weight: 800; margin-bottom: 20px;">주말 아침 한강 러닝 크루 모집합니다! 초보 환영해요 🏃‍♂️</h1>
+    <div class="cd-content-wrapper">
+        <div class="cd-layout-container">
             
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 30px;">
-                <div class="host-info" style="gap: 12px;">
-                    <div class="host-avatar" style="width: 40px; height: 40px; font-size: 18px;">런</div>
-                    <div>
-                        <div class="host-name" style="font-size: 15px;">런닝맨</div>
-                        <div style="font-size: 12px; color: var(--text-light); margin-top: 4px;">서울시 강남구 · 2시간 전 작성</div>
+            <aside class="cd-sidebar cd-glass-card">
+                <div class="cd-profile-section">
+                    <div class="cd-profile-wrapper">
+                        <img :src="crew.logoImage || 'https://via.placeholder.com/300'" alt="크루 프로필" class="cd-profile-img">
+                    </div>
+                    
+                    <div class="cd-tags">
+                        <span v-for="tag in crew.tags" :key="tag">{{ tag }}</span>
+                    </div>
+                    
+                    <h2 class="cd-crew-title">{{ crew.name }}</h2>
+                    <p class="cd-crew-desc">{{ crew.description }}</p>
+                    
+                    <div class="cd-member-status">
+                        <div class="cd-member-count">
+                            <span>현재 참여 인원</span>
+                            <strong>{{ crew.currentMember }} / {{ crew.maxMember }}명</strong>
+                        </div>
+                        <div class="cd-progress-bg">
+                            <div class="cd-progress-fill" :style="{ width: (crew.currentMember / crew.maxMember * 100) + '%' }"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="interaction-info">
-                    <span><i class="ri-eye-line"></i> 124</span>
-                </div>
-            </div>
 
-            <div style="font-size: 16px; line-height: 1.6; color: var(--text-sub); min-height: 200px;">
-                안녕하세요! 주말마다 한강을 뛰는 런닝 크루입니다.<br>
-                초보자도 무리 없이 뛸 수 있는 페이스로 진행할 예정이니 부담 없이 참여해 주세요.<br>
-                뛰고 나서 간단하게 커피 한잔 하면서 친목도 다져요!
-            </div>
+                <nav class="cd-tab-nav">
+                    <button class="cd-tab-btn" :class="{ active: currentTab === 'dashboard' }" @click="currentTab = 'dashboard'">
+                        <i class="ri-dashboard-fill"></i> 대시보드
+                    </button>
+                    <button class="cd-tab-btn" :class="{ active: currentTab === 'board' }" @click="currentTab = 'board'">
+                        <i class="ri-clipboard-fill"></i> 게시판
+                    </button>
+                    <button class="cd-tab-btn" :class="{ active: currentTab === 'schedule' }" @click="currentTab = 'schedule'">
+                        <i class="ri-calendar-event-fill"></i> 일정
+                    </button>
+                    <button class="cd-tab-btn" :class="{ active: currentTab === 'chat' }" @click="currentTab = 'chat'">
+                        <i class="ri-chat-smile-3-fill"></i> 채팅
+                    </button>
+                </nav>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                <div class="member-gauge" style="width: 250px;">
-                    <div class="gauge-text"><span>현재 참여 인원</span><strong>3 / 10명</strong></div>
-                    <div class="gauge-bar"><div class="gauge-fill" style="width: 30%;"></div></div>
+                <div class="cd-sidebar-footer">
+                    <button class="cd-action-btn primary">모임 가입하기</button>
                 </div>
-                <div style="display: flex; gap: 12px;">
-                    <button style="padding: 12px 20px; border-radius: 12px; border: 1px solid var(--border-color); background: #fff; cursor: pointer; font-size: 20px; color: var(--text-light);"><i class="ri-heart-3-line"></i></button>
-                    <button class="btn-create-crew" style="padding: 12px 40px; font-size: 16px;">참여하기</button>
-                </div>
-            </div>
+            </aside>
+
+            <main class="cd-main-content">
+                <transition name="cd-fade" mode="out-in">
+                    
+                    <div v-if="currentTab === 'dashboard'" class="cd-dashboard-grid" key="dash">
+                        
+                        <div class="cd-hero-card cd-glass-card cd-full-width">
+                            <div class="cd-hero-content">
+                                <span class="cd-hero-sub">DASHBOARD</span>
+                                <h3 class="cd-hero-title">오늘도 즐거운 모임 되세요! 🙌</h3>
+                                <p class="cd-hero-desc">
+                                    이번 주에는 <span class="cd-highlight">{{ schedules.length }}개</span>의 일정이 예정되어 있어요.<br>
+                                    크루원들과 함께 활기찬 한 주를 만들어보세요.
+                                </p>
+                            </div>
+                            <div class="cd-hero-actions">
+                                <button class="cd-action-btn secondary">일정 만들기</button>
+                                <button class="cd-action-btn primary">게시글 작성</button>
+                            </div>
+                        </div>
+
+                        <div class="cd-widget cd-glass-card">
+                            <div class="cd-widget-header">
+                                <h4><i class="ri-sun-cloudy-line"></i> 지역 날씨</h4>
+                            </div>
+                            <div class="cd-weather-body">
+                                <i class="ri-sun-fill" style="font-size: 50px; color: #FFA000;"></i>
+                                <div class="cd-weather-info">
+                                    <span class="cd-temp">18°C</span>
+                                    <span class="cd-weather-text">맑음 · 활동하기 좋아요</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cd-widget cd-glass-card cd-wide-widget">
+                            <div class="cd-widget-header">
+                                <h4><i class="ri-calendar-check-line"></i> 다가오는 일정</h4>
+                                <button class="cd-icon-btn"><i class="ri-add-line"></i></button>
+                            </div>
+                            <ul class="cd-schedule-list">
+                                <li v-for="sch in schedules" :key="sch.id" class="cd-schedule-item">
+                                    <div class="cd-sch-date">
+                                        <span class="day">{{ sch.day }}</span>
+                                        <span class="month">{{ sch.month }}</span>
+                                    </div>
+                                    <div class="cd-sch-info">
+                                        <strong>{{ sch.title }}</strong>
+                                        <span>{{ sch.time }} · {{ sch.location }}</span>
+                                    </div>
+                                    <div class="cd-status-badge">예정</div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="cd-widget cd-glass-card cd-full-width">
+                            <div class="cd-widget-header">
+                                <h4><i class="ri-discuss-line"></i> 최근 올라온 이야기</h4>
+                                <span class="cd-view-more" @click="currentTab = 'board'">더보기 <i class="ri-arrow-right-s-line"></i></span>
+                            </div>
+                            <div class="cd-post-grid">
+                                <div v-for="post in recentPosts" :key="post.id" class="cd-post-item">
+                                    <div class="cd-post-header">
+                                        <span class="cd-post-author">{{ post.author }}</span>
+                                        <span class="cd-post-time">{{ post.time }}</span>
+                                    </div>
+                                    <strong class="cd-post-title">{{ post.title }}</strong>
+                                    <div class="cd-post-meta">
+                                        <span><i class="ri-heart-3-line"></i> {{ post.likes }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div v-else class="cd-placeholder cd-glass-card" :key="currentTab">
+                        <i class="ri-tools-line"></i>
+                        <h2>{{ currentTab.toUpperCase() }} 준비 중입니다.</h2>
+                    </div>
+                </transition>
+            </main>
         </div>
     </div>
 </template>
