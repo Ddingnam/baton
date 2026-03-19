@@ -49,15 +49,22 @@
                         </a>
                     </div>
                     <div class="search-group">
-                        <select name="domainType" class="fm-input search-select">
-                            <option value="">전체 유형</option>
-                            <option value="TRADE"            ${param.domainType == 'TRADE'            ? 'selected' : ''}>중고거래</option>
-                            <option value="COMMUNITY"       ${param.domainType == 'COMMUNITY'       ? 'selected' : ''}>커뮤니티 게시글</option>
-                            <option value="COMMUNITY_REPLY" ${param.domainType == 'COMMUNITY_REPLY' ? 'selected' : ''}>커뮤니티 댓글</option>
-                            <option value="ALBA"            ${param.domainType == 'ALBA'            ? 'selected' : ''}>알바구인</option>
-                            <option value="CHAT"            ${param.domainType == 'CHAT'            ? 'selected' : ''}>채팅</option>
-                            <option value="USER"            ${param.domainType == 'USER'            ? 'selected' : ''}>사용자</option>
-                        </select>
+                        <input type="hidden" name="domainType" id="domainTypeInput" value="${param.domainType}">
+                        <div class="rpt-dropdown" id="domainDropdown">
+                            <button type="button" class="rpt-dropdown-btn" onclick="toggleDropdown()">
+                                <span id="domainLabel">전체 유형</span>
+                                <i class="ri-arrow-down-s-line rpt-dropdown-arrow"></i>
+                            </button>
+                            <div class="rpt-dropdown-menu" id="domainMenu">
+                                <div class="rpt-dropdown-item ${empty param.domainType ? 'active' : ''}" data-value="" onclick="selectDomain(this, '전체 유형')">전체 유형</div>
+                                <div class="rpt-dropdown-item ${param.domainType == 'TRADE' ? 'active' : ''}" data-value="TRADE" onclick="selectDomain(this, '중고거래')">중고거래</div>
+                                <div class="rpt-dropdown-item ${param.domainType == 'COMMUNITY' ? 'active' : ''}" data-value="COMMUNITY" onclick="selectDomain(this, '커뮤니티 게시글')">커뮤니티 게시글</div>
+                                <div class="rpt-dropdown-item ${param.domainType == 'COMMUNITY_REPLY' ? 'active' : ''}" data-value="COMMUNITY_REPLY" onclick="selectDomain(this, '커뮤니티 댓글')">커뮤니티 댓글</div>
+                                <div class="rpt-dropdown-item ${param.domainType == 'ALBA' ? 'active' : ''}" data-value="ALBA" onclick="selectDomain(this, '알바구인')">알바구인</div>
+                                <div class="rpt-dropdown-item ${param.domainType == 'CHAT' ? 'active' : ''}" data-value="CHAT" onclick="selectDomain(this, '채팅')">채팅</div>
+                                <div class="rpt-dropdown-item ${param.domainType == 'USER' ? 'active' : ''}" data-value="USER" onclick="selectDomain(this, '사용자')">사용자</div>
+                            </div>
+                        </div>
                         <div class="search-input-wrap">
                             <i class="ri-search-2-line"></i>
                             <input type="text" name="kwd" class="fm-input"
@@ -193,17 +200,18 @@
 
 <div class="fullscreen-overlay" id="detailOverlay">
     <div class="rpt-modal">
-
         <div class="rpt-modal-header">
             <div class="rpt-header-left">
                 <div class="rpt-header-icon"><i class="ri-alarm-warning-fill"></i></div>
-                <span class="rpt-header-title">신고 상세</span>
+                <div>
+                    <p class="rpt-header-eyebrow">REPORT DETAIL</p>
+                    <p class="rpt-header-title">신고 상세</p>
+                </div>
             </div>
             <button class="rpt-close-btn" id="detailClose"><i class="ri-close-line"></i></button>
         </div>
 
         <div class="rpt-modal-body">
-
             <div class="rpt-info-list">
                 <div class="rpt-info-row">
                     <span class="rpt-info-key">신고 유형</span>
@@ -231,6 +239,8 @@
                 </div>
             </div>
 
+            <div class="rpt-divider"></div>
+
             <div class="rpt-field">
                 <p class="rpt-field-label">신고 내용</p>
                 <div class="rpt-field-box" id="dReportContent">내용 없음</div>
@@ -240,7 +250,6 @@
                 <p class="rpt-field-label">관리자 메모</p>
                 <textarea class="rpt-textarea" id="dAdminMemo" rows="3" placeholder="처리 메모를 입력하세요"></textarea>
             </div>
-
         </div>
 
         <div class="rpt-modal-footer" id="detailFooter">
@@ -258,6 +267,43 @@
 </div>
 
 <script>var CTX = '${pageContext.request.contextPath}';</script>
+<script>
+(function() {
+    var labelMap = {
+        '': '전체 유형',
+        'TRADE': '중고거래',
+        'COMMUNITY': '커뮤니티 게시글',
+        'COMMUNITY_REPLY': '커뮤니티 댓글',
+        'ALBA': '알바구인',
+        'CHAT': '채팅',
+        'USER': '사용자'
+    };
+    var current = document.getElementById('domainTypeInput').value;
+    if (labelMap[current]) {
+        document.getElementById('domainLabel').textContent = labelMap[current];
+    }
+
+    document.addEventListener('click', function(e) {
+        var dd = document.getElementById('domainDropdown');
+        if (dd && !dd.contains(e.target)) {
+            dd.classList.remove('open');
+        }
+    });
+})();
+
+function toggleDropdown() {
+    document.getElementById('domainDropdown').classList.toggle('open');
+}
+
+function selectDomain(el, label) {
+    var val = el.dataset.value;
+    document.getElementById('domainTypeInput').value = val;
+    document.getElementById('domainLabel').textContent = label;
+    document.querySelectorAll('.rpt-dropdown-item').forEach(function(i) { i.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById('domainDropdown').classList.remove('open');
+}
+</script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_ui.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/report_list.js"></script>
