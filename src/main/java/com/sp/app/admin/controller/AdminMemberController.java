@@ -41,10 +41,12 @@ public class AdminMemberController {
         int totalCount      = adminMemberService.countMembers(map);
         int totalPages      = (int) Math.ceil((double) totalCount / pageSize);
         
+        Map<String, Object> allMap     = new HashMap<>();
         Map<String, Object> normalMap  = new HashMap<>(); normalMap.put("status", "1");
         Map<String, Object> banMap     = new HashMap<>(); banMap.put("status",    "2");
         Map<String, Object> outMap     = new HashMap<>(); outMap.put("status",    "9");
 
+        model.addAttribute("countAll",    adminMemberService.countMembers(allMap));
         model.addAttribute("countNormal", adminMemberService.countMembers(normalMap));
         model.addAttribute("countBan",    adminMemberService.countMembers(banMap));
         model.addAttribute("countOut",    adminMemberService.countMembers(outMap));
@@ -115,7 +117,7 @@ public class AdminMemberController {
 
         Map<String, Object> map = new HashMap<>();
         map.put("kwd",            kwd);
-        map.put("sanctionFilter", sanctionFilter);   // ACTIVE | LIFTED | PERMANENT | null(전체)
+        map.put("sanctionFilter", sanctionFilter);
         map.put("offset",         offset);
         map.put("pageSize",       pageSize);
 

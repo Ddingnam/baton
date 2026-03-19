@@ -13,18 +13,12 @@
     window.filterByStatus = fSt;
 
     function loadStatCounts() {
-        var base = CTX + '/admin/member/list';
-        var fetches = [
-            fetch(base + '?status=1&pageSize=1&page=1').then(function(r){ return r.text(); }),
-            fetch(base + '?status=2&pageSize=1&page=1').then(function(r){ return r.text(); }),
-            fetch(base + '?status=9&pageSize=1&page=1').then(function(r){ return r.text(); })
-        ];
-        var n = document.getElementById('countNormal');
-        var b = document.getElementById('countBan');
-        var o = document.getElementById('countOut');
-        var normal  = document.querySelector('[data-count-normal]');
-        var ban     = document.querySelector('[data-count-ban]');
-        var out     = document.querySelector('[data-count-out]');
+        var n      = document.getElementById('countNormal');
+        var b      = document.getElementById('countBan');
+        var o      = document.getElementById('countOut');
+        var normal = document.querySelector('[data-count-normal]');
+        var ban    = document.querySelector('[data-count-ban]');
+        var out    = document.querySelector('[data-count-out]');
         if (n && normal) n.textContent = normal.dataset.countNormal;
         if (b && ban)    b.textContent = ban.dataset.countBan;
         if (o && out)    o.textContent = out.dataset.countOut;
@@ -61,38 +55,44 @@
             document.getElementById('dLastLogin').textContent = fmtDate(m.lastLoginDate);
             document.getElementById('dLevel').textContent     = 'Lv.' + (m.userLevel || 1);
 
-            var score = m.score || 36.5;
-            document.getElementById('dScoreText').textContent = score + '°';
-            var pct = Math.min(100, Math.max(0, ((score - 0) / 100) * 100));
+            var score    = m.score || 0;
             var barColor = score >= 60 ? '#6EE7B7' : score >= 36 ? '#FCD34D' : '#FCA5A5';
+            var pct      = Math.min(100, Math.max(0, (score / 100) * 100));
+            document.getElementById('dScoreText').textContent = score;
             var bar = document.getElementById('dScoreBar');
             if (bar) {
-                bar.style.width = '0%';
+                bar.style.width      = '0%';
                 bar.style.background = barColor;
-
                 setTimeout(function () { bar.style.width = pct + '%'; }, 80);
             }
 
-            document.getElementById('dPoint').textContent     = ((m.batonpoint || 0)).toLocaleString();
-            document.getElementById('dAuthority').value       = m.authority   || 'USER';
+            document.getElementById('dPoint').textContent = (m.batonpoint || 0).toLocaleString();
+            document.getElementById('dAuthority').value   = m.authority || 'USER';
 
-            var b = document.getElementById('dStatusBadge');
+            var authorityLabels = { USER: '일반 회원', EMP: '직원', ADMIN: '관리자' };
+            document.getElementById('dAuthorityLabel').textContent = authorityLabels[m.authority] || '일반 회원';
+
+            document.querySelectorAll('#dAuthorityDd .adm-dropdown-item').forEach(function (i) {
+                i.classList.toggle('active', i.dataset.value === (m.authority || 'USER'));
+            });
+
+            var b  = document.getElementById('dStatusBadge');
             var bs = document.getElementById('btnSuspend');
             var ba = document.getElementById('btnActivate');
 
             if (m.status == 1) {
                 b.textContent = '정상';
-                b.className = 'detail-status-badge status-ok';
+                b.className   = 'detail-status-badge status-ok';
                 bs.style.display = '';
                 ba.style.display = 'none';
             } else if (m.status == 2) {
                 b.textContent = '제재중';
-                b.className = 'detail-status-badge status-ban';
+                b.className   = 'detail-status-badge status-ban';
                 bs.style.display = 'none';
                 ba.style.display = '';
             } else {
                 b.textContent = '탈퇴';
-                b.className = 'detail-status-badge status-out';
+                b.className   = 'detail-status-badge status-out';
                 bs.style.display = 'none';
                 ba.style.display = 'none';
             }
@@ -168,9 +168,9 @@
     window.switchPane = swP;
 
     function sSan() {
-        var t = document.getElementById('sanctionType').value;
-        var d = document.getElementById('sanctionDays').value;
-        var r = document.getElementById('sanctionReason').value.trim();
+        var t     = document.getElementById('sanctionType').value;
+        var d     = document.getElementById('sanctionDays').value;
+        var r     = document.getElementById('sanctionReason').value.trim();
         var errEl = document.getElementById('reasonError');
 
         if (!r) {
@@ -208,22 +208,48 @@
     window.submitSanction = sSan;
 
     function svAuth() {
-        var a = document.getElementById('dAuthority').value;
+        var a             = document.getElementById('dAuthority').value;
+        var authorityLabels = { USER: '일반 회원', EMP: '직원', ADMIN: '관리자' };
         showConfirm({
             type  : 'warning',
             title : '권한 변경',
-            desc  : '선택한 권한 [' + (a === 'ADMIN' ? '관리자' : '일반 회원') + '] 으로 변경합니다.',
+            desc  : '선택한 권한 [' + (authorityLabels[a] || a) + '] 으로 변경합니다.',
             okText: '변경',
             onOk  : function () {
                 fetch(CTX + '/admin/member/authority', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: cId, authority: a })
+                    body: JSON.stringify({ userId: cId, userIdx: cIdx, authority: a })
                 })
                 .then(function (rs) { return rs.json(); })
                 .then(function (dt) {
-                    if (dt.success) showToast('권한이 변경되었습니다.', 'success');
-                    else            showToast('오류: ' + dt.msg, 'error');
+                    if (dt.success) {
+                        showToast('권한이 변경되었습니다.', 'success');
+
+                        var badgeClassMap = { USER: 'user', EMP: 'emp', ADMIN: 'admin' };
+                        var badgeLabelMap = { USER: '일반', EMP: '직원', ADMIN: '관리자' };
+                        var badge = document.querySelector('tr[data-useridx="' + cIdx + '"] .auth-badge');
+                        if (badge) {
+                            badge.className   = 'auth-badge ' + (badgeClassMap[a] || 'user');
+                            badge.textContent = badgeLabelMap[a] || '일반';
+                        }
+
+                        var levelMap = { USER: 1, EMP: 51, ADMIN: 99 };
+                        var newLevel = levelMap[a] !== undefined ? levelMap[a] : 1;
+
+                        var lvEl = document.getElementById('dLevel');
+                        if (lvEl) lvEl.textContent = 'Lv.' + newLevel;
+
+                        var row = document.querySelector('tr[data-useridx="' + cIdx + '"]');
+                        if (row) {
+                            var cells = row.querySelectorAll('td');
+                            if (cells[4]) cells[4].textContent = 'Lv.' + newLevel;
+                        }
+
+                        setTimeout(function () { location.reload(); }, 1000);
+                    } else {
+                        showToast('오류: ' + dt.msg, 'error');
+                    }
                 })
                 .catch(function () { showToast('요청 중 오류가 발생했습니다.', 'error'); });
             }

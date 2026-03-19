@@ -70,6 +70,12 @@
         INSERT INTO userAuthority (userId, authority) VALUES (#{userId}, #{authority})
     </insert>
 
+    <update id="updateUserLevel" parameterType="map">
+        UPDATE users 
+        SET userLevel = #{userLevel}
+        WHERE userId = #{userId}
+    </update>
+
     <select id="listSanctions" parameterType="map" resultType="map">
         SELECT * FROM (
             SELECT ROWNUM AS rn, t.* FROM (

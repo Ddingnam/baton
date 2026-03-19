@@ -32,7 +32,7 @@
                 <div class="member-stat-card" onclick="filterByStatus('')">
                     <div class="msc-icon purple"><i class="ri-group-fill"></i></div>
                     <div class="msc-info">
-                        <span class="msc-val">${totalCount}</span>
+                        <span class="msc-val">${not empty countAll ? countAll : 0}</span>
                         <span class="msc-lbl">전체 회원</span>
                     </div>
                 </div>
@@ -122,7 +122,7 @@
                                 </tr>
                             </c:if>
                             <c:forEach var="m" items="${list}">
-                                <tr>
+                                <tr data-useridx="${m.userIdx}">
                                     <td>
                                         <div class="member-cell">
                                             <div class="member-avt">${fn:substring(m.nickname, 0, 1)}</div>
@@ -134,8 +134,8 @@
                                     <td class="font-medium">${m.userId}</td>
                                     <td class="font-medium">${m.email}</td>
                                     <td>
-                                        <span class="auth-badge ${m.authority == 'ADMIN' ? 'admin' : 'user'}">
-                                            ${m.authority == 'ADMIN' ? '관리자' : '일반'}
+                                        <span class="auth-badge ${m.authority == 'ADMIN' ? 'admin' : (m.authority == 'EMP' ? 'emp' : 'user')}">
+                                            ${m.authority == 'ADMIN' ? '관리자' : (m.authority == 'EMP' ? '직원' : '일반')}
                                         </span>
                                     </td>
                                     <td class="font-medium">Lv.${m.userLevel}</td>
@@ -196,18 +196,18 @@
                     <span class="stat-val" id="dLevel"></span>
                     <span class="stat-lbl">레벨</span>
                 </div>
-                <div class="detail-stat" style="flex:1.5;">
-                    <span class="stat-lbl">매너온도</span>
-                    <span class="stat-val" id="dScoreText" style="margin-top:2px;"></span>
-                    <div class="manner-temp-wrap">
-                        <div class="manner-bar-bg">
-                            <div class="manner-bar-fill" id="dScoreBar"></div>
-                        </div>
-                    </div>
+                <div class="detail-stat">
+                    <span class="stat-val" id="dScoreText"></span>
+                    <span class="stat-lbl">바톤 점수</span>
                 </div>
                 <div class="detail-stat">
                     <span class="stat-val" id="dPoint"></span>
                     <span class="stat-lbl">포인트</span>
+                </div>
+            </div>
+            <div style="width:85%;margin:0 auto 12px;">
+                <div class="manner-bar-bg">
+                    <div class="manner-bar-fill" id="dScoreBar"></div>
                 </div>
             </div>
             <div class="detail-actions">
@@ -243,8 +243,9 @@
                                     <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
                                 </button>
                                 <div class="adm-dropdown-menu">
-                                    <div class="adm-dropdown-item active" data-value="USER" onclick="admSelectAuthority(this,'USER','일반 회원')">일반 회원</div>
-                                    <div class="adm-dropdown-item" data-value="ADMIN" onclick="admSelectAuthority(this,'ADMIN','관리자')">관리자</div>
+                                    <div class="adm-dropdown-item active" data-value="USER"  onclick="admSelectAuthority(this,'USER','일반 회원')">일반 회원</div>
+                                    <div class="adm-dropdown-item"        data-value="EMP"   onclick="admSelectAuthority(this,'EMP','직원')">직원</div>
+                                    <div class="adm-dropdown-item"        data-value="ADMIN" onclick="admSelectAuthority(this,'ADMIN','관리자')">관리자</div>
                                 </div>
                             </div>
                             <input type="hidden" id="dAuthority" value="USER">
@@ -257,53 +258,80 @@
             </div>
 
             <div class="detail-pane" id="paneSanction">
-                <h3 class="detail-section-title"><i class="ri-forbid-line"></i> 제재 처리</h3>
-                <div class="sanction-form-box">
-                    <div class="fm-section">
-                        <div class="fm-field">
-                            <label class="fm-label">제재 유형</label>
-                            <div class="adm-dropdown" id="sanctionTypeDd">
-                                <button type="button" class="adm-dropdown-btn" onclick="admToggle('sanctionTypeDd')">
+                <div class="sanction-panel">
+
+                    <div class="sanction-panel-header">
+                        <div class="sanction-panel-icon"><i class="ri-forbid-2-line"></i></div>
+                        <div>
+                            <div class="sanction-panel-title">제재 처리</div>
+                            <div class="sanction-panel-desc">유형과 기간을 선택하고 사유를 입력하세요.</div>
+                        </div>
+                    </div>
+
+                    <div class="sanction-panel-body">
+
+                        <div class="sp-field">
+                            <label class="sp-label"><i class="ri-shield-cross-line"></i> 제재 유형</label>
+                            <div class="adm-dropdown sp-dropdown" id="sanctionTypeDd" style="width:100%;">
+                                <button type="button" class="adm-dropdown-btn sp-dd-btn" onclick="admToggle('sanctionTypeDd')" style="width:100%;">
                                     <span id="sanctionTypeLabel">기간 정지</span>
                                     <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
                                 </button>
                                 <div class="adm-dropdown-menu">
-                                    <div class="adm-dropdown-item active" data-value="TEMPORARY" onclick="admSelectSanctionType(this,'TEMPORARY','기간 정지')">기간 정지</div>
-                                    <div class="adm-dropdown-item" data-value="PERMANENT" onclick="admSelectSanctionType(this,'PERMANENT','영구 정지')">영구 정지</div>
+                                    <div class="adm-dropdown-item active" data-value="TEMPORARY"
+                                         onclick="selectSanctionField(this,'sanctionTypeDd','sanctionType','sanctionTypeLabel',handleSanctionTypeChange)">
+                                        <i class="ri-timer-line" style="margin-right:6px;"></i>기간 정지
+                                    </div>
+                                    <div class="adm-dropdown-item" data-value="PERMANENT"
+                                         onclick="selectSanctionField(this,'sanctionTypeDd','sanctionType','sanctionTypeLabel',handleSanctionTypeChange)">
+                                        <i class="ri-forbid-line" style="margin-right:6px;"></i>영구 정지
+                                    </div>
                                 </div>
                             </div>
                             <input type="hidden" id="sanctionType" value="TEMPORARY">
                         </div>
-                        <div class="fm-field" id="daysField">
-                            <label class="fm-label">정지 기간</label>
-                            <div class="adm-dropdown" id="sanctionDaysDd">
-                                <button type="button" class="adm-dropdown-btn" onclick="admToggle('sanctionDaysDd')">
+
+                        <div class="sp-field" id="daysField">
+                            <label class="sp-label"><i class="ri-calendar-close-line"></i> 정지 기간</label>
+                            <div class="adm-dropdown sp-dropdown" id="sanctionDaysDd" style="width:100%;">
+                                <button type="button" class="adm-dropdown-btn sp-dd-btn" onclick="admToggle('sanctionDaysDd')" style="width:100%;">
                                     <span id="sanctionDaysLabel">7일</span>
                                     <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
                                 </button>
                                 <div class="adm-dropdown-menu">
-                                    <div class="adm-dropdown-item" data-value="3" onclick="admSelectDays(this,'3','3일')">3일</div>
-                                    <div class="adm-dropdown-item active" data-value="7" onclick="admSelectDays(this,'7','7일')">7일</div>
-                                    <div class="adm-dropdown-item" data-value="14" onclick="admSelectDays(this,'14','14일')">14일</div>
-                                    <div class="adm-dropdown-item" data-value="30" onclick="admSelectDays(this,'30','30일')">30일</div>
+                                    <div class="adm-dropdown-item"        data-value="3"
+                                         onclick="selectSanctionField(this,'sanctionDaysDd','sanctionDays','sanctionDaysLabel',null)">3일</div>
+                                    <div class="adm-dropdown-item active" data-value="7"
+                                         onclick="selectSanctionField(this,'sanctionDaysDd','sanctionDays','sanctionDaysLabel',null)">7일</div>
+                                    <div class="adm-dropdown-item"        data-value="14"
+                                         onclick="selectSanctionField(this,'sanctionDaysDd','sanctionDays','sanctionDaysLabel',null)">14일</div>
+                                    <div class="adm-dropdown-item"        data-value="30"
+                                         onclick="selectSanctionField(this,'sanctionDaysDd','sanctionDays','sanctionDaysLabel',null)">30일</div>
                                 </div>
                             </div>
                             <input type="hidden" id="sanctionDays" value="7">
                         </div>
-                        <div class="fm-field">
-                            <label class="fm-label">제재 사유</label>
-                            <textarea class="fm-input" id="sanctionReason" rows="3" placeholder="제재 사유를 구체적으로 입력하세요"></textarea>
+
+                        <div class="sp-field">
+                            <label class="sp-label"><i class="ri-file-text-line"></i> 제재 사유</label>
+                            <textarea class="sp-textarea" id="sanctionReason" rows="4"
+                                      placeholder="제재 사유를 구체적으로 입력하세요"></textarea>
                             <div class="fm-helper error" id="reasonError" style="display:none;">
                                 <i class="ri-error-warning-line"></i> 제재 사유를 입력해주세요.
                             </div>
                         </div>
-                        <div class="sanction-btns">
-                            <button class="btn-pill btn-light" onclick="switchPane('paneInfo')">취소</button>
-                            <button class="btn-pill" style="background:var(--color-red);color:white;padding:12px 24px;" onclick="submitSanction()">
-                                <i class="ri-forbid-line"></i> 제재 적용
-                            </button>
-                        </div>
+
                     </div>
+
+                    <div class="sanction-panel-footer">
+                        <button class="sp-btn-cancel" onclick="switchPane('paneInfo')">
+                            <i class="ri-close-line"></i> 취소
+                        </button>
+                        <button class="sp-btn-submit" onclick="submitSanction()">
+                            <i class="ri-forbid-line"></i> 제재 적용
+                        </button>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -314,49 +342,112 @@
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_ui.js"></script>
 <script>
+function _closeAllDd() {
+    document.querySelectorAll('.adm-dropdown.open').forEach(function(d) {
+        d.classList.remove('open');
+        var m = d._portal;
+        if (m) {
+            d.appendChild(m);
+            m.removeAttribute('style');
+            d._portal = null;
+        }
+    });
+}
+
 function admToggle(id) {
     var dd = document.getElementById(id);
+    if (!dd) return;
     var isOpen = dd.classList.contains('open');
-    document.querySelectorAll('.adm-dropdown.open').forEach(function(d) { d.classList.remove('open'); });
-    if (!isOpen) dd.classList.add('open');
+    _closeAllDd();
+    if (isOpen) return;
+
+    var btn  = dd.querySelector('.adm-dropdown-btn');
+    var menu = dd.querySelector('.adm-dropdown-menu');
+    if (!btn || !menu) return;
+
+    dd.classList.add('open');
+    dd._portal = menu;
+    document.body.appendChild(menu);
+
+    var r    = btn.getBoundingClientRect();
+    var mW   = Math.max(r.width, 160);
+    var top  = r.bottom + 6;
+    var left = r.left;
+
+    if (left + mW > window.innerWidth - 8) left = r.right - mW;
+    if (left < 8) left = 8;
+
+    menu.style.cssText = [
+        'position:fixed',
+        'top:'    + top  + 'px',
+        'left:'   + left + 'px',
+        'width:'  + mW   + 'px',
+        'display:block',
+        'z-index:999999',
+        'background:#fff',
+        'border:1px solid var(--border-color)',
+        'border-radius:14px',
+        'box-shadow:0 12px 40px rgba(0,0,0,0.14)',
+        'padding:6px'
+    ].join(';');
 }
+
+function admCloseDd(ddId) {
+    var dd = document.getElementById(ddId);
+    if (!dd) return;
+    dd.classList.remove('open');
+    var m = dd._portal;
+    if (m) {
+        dd.appendChild(m);
+        m.removeAttribute('style');
+        dd._portal = null;
+    }
+}
+
 function admSelect(el, ddId) {
-    document.getElementById(ddId + 'Input').value = el.dataset.value;
-    document.getElementById(ddId + 'Label').textContent = el.textContent.trim();
-    document.querySelectorAll('#' + ddId + ' .adm-dropdown-item').forEach(function(i) { i.classList.remove('active'); });
+    document.getElementById(ddId + 'Input').value        = el.dataset.value;
+    document.getElementById(ddId + 'Label').textContent  = el.textContent.trim();
+    document.querySelectorAll('#' + ddId + ' .adm-dropdown-item').forEach(function(i){ i.classList.remove('active'); });
     el.classList.add('active');
-    document.getElementById(ddId).classList.remove('open');
+    admCloseDd(ddId);
 }
+
 function admSelectAuthority(el, val, label) {
-    document.getElementById('dAuthority').value = val;
+    document.getElementById('dAuthority').value           = val;
     document.getElementById('dAuthorityLabel').textContent = label;
-    document.querySelectorAll('#dAuthorityDd .adm-dropdown-item').forEach(function(i) { i.classList.remove('active'); });
+    document.querySelectorAll('#dAuthorityDd .adm-dropdown-item').forEach(function(i){ i.classList.remove('active'); });
     el.classList.add('active');
-    document.getElementById('dAuthorityDd').classList.remove('open');
+    admCloseDd('dAuthorityDd');
 }
-function admSelectSanctionType(el, val, label) {
-    document.getElementById('sanctionType').value = val;
-    document.getElementById('sanctionTypeLabel').textContent = label;
-    document.querySelectorAll('#sanctionTypeDd .adm-dropdown-item').forEach(function(i) { i.classList.remove('active'); });
+
+function selectSanctionField(el, ddId, inputId, labelId, cb) {
+    document.getElementById(inputId).value       = el.dataset.value;
+    document.getElementById(labelId).textContent = el.textContent.trim();
+    el.parentNode.querySelectorAll('.adm-dropdown-item').forEach(function(i){ i.classList.remove('active'); });
     el.classList.add('active');
-    document.getElementById('sanctionTypeDd').classList.remove('open');
+    admCloseDd(ddId);
+    if (cb) cb(el.dataset.value);
+}
+
+function handleSanctionTypeChange(val) {
     var df = document.getElementById('daysField');
     if (df) val === 'PERMANENT' ? df.classList.add('hidden') : df.classList.remove('hidden');
 }
-function admSelectDays(el, val, label) {
-    document.getElementById('sanctionDays').value = val;
-    document.getElementById('sanctionDaysLabel').textContent = label;
-    document.querySelectorAll('#sanctionDaysDd .adm-dropdown-item').forEach(function(i) { i.classList.remove('active'); });
-    el.classList.add('active');
-    document.getElementById('sanctionDaysDd').classList.remove('open');
-}
+
 document.addEventListener('DOMContentLoaded', function() {
-    var map = { all: '통합검색', userId: '아이디', nickname: '닉네임', email: '이메일' };
+    var map = { all:'통합검색', userId:'아이디', nickname:'닉네임', email:'이메일' };
     var inp = document.getElementById('memberSchTypeInput');
     if (inp && map[inp.value]) document.getElementById('memberSchTypeLabel').textContent = map[inp.value];
+
     document.addEventListener('click', function(e) {
         document.querySelectorAll('.adm-dropdown.open').forEach(function(dd) {
-            if (!dd.contains(e.target)) dd.classList.remove('open');
+            var m      = dd._portal;
+            var inBtn  = dd.contains(e.target);
+            var inMenu = m && m.contains(e.target);
+            if (!inBtn && !inMenu) {
+                dd.classList.remove('open');
+                if (m) { dd.appendChild(m); m.removeAttribute('style'); dd._portal = null; }
+            }
         });
     });
 });

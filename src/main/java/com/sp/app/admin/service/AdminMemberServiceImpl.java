@@ -50,6 +50,23 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     public void updateAuthority(Map<String, Object> map) throws Exception {
         mapper.deleteAuthority((String) map.get("userId"));
         mapper.insertAuthority(map);
+
+        String authority = String.valueOf(map.get("authority")).trim().toUpperCase();
+        int level = 1;
+        
+        if ("ADMIN".equals(authority)) {
+            level = 99;
+        } else if ("EMP".equals(authority)) {
+            level = 51;
+        } else if ("INSTRUCTOR".equals(authority)) {
+            level = 31;
+        }
+
+        Map<String, Object> levelMap = new java.util.HashMap<>();
+        levelMap.put("userId", map.get("userId"));
+        levelMap.put("userLevel", level);
+        
+        mapper.updateUserLevel(levelMap);
     }
 
     @Override

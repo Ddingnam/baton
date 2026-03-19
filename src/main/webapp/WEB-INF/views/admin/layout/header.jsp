@@ -36,7 +36,7 @@
                 <div class="sq-box" id="myProfileTrigger">
                     <i class="ri-user-settings-fill"></i>프로필
                 </div>
-                <div class="sq-box red" onclick="location.href='${pageContext.request.contextPath}/member/logout'">
+                <div class="sq-box red" onclick="location.href='${pageContext.request.contextPath}/admin/login'">
                     <i class="ri-shut-down-line"></i>로그아웃
                 </div>
             </div>

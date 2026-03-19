@@ -31,7 +31,7 @@
             a.authority
         FROM users u
         JOIN userAuthority a ON u.userId = a.userId
-        WHERE a.authority IN ('ROLE_ADMIN', 'ADMIN')
+        WHERE a.authority IN ('ROLE_ADMIN', 'ADMIN', 'ROLE_EMP', 'EMP')
         ORDER BY u.userIdx ASC
     </select>
 

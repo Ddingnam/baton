@@ -774,6 +774,27 @@ ul, li { list-style: none; }
 }
 .fm-input:focus { border-color: var(--color-purple); box-shadow: 0 4px 12px rgba(124,58,237,0.1); }
 
+.fm-select {
+    padding: 11px 14px;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border-color);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+    background: white;
+    transition: all 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    cursor: pointer;
+    width: 100%;
+}
+.fm-select:focus { border-color: var(--color-purple); box-shadow: 0 4px 12px rgba(124,58,237,0.1); outline: none; }
+
 .fm-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
 .fm-toggle-desc { font-size: 13px; font-weight: 500; color: var(--text-sub); }
 .fm-toggle { position: relative; display: inline-block; }

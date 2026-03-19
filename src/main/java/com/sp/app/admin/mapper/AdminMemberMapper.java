@@ -15,6 +15,7 @@ public interface AdminMemberMapper {
 	public void updateMemberStatus(Map<String, Object> map);
 	public void deleteAuthority(@Param("userId") String userId);
 	public void insertAuthority(Map<String, Object> map);
+	public void updateUserLevel(Map<String, Object> map);
 
 	public List<Map<String, Object>> listSanctions(Map<String, Object> map);
 	public int countSanctions(Map<String, Object> map);
