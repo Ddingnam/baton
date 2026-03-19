@@ -36,9 +36,8 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     @Transactional(rollbackFor = Exception.class)
     public void updateMemberStatus(Map<String, Object> map) throws Exception {
         mapper.updateMemberStatus(map);
-        
+
         int status = Integer.parseInt(String.valueOf(map.get("status")));
-        
         if (status == 1) {
             Long userIdx = Long.valueOf(String.valueOf(map.get("userIdx")));
             mapper.liftSanctionByUserIdx(userIdx);
@@ -48,24 +47,19 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateAuthority(Map<String, Object> map) throws Exception {
-        mapper.deleteAuthority((String) map.get("userId"));
+        String userId = (String) map.get("userId");
+        mapper.deleteAuthority(userId);
         mapper.insertAuthority(map);
 
-        String authority = String.valueOf(map.get("authority")).trim().toUpperCase();
+        String authority = (String) map.get("authority");
         int level = 1;
-        
-        if ("ADMIN".equals(authority)) {
-            level = 99;
-        } else if ("EMP".equals(authority)) {
-            level = 51;
-        } else if ("INSTRUCTOR".equals(authority)) {
-            level = 31;
-        }
+        if ("ADMIN".equals(authority))      level = 99;
+        else if ("EMP".equals(authority))   level = 51;
+        else if ("INSTRUCTOR".equals(authority)) level = 31;
 
         Map<String, Object> levelMap = new java.util.HashMap<>();
-        levelMap.put("userId", map.get("userId"));
+        levelMap.put("userId",    userId);
         levelMap.put("userLevel", level);
-        
         mapper.updateUserLevel(levelMap);
     }
 
@@ -130,5 +124,4 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         statusMap.put("status", 1);
         mapper.updateMemberStatus(statusMap);
     }
-    
 }

@@ -37,29 +37,26 @@ public class MemberServiceImpl implements MemberService {
 		try {
 			dto = mapper.loginSnsUser(map);
 		} catch (Exception e) {
-
 			log.info("loginSnsUser : ", e);
 		}
 		return dto;
 	}
-	
+
 	@Override
 	public UserDto loginUser(Map<String, Object> map) {
 		UserDto dto = null;
 		try {
 			String pwd = (String)map.get("pwd");
-			
 			dto = mapper.loginUser(map);
 			if(!bcryptEncoder.matches(pwd, dto.getPwd())) {
 				return dto;
 			}
-			
 		} catch (Exception e) {
 			log.info("loginUser : ", e);
 		}
 		return dto;
 	}
-	
+
 	@Override
 	public void insertUser(UserDto dto, String uploadPath) throws Exception {
 	    this.insertUser(dto, null, uploadPath);
@@ -101,6 +98,7 @@ public class MemberServiceImpl implements MemberService {
 		}
 	}
 	
+
 	@Override
 	public void insertSnsUser(SnsUserDto snsUserDto) {
 		try {
@@ -112,14 +110,16 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public void insertMemberStatus(MemberDto dto) throws Exception {
-		// TODO Auto-generated method stub
-		
+		try {
+			mapper.insertMemberStatus(dto);
+		} catch (Exception e) {
+			log.info("insertMemberStatus : ", e);
+		}
 	}
 
 	@Override
 	public void updatePassword(MemberDto dto) throws Exception {
-		// TODO Auto-generated method stub
-		
+		mapper.updateMemberPassword(dto);
 	}
 
 	@Override
@@ -128,88 +128,71 @@ public class MemberServiceImpl implements MemberService {
 			mapper.updateUserEnabled(map);
 		} catch (Exception e) {
 			log.info("updateUserEnabled : ", e);
-			
 			throw e;
 		}
 	}
 
 	@Override
 	public void updateMember(MemberDto dto, String uploadPath) throws Exception {
-		// TODO Auto-generated method stub
-		
+		mapper.updateMember1(dto);
 	}
 
 	@Override
 	public void updateLastLogin(Long member_id) throws Exception {
-		// TODO Auto-generated method stub
-		
+		mapper.updateLastLogin(member_id);
 	}
 
 	@Override
 	public void updateLastLogin(String login_id) throws Exception {
-		// TODO Auto-generated method stub
-		
+		mapper.updateLastLoginId(login_id);
 	}
 
 	@Override
 	public UserDto findById(Long member_id) {
 		UserDto dto = null;
-
 		try {
-			dto = Objects.requireNonNull(mapper.findById(member_id));
-		} catch (NullPointerException e) {
-		} catch (ArrayIndexOutOfBoundsException e) {
+			dto = mapper.findById(member_id);
 		} catch (Exception e) {
 			log.info("findById : ", e);
 		}
-
 		return dto;
 	}
 
 	@Override
 	public UserDto findByLoginId(String login_id) {
 		UserDto dto = null;
-
 		try {
-			dto = Objects.requireNonNull(mapper.findByLoginId(login_id));
-		} catch (NullPointerException e) {
+			dto = mapper.findByLoginId(login_id);
 		} catch (Exception e) {
-			log.info("findById : ", e);
+			log.info("findByLoginId : ", e);
 		}
-
 		return dto;
 	}
-	
+
 	@Override
 	public UserDto findByEmail(String email) {
 		UserDto dto = null;
-
 		try {
-			dto = Objects.requireNonNull(mapper.findByEmail(email));
-		} catch (NullPointerException e) {
+			dto = mapper.findByEmail(email);
 		} catch (Exception e) {
 			log.info("findByEmail : ", e);
 		}
-
 		return dto;
 	}
 
 	@Override
 	public Long getMemberId(String login_id) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public int checkFailureCount(String login_id) {
 		int result = 0;
-		
 		try {
 			result = mapper.checkFailureCount(login_id);
 		} catch (Exception e) {
 			log.info("checkFailureCount : ", e);
 		}
-		
 		return result;
 	}
 
@@ -219,7 +202,6 @@ public class MemberServiceImpl implements MemberService {
 			mapper.updateFailureCountReset(login_id);
 		} catch (Exception e) {
 			log.info("updateFailureCountReset : ", e);
-			
 			throw e;
 		}
 	}
@@ -230,69 +212,57 @@ public class MemberServiceImpl implements MemberService {
 			mapper.updateFailureCount(login_id);
 		} catch (Exception e) {
 			log.info("updateFailureCount : ", e);
-			
 			throw e;
 		}
 	}
 
 	@Override
 	public void deleteMember(Map<String, Object> map, String uploadPath) throws Exception {
-		// TODO Auto-generated method stub
-		
+		mapper.deleteMember1(map);
 	}
 
 	@Override
 	public void deleteProfilePhoto(Map<String, Object> map, String uploadPath) throws Exception {
-		// TODO Auto-generated method stub
-		
+		mapper.deleteProfilePhoto(map);
 	}
 
 	@Override
 	public void generatePwd(MemberDto dto) throws Exception {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public List<MemberDto> listFindMember(Map<String, Object> map) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String findByAuthority(String login_id) {
 		String authority = null;
-		
 		try {
 			authority = mapper.findByAuthority(login_id);
 		} catch (Exception e) {
-			log.info("findByAuthority", e);
+			log.info("findByAuthority : ", e);
 		}
-		
 		return authority;
 	}
 
 	@Override
 	public void insertRefreshToken(MemberDto dto) throws Exception {
-		// TODO Auto-generated method stub
-		
+		mapper.insertRefreshToken(dto);
 	}
 
 	@Override
 	public void updateRefreshToken(MemberDto dto) throws Exception {
-		// TODO Auto-generated method stub
-		
+		mapper.updateRefreshToken(dto);
 	}
 
 	@Override
 	public MemberDto findByToken(String login_id) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean isPasswordCheck(String login_id, String password) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -305,7 +275,7 @@ public class MemberServiceImpl implements MemberService {
 	public boolean isNicknameDuplicated(String nickname) {
 		return mapper.isNicknameDuplicated(nickname) > 0;
 	}
-	
+
 	@Override
 	public boolean isEmailDuplicated(String email) {
 		return mapper.isEmailDuplicated(email) > 0;
@@ -317,18 +287,18 @@ public class MemberServiceImpl implements MemberService {
 		try {
 			userId = mapper.findUserId(map);
 		} catch (Exception e) {
-			log.info("findUserId", e);
+			log.info("findUserId : ", e);
 		}
 		return userId;
 	}
-	
+
 	@Override
 	public long findByUserIdAndEmail(Map<String, Object> map) {
 		long userIdx = 0;
 		try {
 			userIdx = mapper.findByUserIdAndEmail(map);
 		} catch (Exception e) {
-			log.info("findByUserIdAndEmail", e);
+			log.info("findByUserIdAndEmail : ", e);
 		}
 		return userIdx;
 	}
@@ -336,24 +306,22 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public void updateUserPwd(Map<String, Object> map) throws SQLException {
 		try {
-			String pwd = (String) map.get("pwd");
-			String encPassword = bcryptEncoder.encode(pwd);
-			map.put("pwd", encPassword);
-			
+			String newPwd = bcryptEncoder.encode((String) map.get("newPwd"));
+			map.put("newPwd", newPwd);
 			mapper.updateUserPwd(map);
 		} catch (Exception e) {
 			log.info("updateUserPwd : ", e);
 			throw e;
 		}
 	}
-	
+
 	@Override
 	public RegionDto findRegionByCode(String regionCode) {
 		RegionDto regionDto = null;
 		try {
 			regionDto = mapper.findRegionbyCode(regionCode);
 		} catch (Exception e) {
-			log.info("findRegionByCode", e);
+			log.info("findRegionByCode : ", e);
 		}
 		return regionDto;
 	}
@@ -364,7 +332,7 @@ public class MemberServiceImpl implements MemberService {
 		try {
 			regionDto = mapper.findUserRegionbyType(map);
 		} catch (Exception e) {
-			log.info("findUserRegionbyType", e);
+			log.info("findUserRegionbyType : ", e);
 		}
 		return regionDto;
 	}
@@ -372,8 +340,10 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public void saveUserRegion(RegionDto dto) throws SQLException {
 		try {
-			mapper.insertRegion(dto);
-			mapper.saveUserRegion(dto);
+			if (!Objects.isNull(dto.getRegionCode()) && !dto.getRegionCode().isEmpty()) {
+				mapper.insertRegion(dto);
+				mapper.saveUserRegion(dto);
+			}
 		} catch (Exception e) {
 			log.info("saveUserRegion : ", e);
 		}
@@ -382,7 +352,6 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public void deleteRegion(Map<String, Object> map) throws SQLException {
 		try {
-			// mapper.deleteRegion(map);
 		} catch (Exception e) {
 			log.info("deleteRegion : ", e);
 		}
@@ -400,25 +369,65 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public UserRegionInfo getUserRegionInfo(Long userIdx) {
 		UserRegionInfo userRegionInfo = new UserRegionInfo();
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("userIdx", userIdx);
 		try {
 			map.put("regionType", 1);
-	        RegionDto main = mapper.findUserRegionbyType(map);
-	        userRegionInfo.setMainRegion(main);
-	        
-	        map.put("regionType", 2);
-	        RegionDto sub = mapper.findUserRegionbyType(map);
-	        userRegionInfo.setSubRegion(sub);
-	        
-	        if (sub != null && sub.getIsActive() == 1) {
-	            userRegionInfo.setActiveType(2);
-	        } else {
-	            userRegionInfo.setActiveType(1);
-	        }
+			RegionDto main = mapper.findUserRegionbyType(map);
+			userRegionInfo.setMainRegion(main);
+
+			map.put("regionType", 2);
+			RegionDto sub = mapper.findUserRegionbyType(map);
+			userRegionInfo.setSubRegion(sub);
+
+			if (sub != null && sub.getIsActive() == 1) {
+				userRegionInfo.setActiveType(2);
+			} else {
+				userRegionInfo.setActiveType(1);
+			}
 		} catch (Exception e) {
 			log.info("getUserRegionInfo", e);
 		}
-		return userRegionInfo;	
+		return userRegionInfo;
+	}
+
+	@Override
+	public boolean hasPendingWithdraw(Long userIdx) {
+		try {
+			return mapper.hasPendingWithdraw(userIdx) > 0;
+		} catch (Exception e) {
+			log.info("hasPendingWithdraw : ", e);
+			return false;
+		}
+	}
+
+	@Override
+	public int countActiveTrades(Long userIdx) {
+		try {
+			return mapper.countActiveTrades(userIdx);
+		} catch (Exception e) {
+			log.info("countActiveTrades : ", e);
+			return 0;
+		}
+	}
+
+	@Override
+	public int countPendingReports(Long userIdx) {
+		try {
+			return mapper.countPendingReports(userIdx);
+		} catch (Exception e) {
+			log.info("countPendingReports : ", e);
+			return 0;
+		}
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void requestWithdraw(Map<String, Object> map) throws Exception {
+		mapper.insertWithdrawRequest(map);
+		Map<String, Object> statusMap = new HashMap<>();
+		statusMap.put("userIdx", map.get("userIdx"));
+		statusMap.put("status",  8);
+		mapper.updateUserEnabled(statusMap);
 	}
 }

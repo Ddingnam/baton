@@ -71,8 +71,7 @@
     </insert>
 
     <update id="updateUserLevel" parameterType="map">
-        UPDATE users 
-        SET userLevel = #{userLevel}
+        UPDATE users SET userLevel = #{userLevel}
         WHERE userId = #{userId}
     </update>
 
@@ -92,18 +91,11 @@
                         AND (u.userId   LIKE '%' || #{kwd} || '%'
                           OR u.nickname LIKE '%' || #{kwd} || '%')
                     </if>
-                    <!-- sanctionFilter: ACTIVE=제재중, LIFTED=해제됨, PERMANENT=영구정지 -->
                     <if test="sanctionFilter != null and sanctionFilter != ''">
                         <choose>
-                            <when test="sanctionFilter == 'ACTIVE'">
-                                AND s.isLifted = 0
-                            </when>
-                            <when test="sanctionFilter == 'LIFTED'">
-                                AND s.isLifted = 1
-                            </when>
-                            <when test="sanctionFilter == 'PERMANENT'">
-                                AND s.sanctionType = 'PERMANENT' AND s.isLifted = 0
-                            </when>
+                            <when test="sanctionFilter == 'ACTIVE'">AND s.isLifted = 0</when>
+                            <when test="sanctionFilter == 'LIFTED'">AND s.isLifted = 1</when>
+                            <when test="sanctionFilter == 'PERMANENT'">AND s.sanctionType = 'PERMANENT' AND s.isLifted = 0</when>
                         </choose>
                     </if>
                 </where>
@@ -124,15 +116,9 @@
             </if>
             <if test="sanctionFilter != null and sanctionFilter != ''">
                 <choose>
-                    <when test="sanctionFilter == 'ACTIVE'">
-                        AND s.isLifted = 0
-                    </when>
-                    <when test="sanctionFilter == 'LIFTED'">
-                        AND s.isLifted = 1
-                    </when>
-                    <when test="sanctionFilter == 'PERMANENT'">
-                        AND s.sanctionType = 'PERMANENT' AND s.isLifted = 0
-                    </when>
+                    <when test="sanctionFilter == 'ACTIVE'">AND s.isLifted = 0</when>
+                    <when test="sanctionFilter == 'LIFTED'">AND s.isLifted = 1</when>
+                    <when test="sanctionFilter == 'PERMANENT'">AND s.sanctionType = 'PERMANENT' AND s.isLifted = 0</when>
                 </choose>
             </if>
         </where>
@@ -166,7 +152,12 @@
                 SELECT w.withdrawIdx, w.userIdx, w.reason,
                        TO_CHAR(w.requestDate, 'YYYY-MM-DD HH24:MI') AS requestDate,
                        w.withdrawStatus,
-                       u.userId, u.nickname, u.email, u.createdDate
+                       u.userId, u.nickname, u.email, u.createdDate,
+                       (SELECT COUNT(*) FROM adminReport r
+                        WHERE r.reportedUserIdx = w.userIdx AND r.processStatus = 0) AS pendingReports,
+                       (SELECT COUNT(*) FROM TRADETRANSACTION t2
+                        WHERE (t2.BUYERIDX = w.userIdx OR t2.SELLERIDX = w.userIdx)
+                        AND t2.TRADESTATUS NOT IN ('COMPLETED','CANCELLED')) AS activeTrades
                 FROM withdrawRequest w
                 JOIN users u ON w.userIdx = u.userIdx
                 <where>
@@ -174,7 +165,6 @@
                         AND (u.userId   LIKE '%' || #{kwd} || '%'
                           OR u.nickname LIKE '%' || #{kwd} || '%')
                     </if>
-                    <!-- wFilter: PENDING | APPROVED | REJECTED -->
                     <if test="wFilter != null and wFilter != ''">
                         AND w.withdrawStatus = #{wFilter}
                     </if>
@@ -205,11 +195,11 @@
         SET withdrawStatus = #{withdrawStatus}, processDate = CURRENT_TIMESTAMP
         WHERE withdrawIdx = #{withdrawIdx}
     </update>
-    
+
     <update id="liftSanctionByUserIdx" parameterType="Long">
         UPDATE adminSanction
-        SET isLifted = 1, 
-            liftReason = '회원 목록에서 관리자 직권 해제', 
+        SET isLifted = 1,
+            liftReason = '회원 목록에서 관리자 직권 해제',
             liftDate = CURRENT_TIMESTAMP
         WHERE userIdx = #{userIdx} AND isLifted = 0
     </update>

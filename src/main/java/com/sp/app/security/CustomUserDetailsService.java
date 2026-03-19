@@ -22,25 +22,24 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		
 		UserDto member = memberService.findByLoginId(username);
-		 
-		if(member == null) {
+
+		if (member == null) {
 			throw new UsernameNotFoundException("아이디가 존재하지 않습니다.");
 		}
-		
+
 		List<String> authorities = new ArrayList<>();
 		String authority = memberService.findByAuthority(username);
-		
+
 		if (authority != null && !authority.trim().isEmpty()) {
 			authorities.add(authority.trim().toUpperCase());
 		} else {
 			authorities.add("USER");
 		}
-		
+
 		return toUserDetails(member, authority, authorities);
 	}
-	
+
 	private UserDetails toUserDetails(UserDto member, String authority, List<String> authorities) {
 		UserRegionInfo userRegionInfo = memberService.getUserRegionInfo(member.getUserIdx());
 		SessionInfo info = SessionInfo.builder()
@@ -55,10 +54,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 				.login_type(member.getProvider())
 				.userRegionInfo(userRegionInfo)
 				.build();
-		
+
+		boolean disabled = (member.getStatus() == 0 || member.getStatus() == 8);
+
 		return CustomUserDetails.builder()
 				.sessionInfo(info)
-				.disabled(member.getStatus() == 0)
+				.disabled(disabled)
 				.roles(authorities)
 				.build();
 	}

@@ -31,6 +31,7 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 			AuthenticationException exception) throws IOException, ServletException {
 
 		String login_id = request.getParameter("login_id");
+		String redirectUrl = defaultFailureUrl;
 		
 		String msg = "로그인 실패";
 		try {
@@ -63,6 +64,11 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 				msg = "존재하지 않은 아이디";
 			} else if(exception instanceof DisabledException) {
 				msg = "계정 비활성화";
+				
+				UserDto dto = memberService.findByLoginId(login_id);
+				if (dto != null && dto.getStatus() == 8) {
+					redirectUrl = defaultFailureUrl.replace("?error", "?withdraw");
+				}
 			}
 			
 			
@@ -70,7 +76,7 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 			log.info("Login Failure : " + msg, e);
 		}
 
-		response.sendRedirect(defaultFailureUrl);
+		response.sendRedirect(redirectUrl);
 	}
 
 	public void setDefaultFailureUrl(String defaultFailureUrl) {

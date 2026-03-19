@@ -37,14 +37,14 @@ public class AdminMemberController {
         map.put("offset",   offset);
         map.put("pageSize", pageSize);
 
-        List<UserDto> list  = adminMemberService.listMembers(map);
-        int totalCount      = adminMemberService.countMembers(map);
-        int totalPages      = (int) Math.ceil((double) totalCount / pageSize);
-        
-        Map<String, Object> allMap     = new HashMap<>();
-        Map<String, Object> normalMap  = new HashMap<>(); normalMap.put("status", "1");
-        Map<String, Object> banMap     = new HashMap<>(); banMap.put("status",    "2");
-        Map<String, Object> outMap     = new HashMap<>(); outMap.put("status",    "9");
+        List<UserDto> list = adminMemberService.listMembers(map);
+        int totalCount     = adminMemberService.countMembers(map);
+        int totalPages     = (int) Math.ceil((double) totalCount / pageSize);
+
+        Map<String, Object> allMap    = new HashMap<>();
+        Map<String, Object> normalMap = new HashMap<>(); normalMap.put("status", "1");
+        Map<String, Object> banMap    = new HashMap<>(); banMap.put("status",    "2");
+        Map<String, Object> outMap    = new HashMap<>(); outMap.put("status",    "9");
 
         model.addAttribute("countAll",    adminMemberService.countMembers(allMap));
         model.addAttribute("countNormal", adminMemberService.countMembers(normalMap));
