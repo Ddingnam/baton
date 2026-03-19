@@ -111,7 +111,7 @@
                             </div>
                         </div>
 
-                        <sec:authorize access="hasAnyRole('ADMIN')">
+                        <sec:authorize access="hasAnyRole('ADMIN', 'EMP')">
                             <a href="${pageContext.request.contextPath}/admin" class="action-icon admin-icon" title="관리자 페이지">
                                 <i class="ri-settings-3-line"></i>
                             </a>

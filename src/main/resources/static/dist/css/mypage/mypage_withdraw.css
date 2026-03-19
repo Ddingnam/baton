@@ -25,11 +25,11 @@ body {
     gap: 24px;
 }
 
+/* ── 카드 ─────────────────────────────── */
 .wd-card {
     background: #fff;
     border-radius: 16px;
     border: 1px solid #E9ECEF;
-    overflow: visible;
 }
 
 .wd-header {
@@ -66,6 +66,7 @@ body {
     margin-top: 3px;
 }
 
+/* ── 바디 ─────────────────────────────── */
 .wd-body {
     padding: 28px 32px;
     display: flex;
@@ -73,73 +74,93 @@ body {
     gap: 20px;
 }
 
-.wd-blocker {
-    background: #FFF9DB;
-    border: 1px solid #FFE066;
+/* ── 역할 차단 ────────────────────────── */
+.wd-role-blocked {
+    background: #F8F9FA;
+    border: 1px solid #DEE2E6;
     border-radius: 12px;
-    padding: 16px 20px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
+    padding: 36px 24px;
+    text-align: center;
 }
-
-.wd-blocker i {
-    color: #F08C00;
-    font-size: 18px;
-    flex-shrink: 0;
-    margin-top: 1px;
+.wd-role-blocked i {
+    font-size: 40px;
+    color: #ADB5BD;
+    display: block;
+    margin-bottom: 12px;
 }
-
-.wd-blocker-text {
-    font-size: 13px;
-    font-weight: 600;
-    color: #664D03;
+.wd-role-blocked p {
+    font-size: 15px;
+    font-weight: 700;
+    color: #495057;
+    margin: 0 0 6px;
+}
+.wd-role-blocked small {
+    font-size: 12px;
+    color: #ADB5BD;
     line-height: 1.6;
 }
 
-.wd-blocker-text strong {
-    display: block;
-    font-size: 14px;
-    margin-bottom: 4px;
-    color: #5C3D02;
-}
-
+/* ── 이미 요청됨 ──────────────────────── */
 .wd-already {
     background: #F8F9FA;
     border: 1px solid #DEE2E6;
     border-radius: 12px;
-    padding: 32px 24px;
+    padding: 36px 24px;
     text-align: center;
 }
-
 .wd-already i {
     font-size: 40px;
     color: #ADB5BD;
     display: block;
     margin-bottom: 12px;
 }
-
 .wd-already p {
     font-size: 15px;
     font-weight: 700;
     color: #495057;
-    margin: 0;
+    margin: 0 0 6px;
 }
-
 .wd-already small {
     font-size: 12px;
     color: #ADB5BD;
     display: block;
-    margin-top: 8px;
     line-height: 1.6;
 }
 
+/* ── 거래 안내 (정보, 막지 않음) ────────── */
+.wd-info {
+    background: #F0F6FF;
+    border: 1px solid #BDD7FF;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+.wd-info i {
+    color: #3182F6;
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+.wd-info-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1A4B8C;
+    line-height: 1.6;
+}
+.wd-info-text strong {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 3px;
+}
+
+/* ── 유의사항 ─────────────────────────── */
 .wd-notice {
     background: #F8F9FA;
     border-radius: 12px;
     padding: 18px 20px;
 }
-
 .wd-notice-title {
     font-size: 13px;
     font-weight: 700;
@@ -149,18 +170,17 @@ body {
     align-items: center;
     gap: 6px;
 }
-
 .wd-notice ul {
     margin: 0;
     padding-left: 18px;
 }
-
 .wd-notice ul li {
     font-size: 12px;
     color: #6C757D;
     line-height: 1.9;
 }
 
+/* ── 사유 입력 ────────────────────────── */
 .wd-field label {
     display: block;
     font-size: 13px;
@@ -168,13 +188,11 @@ body {
     color: #495057;
     margin-bottom: 8px;
 }
-
 .wd-field label span {
     font-size: 12px;
     color: #ADB5BD;
     font-weight: 500;
 }
-
 .wd-textarea {
     width: 100%;
     padding: 14px 16px;
@@ -189,17 +207,14 @@ body {
     background: #fff;
     min-height: 100px;
 }
-
 .wd-textarea:focus {
     outline: none;
     border-color: #ADB5BD;
-    box-shadow: 0 0 0 3px rgba(173, 181, 189, 0.15);
+    box-shadow: 0 0 0 3px rgba(173,181,189,0.15);
 }
+.wd-textarea::placeholder { color: #CED4DA; }
 
-.wd-textarea::placeholder {
-    color: #CED4DA;
-}
-
+/* ── 푸터 ─────────────────────────────── */
 .wd-footer {
     padding: 20px 32px;
     border-top: 1px solid #F1F3F5;
@@ -208,6 +223,7 @@ body {
     align-items: center;
 }
 
+/* ── 버튼 ─────────────────────────────── */
 .wd-btn-cancel {
     padding: 11px 22px;
     border-radius: 100px;
@@ -244,11 +260,11 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    box-shadow: 0 4px 14px rgba(224, 49, 49, 0.25);
+    box-shadow: 0 4px 14px rgba(224,49,49,0.25);
 }
 .wd-btn-submit:hover {
     background: #C92A2A;
-    box-shadow: 0 6px 18px rgba(224, 49, 49, 0.35);
+    box-shadow: 0 6px 18px rgba(224,49,49,0.35);
     transform: translateY(-1px);
 }
 .wd-btn-submit:disabled {
@@ -258,26 +274,108 @@ body {
     transform: none;
 }
 
-.wd-toast {
+/* ── 커스텀 Confirm 모달 ──────────────── */
+.wd-confirm-backdrop {
     position: fixed;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: #212529;
-    color: #fff;
-    padding: 13px 22px;
-    border-radius: 100px;
-    font-size: 13px;
-    font-weight: 600;
+    inset: 0;
+    background: rgba(15,23,42,0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9990;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     opacity: 0;
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
-    white-space: nowrap;
-    z-index: 9999;
+    transition: opacity 0.25s ease;
 }
-.wd-toast.show {
+.wd-confirm-backdrop.show {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    pointer-events: all;
 }
-.wd-toast.success { background: #2F9E44; }
-.wd-toast.error   { background: #E03131; }
+
+.wd-confirm-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 36px 32px 28px;
+    width: 360px;
+    max-width: 92vw;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    transform: translateY(18px) scale(0.97);
+    transition: transform 0.28s cubic-bezier(0.16,1,0.3,1);
+}
+.wd-confirm-backdrop.show .wd-confirm-box {
+    transform: translateY(0) scale(1);
+}
+
+.wd-confirm-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #FEE2E2;
+    color: #E03131;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+.wd-confirm-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #191F28;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.wd-confirm-desc {
+    font-size: 13px;
+    color: #6B7684;
+    line-height: 1.6;
+    margin: 0 0 6px;
+    white-space: pre-line;
+}
+
+.wd-confirm-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+    width: 100%;
+}
+
+.wd-confirm-cancel {
+    flex: 1;
+    padding: 12px;
+    border-radius: 100px;
+    background: #F8F9FA;
+    border: 1.5px solid #DEE2E6;
+    color: #495057;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+.wd-confirm-cancel:hover { background: #E9ECEF; }
+
+.wd-confirm-ok {
+    flex: 1;
+    padding: 12px;
+    border-radius: 100px;
+    background: #E03131;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    border: none;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(224,49,49,0.25);
+}
+.wd-confirm-ok:hover { background: #C92A2A; }

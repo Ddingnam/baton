@@ -35,6 +35,16 @@
 
             <div class="wd-body">
 
+                <%-- 직원·관리자 차단 --%>
+                <c:if test="${blockedByRole}">
+                    <div class="wd-role-blocked">
+                        <i class="ri-shield-user-line"></i>
+                        <p>탈퇴 요청이 불가한 계정입니다.</p>
+                        <small>관리자·직원 계정은 자체 탈퇴 요청이 제한됩니다.<br>탈퇴가 필요한 경우 운영팀에 별도로 문의해주세요.</small>
+                    </div>
+                </c:if>
+
+                <%-- 이미 요청됨 --%>
                 <c:if test="${alreadyRequested}">
                     <div class="wd-already">
                         <i class="ri-time-line"></i>
@@ -43,26 +53,16 @@
                     </div>
                 </c:if>
 
-                <c:if test="${not alreadyRequested}">
+                <%-- 정상 요청 폼 --%>
+                <c:if test="${not blockedByRole and not alreadyRequested}">
 
+                    <%-- 진행 중인 거래 안내 (막지 않음, 정보만 제공) --%>
                     <c:if test="${activeTrades > 0}">
-                        <div class="wd-blocker">
+                        <div class="wd-info">
                             <i class="ri-shopping-bag-2-line"></i>
-                            <div class="wd-blocker-text">
-                                <strong>진행 중인 거래가 있습니다.</strong>
-                                현재 <b>${activeTrades}건</b>의 거래가 완료되지 않았습니다.
-                                모든 거래를 완료하거나 취소한 후 탈퇴를 요청할 수 있습니다.
-                            </div>
-                        </div>
-                    </c:if>
-
-                    <c:if test="${pendingReports > 0}">
-                        <div class="wd-blocker">
-                            <i class="ri-alarm-warning-line"></i>
-                            <div class="wd-blocker-text">
-                                <strong>처리되지 않은 신고 내역이 있습니다.</strong>
-                                <b>${pendingReports}건</b>의 신고가 검토 중입니다.
-                                모든 신고 처리가 완료된 후 탈퇴를 요청할 수 있습니다.
+                            <div class="wd-info-text">
+                                <strong>진행 중인 거래가 ${activeTrades}건 있습니다.</strong>
+                                탈퇴 요청은 가능하지만, 관리자 검토 시 거래 완료 후 승인될 수 있습니다.
                             </div>
                         </div>
                     </c:if>
@@ -93,9 +93,8 @@
                 <a href="${pageContext.request.contextPath}/mypage/main" class="wd-btn-cancel">
                     <i class="ri-arrow-left-line"></i> 돌아가기
                 </a>
-                <c:if test="${not alreadyRequested}">
-                    <button type="button" class="wd-btn-submit" id="btnWithdrawSubmit"
-                            ${activeTrades > 0 || pendingReports > 0 ? 'disabled' : ''}>
+                <c:if test="${not blockedByRole and not alreadyRequested}">
+                    <button type="button" class="wd-btn-submit" id="btnWithdrawSubmit">
                         <i class="ri-logout-circle-r-line"></i> 탈퇴 요청하기
                     </button>
                 </c:if>
@@ -106,56 +105,89 @@
 
 </div>
 
-<div class="wd-toast" id="wdToast"></div>
+<%-- 커스텀 Confirm 모달 --%>
+<div class="wd-confirm-backdrop" id="wdConfirmBackdrop">
+    <div class="wd-confirm-box">
+        <div class="wd-confirm-icon"><i class="ri-logout-circle-r-line"></i></div>
+        <p class="wd-confirm-title">탈퇴 요청</p>
+        <p class="wd-confirm-desc">정말 탈퇴를 요청하시겠습니까?&#10;요청 후 관리자 승인 전까지 로그인이 제한됩니다.</p>
+        <div class="wd-confirm-btns">
+            <button class="wd-confirm-cancel" id="wdConfirmCancel">취소</button>
+            <button class="wd-confirm-ok"     id="wdConfirmOk">탈퇴 요청</button>
+        </div>
+    </div>
+</div>
 
 <script>
 var CTX         = '${pageContext.request.contextPath}';
 var CSRF_TOKEN  = document.querySelector('meta[name="_csrf"]').content;
 var CSRF_HEADER = document.querySelector('meta[name="_csrf_header"]').content;
 
-function showToast(msg, type) {
-    var t = document.getElementById('wdToast');
-    t.textContent = msg;
-    t.className   = 'wd-toast ' + (type || '');
-    t.classList.add('show');
-    setTimeout(function () { t.classList.remove('show'); }, 3000);
+/* ── 커스텀 Confirm ─────────────────────────── */
+var backdrop       = document.getElementById('wdConfirmBackdrop');
+var confirmCancelBtn = document.getElementById('wdConfirmCancel');
+var confirmOkBtn     = document.getElementById('wdConfirmOk');
+
+function openConfirm(onOk) {
+    backdrop.classList.add('show');
+    confirmOkBtn.onclick = function () {
+        closeConfirm();
+        onOk();
+    };
+}
+function closeConfirm() {
+    backdrop.classList.remove('show');
+}
+if (confirmCancelBtn) {
+    confirmCancelBtn.addEventListener('click', closeConfirm);
+}
+if (backdrop) {
+    backdrop.addEventListener('click', function (e) {
+        if (e.target === this) closeConfirm();
+    });
 }
 
+/* ── 탈퇴 요청 ──────────────────────────────── */
 var btn = document.getElementById('btnWithdrawSubmit');
 if (btn) {
     btn.addEventListener('click', function () {
-        if (btn.disabled) return;
-        if (!confirm('정말 탈퇴를 요청하시겠습니까?\n요청 후 관리자 승인 전까지 로그인이 제한됩니다.')) return;
+        openConfirm(function () {
+            var reason = document.getElementById('withdrawReason').value.trim();
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ri-loader-4-line"></i> 처리 중...';
 
-        var reason = document.getElementById('withdrawReason').value.trim();
-        btn.disabled = true;
-        btn.innerHTML = '<i class="ri-loader-4-line"></i> 처리 중...';
+            var headers = { 'Content-Type': 'application/json' };
+            headers[CSRF_HEADER] = CSRF_TOKEN;
 
-        var headers = { 'Content-Type': 'application/json' };
-        headers[CSRF_HEADER] = CSRF_TOKEN;
-
-        fetch(CTX + '/mypage/withdraw/request', {
-            method:  'POST',
-            headers: headers,
-            body:    JSON.stringify({ reason: reason })
-        })
-        .then(function (r) { return r.json(); })
-        .then(function (d) {
-            if (d.success) {
-                showToast('탈퇴 요청이 접수되었습니다. 관리자 검토 후 처리됩니다.', 'success');
-                setTimeout(function () {
-                    window.location.href = CTX + '/member/logout';
-                }, 2000);
-            } else {
-                showToast(d.msg || '오류가 발생했습니다.', 'error');
+            fetch(CTX + '/mypage/withdraw/request', {
+                method:  'POST',
+                headers: headers,
+                body:    JSON.stringify({ reason: reason })
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (d.success) {
+                    if (typeof showBatonToast === 'function') {
+                        showBatonToast('탈퇴 요청이 접수되었습니다. 관리자 검토 후 처리됩니다.');
+                    }
+                    setTimeout(function () {
+                        window.location.href = CTX + '/member/logout';
+                    }, 2000);
+                } else {
+                    if (typeof showBatonToast === 'function') {
+                        showBatonToast(d.msg || '오류가 발생했습니다.');
+                    }
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="ri-logout-circle-r-line"></i> 탈퇴 요청하기';
+                }
+            })
+            .catch(function () {
+                if (typeof showBatonToast === 'function') {
+                    showBatonToast('요청 중 오류가 발생했습니다.');
+                }
                 btn.disabled = false;
                 btn.innerHTML = '<i class="ri-logout-circle-r-line"></i> 탈퇴 요청하기';
-            }
-        })
-        .catch(function () {
-            showToast('요청 중 오류가 발생했습니다.', 'error');
-            btn.disabled = false;
-            btn.innerHTML = '<i class="ri-logout-circle-r-line"></i> 탈퇴 요청하기';
+            });
         });
     });
 }

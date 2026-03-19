@@ -143,23 +143,34 @@ public class MyPageController {
         return model;
     }
 
-    // 탈퇴 요청 페이지
+    // ── 탈퇴 요청 페이지 ────────────────────────────────────────
     @GetMapping("/withdraw")
-    public String withdrawPage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
-        long userIdx = userDetails.getUserIdx();
+    public String withdrawPage(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            Model model) {
+
+        long   userIdx   = userDetails.getUserIdx();
+        String authority = memberService.findByAuthority(userDetails.getUsername());
+
+        // 직원·관리자는 탈퇴 불가
+        boolean blocked = "ADMIN".equals(authority) || "EMP".equals(authority);
+        if (blocked) {
+            model.addAttribute("blockedByRole", true);
+            return "mypage/withdraw";
+        }
 
         boolean alreadyRequested = memberService.hasPendingWithdraw(userIdx);
-        int activeTrades         = memberService.countActiveTrades(userIdx);
-        int pendingReports       = memberService.countPendingReports(userIdx);
+        // 진행 중인 거래 건수만 정보 제공 (막지 않음 - 관리자가 최종 판단)
+        int activeTrades = memberService.countActiveTrades(userIdx);
 
         model.addAttribute("alreadyRequested", alreadyRequested);
         model.addAttribute("activeTrades",     activeTrades);
-        model.addAttribute("pendingReports",   pendingReports);
         model.addAttribute("userDto",          memberService.findById(userIdx));
 
         return "mypage/withdraw";
     }
 
+    // ── 탈퇴 요청 제출 (REST) ────────────────────────────────────
     @PostMapping("/withdraw/request")
     @ResponseBody
     public Map<String, Object> withdrawRequest(
@@ -168,21 +179,18 @@ public class MyPageController {
 
         Map<String, Object> result = new HashMap<>();
         try {
-            long userIdx = userDetails.getUserIdx();
+            long   userIdx   = userDetails.getUserIdx();
+            String authority = memberService.findByAuthority(userDetails.getUsername());
+
+            if ("ADMIN".equals(authority) || "EMP".equals(authority)) {
+                result.put("success", false);
+                result.put("msg", "관리자·직원 계정은 탈퇴 요청이 불가합니다. 운영팀에 문의해주세요.");
+                return result;
+            }
 
             if (memberService.hasPendingWithdraw(userIdx)) {
                 result.put("success", false);
                 result.put("msg", "이미 탈퇴 요청이 진행 중입니다.");
-                return result;
-            }
-            if (memberService.countActiveTrades(userIdx) > 0) {
-                result.put("success", false);
-                result.put("msg", "진행 중인 거래가 있어 탈퇴 요청이 불가합니다.");
-                return result;
-            }
-            if (memberService.countPendingReports(userIdx) > 0) {
-                result.put("success", false);
-                result.put("msg", "처리되지 않은 신고 내역이 있어 탈퇴 요청이 불가합니다.");
                 return result;
             }
 
