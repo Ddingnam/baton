@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/report/report-modal.css">
 <div id="reportModal" class="report-modal-overlay" style="display:none;">
     <div class="report-modal-sheet">
         <div class="report-modal-head">
@@ -70,6 +71,3 @@
         <input type="hidden" id="reportedUserIdx"       value="">
     </div>
 </div>
-<script src="${pageContext.request.contextPath}/dist/css/report/report-modal.css"></script>
-<script src="${pageContext.request.contextPath}/dist/js/report/report-modal.js"></script>
-

@@ -1,121 +1,84 @@
-(function () {
-    'use strict';
+function openReportModal(domainType, targetIdx, reportedUserIdx) {
+    document.getElementById('reportDomainType').value  = domainType;
+    document.getElementById('reportTargetIdx').value   = targetIdx;
+    document.getElementById('reportedUserIdx').value   = reportedUserIdx;
 
-    var currentReportIdx = null;
+    document.querySelectorAll('input[name="reportType"]').forEach(r => r.checked = false);
+    document.getElementById('reportContent').value = '';
+    document.getElementById('reportContentCount').textContent = '0';
 
-    var overlay      = document.getElementById('detailOverlay');
-    var detailClose  = document.getElementById('detailClose');
-    var detailCancel = document.getElementById('detailCancel');
+    const overlay = document.getElementById('reportModal');
+    overlay.style.display = 'flex';
+    overlay.onclick = function(e) {
+        if (e.target === overlay) closeReportModal();
+    };
+}
 
-    var dDomainType     = document.getElementById('dDomainType');
-    var dReportType     = document.getElementById('dReportType');
-    var dReporter       = document.getElementById('dReporter');
-    var dReportedUser   = document.getElementById('dReportedUser');
-    var dReportDate     = document.getElementById('dReportDate');
-    var dProcessStatus  = document.getElementById('dProcessStatus');
-    var dReportContent  = document.getElementById('dReportContent');
-    var dAdminMemo      = document.getElementById('dAdminMemo');
-    var detailFooter    = document.getElementById('detailFooter');
+function closeReportModal() {
+    document.getElementById('reportModal').style.display = 'none';
+}
 
-    var DOMAIN_LABEL = { TRADE: '중고거래', COMMUNITY: '커뮤니티', COMMUNITY_REPLY: '커뮤니티 댓글', ALBA: '알바구인', CHAT: '채팅', USER: '사용자' };
-    var STATUS_LABEL = { 0: '미처리', 1: '처리완료', 2: '반려' };
-    var STATUS_CLASS = { 0: 'tag-red', 1: 'tag-green', 2: 'tag-gray' };
-
-    function openDetail(reportIdx) {
-        currentReportIdx = reportIdx;
-
-        fetch(CTX + '/admin/report/detail?reportIdx=' + reportIdx)
-            .then(function (r) { return r.json(); })
-            .then(function (d) {
-                var domainLabel = DOMAIN_LABEL[d.domainType] || d.domainType;
-                var statusLabel = STATUS_LABEL[d.processStatus] || '-';
-                var statusClass = STATUS_CLASS[d.processStatus] || 'tag-gray';
-
-                document.getElementById('dReportIdx') && (document.getElementById('dReportIdx').textContent = '# ' + d.reportIdx);
-                dDomainType.innerHTML    = '<span class="tag ' + domainTagClass(d.domainType) + '">' + domainLabel + '</span>';
-                dReportType.innerHTML    = '<span class="rdm-reason-chip">' + (d.reportType || '-') + '</span>';
-                dReporter.textContent    = (d.reporterName || '-') + ' (' + (d.reporterId || '-') + ')';
-                dReportedUser.textContent = (d.reportedUserName || '-') + ' (' + (d.reportedUserId || '-') + ')';
-                dReportDate.textContent  = d.reportDate ? d.reportDate.substring(0, 16) : '-';
-                dProcessStatus.innerHTML = '<span class="tag ' + statusClass + '">' + statusLabel + '</span>';
-                dReportContent.textContent = d.reportContent || '내용 없음';
-                dAdminMemo.value         = d.adminMemo || '';
-
-                if (d.processStatus == 0) {
-                    detailFooter.style.display = '';
-                } else {
-                    detailFooter.querySelector('#btnProcess').style.display = 'none';
-                    detailFooter.querySelector('#btnReject').style.display  = 'none';
-                }
-
-                overlay.classList.add('show');
-            })
-            .catch(function () {
-                showToast('상세 정보를 불러오는데 실패했습니다.', 'error');
-            });
-    }
-    window.openDetail = openDetail;
-
-    function domainTagClass(type) {
-        if (type === 'TRADE')            return 'tag-blue';
-        if (type === 'COMMUNITY')        return 'tag-purple';
-        if (type === 'COMMUNITY_REPLY')  return 'tag-violet';
-        if (type === 'ALBA')             return 'tag-orange';
-        if (type === 'CHAT')             return 'tag-teal';
-        return 'tag-gray';
-    }
-
-    function submitProcess(status) {
-        if (!currentReportIdx) return;
-
-        var statusText = status === 1 ? '처리 완료' : '반려';
-        var memo = dAdminMemo.value.trim();
-
-        showConfirm({
-            type  : status === 1 ? 'info' : 'warning',
-            title : '신고 ' + statusText,
-            desc  : '이 신고를 [' + statusText + '] 처리하시겠습니까?',
-            okText: '확인',
-            onOk  : function () {
-                closeModal();
-                fetch(CTX + '/admin/report/process', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        reportIdx     : currentReportIdx,
-                        processStatus : status,
-                        adminMemo     : memo
-                    })
-                })
-                .then(function (r) { return r.json(); })
-                .then(function (d) {
-                    if (d.success) {
-                        showToast('신고가 ' + statusText + ' 처리되었습니다.', 'success');
-                        setTimeout(function () { location.reload(); }, 1000);
-                    } else {
-                        showToast('오류: ' + (d.msg || '처리에 실패했습니다.'), 'error');
-                    }
-                })
-                .catch(function () { showToast('요청 중 오류가 발생했습니다.', 'error'); });
-            }
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('reportContent');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            document.getElementById('reportContentCount').textContent = this.value.length;
         });
     }
-    window.submitProcess = submitProcess;
 
-    function closeModal() {
-        overlay.classList.remove('show');
-        currentReportIdx = null;
-        var btnProcess = document.getElementById('btnProcess');
-        var btnReject  = document.getElementById('btnReject');
-        if (btnProcess) btnProcess.style.display = '';
-        if (btnReject)  btnReject.style.display  = '';
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeReportModal();
+    });
+});
+
+function submitReport() {
+    const domainType      = document.getElementById('reportDomainType').value;
+    const targetIdx       = document.getElementById('reportTargetIdx').value;
+    const reportedUserIdx = document.getElementById('reportedUserIdx').value;
+    const reportContent   = document.getElementById('reportContent').value.trim();
+    const checkedType     = document.querySelector('input[name="reportType"]:checked');
+
+    if (!checkedType) {
+        alert('신고 사유를 선택해주세요.');
+        return;
     }
 
-    detailClose.addEventListener('click',  closeModal);
-    detailCancel.addEventListener('click', closeModal);
-    overlay.addEventListener('click', function (e) { if (e.target === this) closeModal(); });
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && overlay.classList.contains('show')) closeModal();
-    });
+    const btn = document.querySelector('.report-btn-submit');
+    btn.disabled = true;
+    btn.textContent = '접수 중...';
 
-})();
+    fetch(window.contextPath + '/report/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            domainType:      domainType,
+            targetIdx:       targetIdx,
+            reportedUserIdx: reportedUserIdx,
+            reportType:      checkedType.value,
+            reportContent:   reportContent
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        closeReportModal();
+        if (data.state === 'success') {
+            showBatonToast('신고가 접수되었습니다.');
+        } else if (data.state === 'duplicate') {
+            showBatonToast('이미 신고한 게시물입니다.');
+        } else if (data.state === 'selfReport') {
+            showBatonToast('본인을 신고할 수 없습니다.');
+        } else if (data.state === 'unauthorized') {
+            alert('로그인이 필요합니다.');
+        } else {
+            showBatonToast('신고 접수 중 오류가 발생했습니다.');
+        }
+    })
+    .catch(() => {
+        closeReportModal();
+        showBatonToast('네트워크 오류가 발생했습니다.');
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.textContent = '신고 접수';
+    });
+}

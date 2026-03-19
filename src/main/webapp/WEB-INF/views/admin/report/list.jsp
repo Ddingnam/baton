@@ -193,88 +193,64 @@
 
 <div class="fullscreen-overlay" id="detailOverlay">
     <div class="rpt-modal">
-        <!-- 헤더 -->
+
         <div class="rpt-modal-header">
-            <div class="rpt-modal-header-left">
-                <div class="rpt-header-icon">
-                    <i class="ri-alarm-warning-fill"></i>
-                </div>
-                <div>
-                    <p class="rpt-header-label">REPORT DETAIL</p>
-                    <h3 class="rpt-header-title">신고 상세 내역</h3>
-                </div>
+            <div class="rpt-header-left">
+                <div class="rpt-header-icon"><i class="ri-alarm-warning-fill"></i></div>
+                <span class="rpt-header-title">신고 상세</span>
             </div>
-            <button class="rpt-close-btn" id="detailClose">
-                <i class="ri-close-line"></i>
-            </button>
+            <button class="rpt-close-btn" id="detailClose"><i class="ri-close-line"></i></button>
         </div>
 
-        <!-- 메타 배지 영역 -->
-        <div class="rpt-meta-bar">
-            <span class="rpt-meta-item">
-                <span class="rpt-meta-label">신고 유형</span>
-                <span id="dDomainType"></span>
-            </span>
-            <span class="rpt-meta-sep"></span>
-            <span class="rpt-meta-item">
-                <span class="rpt-meta-label">처리 상태</span>
-                <span id="dProcessStatus"></span>
-            </span>
-            <span class="rpt-meta-sep"></span>
-            <span class="rpt-meta-item">
-                <span class="rpt-meta-label">신고일시</span>
-                <span class="rpt-meta-date" id="dReportDate"></span>
-            </span>
-        </div>
-
-        <!-- 바디 -->
         <div class="rpt-modal-body">
-            <!-- 사용자 행 -->
-            <div class="rpt-user-row">
-                <div class="rpt-user-card">
-                    <div class="rpt-user-avatar reporter"><i class="ri-user-line"></i></div>
-                    <div>
-                        <p class="rpt-user-role">신고자</p>
-                        <p class="rpt-user-name" id="dReporter">-</p>
-                    </div>
+
+            <div class="rpt-info-list">
+                <div class="rpt-info-row">
+                    <span class="rpt-info-key">신고 유형</span>
+                    <span class="rpt-info-val" id="dDomainType"></span>
                 </div>
-                <div class="rpt-arrow"><i class="ri-arrow-right-line"></i></div>
-                <div class="rpt-user-card">
-                    <div class="rpt-user-avatar reported"><i class="ri-user-forbid-line"></i></div>
-                    <div>
-                        <p class="rpt-user-role">피신고자</p>
-                        <p class="rpt-user-name" id="dReportedUser">-</p>
-                    </div>
+                <div class="rpt-info-row">
+                    <span class="rpt-info-key">처리 상태</span>
+                    <span class="rpt-info-val" id="dProcessStatus"></span>
+                </div>
+                <div class="rpt-info-row">
+                    <span class="rpt-info-key">신고 사유</span>
+                    <span class="rpt-info-val bold" id="dReportType"></span>
+                </div>
+                <div class="rpt-info-row">
+                    <span class="rpt-info-key">신고일시</span>
+                    <span class="rpt-info-val" id="dReportDate"></span>
+                </div>
+                <div class="rpt-info-row">
+                    <span class="rpt-info-key">신고자</span>
+                    <span class="rpt-info-val" id="dReporter"></span>
+                </div>
+                <div class="rpt-info-row">
+                    <span class="rpt-info-key">피신고자</span>
+                    <span class="rpt-info-val" id="dReportedUser"></span>
                 </div>
             </div>
 
-            <div class="rpt-section">
-                <span class="rpt-section-label"><i class="ri-error-warning-line"></i>신고 사유</span>
-                <span class="rpt-section-value" id="dReportType">-</span>
+            <div class="rpt-field">
+                <p class="rpt-field-label">신고 내용</p>
+                <div class="rpt-field-box" id="dReportContent">내용 없음</div>
             </div>
 
-            <div class="rpt-section">
-                <span class="rpt-section-label"><i class="ri-chat-3-line"></i>신고 내용</span>
-                <div class="rpt-content-box" id="dReportContent">내용 없음</div>
+            <div class="rpt-field">
+                <p class="rpt-field-label">관리자 메모</p>
+                <textarea class="rpt-textarea" id="dAdminMemo" rows="3" placeholder="처리 메모를 입력하세요"></textarea>
             </div>
 
-            <div class="rpt-section">
-                <span class="rpt-section-label"><i class="ri-edit-line"></i>관리자 메모</span>
-                <textarea class="fm-input" id="dAdminMemo" rows="3" placeholder="처리 메모를 입력하세요"></textarea>
-            </div>
         </div>
 
-        <!-- 푸터 -->
         <div class="rpt-modal-footer" id="detailFooter">
-            <button class="rpt-btn-cancel" id="detailCancel">
-                닫기
-            </button>
+            <button class="rpt-btn-cancel" id="detailCancel">닫기</button>
             <div class="rpt-footer-actions">
                 <button class="rpt-btn-reject" id="btnReject" onclick="submitProcess(2)">
-                    <i class="ri-close-circle-line"></i> 반려
+                    <i class="ri-close-line"></i> 반려
                 </button>
                 <button class="rpt-btn-approve" id="btnProcess" onclick="submitProcess(1)">
-                    <i class="ri-check-double-line"></i> 처리 완료
+                    <i class="ri-check-line"></i> 처리 완료
                 </button>
             </div>
         </div>
