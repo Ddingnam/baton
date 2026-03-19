@@ -223,8 +223,7 @@
 
 		</div>
 	</main>
-
-	<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
+<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 
 
 <script>
@@ -255,145 +254,24 @@ const serverData = [
 </c:forEach>
 ];
 </script>
+
 <script src="${pageContext.request.contextPath}/dist/js/alba/alba-list.js"></script>
 
 <script>
-const REGION_API_URL = "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes";
-
 document.addEventListener('DOMContentLoaded', function() {
-    loadFilterSido(() => {
-        if (myRegion && myRegion.sido) {
-            applyAreaFilterAuto(
-                myRegion.sido,
-                myRegion.gugun,
-                myRegion.dong
-            );
-        }
-    });
+
+    // 👉 페이지 첫 렌더 (전체 데이터)
+    setTimeout(applyFilters, 50);
+
+    // 👉 로그인된 유저면 자동 지역 필터
+    if (myRegion && myRegion.sido) {
+        applyAreaFilterAuto(
+            myRegion.sido,
+            myRegion.gugun,
+            myRegion.dong
+        );
+    }
 });
-
-function loadFilterSido(callback) {
-    fetch(REGION_API_URL + "?regcode_pattern=*00000000")
-        .then(response => response.json())
-        .then(data => {
-            const sidoUl = document.getElementById('col-sido');
-            sidoUl.innerHTML = ""; 
-            
-            const validData = data.regcodes.filter(code => code.name.split(" ").length === 1);
-            
-            validData.forEach(item => {
-                const li = document.createElement('li');
-                li.innerText = item.name;
-                li.dataset.name = item.name;
-
-                li.onclick = function() {
-                    document.querySelectorAll('#col-sido li').forEach(el => el.classList.remove('active'));
-                    this.classList.add('active');
-
-                    document.getElementById('col-gugun').innerHTML = "";
-                    document.getElementById('col-dong').innerHTML = "";
-
-                    loadFilterGugun(item.code);
-                };
-
-                sidoUl.appendChild(li);
-            });
-
-            if (callback) callback();
-        });
-}
-
-function loadFilterGugun(sidoCode) {
-    const pattern = sidoCode.substring(0, 2) + "*00000";
-    fetch(REGION_API_URL + "?regcode_pattern=" + pattern + "&is_ignore_zero=true")
-        .then(response => response.json())
-        .then(data => {
-            const gugunUl = document.getElementById('col-gugun');
-            gugunUl.innerHTML = "";
-            
-            const filteredData = data.regcodes.filter(item => item.code !== sidoCode);
-            
-            filteredData.forEach(item => {
-                const nameParts = item.name.split(" ");
-                const gugunName = nameParts.slice(1).join(" ");
-                
-                const li = document.createElement('li');
-                li.innerText = gugunName;
-                li.dataset.name = gugunName;
-
-                li.onclick = function() {
-                    document.querySelectorAll('#col-gugun li').forEach(el => el.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    document.getElementById('col-dong').innerHTML = "";
-                    loadFilterDong(item.code);
-                };
-
-                gugunUl.appendChild(li);
-            });
-        });
-}
-
-function loadFilterDong(gugunCode) {
-    const pattern = gugunCode.substring(0, 4) + "*&is_ignore_zero=true";
-    fetch(REGION_API_URL + "?regcode_pattern=" + pattern)
-        .then(response => response.json())
-        .then(data => {
-            const dongUl = document.getElementById('col-dong');
-            dongUl.innerHTML = "";
-            dongUl.classList.remove('empty');
-            
-            const filteredData = data.regcodes.filter(item => item.code !== gugunCode);
-            
-            filteredData.forEach(item => {
-                const nameParts = item.name.split(" ");
-                const dongName = nameParts[nameParts.length - 1];
-                
-                const li = document.createElement('li');
-                li.innerText = dongName;
-                li.dataset.name = dongName;
-
-                li.onclick = function() {
-                    document.querySelectorAll('#col-dong li').forEach(el => el.classList.remove('active'));
-                    this.classList.add('active');
-                };
-
-                dongUl.appendChild(li);
-            });
-        });
-}
-
-function applyAreaFilterAuto(sido, gugun, dong) {
-    const sidoList = document.querySelectorAll('#col-sido li');
-
-    sidoList.forEach(li => {
-        if (li.dataset.name === sido) {
-            li.click();
-
-            setTimeout(() => {
-                const gugunList = document.querySelectorAll('#col-gugun li');
-
-                gugunList.forEach(gli => {
-                    if (gli.dataset.name === gugun) {
-                        gli.click();
-
-                        setTimeout(() => {
-                            const dongList = document.querySelectorAll('#col-dong li');
-
-                            dongList.forEach(dli => {
-                                if (dli.dataset.name === dong) {
-                                    dli.click();
-                                }
-                            });
-
-                        }, 200);
-                    }
-                });
-
-            }, 200);
-        }
-    });
-}
 </script>
 </body>
 </html>

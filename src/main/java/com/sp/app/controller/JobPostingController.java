@@ -176,10 +176,9 @@ public class JobPostingController {
 		return postingService.listPostingByArea(map);
 	}
 
-	// 요일 변환 함수 수정 (기본값 제거)
 	private String convertToKoreanDays(String days) {
 		if (days == null || days.trim().isEmpty())
-			return ""; // 협의 텍스트 제거
+			return ""; 
 
 		String[] dayArr = days.split(",");
 		String[] korNames = { "", "월", "화", "수", "목", "금", "토", "일" };

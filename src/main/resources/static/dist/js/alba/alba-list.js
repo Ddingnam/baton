@@ -1,3 +1,5 @@
+
+const API_BASE_URL = "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes";
 const CAT_MAP = {
 	'서빙': '서빙',
 	'주방보조': '주방보조',
@@ -157,57 +159,92 @@ const areaData = {
 };
 
 function loadGugunData(sidoName) {
-	const gugunList = document.getElementById('col-gugun');
-	const dongList = document.getElementById('col-dong');
 
-	gugunList.innerHTML = '';
-	dongList.innerHTML = '';
+    const gugunList = document.getElementById('col-gugun');
+    const dongList = document.getElementById('col-dong');
 
-	const guguns = areaData[sidoName] || [`${sidoName} 전체`];
+    gugunList.innerHTML = '';
+    dongList.innerHTML = '';
 
-	guguns.forEach(gugun => {
-		const li = document.createElement('li');
-		li.textContent = gugun;
-		gugunList.appendChild(li);
-	});
+    // 👉 시도 코드 찾기 (regionAuth처럼)
+    fetch(API_BASE_URL + "?regcode_pattern=*00000000")
+        .then(res => res.json())
+        .then(data => {
 
-	gugunList.scrollTop = 0;
+            const sidoObj = data.regcodes.find(r => r.name.startsWith(sidoName));
+            if (!sidoObj) return;
+
+            const pattern = sidoObj.code.substring(0, 2) + "*00000";
+
+            return fetch(API_BASE_URL + "?regcode_pattern=" + pattern + "&is_ignore_zero=true");
+        })
+        .then(res => res.json())
+        .then(data => {
+
+            data.regcodes.forEach(item => {
+
+                const nameParts = item.name.split(" ");
+                const gugunName = nameParts.slice(1).join(" ");
+
+                const li = document.createElement('li');
+                li.textContent = gugunName;
+
+                // ⭐ 핵심
+                li.dataset.code = item.code;
+
+                gugunList.appendChild(li);
+            });
+
+        })
+        .catch(err => console.error(err));
 }
 
 function loadDongData(gugunName) {
     const dongList = document.getElementById('col-dong');
     if (!dongList) return;
 
-    // "전체"를 클릭한 경우
-    if (gugunName.includes('전체')) {
-        dongList.innerHTML = '<li class="all-selected">해당 지역 전체가 선택되었습니다.</li>';
-        dongList.classList.add('empty'); // 필요에 따라 스타일 조절
-        return; 
-    }
-
-    dongList.innerHTML = '<li>불러오는 중...</li>';
-    dongList.classList.remove('empty');
-
     const sido = document.querySelector('#col-sido li.active')?.textContent || '';
 
-    // fetch 호출... (기존 코드 유지)
-    fetch(`${CONTEXT_PATH}/alba/dong?sido=${sido}&gugun=${gugunName}`)
+    // 👉 행정안전부 API용 코드 찾기
+    const gugunCode = window.selectedGugunCode;
+	if (!gugunCode) {
+	    console.log("❌ 구군 코드 없음");
+	    return;
+	}
+
+    const pattern = gugunCode.substring(0, 4) + "*&is_ignore_zero=true";
+
+    fetch(API_BASE_URL + "?regcode_pattern=" + pattern)
         .then(res => res.json())
-        .then(list => {
+        .then(data => {
             dongList.innerHTML = '';
-            if (!list || list.length === 0) {
+
+            const filtered = data.regcodes.filter(item => item.code !== gugunCode);
+
+            if (!filtered.length) {
                 dongList.innerHTML = '<li>검색 결과 없음</li>';
                 return;
             }
-            list.forEach(dong => {
+
+            filtered.forEach(item => {
+                const nameParts = item.name.split(" ");
+                const dongName = nameParts[nameParts.length - 1];
+
                 const li = document.createElement('li');
-                li.textContent = dong;
+                li.textContent = dongName;
+
+                li.onclick = function() {
+                    document.querySelectorAll('#col-dong li').forEach(el => el.classList.remove('active'));
+                    this.classList.add('active');
+                    applyAreaFilter();
+                };
+
                 dongList.appendChild(li);
             });
         })
         .catch(err => {
             console.error(err);
-            dongList.innerHTML = '<li>데이터 로드 실패</li>';
+            dongList.innerHTML = '<li>로드 실패</li>';
         });
 }
 
@@ -236,8 +273,8 @@ function setupColumnSelection(colId) {
 				loadGugunData(selectedText);
 			}
 			else if (colId === 'col-gugun') {
-				loadDongData(selectedText);
-				applyAreaFilter();
+			    window.selectedGugunCode = e.target.dataset.code; // 👈 이거 추가
+			    loadDongData(selectedText);
 			}
 			else if (colId === 'col-dong') {
 				applyAreaFilter();
@@ -346,67 +383,52 @@ function applyAreaFilter() {
 		.catch(err => console.error(err));
 }
 
-function applyAreaFilterAuto(sido, gugun, dong) {
-	
-	sido = normalizeSido(sido);
-	console.log("변환 후 sido:", sido);
-    fetch(`${CONTEXT_PATH}/alba/filter?sido=${sido}&gugun=${gugun}&dong=${dong}`)
-        .then(res => res.json())
-        .then(data => {
-            filteredJobs = data.map(job => ({
-                postingIdx: job.postingIdx,
-                title: job.title,
-                employer: job.employer || '업체명',
-                payType: job.payType,
-                pay: job.pay || 0,
-                location: job.location,
-                createdDate: job.createdDate,
-                workPeriod: job.workPeriod,
-                category: job.category,
-                startTime: job.startTime,
-                endTime: job.endTime
-            }));
+async function applyAreaFilterAuto(sido, gugun, dong) {
 
-            currentPage = 1;
-            const rc = document.getElementById('resultCount');
-            if (rc) rc.textContent = filteredJobs.length;
+    sido = normalizeSido(sido);
 
-            renderCurrentPage();
-            renderPagination();
-        })
-        .catch(err => console.error(err));
+    // 1. 서버 필터
+    const res = await fetch(`${CONTEXT_PATH}/alba/filter?sido=${sido}&gugun=${gugun}&dong=${dong}`);
+    const data = await res.json();
 
-    // 2. 필터 모달창 UI (시/도, 구/군, 동) 선택 상태 동기화
-    const sidoList = document.querySelectorAll('#col-sido li');
-	sidoList.forEach(li => {
-		li.classList.remove('active');
-	    
-    });
+    filteredJobs = data;
+    renderCurrentPage();
+    renderPagination();
 
-    // 구/군이 렌더링될 시간을 살짝 준 뒤 세팅
-    setTimeout(() => {
-        const gugunList = document.querySelectorAll('#col-gugun li');
-        let matchedGugun = '';
-        gugunList.forEach(li => {
-            li.classList.remove('active');
-            if (gugun.includes(li.textContent) || li.textContent.includes(gugun)) {
-                li.classList.add('active');
-                matchedGugun = li.textContent;
-                loadDongData(matchedGugun); // 동 데이터 로드 (비동기)
+    // 2. 시도 클릭
+    const sidoEl = [...document.querySelectorAll('#col-sido li')]
+        .find(li => li.textContent.includes(sido));
+
+    if (!sidoEl) return;
+    sidoEl.click();
+
+    // 👉 구군 로딩 기다림
+    await waitForElement('#col-gugun li');
+
+    const gugunEl = [...document.querySelectorAll('#col-gugun li')]
+        .find(li => li.textContent.includes(gugun));
+
+    if (!gugunEl) return;
+    gugunEl.click();
+
+    // 👉 동 로딩 기다림
+    await waitForElement('#col-dong li');
+
+    const dongEl = [...document.querySelectorAll('#col-dong li')]
+        .find(li => li.textContent.includes(dong));
+
+    if (dongEl) dongEl.click();
+}
+
+function waitForElement(selector) {
+    return new Promise(resolve => {
+        const interval = setInterval(() => {
+            if (document.querySelector(selector)) {
+                clearInterval(interval);
+                resolve();
             }
-        });
-
-        // 동/읍/면이 비동기로 렌더링될 시간을 준 뒤 세팅
-        setTimeout(() => {
-            const dongList = document.querySelectorAll('#col-dong li');
-            dongList.forEach(li => {
-                li.classList.remove('active');
-                if (dong.includes(li.textContent) || li.textContent.includes(dong)) {
-                    li.classList.add('active');
-                }
-            });
-        }, 300); 
-    }, 100);
+        }, 50);
+    });
 }
 
 function normalizeSido(sido) {
