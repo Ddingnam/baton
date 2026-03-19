@@ -45,7 +45,7 @@
                                 <div class="profile-thumb">
                                     <i class="ri-user-smile-fill"></i>
                                 </div>
-                                <span class="user-name"><sec:authentication property="principal.member.userId" />님</span>
+                                <span class="user-name"><sec:authentication property="principal.member.nickname" />님</span>
                                 <i class="ri-arrow-down-s-line dropdown-arrow"></i>
                             </button>
 
@@ -54,7 +54,7 @@
                                 <div class="dropdown-header">
                                     <div class="dh-thumb"><i class="ri-user-smile-fill"></i></div>
                                     <div class="dh-info">
-                                        <strong><sec:authentication property="principal.member.userId" /></strong>
+                                        <strong><sec:authentication property="principal.member.nickname" /></strong>
                                         <span>환영합니다!</span>
                                     </div>
                                 </div>

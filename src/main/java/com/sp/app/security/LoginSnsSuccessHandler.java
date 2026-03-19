@@ -34,6 +34,7 @@ public class LoginSnsSuccessHandler {
 					.userIdx(dto.getUserIdx())
 					.userId(dto.getUserId())
 					.name(dto.getName())
+					.nickname(dto.getNickname())
 					.email(dto.getEmail())
 					.userLevel(NumericRoleGranted.getUserLevel("USER"))					
 					.login_type(dto.getProvider())

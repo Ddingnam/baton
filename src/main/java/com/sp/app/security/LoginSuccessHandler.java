@@ -83,6 +83,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 			info.setUserIdx(dto2.getUserIdx());
 			info.setUserId(dto2.getUserId());
 			info.setName(dto2.getName());
+			info.setNickname(dto2.getNickname());
 			info.setEmail(dto2.getEmail());
 			info.setUserLevel(dto2.getUserLevel());
 			info.setAvatar(dto2.getProfile_photo());

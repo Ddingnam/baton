@@ -17,6 +17,7 @@ public class SessionInfo {
 	private String userId;
 	private String pwd;
 	private String name;
+	private String nickname;
 	private String email;
 	private int userLevel;
 	private String login_type; // local, kakao, naver, google

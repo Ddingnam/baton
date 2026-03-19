@@ -48,6 +48,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 				.userId(member.getUserId())
 				.pwd(member.getPwd())
 				.name(member.getName())
+				.nickname(member.getNickname())
 				.email(member.getEmail())
 				.userLevel(NumericRoleGranted.getUserLevel(authority != null ? authority : "USER"))
 				.avatar(member.getProfile_photo())
