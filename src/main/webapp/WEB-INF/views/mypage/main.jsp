@@ -30,11 +30,11 @@
 				<div class="pb-left">
 					<div class="pb-avatar"><i class="ri-user-smile-fill"></i></div>
 					<div class="pb-info">
-						<h2 class="pb-name">${sessionScope.member.name != null ? sessionScope.member.name : '박바통'} 님</h2>
-						<span class="pb-desc">서초4동 · 매너온도 <strong class="theme-text">36.5℃</strong></span>
+						<h2 class="pb-name">${userDto.nickname} 님</h2>
+						<span class="pb-desc">${region.dong} · 매너온도 <strong class="theme-text">${userDto.score}℃</strong></span>
 						<div class="manner-bar-wrap">
 							<div class="manner-bar-bg">
-								<div class="manner-bar-fill theme-bg" style="width: 36.5%"></div>
+								<div class="manner-bar-fill theme-bg" style="width: ${userDto.score}%"></div>
 							</div>
 						</div>
 					</div>
@@ -55,10 +55,10 @@
 				<div class="mp-tab-container">
 					<ul class="mp-tabs" id="domain-tabs">
 						<li class="tab-item active" data-target="sec-overview"   data-color="#3182F6" data-bg="#E8F3FF">종합 요약</li>
-						<li class="tab-item"         data-target="sec-trade"     data-color="#00B98D" data-bg="#E6F8F3">중고거래</li>
-						<li class="tab-item"         data-target="sec-club"      data-color="#F86D7D" data-bg="#FFF0F1">동네모임</li>
-						<li class="tab-item"         data-target="sec-alba"      data-color="#002C5F" data-bg="#F0F4F8">알바구인</li>
-						<li class="tab-item"         data-target="sec-community" data-color="#8A63FF" data-bg="#F4F0FF">커뮤니티</li>
+						<li class="tab-item" data-target="sec-trade" data-color="#00B98D" data-bg="#E6F8F3">중고거래</li>
+						<li class="tab-item" data-target="sec-club" data-color="#F86D7D" data-bg="#FFF0F1">동네모임</li>
+						<li class="tab-item" data-target="sec-alba" data-color="#002C5F" data-bg="#F0F4F8">알바구인</li>
+						<li class="tab-item" data-target="sec-community" data-color="#8A63FF" data-bg="#F4F0FF">커뮤니티</li>
 					</ul>
 				</div>
 
