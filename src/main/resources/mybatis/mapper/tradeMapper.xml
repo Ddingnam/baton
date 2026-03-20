@@ -96,7 +96,7 @@
 				AND (tradeStatus != '임시저장')
 			</when>
 			<otherwise>
-				AND tradeStatus IN ('판매완료', '판매중', '예약중')
+				AND tradeStatus IN ('판매완료', '판매중', '예약중', '숨기기')
 			</otherwise>
 		</choose>
 		ORDER BY lastUpDate DESC

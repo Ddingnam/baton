@@ -25,10 +25,8 @@
 
         <div class="ta-left">
 
-            <%-- 갤러리 + 상품정보 + 설명 + 거래정보 = 하나의 흰 카드 --%>
             <div class="ta-main-card">
 
-                <%-- 갤러리 --%>
                 <div class="ta-img-main">
                     <c:choose>
                         <c:when test="${not empty imageList}">
@@ -63,7 +61,6 @@
                     </div>
                 </c:if>
 
-                <%-- 상품 정보 --%>
                 <div class="ta-product-info">
                     <div class="ta-badges">
                         <c:if test="${not empty trade.categoryName}">
@@ -96,13 +93,11 @@
                     </c:if>
                 </div>
 
-                <%-- 상품 설명 --%>
                 <div class="ta-inner-section">
                     <h2 class="ta-section-title">상품 설명</h2>
                     <p class="ta-desc">${trade.content}</p>
                 </div>
 
-                <%-- 거래 정보 --%>
                 <div class="ta-inner-section">
                     <h2 class="ta-section-title">거래 정보</h2>
                     <div class="ta-info-grid">
@@ -160,7 +155,7 @@
                     </div>
                 </div>
 
-            </div><%-- /ta-main-card --%>
+            </div>
 
         </div>
 
@@ -286,8 +281,8 @@
                         <div class="ta-owner-section">
                             <p class="ta-owner-label">게시글 관리</p>
                             <div class="ta-owner-grid">
-                                <button type="button" class="btn-manage status-style" onclick="StatusModule.open()"><i class="ri-loop-left-line"></i> 상태 변경</button>
-                                <button type="button" class="btn-manage pull-style" onclick="PullUpModule.execute(${trade.productIdx})"><i class="ri-rocket-2-line"></i> 끌어올리기</button>
+                                <button type="button" class="btn-manage status-style ${trade.tradeStatus == '판매완료' ? 'disabled-style' : ''}" onclick="StatusModule.open()"><i class="ri-loop-left-line"></i> 상태 변경</button>
+                                <button type="button" class="btn-manage pull-style ${trade.tradeStatus == '판매완료' ? 'disabled-style' : ''}" onclick="PullUpModule.execute(${trade.productIdx})"><i class="ri-rocket-2-line"></i> 끌어올리기</button>
                                 <c:choose>
                                     <c:when test="${trade.tradeStatus == '판매완료'}">
                                         <button type="button" class="btn-manage edit-style disabled-style" onclick="showBatonToast('판매 완료된 게시글은 수정할 수 없습니다.')"><i class="ri-edit-line"></i> 수정</button>
@@ -319,6 +314,7 @@
     data-trade-idx="${trade.productIdx}"
     data-wished="${isLiked}"
     data-wish-count="${trade.likeCount}"
+    data-trade-status="${trade.tradeStatus}"
     data-lat="${trade.latitude}"
     data-lng="${trade.longitude}"
     style="display:none">
@@ -328,12 +324,34 @@
     <div class="modal-content" onclick="event.stopPropagation()">
         <div class="modal-header">
             <h3>상태 변경</h3>
-            <button type="button" class="close-modal" onclick="StatusModule.close()"><i class="ri-close-line"></i></button>
+            <button type="button" class="close-modal" onclick="StatusModule.close()">
+                <i class="ri-close-line"></i>
+            </button>
         </div>
         <div class="status-options">
-            <button type="button" class="status-opt ${trade.tradeStatus == '판매중' ? 'active' : ''}" onclick="StatusModule.update('${trade.productIdx}', '판매중')">판매 중</button>
-            <button type="button" class="status-opt ${trade.tradeStatus == '예약중' ? 'active' : ''}" onclick="StatusModule.update('${trade.productIdx}', '예약중')">예약 중</button>
-            <button type="button" class="status-opt ${trade.tradeStatus == '숨기기' ? 'active' : 'hide-opt'}" onclick="StatusModule.update('${trade.productIdx}', '숨기기')">숨기기</button>
+            <button type="button" 
+                class="status-opt ${trade.tradeStatus == '판매중' ? 'active' : ''}" 
+                onclick="StatusModule.update('${trade.productIdx}', '판매중')">
+                판매중
+            </button>
+            
+            <button type="button" 
+                class="status-opt ${trade.tradeStatus == '예약중' ? 'active' : ''}" 
+                onclick="StatusModule.update('${trade.productIdx}', '예약중')">
+                예약중
+            </button>
+            
+            <button type="button" 
+                class="status-opt sold-out-opt ${trade.tradeStatus == '판매완료' ? 'active' : ''}" 
+                onclick="StatusModule.update('${trade.productIdx}', '판매완료')">
+                판매완료
+            </button>
+            <hr>
+            <button type="button" 
+                class="status-opt hide-opt ${trade.tradeStatus == '숨기기' ? 'active' : ''}" 
+                onclick="StatusModule.update('${trade.productIdx}', '숨기기')">
+                숨기기
+            </button>
         </div>
     </div>
 </div>

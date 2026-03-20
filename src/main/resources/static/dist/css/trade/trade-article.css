@@ -415,7 +415,11 @@ a { text-decoration: none; color: inherit; }
     cursor: pointer; transition: all 0.15s; font-family: inherit; color: var(--text-sub);
 }
 .status-opt:hover { background: var(--bg-color); }
-.status-opt.active { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+.status-opt.active { 
+	border-color: var(--primary); 
+	color: var(--primary); 
+	background: var(--primary-light); 
+}
 .status-opt.hide-opt { color: var(--text-light); }
 
 #shippingModal { align-items: center; }

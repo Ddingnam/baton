@@ -250,12 +250,21 @@ const ShareModule = (function () {
 
 const StatusModule = (function () {
     const getModal = () => document.getElementById('statusModal');
+	
 
     function open() {
+		const articleData = document.getElementById('articleData');
+		const currentStatus = articleData ? articleData.dataset.tradeStatus : '';
+	
+		if (currentStatus === '판매완료') {
+			showBatonToast("판매 완료된 상품은 상태를 변경할 수 없습니다.");
+			return;
+		}
+		
         const modal = getModal();
         if (modal) {
-            modal.classList.add('open');
-            document.body.style.overflow = 'hidden';
+			modal.classList.add('open');
+			document.body.style.overflow = 'hidden';
         }
     }
 
@@ -267,42 +276,55 @@ const StatusModule = (function () {
         }
     }
 
-    function update(productIdx, tradeStatus) {
-        const params = new URLSearchParams();
-        params.append('productIdx', productIdx);
-        params.append('tradeStatus', tradeStatus);
+	function update(productIdx, tradeStatus) {
+		const params = new URLSearchParams();
+		params.append('productIdx', productIdx);
+		params.append('tradeStatus', tradeStatus);
 
-        fetch(`${window.location.origin}/trade/updateStatus`, {
-            method: 'POST',
-            body: params
-        })
-        .then(() => {
-            close();
+		fetch(`${window.location.origin}/trade/updateStatus`, {
+			method: 'POST',
+			body: params
+		})
+		.then(() => {
+			close();
 
-            const msg = tradeStatus === '숨기기' 
-                        ? '게시글이 숨김 처리되었습니다. 목록으로 이동합니다.' 
-                        : `상품 상태가 [${tradeStatus}]로 변경되었습니다.`;
-            showBatonToast(msg);
+			let msg = `상품 상태가 [${tradeStatus}]로 변경되었습니다.`;
+	            
+			if (tradeStatus === '숨기기') {
+				msg = '게시글이 숨김 처리되었습니다. 목록으로 이동합니다.';
+			} else if (tradeStatus === '판매완료') {
+				msg = '🎉 판매가 완료되었습니다! 상태가 변경되었습니다.';
+			}
 
-            setTimeout(() => {
-                if (tradeStatus === '숨기기') {
-                    location.href = '/trade/list'; 
-                } else {
-                    location.reload();
-                }
-            }, 1200);
-        })
-        .catch(err => {
-            console.error("통신 실패:", err);
-            showBatonToast("상태 변경 중 오류가 발생했습니다.");
-        });
-    }
+	        showBatonToast(msg);
+
+	        setTimeout(() => {
+	            if (tradeStatus === '숨기기') {
+	            	location.href = '/trade/list'; 
+	            } else {
+	                location.reload();
+	            }
+	        }, 1200);
+		})
+		.catch(err => {
+			console.error("통신 실패:", err);
+			showBatonToast("상태 변경 중 오류가 발생했습니다.");
+		});
+	}
 
     return { open, close, update };
 })();
 
 const PullUpModule = (function () {
     function execute(productIdx) {
+		const articleData = document.getElementById('articleData');
+		const currentStatus = articleData ? articleData.dataset.tradeStatus : '';
+
+		if (currentStatus === '판매완료') {
+			showBatonToast("판매 완료된 상품은 끌어올리기를 할 수 없습니다.");
+			return; 
+		}
+		
         if (!confirm('🚀 이 게시글을 목록 맨 위로 올리시겠습니까?')) return;
 
         const params = new URLSearchParams();
