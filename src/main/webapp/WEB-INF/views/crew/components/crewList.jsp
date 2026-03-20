@@ -32,17 +32,12 @@
                             <div class="cl-filter-group">
                                 <button class="cl-filter-btn active">전체</button>
                                 <button class="cl-filter-btn">스터디</button>
-                                <button class="cl-filter-btn">독서</button>
                                 <button class="cl-filter-btn">운동</button>
-                                <button class="cl-filter-btn">여행</button>
-                                <button class="cl-filter-btn">취미/게임</button>
-                                <button class="cl-filter-btn">문화/예술</button>
-                                <button class="cl-filter-btn">맛집/카페</button>
-                                <button class="cl-filter-btn">가족/육아</button>
                                 <button class="cl-filter-btn">반려동물</button>
                                 <button class="cl-filter-btn">자기계발</button>
-                                <button class="cl-filter-btn">코딩/IT</button>
+                                <button class="cl-filter-btn">취미/게임</button>
                                 <button class="cl-filter-btn">경제/재테크</button>
+                                <button class="cl-filter-btn">맛집/카페</button>
                                 <button class="cl-filter-btn">기타</button>
                             </div>
                         </div>
@@ -69,56 +64,64 @@
                 </div>
             </div>
 
-            <div class="cl-grid-container">
-                <c:forEach var="i" begin="1" end="6">
-                    <div class="cl-card" @click="$router.push('/article/${i}')">
-                        <div class="cl-image-section">
-                            <div class="cl-thumbnail no-img">
-                                <i class="ri-image-line"></i>
+            <div class="cl-grid-container" v-if="crews.length > 0">
+                <div class="cl-card" v-for="crew in crews" :key="crew.crewIdx" @click="$router.push('/article/' + crew.crewIdx)">
+                    <div class="cl-image-section">
+                        <div class="cl-thumbnail no-img">
+                        </div>
+                        <div class="cl-badge-wrapper">
+                            <span class="cl-status-badge recruiting">모집중</span>
+                        </div>
+                        <button class="cl-wish-btn" @click.stop="toggleWish(crew.crewIdx)">
+                            <i class="ri-heart-fill"></i>
+                        </button>
+                        <div class="cl-host-profile">
+						    <div class="cl-host-img">
+						        <template v-if="crew.logoImage">
+						            <img :src="'/uploads/crew/' + crew.logoImage" :alt="crew.crewName" loading="lazy">
+						        </template>
+						        <template v-else>
+						            <i class="ri-user-fill"></i>
+						        </template>
+						    </div>
+						</div>
+                    </div>
+
+                    <div class="cl-content-section">
+                        <h3 class="cl-title">{{ crew.name }}</h3>
+                        <div class="cl-meta-top">
+                            <span class="cl-region" v-if="crew.regions && crew.regions.length > 0">
+                                {{ crew.regions[0].sido }} {{ crew.regions[0].sigungu }}
+                            </span> 
+                            <span class="cl-date-dot"></span>
+                            <span class="cl-created-date">개설 {{ crew.createdDate }}</span>
+                        </div>
+                        <div class="cl-tags">
+                            <span v-for="(cat, idx) in crew.categories" :key="idx">{{ cat.name }}</span>
+                        </div>
+                        <div class="cl-member-status">
+                            <div class="cl-member-count">
+                                <strong>{{ crew.currentMember || 0 }}</strong><span> / {{ crew.maxMember }}명 참여중</span>
                             </div>
-                            <div class="cl-badge-wrapper">
-                                <span class="cl-status-badge recruiting">모집중</span>
-                            </div>
-                            <button class="cl-wish-btn" @click.stop="toggleWish(${i})">
-                                <i class="ri-heart-fill"></i>
-                            </button>
-                            <div class="cl-host-profile">
-                                <div class="cl-host-img">
-                                    <i class="ri-user-fill"></i>
-                                </div>
+                            <div class="cl-progress-bg">
+                                <div class="cl-progress-fill" :style="{ width: (crew.currentMember / crew.maxMember * 100) + '%' }"></div>
                             </div>
                         </div>
-
-                        <div class="cl-content-section">
-                            <h3 class="cl-title">한강 야간 러닝 크루 '비상'</h3>
-                            <div class="cl-meta-top">
-                                <span class="cl-region">서울 강남구</span> 
-                                <span class="cl-date-dot"></span>
-                                <span class="cl-created-date">개설 2024.03.12</span>
-                            </div>
-                            <div class="cl-tags">
-                                <span>#러닝</span><span>#초보환영</span><span>#오운완</span>
-                            </div>
-                            <div class="cl-member-status">
-                                <div class="cl-member-count">
-                                    <strong>12</strong><span> / 20명</span>
-                                </div>
-                                <div class="cl-progress-bg">
-                                    <div class="cl-progress-fill" style="width: 60%;"></div>
-                                </div>
-                            </div>
-                            <div class="cl-footer">
-                                <span class="cl-host-name">런닝조아</span>
-                                <div class="cl-activity">
-                                    <i class="ri-flashlight-line"></i> 방금 전 활동
-                                </div>
+                        <div class="cl-footer">
+                            <span class="cl-host-name">{{ crew.hostNickname || '크루장' }}</span>
+                            <div class="cl-activity">
+                                <i class="ri-flashlight-line"></i> 방금 전 활동
                             </div>
                         </div>
                     </div>
-                </c:forEach>
+                </div>
+            </div>
+            
+            <div v-else class="cl-empty-state">
+                <p>현재 등록된 크루가 없습니다.</p>
             </div>
 
-            <div class="cl-pagination-container">${paging}</div>
+            <div class="cl-pagination-container" v-if="totalCount > 0">${paging}</div>
         </div>
     </div>
 </template>

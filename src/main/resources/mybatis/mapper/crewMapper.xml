@@ -80,16 +80,36 @@
 	    WHERE crewIdx = #{crewIdx}
 	</select>
 	
-	<select id="listCrewCategoryIdxs" parameterType="long" resultType="int">
-	    SELECT categoryIdx 
-	    FROM crew_category_mapping 
-	    WHERE crewIdx = #{crewIdx}
+	<select id="listAllCrew" resultType="com.sp.app.domain.dto.CrewDto">
+	    SELECT 
+	        crewIdx, userIdx, name, description, logoImage, 
+	        maxMember, currentMember, joinType, chatRoomId, 
+	        viewCount, status, TO_CHAR(createdDate, 'YYYY-MM-DD') AS createdDate
+	    FROM crew
+	    WHERE status = '1'
+	    ORDER BY createdDate DESC
 	</select>
 	
-	<select id="listCrewRegionCodes" parameterType="long" resultType="string">
-	    SELECT regionCode 
-	    FROM crew_region_mapping 
-	    WHERE crewIdx = #{crewIdx}
+	<select id="listCrewCategories" parameterType="long" resultType="com.sp.app.domain.dto.CategoryDto">
+	    SELECT c.categoryIdx, c.name, c.icon 
+	    FROM crewCategory c INNER JOIN crew_category_mapping m
+	    ON c.categoryIdx = m.categoryIdx 
+	    WHERE m.crewIdx = #{crewIdx}
+	    ORDER BY c.categoryIdx ASC
+	</select>
+	
+	<select id="listCrewRegions" parameterType="long" resultType="com.sp.app.domain.dto.RegionDto">
+	    SELECT
+	    	r.regionCode,
+	    	r.sido,
+	    	r.sigungu,
+	    	r.dong,
+	    	r.represent_lat AS lnt,
+	    	r.represent_lng AS lng
+	    FROM region r INNER JOIN crew_region_mapping m
+	    ON r.regionCode = m.regionCode 
+	    WHERE m.crewIdx = #{crewIdx}
+	    ORDER BY r.regionCode ASC
 	</select>
 	
 	

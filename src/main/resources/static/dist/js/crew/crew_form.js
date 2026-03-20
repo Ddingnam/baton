@@ -29,12 +29,17 @@ const CrewForm = {
             selectedSido: null,
             selectedSigungu: null,
             
-            categories: [
-                { idx: 1, name: '스터디', icon: 'ri-book-open-line' },
-                { idx: 2, name: '운동', icon: 'ri-run-line' },
-                { idx: 3, name: '독서', icon: 'ri-ball-pen-line' },
-                { idx: 4, name: '맛집/카페', icon: 'ri-cup-line' }
-            ]
+			categories: [
+			    { idx: 1, name: '스터디', icon: 'ri-book-open-line' },
+			    { idx: 2, name: '운동', icon: 'ri-run-line' },
+			    { idx: 3, name: '독서', icon: 'ri-ball-pen-line' },
+			    { idx: 4, name: '맛집/카페', icon: 'ri-cup-line' },
+			    { idx: 5, name: '산책/반려동물', icon: 'ri-guide-line' },
+			    { idx: 6, name: '공예/만들기', icon: 'ri-t-shirt-air-line' },
+			    { idx: 7, name: '음악/악기', icon: 'ri-music-2-line' },
+			    { idx: 8, name: '게임/오락', icon: 'ri-gamepad-line' },
+			    { idx: 9, name: '자유 주제', icon: 'ri-shining-line' }
+			]
         }
     },
     methods: {
@@ -103,25 +108,30 @@ const CrewForm = {
             this.isRegionModalOpen = false;
         },
 
-        async fetchSido() {
-            if(this.sidoList.length > 0) return;
-            
-            try {
-                const response = await fetch(API_BASE_URL + "?regcode_pattern=*00000000");
-                const data = await response.json();
-                
-                const validData = data.regcodes.filter(item => item.name.split(" ").length === 1);
-                
-                this.sidoList = validData.map(item => ({
-                    code: item.code,
-                    name: item.name,
-                    displayName: item.name.split(" ")[0]
-                })).sort((a, b) => a.displayName.localeCompare(b.displayName));
-                
-            } catch (error) {
-                console.error("시/도 로드 실패:", error);
-            }
-        },
+		async fetchSido() {
+		    if(this.sidoList.length > 0) return;
+		    
+		    try {
+		        const response = await fetch(API_BASE_URL + "?regcode_pattern=*00000000");
+		        const data = await response.json();
+		        
+		        const allowedRegions = ["서울특별시", "인천광역시", "경기도"];
+		        
+		        const validData = data.regcodes.filter(item => {
+		            const nameParts = item.name.split(" ");
+		            return nameParts.length === 1 && allowedRegions.includes(nameParts[0]);
+		        });
+		        
+		        this.sidoList = validData.map(item => ({
+		            code: item.code,
+		            name: item.name,
+		            displayName: item.name.split(" ")[0]
+		        })).sort((a, b) => a.displayName.localeCompare(b.displayName));
+		        
+		    } catch (error) {
+		        console.error("시/도 로드 실패:", error);
+		    }
+		},
 
         async fetchSigungu(sido) {
             this.selectedSido = sido;
@@ -223,7 +233,7 @@ const CrewForm = {
 		    }
 
 		    try {
-		        const response = await fetch('/crew/formSubmit', {
+		        const response = await fetch('/api/crew/register', {
 		            method: 'POST',
 		            body: formData
 		        });

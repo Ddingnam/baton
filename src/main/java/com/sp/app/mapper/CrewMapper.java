@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.sp.app.domain.dto.CategoryDto;
 import com.sp.app.domain.dto.CrewDto;
 import com.sp.app.domain.dto.MemberDto;
 import com.sp.app.domain.dto.RegionDto;
@@ -27,8 +28,10 @@ public interface CrewMapper {
 	public void deleteCrewCategories(long crewIdx) throws Exception;
 	
 	public CrewDto findByCrewIdx(Long crewIdx);
-	public List<Integer> listCrewCategoryIdxs(Long crewIdx);
-	public List<String> listCrewRegionCodes(Long crewIdx);
+	public List<CrewDto> listAllCrew();
+	
+	public List<CategoryDto> listCrewCategories(Long crewIdx);
+	public List<RegionDto> listCrewRegions(Long crewIdx);
 	
 	public SnsUserDto loginSnsUser(Map<String, Object> map);
 	public UserDto loginUser(Map<String, Object> map);

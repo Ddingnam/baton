@@ -1,5 +1,7 @@
 package com.sp.app.service;
 
+import java.util.List;
+
 import com.sp.app.domain.dto.CrewDto;
 
 public interface CrewService {
@@ -8,4 +10,6 @@ public interface CrewService {
 	public void deleteCrew(long crewIdx, String uploadPath) throws Exception;
 	
 	public CrewDto findByCrewIdx(Long crewIdx);
+	
+	public List<CrewDto> listAllCrew();
 }

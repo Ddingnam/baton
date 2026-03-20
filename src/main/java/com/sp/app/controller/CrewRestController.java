@@ -1,12 +1,15 @@
 package com.sp.app.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,15 +26,15 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping(value = "/crew/*")
+@RequestMapping(value = "/api/crew/*")
 public class CrewRestController {
 	private final CrewService service;
 	
 	@Value("${file.upload-root}/crew")
     private String uploadPath;
 	
-	@PostMapping("formSubmit")
-    public ResponseEntity<?> formSubmit(
+	@PostMapping("register")
+    public ResponseEntity<?> register(
     		@ModelAttribute CrewDto crewDto,
     		@AuthenticationPrincipal CustomUserDetails userDetails) {
 		Map<String, Object> model = new HashMap<>();
@@ -61,4 +64,29 @@ public class CrewRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
         }
     }
+	
+	@GetMapping("list")
+    public ResponseEntity<?> getAllCrews() {
+		Map<String, Object> model = new HashMap<>();
+        try {
+            List<CrewDto> list = service.listAllCrew();
+            if(list != null) {
+            	model.put("crewList", list);
+            	model.put("count", list.size());
+            } else {
+            	model.put("crewList", new ArrayList<>());
+            	model.put("count", 0);
+            }
+            
+            model.put("state", "success");
+            return ResponseEntity.ok(model);
+        } catch (Exception e) {
+            log.error("getAllCrews error : ", e);
+            model.put("state", "error");
+            
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
+        }
+    }
+	
+	
 }

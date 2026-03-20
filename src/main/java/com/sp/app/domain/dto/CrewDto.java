@@ -29,4 +29,7 @@ public class CrewDto {
     
     private List<Integer> categoryIdxs; 
     private List<String> regionCodes;
+    
+    private List<CategoryDto> categories;
+    private List<RegionDto> regions;
 }

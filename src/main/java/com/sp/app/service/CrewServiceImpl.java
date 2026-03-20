@@ -1,5 +1,7 @@
 package com.sp.app.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,13 +106,32 @@ public class CrewServiceImpl implements CrewService {
 		try {
 			dto = mapper.findByCrewIdx(crewIdx);
 			if(dto != null) {
-				dto.setCategoryIdxs(mapper.listCrewCategoryIdxs(crewIdx));
-				dto.setRegionCodes(mapper.listCrewRegionCodes(crewIdx));
+				dto.setCategories(mapper.listCrewCategories(crewIdx));
+				dto.setRegions(mapper.listCrewRegions(crewIdx));
 			}
 		} catch (Exception e) {
 			log.info("findByCrewIdx : ", e);
 			throw e;
 		}
 		return dto;
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public List<CrewDto> listAllCrew() {
+		List<CrewDto> crewList = null;
+		long crewIdx = 0;
+		try {
+			crewList = mapper.listAllCrew();
+			for(CrewDto crew : crewList) {
+				crewIdx = crew.getCrewIdx();
+				crew.setCategories(mapper.listCrewCategories(crewIdx));
+				crew.setRegions(mapper.listCrewRegions(crewIdx));
+			}
+		} catch (Exception e) {
+			log.info("listAllCrew : ", e);
+			throw e;
+		}
+		return crewList;
 	}
 }
