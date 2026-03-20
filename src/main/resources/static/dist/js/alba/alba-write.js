@@ -5,9 +5,24 @@ const uploadedFiles = [];
 function searchAddress() {
   new daum.Postcode({
     oncomplete: function (data) {
-      document.getElementById('location').value = data.roadAddress || data.jibunAddress;
-      document.getElementById('locationDetail').focus();
-      updateProgress();
+
+      const addr = data.roadAddress || data.jibunAddress;
+      document.getElementById('location').value = addr;
+
+      // 🔥 추가 (핵심)
+      document.getElementById('sidoInput').value = data.sido;
+      document.getElementById('gugunInput').value = data.sigungu;
+      document.getElementById('dongInput').value = data.bname;
+
+      // 좌표 변환
+      const geocoder = new kakao.maps.services.Geocoder();
+      geocoder.addressSearch(addr, function(result, status) {
+        if (status === kakao.maps.services.Status.OK) {
+          document.getElementById('latInput').value = result[0].y;
+          document.getElementById('lngInput').value = result[0].x;
+        }
+      });
+
       updatePreview();
     }
   }).open();
@@ -195,6 +210,9 @@ function updateProgress() {
 }
 
 function submitForm() {
+	  console.log("lat:", document.getElementById('latInput').value);
+	  console.log("lng:", document.getElementById('lngInput').value); // 일단 테스트용으로 넣어봄	
+	
   const title = document.getElementById('title').value.trim();
   const pay = document.getElementById('pay').value;
   const loc = document.getElementById('location').value.trim();
@@ -219,3 +237,115 @@ document.addEventListener('DOMContentLoaded', () => {
 
   updatePreview();
 });
+
+// ===== 지역 모달 =====
+const API_BASE = "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes";
+let selectedLocation = '';
+
+function openRegionModal() {
+  document.getElementById('regionModal').style.display = 'flex';
+  loadSido();
+}
+
+function closeRegionModal() {
+  document.getElementById('regionModal').style.display = 'none';
+}
+
+function resetModalSelection() {
+  document.getElementById('listSigungu').innerHTML = '<li class="region-empty">시/도를<br>선택해주세요</li>';
+  document.getElementById('listDong').innerHTML = '<li class="region-empty">시/군/구를<br>선택해주세요</li>';
+  document.getElementById('modalSelectedText').textContent = '지역을 선택해주세요.';
+  document.querySelectorAll('.region-list li').forEach(li => li.classList.remove('active'));
+  selectedLocation = '';
+}
+
+function confirmRegionSelection() {
+  if (!selectedLocation) { alert('지역을 선택해주세요.'); return; }
+
+  document.getElementById('location').value = selectedLocation;
+
+  // 👇 여기 추가
+  const parts = selectedLocation.split(' ');
+  document.getElementById('sidoInput').value = parts[0] || '';
+  document.getElementById('gugunInput').value = parts[1] || '';
+  document.getElementById('dongInput').value = parts[2] || '';
+
+  // 기존 좌표 코드 그대로
+  const geocoder = new kakao.maps.services.Geocoder();
+  geocoder.addressSearch(selectedLocation, function(result, status) {
+    if (status === kakao.maps.services.Status.OK) {
+      document.getElementById('latInput').value = result[0].y;
+      document.getElementById('lngInput').value = result[0].x;
+    }
+  });
+
+  updatePreview();
+  updateProgress();
+  closeRegionModal();
+}
+
+function loadSido() {
+  fetch(API_BASE + '?regcode_pattern=*00000000')
+    .then(r => r.json())
+    .then(data => {
+      const ul = document.getElementById('listSido');
+      ul.innerHTML = '';
+      data.regcodes.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item.name;
+        li.dataset.code = item.code;
+        li.onclick = function() {
+          document.querySelectorAll('#listSido li').forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+          loadSigungu(item.code, item.name);
+        };
+        ul.appendChild(li);
+      });
+    });
+}
+
+function loadSigungu(sidoCode, sidoName) {
+  const pattern = sidoCode.substring(0, 2) + '*00000';
+  fetch(API_BASE + '?regcode_pattern=' + pattern + '&is_ignore_zero=true')
+    .then(r => r.json())
+    .then(data => {
+      const ul = document.getElementById('listSigungu');
+      ul.innerHTML = '';
+      document.getElementById('listDong').innerHTML = '<li class="region-empty">시/군/구를<br>선택해주세요</li>';
+      data.regcodes.forEach(item => {
+        const li = document.createElement('li');
+        const parts = item.name.split(' ');
+        li.textContent = parts.slice(1).join(' ');
+        li.dataset.code = item.code;
+        li.onclick = function() {
+          document.querySelectorAll('#listSigungu li').forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+          loadDong(item.code, sidoName, li.textContent);
+        };
+        ul.appendChild(li);
+      });
+    });
+}
+
+function loadDong(sigunguCode, sidoName, sigunguName) {
+  const pattern = sigunguCode.substring(0, 4) + '*';
+  fetch(API_BASE + '?regcode_pattern=' + pattern + '&is_ignore_zero=true')
+    .then(r => r.json())
+    .then(data => {
+      const ul = document.getElementById('listDong');
+      ul.innerHTML = '';
+      const filtered = data.regcodes.filter(item => item.code !== sigunguCode);
+      filtered.forEach(item => {
+        const li = document.createElement('li');
+        const parts = item.name.split(' ');
+        li.textContent = parts[parts.length - 1];
+        li.onclick = function() {
+          document.querySelectorAll('#listDong li').forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+          selectedLocation = sidoName + ' ' + sigunguName + ' ' + li.textContent;
+          document.getElementById('modalSelectedText').textContent = '선택: ' + selectedLocation;
+        };
+        ul.appendChild(li);
+      });
+    });
+}

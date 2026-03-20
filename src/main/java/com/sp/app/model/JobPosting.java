@@ -33,8 +33,11 @@ public class JobPosting {
     
     private String location;
     private String locationDetail;
-    private String locationLat;
-    private String locationLng;
+    
+    //private String locationLat;
+    //private String locationLng;
+    private Double locationLat;
+    private Double locationLng;
     
     private String deadline;
     private String contact;
@@ -57,4 +60,8 @@ public class JobPosting {
     private String thumbUrl;
    
     private List<JobPostingImage> imageList; 
+    
+    private String sido;
+    private String gugun;
+    private String dong;
 }

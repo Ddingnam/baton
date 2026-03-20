@@ -240,12 +240,19 @@
             <div class="form-group">
               <label>주소 <span class="req">*</span></label>
               
+             <input type="hidden" id="latInput" name="locationLat" value="${dto.locationLat}">
+			<input type="hidden" id="lngInput" name="locationLng" value="${dto.locationLng}">
+			
+			<input type="hidden" name="sido" id="sidoInput">
+			<input type="hidden" name="gugun" id="gugunInput">
+			<input type="hidden" name="dong" id="dongInput">
+              
               <div class="input-with-btn">
                 <input type="text" id="location" name="location" readonly
                        placeholder="주소 검색 버튼을 눌러주세요"
                        value="${dto.location}"
                        oninput="updatePreview();">
-                <button type="button" class="addr-btn" onclick="openRegionModal()">
+                <button type="button" class="addr-btn" onclick="searchAddress()">
                   <i class="ri-map-pin-2-line"></i> 검색
                 </button>
               </div>
@@ -329,6 +336,7 @@
 </div>
 
 <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY&libraries=services"></script>
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/alba/alba-write.js"></script>
 </body>
