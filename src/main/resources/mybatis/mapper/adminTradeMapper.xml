@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sp.app.admin.mapper.AdminTradeMapper">
+
+    <!-- 관리자용 조건절: 임시저장만 제외, 숨기기 포함 전체 노출 -->
+    <sql id="admin-where">
+        <where>
+            p.tradeStatus != '임시저장'
+
+            <if test="tradeStatus != null and tradeStatus != ''">
+                AND p.tradeStatus = #{tradeStatus}
+            </if>
+
+            <if test="keyword != null and keyword != ''">
+                <choose>
+                    <when test="schType == 'title'">
+                        AND p.title LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <when test="schType == 'content'">
+                        AND p.content LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <when test="schType == 'nickname'">
+                        AND u.nickname LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <otherwise>
+                        AND (
+                            p.title   LIKE '%' || #{keyword} || '%'
+                            OR p.content LIKE '%' || #{keyword} || '%'
+                        )
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+    </sql>
+
+    <select id="dataCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM   product p
+        JOIN   users u ON p.userIdx = u.userIdx
+        <include refid="admin-where"/>
+    </select>
+
+    <select id="listTrade" parameterType="map" resultType="com.sp.app.model.Trade">
+        SELECT * FROM (
+            SELECT ROWNUM rnum, tb.* FROM (
+                SELECT
+                    p.productIdx, p.title, p.price, p.userIdx,
+                    u.nickName,
+                    p.tradeType, p.tradeStatus, p.productStatus,
+                    p.hitCount, p.likeCount, p.chatCount,
+                    p.regionCode, r.dong,
+                    p.createdDate, p.lastUpDate,
+                    (SELECT imgUrl
+                       FROM productImages
+                      WHERE productIdx = p.productIdx AND imgOrder = 1) AS imgUrl
+                FROM   product p
+                JOIN   users u ON p.userIdx = u.userIdx
+                LEFT JOIN region r ON p.regionCode = r.regionCode
+                <include refid="admin-where"/>
+                ORDER BY p.productIdx DESC
+            ) tb WHERE ROWNUM &lt;= #{end}
+        ) WHERE rnum &gt;= #{start}
+    </select>
+
+    <select id="findById" resultType="com.sp.app.model.Trade">
+        SELECT
+            p.productIdx, p.title, p.content, p.price, p.shippingFee,
+            p.userIdx, u.nickName,
+            p.tradeType, p.tradeStatus, p.productStatus,
+            p.hitCount, p.likeCount, p.chatCount, p.pullCount,
+            p.tradePlace, p.latitude, p.longitude,
+            p.regionCode, r.dong,
+            p.categoryIdx,
+            p.createdDate, p.updatedDate, p.lastUpDate
+        FROM   product p
+        JOIN   users u  ON p.userIdx    = u.userIdx
+        LEFT JOIN region r ON p.regionCode = r.regionCode
+        WHERE  p.productIdx = #{productIdx}
+    </select>
+
+    <select id="findImages" resultType="com.sp.app.model.TradeImg">
+        SELECT productIdx, imgOrder, originalName, saveName, imgUrl
+        FROM   productImages
+        WHERE  productIdx = #{productIdx}
+        ORDER BY imgOrder ASC
+    </select>
+
+    <select id="findTags" resultType="String">
+        SELECT t.tagName
+        FROM   productTag pt
+        JOIN   tag t ON pt.tagIdx = t.tagIdx
+        WHERE  pt.productIdx = #{productIdx}
+    </select>
+
+    <delete id="deleteTradeImages">
+        DELETE FROM productImages WHERE productIdx = #{productIdx}
+    </delete>
+
+    <delete id="deleteTradePostTags">
+        DELETE FROM productTag WHERE productIdx = #{productIdx}
+    </delete>
+
+    <delete id="deleteTradePost">
+        DELETE FROM product WHERE productIdx = #{productIdx}
+    </delete>
+
+</mapper>

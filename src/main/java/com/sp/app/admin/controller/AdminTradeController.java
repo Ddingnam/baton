@@ -1,0 +1,96 @@
+package com.sp.app.admin.controller;
+
+import com.sp.app.admin.mapper.AdminTradeMapper;
+import com.sp.app.model.Trade;
+import com.sp.app.model.TradeImg;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+@Controller
+@RequiredArgsConstructor
+@RequestMapping("/admin/trade")
+public class AdminTradeController {
+
+    private final AdminTradeMapper adminTradeMapper;
+
+    @GetMapping("/list")
+    public String list(
+            @RequestParam(name = "page",         defaultValue = "1")  int page,
+            @RequestParam(name = "schType",      defaultValue = "all") String schType,
+            @RequestParam(name = "kwd",          defaultValue = "")    String kwd,
+            @RequestParam(name = "tradeStatus",  defaultValue = "")    String tradeStatus,
+            Model model) {
+
+        int size  = 15;
+        int start = (page - 1) * size + 1;
+        int end   = page * size;
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("schType",     schType);
+        map.put("keyword",     kwd);
+        map.put("tradeStatus", tradeStatus.isEmpty() ? null : tradeStatus);
+        map.put("start",       start);
+        map.put("end",         end);
+
+        List<Trade> list = adminTradeMapper.listTrade(map);
+        int dataCount    = adminTradeMapper.dataCount(map);
+        int total_page   = (int) Math.ceil((double) dataCount / size);
+        if (total_page > 0 && total_page < page) page = total_page;
+
+        model.addAttribute("list",        list);
+        model.addAttribute("page",        page);
+        model.addAttribute("total_page",  total_page);
+        model.addAttribute("dataCount",   dataCount);
+        model.addAttribute("schType",     schType);
+        model.addAttribute("kwd",         kwd);
+        model.addAttribute("tradeStatus", tradeStatus);
+
+        return "admin/trade/list";
+    }
+
+    @GetMapping("/detail")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> detail(@RequestParam("id") long id) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        try {
+            Trade          trade  = adminTradeMapper.findById(id);
+            List<TradeImg> images = adminTradeMapper.findImages(id);
+            List<String>   tags   = adminTradeMapper.findTags(id);
+
+            result.put("success", true);
+            result.put("trade",   trade);
+            result.put("images",  images);
+            result.put("tags",    tags);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg",     e.getMessage());
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/delete")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> delete(@RequestBody Map<String, Object> param) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            long id = Long.parseLong(param.get("id").toString());
+            adminTradeMapper.deleteTradePostTags(id);
+            adminTradeMapper.deleteTradeImages(id);
+            adminTradeMapper.deleteTradePost(id);
+            result.put("success", true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("success", false);
+            result.put("msg",     e.getMessage());
+        }
+        return ResponseEntity.ok(result);
+    }
+}

@@ -93,6 +93,25 @@
         </div>
     </nav>
 
+    <script>
+    (function() {
+        var path = window.location.pathname;
+        document.querySelectorAll('.sub-list .sub-item').forEach(function(link) {
+            var href = link.getAttribute('href');
+            if (!href) return;
+            var hrefPath = href.split('?')[0];
+            if (path === hrefPath || path.startsWith(hrefPath)) {
+                link.classList.add('active');
+                var parentBox = link.closest('.nav-box');
+                if (parentBox) parentBox.classList.add('open');
+            }
+        });
+        document.querySelectorAll('.nav-box:not(.has-child) .nav-btn').forEach(function(btn) {
+            var href = btn.getAttribute('href');
+            if (href && path === href) btn.classList.add('active');
+        });
+    })();
+    </script>
     <div class="sidebar-foot">
         <button class="chat-entry-btn" onclick="location.href='${pageContext.request.contextPath}/admin/chat'">
             <i class="ri-message-3-fill"></i>

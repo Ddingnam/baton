@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sp.app.admin.mapper.AdminAlbaMapper">
+
+    <sql id="admin-where">
+        <where>
+            <if test="keyword != null and keyword != ''">
+                <choose>
+                    <when test="schType == 'title'">
+                        title LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <when test="schType == 'employer'">
+                        employer LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <when test="schType == 'location'">
+                        location LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <otherwise>
+                        (title    LIKE '%' || #{keyword} || '%'
+                        OR employer LIKE '%' || #{keyword} || '%'
+                        OR location LIKE '%' || #{keyword} || '%')
+                    </otherwise>
+                </choose>
+            </if>
+
+            <if test="category != null and category != ''">
+                AND category = #{category}
+            </if>
+
+            <if test="recruitStatus != null and recruitStatus != ''">
+                AND recruit_status = #{recruitStatus}
+            </if>
+        </where>
+    </sql>
+
+    <select id="dataCount" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM job_posting
+        <include refid="admin-where"/>
+    </select>
+
+    <select id="listPosting" parameterType="map" resultType="com.sp.app.model.JobPosting">
+        SELECT * FROM (
+            SELECT ROWNUM rnum, tb.* FROM (
+                SELECT
+                    posting_idx    AS postingIdx,
+                    user_idx       AS userIdx,
+                    title, employer, category,
+                    pay_type       AS payType,
+                    pay,
+                    work_period    AS workPeriod,
+                    work_days      AS workDays,
+                    location,
+                    deadline,
+                    hit_count      AS hitCount,
+                    created_date   AS createdDate
+                FROM job_posting
+                <include refid="admin-where"/>
+                ORDER BY posting_idx DESC
+            ) tb WHERE ROWNUM &lt;= #{end}
+        ) WHERE rnum &gt;= #{start}
+    </select>
+
+    <select id="findById" resultType="com.sp.app.model.JobPosting">
+        SELECT
+            posting_idx       AS postingIdx,
+            user_idx          AS userIdx,
+            region_idx        AS regionIdx,
+            title, employer, category, description,
+            pay_type          AS payType,
+            pay,
+            work_period       AS workPeriod,
+            work_days         AS workDays,
+            start_time        AS startTime,
+            end_time          AS endTime,
+            time_negotiable   AS timeNegotiable,
+            location,
+            location_detail   AS locationDetail,
+            location_lat      AS locationLat,
+            location_lng      AS locationLng,
+            subway_info       AS subwayInfo,
+            contact, benefits, deadline,
+            hit_count         AS hitCount,
+            created_date      AS createdDate
+        FROM job_posting
+        WHERE posting_idx = #{postingIdx}
+    </select>
+
+    <select id="findImages" resultType="String">
+        SELECT img_url FROM job_posting_image
+        WHERE  posting_idx = #{postingIdx}
+    </select>
+
+    <delete id="deleteImages">
+        DELETE FROM job_posting_image WHERE posting_idx = #{postingIdx}
+    </delete>
+
+    <delete id="deletePosting">
+        DELETE FROM job_posting WHERE posting_idx = #{postingIdx}
+    </delete>
+
+</mapper>
