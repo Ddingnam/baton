@@ -33,8 +33,7 @@ const AiAssistant = (function() {
                 document.getElementById('titleInput').value = data.title;
                 document.getElementById('contentInput').value = data.content;
                 
-                const countSpan = document.getElementById('contentCount');
-                if(countSpan) countSpan.textContent = `${data.content.length}/2000`;
+                updateContentCount();
             } else {
                 alert('이미지 분석에 실패했습니다.');
             }
@@ -157,6 +156,21 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!dropdown.contains(e.target)) dropdown.classList.remove('active');
     });
 });
+
+function updateContentCount() {
+    const textarea = document.getElementById('contentInput');
+    const countSpan = document.getElementById('contentCount');
+    if (textarea && countSpan) {
+        const length = textarea.value.length;
+        countSpan.textContent = `${length}/2000`;
+
+        if (length > 2000) {
+            countSpan.style.color = 'red';
+        } else {
+            countSpan.style.color = 'inherit';
+        }
+    }
+}
 
 const toggleTag = (function() {
     let tags = [];
@@ -359,6 +373,13 @@ const initDropdown = () => {
 };
 
 window.onload = function() {
+	
+	const contentInput = document.getElementById('contentInput');
+	if (contentInput) {
+		contentInput.addEventListener('input', updateContentCount);
+		updateContentCount();
+	}
+	
     toggleImage.init();
     toggleTag.init();
     PriceFormatter.init();
@@ -375,7 +396,10 @@ window.onload = function() {
         const t = data.trade;
 
         if (document.getElementById('titleInput')) document.getElementById('titleInput').value = t.title || '';
-        if (document.getElementById('contentInput')) document.getElementById('contentInput').value = t.content || '';
+        if (document.getElementById('contentInput')) {
+			document.getElementById('contentInput').value = t.content || '';
+			updateContentCount();
+		}
         if (document.getElementById('locationInput')) document.getElementById('locationInput').value = t.tradePlace || '';
         if (document.getElementById('latitude')) document.getElementById('latitude').value = t.latitude || '';
         if (document.getElementById('longitude')) document.getElementById('longitude').value = t.longitude || '';
