@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sp.app.service.ChatBotProxyService;
 
@@ -23,6 +24,7 @@ public class ChatBotController {
     }
 	
 	@GetMapping(value = "question", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	@ResponseBody
 	public Flux<String> ask(@RequestParam("question") String question) {
         return chatBotService.getChatResponse(question);
     }

@@ -9,13 +9,13 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/chat/chatbot.css">
 </head>
 <body>
-    <div class="chat-container">
+    <div class="chat-wrapper">
         <div class="chat-header">
             <div class="header-left" onclick="history.back()"><i class="ri-arrow-left-s-line"></i></div>
             <div class="header-center">바톤 AI 가이드</div>
             <div class="header-right"></div>
         </div>
-        
+
         <div class="trade-banner">
             <div class="ai-badge"><i class="ri-customer-service-2-fill"></i></div>
             <div class="trade-info">
@@ -34,11 +34,8 @@
             </div>
         </div>
 
-        <div id="typingArea">
-            <div class="dots">
-                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-            </div>
-        </div>
+
+        <div id="typingArea"></div>
 
         <div class="chat-input-box">
             <textarea id="chatInput" placeholder="메시지를 입력하세요..." onkeydown="handleEnter(event)"></textarea>
@@ -49,7 +46,6 @@
 <script type="text/javascript">
     const ContextPath = "${pageContext.request.contextPath}";
 </script>
-
 <script src="${pageContext.request.contextPath}/dist/js/chat/chatbot.js"></script>
 </body>
 </html>

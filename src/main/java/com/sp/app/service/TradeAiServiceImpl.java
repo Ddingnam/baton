@@ -46,7 +46,7 @@ public class TradeAiServiceImpl implements TradeAiService{
         String base64Image = Base64.getEncoder().encodeToString(imageFile.getBytes());
 
         String prompt = "중고거래 플랫폼 'Baton Touch'의 상품 등록 도우미야. 사진을 보고 "
-                      + "매력적인 제목과 상세 설명을 JSON 형식으로 써줘. "
+                      + "매력적인 제목과 상세 설명(2000자 이내)을 JSON 형식으로 써줘. "
                       + "형식: {\"title\": \"...\", \"content\": \"...\"}";
 
         JSONObject requestJson = new JSONObject();
