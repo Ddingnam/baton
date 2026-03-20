@@ -73,21 +73,23 @@
 	
 	<select id="findByCrewIdx" parameterType="long" resultType="com.sp.app.domain.dto.CrewDto">
 	    SELECT 
-	        crewIdx, userIdx, name, description, logoImage, 
-	        maxMember, currentMember, joinType, chatRoomId, 
-	        viewCount, status, createdDate
-	    FROM crew
+	        c.crewIdx, c.userIdx, c.name, c.description, c.logoImage, 
+	        c.maxMember, c.currentMember, c.joinType, c.chatRoomId, 
+	        c.viewCount, c.status, TO_CHAR(c.createdDate, 'YYYY-MM-DD') AS createdDate, u.nickname AS hostNickname
+	    FROM crew c INNER JOIN users u
+	    ON c.userIdx = u.userIdx
 	    WHERE crewIdx = #{crewIdx}
 	</select>
 	
 	<select id="listAllCrew" resultType="com.sp.app.domain.dto.CrewDto">
 	    SELECT 
-	        crewIdx, userIdx, name, description, logoImage, 
-	        maxMember, currentMember, joinType, chatRoomId, 
-	        viewCount, status, TO_CHAR(createdDate, 'YYYY-MM-DD') AS createdDate
-	    FROM crew
-	    WHERE status = '1'
-	    ORDER BY createdDate DESC
+	        c.crewIdx, c.userIdx, c.name, c.description, c.logoImage, 
+	        c.maxMember, c.currentMember, c.joinType, c.chatRoomId, 
+	        c.viewCount, c.status, TO_CHAR(c.createdDate, 'YYYY-MM-DD') AS createdDate, u.nickname AS hostNickname
+	    FROM crew c INNER JOIN users u
+	    ON c.userIdx = u.userIdx 
+	    WHERE c.status = '1'
+	    ORDER BY c.createdDate DESC
 	</select>
 	
 	<select id="listCrewCategories" parameterType="long" resultType="com.sp.app.domain.dto.CategoryDto">
