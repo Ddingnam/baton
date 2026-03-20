@@ -142,8 +142,6 @@ body, html {
     50%       { opacity: 1;   transform: scale(1.1);  }
 }
 
-#typingArea { display: none !important; }
-
 .chat-input-box {
     display: flex;
     padding: 12px 16px;

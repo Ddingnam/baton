@@ -1,6 +1,5 @@
 const chatArea = document.getElementById("chatArea");
 const chatInput = document.getElementById("chatInput");
-const typingArea = document.getElementById("typingArea");
 
 function handleEnter(e) {
     if (e.keyCode === 13 && !e.shiftKey) {

@@ -34,9 +34,6 @@
             </div>
         </div>
 
-
-        <div id="typingArea"></div>
-
         <div class="chat-input-box">
             <textarea id="chatInput" placeholder="메시지를 입력하세요..." onkeydown="handleEnter(event)"></textarea>
             <button onclick="sendMessage()"><i class="ri-send-plane-fill"></i></button>
