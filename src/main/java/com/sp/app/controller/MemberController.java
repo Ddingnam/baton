@@ -35,7 +35,6 @@ public class MemberController {
 	
 	@RequestMapping(value = "login", method = {RequestMethod.GET, RequestMethod.POST})
 	public String loginForm(@RequestParam(name = "error", required = false) String error,
-			@RequestParam(name = "withdraw", required = false) String withdraw,
 			@AuthenticationPrincipal CustomUserDetails userDetails,
 			RedirectAttributes rattr,
 			HttpSession session,
@@ -48,10 +47,6 @@ public class MemberController {
 		
 		if(error != null) {
 			model.addAttribute("loginErrMsg", "아이디 또는 패스워드가 일치하지 않습니다.");
-		}
-		
-		if(withdraw != null) {
-			model.addAttribute("isWithdrawPending", true);
 		}
 		
 		GuestSessionInfo guestInfo = (GuestSessionInfo) session.getAttribute("guestInfo");

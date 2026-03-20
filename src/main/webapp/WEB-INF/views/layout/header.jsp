@@ -71,7 +71,7 @@
                                         <div class="region-tab-list">
                                             <c:if test="${not empty sessionScope.member.userRegionInfo.mainRegion}">
                                                 <button type="button"
-                                                        class="region-tab-item ${sessionScope.member.userRegionInfo.activeType != 2 ? 'active' : ''}"
+                                                        class="region-tab-item ${sessionScope.member.userRegionInfo.activeType == 1 ? 'active' : ''}"
                                                         onclick="switchRegion(1)">
                                                     <span class="region-tab-name">${sessionScope.member.userRegionInfo.mainRegion.dong}</span>
                                                 </button>

@@ -234,7 +234,7 @@
 
 	<select id="findUserRegionbyType" parameterType="map" resultType="com.sp.app.domain.dto.RegionDto">
         SELECT u.regionIdx, u.userIdx, u.regionCode, u.regionType,
-        	   u.is_active, u.is_authenticated, u.authDate,
+        	   u.is_active AS isActive, u.is_authenticated AS isAuthenticated, u.authDate,
         	   r.sido, r.sigungu, r.dong,
         	   (r.sido || ' ' || r.sigungu || ' ' || r.dong) AS fullAddress,
         	   r.dong AS coreAddress
@@ -280,7 +280,7 @@
         DELETE FROM userRegion WHERE userIdx = #{userIdx} AND regionType = #{regionType}
     </delete>
 
-    <update id="updateActiveStatus" parameterType="map">
+    <update id="updateActiveStatus" parameterType="map" flushCache="true">
         UPDATE userRegion
         SET is_active = CASE
             WHEN regionType = #{regionType} THEN 1

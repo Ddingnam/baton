@@ -116,15 +116,6 @@ let geocoder = new kakao.maps.services.Geocoder();
 let targetAddress = "";
 let targetDong = ""; 
 
-let finalRepresentLat = 0; 
-let finalRepresentLng = 0; 
-
-let finalSido = "";
-let finalSigungu = "";
-let finalDong = "";
-
-let finalFullAddress = "";
-let finalCoreAddress = "";
 let finalRegionCode = "";
 
 let tempSido = "";
@@ -256,32 +247,15 @@ function executeVerification(lat, lng, addr) {
                 for(let i = 0; i < result.length; i++) {
                     if(result[i].region_type === 'B') {
                         finalRegionCode = result[i].code; 
-                        finalSido = result[i].region_1depth_name;
-                        finalSigungu = result[i].region_2depth_name;
-                        finalDong = result[i].region_3depth_name;
-                        finalCoreAddress = result[i].region_3depth_name;
                         break;
                     }
                 }
                 
-                finalFullAddress = finalSido + " " + finalSigungu + " " + finalDong;
-
-                geocoder.addressSearch(finalFullAddress, function(searchResult, searchStatus) {
-                    if (searchStatus === kakao.maps.services.Status.OK) {
-                        finalRepresentLat = searchResult[0].y;
-                        finalRepresentLng = searchResult[0].x;
-                    } else {
-                        finalRepresentLat = lat; 
-                        finalRepresentLng = lng; 
-                    }
-                    
-                    toast.className = "auth-error-toast item-2 auth-success";
-                    toast.innerHTML = '<i class="ri-checkbox-circle-fill"></i> 현재 위치가 [' + targetDong + '] 주변으로 일치합니다.';
-                    document.getElementById("btnComplete").disabled = false;
-                });
-            }
-        });
-        
+                toast.className = "auth-error-toast item-2 auth-success";
+                toast.innerHTML = '<i class="ri-checkbox-circle-fill"></i> 현재 위치가 [' + targetDong + '] 주변으로 일치합니다.';
+                document.getElementById("btnComplete").disabled = false;
+			}
+		});
     } else {
         toast.className = "auth-error-toast item-2 shake";
         toast.innerHTML = '현재 위치가 목표 지역과 다릅니다.<br>실제 위치: ' + currentAddressFull;
@@ -358,14 +332,7 @@ async function completeVerification() {
 
         const requestData = {
             regionType: `${regionType}`,
-            regionCode: finalRegionCode,
-            sido: finalSido,
-            sigungu: finalSigungu,
-            dong: finalDong,
-            lat: finalRepresentLat,
-            lng: finalRepresentLng,
-            fullAddress: finalFullAddress,
-            coreAddress: finalCoreAddress 
+            regionCode: finalRegionCode
         };
 
         const saveResponse = await fetch('${pageContext.request.contextPath}/member/verifyLocation', {
@@ -412,7 +379,11 @@ function loadSido() {
     fetch(API_BASE_URL + "?regcode_pattern=*00000000")
         .then(response => response.json())
         .then(data => {
-            const validData = data.regcodes.filter(code => code.name.split(" ").length === 1);
+        	const allowedRegions = ["서울특별시", "인천광역시", "경기도"];
+            const validData = data.regcodes.filter(item => {
+                const nameParts = item.name.split(" ");
+                return nameParts.length === 1 && allowedRegions.includes(nameParts[0]);
+            });
             renderList('listSido', validData, handleSidoClick, 1);
         });
 }

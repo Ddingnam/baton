@@ -423,6 +423,13 @@ public class MemberRestController {
 		}
     }
     
+    /**
+     * 지역 등록 시 주/부 동네 중복 여부 검사
+     * @param userDetails
+     * @param regionType
+     * @param regionCode
+     * @return
+     */
     @PostMapping("checkLocation")
     public ResponseEntity<?> checkLocation(
     		@AuthenticationPrincipal CustomUserDetails userDetails,
@@ -515,6 +522,7 @@ public class MemberRestController {
 
     @PostMapping("api/switchActiveRegion")
     public ResponseEntity<?> switchActiveRegion(
+    		@AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam("regionType") int regionType,
             HttpSession session) {
         Map<String, Object> model = new HashMap<>();
@@ -535,10 +543,24 @@ public class MemberRestController {
             model.put("state", "noSubRegion");
             return ResponseEntity.ok(model);
         }
-
-        regionInfo.setActiveType(regionType);
-        info.setUserRegionInfo(regionInfo);
+        
+        try {
+        	Map<String, Object> map = new HashMap<>();
+        	map.put("regionType", regionType);
+        	map.put("userIdx", info.getUserIdx());
+        	
+        	service.updateActiveStatus(map);
+		} catch (Exception e) {
+			log.info("switchActiveRegion error: ", e);
+            model.put("state", "error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
+		}
+        
+        UserRegionInfo newRegionInfo = service.getUserRegionInfo(info.getUserIdx());
+        
+        info.setUserRegionInfo(newRegionInfo);
         session.setAttribute("member", info);
+        userDetails.getMember().setUserRegionInfo(newRegionInfo);
 
         model.put("state", "success");
         return ResponseEntity.ok(model);

@@ -341,7 +341,6 @@ public class MemberServiceImpl implements MemberService {
 	public void saveUserRegion(RegionDto dto) throws SQLException {
 		try {
 			if (!Objects.isNull(dto.getRegionCode()) && !dto.getRegionCode().isEmpty()) {
-				mapper.insertRegion(dto);
 				mapper.saveUserRegion(dto);
 			}
 		} catch (Exception e) {
@@ -381,10 +380,13 @@ public class MemberServiceImpl implements MemberService {
 			userRegionInfo.setSubRegion(sub);
 
 			if (sub != null && sub.getIsActive() == 1) {
-				userRegionInfo.setActiveType(2);
-			} else {
-				userRegionInfo.setActiveType(1);
-			}
+	            userRegionInfo.setActiveType(2);
+	        } else if (main != null && main.getIsActive() == 1) {
+	            userRegionInfo.setActiveType(1);
+	        } else {
+	            userRegionInfo.setActiveType(1); 
+	        }
+			
 		} catch (Exception e) {
 			log.info("getUserRegionInfo", e);
 		}
