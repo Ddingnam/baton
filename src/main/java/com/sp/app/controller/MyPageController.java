@@ -207,4 +207,14 @@ public class MyPageController {
         }
         return result;
     }
+    
+    @GetMapping("/api/tradeHistory")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<List<Map<String, Object>>> getTradeHistory(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return org.springframework.http.ResponseEntity.status(401).build();
+        }
+        List<Map<String, Object>> list = mypageService.getMyTradeHistory(userDetails.getUserIdx());
+        return org.springframework.http.ResponseEntity.ok(list);
+    }
 }

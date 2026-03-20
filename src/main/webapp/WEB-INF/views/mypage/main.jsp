@@ -628,6 +628,13 @@
 			    <div id="pointHistoryListContainer" style="background:#fff; border-radius:16px; padding:0 25px; box-shadow:0 4px 15px rgba(0,0,0,0.03);">
 			        </div>
 			</div>
+			
+			<div id="tradeHistoryContent" style="display:none; margin-top:30px;">
+			    <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid #333; padding-bottom:15px; margin-bottom:20px;">
+			        <h3 style="font-size:20px; font-weight:800; margin:0; color:#333;">거래 내역 보기</h3>
+			    </div>
+			    <div id="tradeHistoryListContainer" style="background:#fff; border-radius:16px; padding:0 25px; box-shadow:0 4px 15px rgba(0,0,0,0.03);"></div>
+			</div>
 
 		</main>
 	</div>
@@ -639,96 +646,8 @@
 	<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_follow.js"></script>
 	<script src="${pageContext.request.contextPath}/dist/js/payment/payment.js"></script>
 	<script src="${pageContext.request.contextPath}/dist/js/util/timeAgo.js"></script>
+	<script>const CONTEXT_PATH = '${pageContext.request.contextPath}';</script>
+	<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_history.js"></script>
 	
-	<script>
-	document.querySelectorAll('.inner-tab').forEach(function(tab) {
-		tab.addEventListener('click', function() {
-			var card = this.closest('.list-card');
-			card.querySelectorAll('.inner-tab').forEach(function(t) { t.classList.remove('active'); });
-			card.querySelectorAll('.inner-section').forEach(function(s) { s.classList.remove('active'); });
-			this.classList.add('active');
-			var target = this.getAttribute('data-inner');
-			var sec = document.getElementById(target);
-			if (sec) sec.classList.add('active');
-		});
-	});
-	</script>
-	<script> 
-	function requestPointRefund() {
-        if(!confirm("정말 가장 최근에 충전한 포인트를 환불(결제 취소) 하시겠습니까?\n환불은 원래 결제하신 수단으로 영업일 기준 1~3일 내에 처리됩니다.")) return;
-        
-        let csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-        let csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-        let headers = {'Content-Type': 'application/json'};
-        if(csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
-        
-        fetch('${pageContext.request.contextPath}/api/payment/refund', {
-            method: 'POST',
-            headers: headers
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.state === 'true') {
-                alert(data.msg);
-                location.reload();
-            } else {
-                alert("환불 불가: " + data.msg);
-            }
-        });
-    }
-
-	function showPointHistoryView(element) {
-	    document.getElementById('mainSummaryContent').style.display = 'none';
-	    document.getElementById('pointHistoryContent').style.display = 'block';
-	    document.querySelectorAll('.sb-link').forEach(link => link.classList.remove('active'));
-	    if(element) {
-	        element.classList.add('active');
-	    }
-
-	    fetch('${pageContext.request.contextPath}/api/payment/history')
-	    .then(res => res.json())
-	    .then(data => {
-	        let html = '';
-	        if(data.length === 0) {
-	            html = '<div style="text-align:center; padding:60px 0; color:#999;"><i class="ri-coins-line" style="font-size:40px; color:#ddd; margin-bottom:15px; display:block;"></i>이용 내역이 없습니다.</div>';
-	        } else {
-	        	data.forEach(item => {
-                    let typeText = '', amountColor = '#333', amountPrefix = '', icon = '';
- 
-                    if(item.historyType === 'CHARGE') { typeText = '포인트 충전'; amountColor = '#00B98D'; amountPrefix = '+ '; icon = '<i class="ri-add-circle-fill" style="color:#00B98D; font-size:24px; margin-right:15px;"></i>'; }
-                    else if(item.historyType === 'USE_ESCROW') { typeText = '안전결제 사용'; amountColor = '#F86D7D'; amountPrefix = '- '; icon = '<i class="ri-shopping-bag-3-fill" style="color:#F86D7D; font-size:24px; margin-right:15px;"></i>'; }
-                    else if(item.historyType === 'REFUND_ESCROW') { typeText = '안전결제 취소 (포인트 반환)'; amountColor = '#00B98D'; amountPrefix = '+ '; icon = '<i class="ri-refund-2-fill" style="color:#00B98D; font-size:24px; margin-right:15px;"></i>'; }
-                    else if(item.historyType === 'REFUND') { typeText = '충전 환불 (실제 돈 반환)'; amountColor = '#F86D7D'; amountPrefix = '- '; icon = '<i class="ri-bank-card-fill" style="color:#F86D7D; font-size:24px; margin-right:15px;"></i>'; }
-                    else if(item.historyType === 'SELL_ESCROW') { typeText = '판매 정산금 적립'; amountColor = '#3182F6'; amountPrefix = '+ '; icon = '<i class="ri-hand-coin-fill" style="color:#3182F6; font-size:24px; margin-right:15px;"></i>'; }
-                    else { 
-                        typeText = '기타 내역 (' + (item.historyType || '알수없음') + ')'; 
-                        amountColor = '#555'; 
-                        amountPrefix = (item.amount > 0 ? '+ ' : (item.amount < 0 ? '- ' : '')); 
-                        icon = '<i class="ri-question-fill" style="color:#aaa; font-size:24px; margin-right:15px;"></i>'; 
-                    }
-
-                    let displayAmount = Math.abs(item.amount).toLocaleString();
-                    
-                    html += `
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding:20px 0; border-bottom:1px solid #f0f0f0;">
-                            <div style="display:flex; align-items:center;">
-                                \${icon}
-                                <div>
-                                    <div style="font-size:15px; font-weight:700; color:#333; margin-bottom:4px;">\${typeText}</div>
-                                    <div style="font-size:12px; color:#888;">\${item.createdAt || '시간 정보 없음'}</div>
-                                </div>
-                            </div>
-                            <div style="text-align:right;">
-                                <div style="font-size:16px; font-weight:800; color:\${amountColor};">\${amountPrefix}\${displayAmount} P</div>
-                                <div style="font-size:13px; color:#888; margin-top:4px;">잔액 \${item.totalPoint.toLocaleString()} P</div>
-                            </div>
-                        </div>
-                    `;
-                });
-	        }
-	        document.getElementById('pointHistoryListContainer').innerHTML = html;
-	    });
-	}
-	</script>
 </body>
 </html>

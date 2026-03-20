@@ -16,7 +16,8 @@
 
 		<div class="sb-group">
 			<span class="sb-label">내 활동 관리</span> 
-			<a href="javascript:void(0);" onclick="showPointHistoryView(this)" class="sb-link" id="menu-point-history"><i class="ri-coin-line"></i> 포인트 이용 내역</a> 
+			<a href="javascript:void(0);" onclick="showPointHistoryView(this)" class="sb-link" id="menu-point-history"><i class="ri-coin-line"></i> 포인트 이용 내역</a>
+			<a href="javascript:void(0);" onclick="showTradeHistoryView(this)" class="sb-link" id="menu-trade-history"><i class="ri-shopping-bag-3-line"></i> 거래 내역 보기</a>
 			<a href="#" class="sb-link"><i class="ri-star-line"></i> 받은 거래 후기</a> 
 			<a href="#" class="sb-link"><i class="ri-star-line"></i> 보낸 거래 후기</a> 
 			<a href="#" class="sb-link"><i class="ri-user-forbid-line"></i> 차단 사용자 관리</a>
