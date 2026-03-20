@@ -12,4 +12,5 @@ public interface TradingReviewsMapper {
     public void insertReview(TradingReviews dto);
     public void deleteReview(Map<String, Object> map);
     public void hideReview(Map<String, Object> map);
+    public Map<String, Object> getTradeTargetInfo(Map<String, Object> map);
 }

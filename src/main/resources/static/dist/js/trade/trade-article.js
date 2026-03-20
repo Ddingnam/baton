@@ -288,32 +288,28 @@ const StatusModule = (function () {
 		.then(() => {
 			close();
 
-			let msg = `상품 상태가 [${tradeStatus}]로 변경되었습니다.`;
-	            
-			if (tradeStatus === '숨기기') {
-				msg = '게시글이 숨김 처리되었습니다. 목록으로 이동합니다.';
-			} else if (tradeStatus === '판매완료') {
-				msg = '🎉 판매가 완료되었습니다! 상태가 변경되었습니다.';
-			}
+		const msg = tradeStatus === '숨기기' 
+		                        ? '게시글이 숨김 처리되었습니다. 목록으로 이동합니다.' 
+		                        : `상품 상태가 [${tradeStatus}]로 변경되었습니다.`;
+		            showBatonToast(msg);
 
-	        showBatonToast(msg);
-
-	        setTimeout(() => {
-	            if (tradeStatus === '숨기기') {
-	            	location.href = '/trade/list'; 
-	            } else {
-	                location.reload();
-	            }
-	        }, 1200);
-		})
-		.catch(err => {
-			console.error("통신 실패:", err);
-			showBatonToast("상태 변경 중 오류가 발생했습니다.");
-		});
-	}
-
-    return { open, close, update };
-})();
+		            setTimeout(() => {
+		                if (tradeStatus === '숨기기') {
+		                    location.href = '/trade/list'; 
+		                } else if (tradeStatus === '판매완료') {
+		                    location.href = '/review/write?productIdx=' + productIdx + '&role=SELLER';
+		                } else {
+		                    location.reload();
+		                }
+		            }, 1200);
+		        })
+		        .catch(err => {
+		            console.error("통신 실패:", err);
+		            showBatonToast("상태 변경 중 오류가 발생했습니다.");
+		        });
+		    }
+		    return { open, close, update };
+		})();
 
 const PullUpModule = (function () {
     function execute(productIdx) {
@@ -474,7 +470,7 @@ function confirmTradePurchase(productIdx) {
     .then(data => {
         if (data.state === 'true') {
             alert(data.message);
-            location.reload(); 
+            location.href = window.contextPath + '/review/write?productIdx=' + productIdx + '&role=BUYER'; 
         } else {
             alert(data.message);
         }

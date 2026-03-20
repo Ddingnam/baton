@@ -94,9 +94,10 @@ function showTradeHistoryView(element) {
                 let amountColor = item.HISTORYTYPE === 'BUY' ? '#F86D7D' : '#3182F6';
                 let statusText = item.STATUS;
                 let reviewBtn = '';
-                
-                if (item.HISTORYTYPE === 'BUY' && (statusText === '판매완료' || statusText === 'CONFIRMED' || statusText === 'COMPLETED' || statusText === '결제완료')) {
-                    reviewBtn = `<button type="button" onclick="location.href='${CONTEXT_PATH}/review/write?productIdx=${item.PRODUCTIDX}'" style="background:#fff; color:#333; border:1px solid #ddd; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; margin-left:10px; transition:0.2s;">거래 후기 남기기</button>`;
+                let roleParam = item.HISTORYTYPE === 'BUY' ? 'BUYER' : 'SELLER';
+
+                if (statusText === '판매완료' || statusText === 'CONFIRMED' || statusText === 'COMPLETED' || statusText === '거래완료') {
+                    reviewBtn = `<button type="button" onclick="location.href='${CONTEXT_PATH}/review/write?productIdx=${item.PRODUCTIDX}&role=${roleParam}'" style="background:#fff; color:#var(--color-purple, #6f42c1); border:1px solid var(--color-purple, #6f42c1); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; margin-left:10px; transition:0.2s;">후기 쓰기</button>`;
                 }
 
                 html += `

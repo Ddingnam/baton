@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,6 +27,49 @@ public class TradingReviewsController {
 
     public TradingReviewsController(TradingReviewsMapper reviewMapper) {
         this.reviewMapper = reviewMapper;
+    }
+
+    @GetMapping("/write")
+    public String writeForm(
+            @RequestParam("productIdx") long productIdx,
+            @RequestParam("role") String role,
+            Model model,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        
+        if(userDetails == null) {
+            return "redirect:/member/login";
+        }
+
+        Map<String, Object> param = new HashMap<>();
+        param.put("productIdx", productIdx);
+        param.put("role", role);
+
+        Map<String, Object> targetInfo = reviewMapper.getTradeTargetInfo(param);
+        
+        if(targetInfo == null) {
+            return "redirect:/trade/article?productIdx=" + productIdx;
+        }
+
+        model.addAttribute("productIdx", productIdx);
+        model.addAttribute("saleReviewType", role);
+        model.addAttribute("targetUserIdx", targetInfo.get("TARGET_USERIDX"));
+        model.addAttribute("targetNickname", targetInfo.get("TARGET_NICKNAME"));
+
+        return "review/write";
+    }
+
+    @PostMapping("/submit")
+    public String writeSubmit(TradingReviews dto, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        try {
+            if (userDetails != null) {
+                dto.setUserIdx((int)userDetails.getUserIdx());
+                reviewMapper.insertReview(dto);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "redirect:/mypage"; 
     }
 
     @GetMapping("/list")
@@ -81,31 +124,6 @@ public class TradingReviewsController {
         else return (diffTime / 12) + "년 전";
     }
 
-    @PostMapping("/write")
-    @ResponseBody
-    public Map<String, Object> writeReview(@RequestBody TradingReviews dto) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
-                CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-                dto.setUserIdx((int)userDetails.getUserIdx()); 
-            } else {
-                response.put("status", "error");
-                response.put("message", "로그인이 필요한 서비스입니다.");
-                return response;
-            }
-            
-            reviewMapper.insertReview(dto);
-            response.put("status", "success");
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.put("status", "error");
-            response.put("message", "데이터 저장 중 오류가 발생했습니다.");
-        }
-        return response;
-    }
-    
     @PostMapping("/delete")
     @ResponseBody
     public Map<String, Object> deleteReview(@RequestParam("reviewIdx") int reviewIdx) {

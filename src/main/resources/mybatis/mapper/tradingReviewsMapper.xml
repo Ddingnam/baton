@@ -23,9 +23,11 @@
             U.ADDR AS writerAddr,
             P.TITLE AS productTitle
         FROM TRADINGREVIEWS R
-        LEFT JOIN USERS U ON R.USERIDX = U.USERIDX LEFT JOIN PRODUCT P ON R.PRODUCTIDX = P.PRODUCTIDX 
+        LEFT JOIN USERS U ON R.USERIDX = U.USERIDX 
+        LEFT JOIN PRODUCT P ON R.PRODUCTIDX = P.PRODUCTIDX 
         <where>
-            R.ISHIDDEN = 0<choose>
+            R.ISHIDDEN = 0
+            <choose>
                 <when test="type == 'BUYER'">
                     AND R.SALEREVIEWTYPE = 'BUYER'
                 </when>
@@ -50,12 +52,29 @@
         INSERT INTO TRADINGREVIEWS (
             REVIEWIDX, SALEREVIEWTYPE, CONTENT, USERIDX, PRODUCTIDX, SCORE, REVIEWTAGS
         ) VALUES (
-            SEQTRADINGREVIEWS.NEXTVAL, 
-            #{saleReviewType}, 
-            #{content, jdbcType=VARCHAR},  #{userIdx}, 
-            #{productIdx}, 
-            #{score}, 
-            #{reviewTags, jdbcType=VARCHAR} )
+            SEQTRADINGREVIEWS.NEXTVAL, #{saleReviewType}, #{content}, #{userIdx}, #{productIdx}, #{score}, #{reviewTags}
+        )
     </insert>
+
+    <select id="getTradeTargetInfo" parameterType="map" resultType="map">
+        SELECT 
+            <choose>
+                <when test="role == 'BUYER'">
+                    t.SELLERIDX as TARGET_USERIDX,
+                    u.NICKNAME as TARGET_NICKNAME
+                </when>
+                <otherwise>
+                    t.BUYERIDX as TARGET_USERIDX,
+                    u.NICKNAME as TARGET_NICKNAME
+                </otherwise>
+            </choose>
+        FROM TRADETRANSACTION t
+        JOIN USERS u ON u.USERIDX = 
+            <choose>
+                <when test="role == 'BUYER'">t.SELLERIDX</when>
+                <otherwise>t.BUYERIDX</otherwise>
+            </choose>
+        WHERE t.PRODUCTIDX = #{productIdx}
+    </select>
 
 </mapper>
