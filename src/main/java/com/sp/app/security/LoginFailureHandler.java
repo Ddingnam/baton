@@ -32,48 +32,56 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 
 		String login_id = request.getParameter("login_id");
 		String redirectUrl = defaultFailureUrl;
-		
-		String msg = "로그인 실패";
-		try {
-			if(exception instanceof BadCredentialsException) {
-				
-				int cnt = memberService.checkFailureCount(login_id);
-				if(cnt <= 4) {
-					memberService.updateFailureCount(login_id);
-				}
-				
-				if(cnt >= 4) {
-					UserDto dto = memberService.findByLoginId(login_id);
-					
-					Map<String, Object> map = new HashMap<>();
-					map.put("status", 0);
-					map.put("userIdx", dto.getUserIdx());
-					memberService.updateUserEnabled(map);
-					
-					/*
-					dto.setRegister_id(dto.getMember_id());
-					dto.setStatus_code(1);
-					dto.setMemo("패스워드 5회이상 실패");
-					memberService.insertMemberStatus(dto);
-					*/
-				}
-				
-				msg = "패스워드 불일치";
-			} else if(exception instanceof InternalAuthenticationServiceException) {
-				
-				msg = "존재하지 않은 아이디";
-			} else if(exception instanceof DisabledException) {
-				msg = "계정 비활성화";
-				
+
+		// Spring Security 6에서 DisabledException이 InternalAuthenticationServiceException으로
+		// 래핑될 수 있으므로 getCause()까지 함께 확인
+		Throwable actual = exception;
+		if (actual instanceof InternalAuthenticationServiceException && actual.getCause() != null) {
+			actual = actual.getCause();
+		}
+
+		// ★ DisabledException은 try-catch 바깥에서 독립 처리
+		// 기존 코드는 전체 try-catch 안에 있어서 내부 예외가 catch에 잡히면
+		// redirectUrl이 ?error 그대로 유지돼 안내 메시지가 절대 안 떴음
+		if (actual instanceof DisabledException) {
+			try {
 				UserDto dto = memberService.findByLoginId(login_id);
 				if (dto != null && dto.getStatus() == 8) {
 					redirectUrl = defaultFailureUrl.replace("?error", "?withdraw");
 				}
+			} catch (Exception e) {
+				// findByLoginId가 실패해도 DisabledException인 이상 ?withdraw로 이동
+				log.warn("탈퇴 상태 확인 중 오류 (login_id={}): {}", login_id, e.getMessage());
+				redirectUrl = defaultFailureUrl.replace("?error", "?withdraw");
 			}
-			
-			
+			response.sendRedirect(redirectUrl);
+			return;
+		}
+
+		// 일반 로그인 실패 처리
+		try {
+			if (exception instanceof BadCredentialsException) {
+
+				int cnt = memberService.checkFailureCount(login_id);
+				if (cnt <= 4) {
+					memberService.updateFailureCount(login_id);
+				}
+
+				if (cnt >= 4) {
+					UserDto dto = memberService.findByLoginId(login_id);
+
+					Map<String, Object> map = new HashMap<>();
+					map.put("status", 0);
+					map.put("userIdx", dto.getUserIdx());
+					memberService.updateUserEnabled(map);
+				}
+
+			} else if (exception instanceof InternalAuthenticationServiceException) {
+				log.info("Login Failure - 존재하지 않는 아이디: {}", login_id);
+			}
+
 		} catch (Exception e) {
-			log.info("Login Failure : " + msg, e);
+			log.info("Login Failure 처리 중 오류: ", e);
 		}
 
 		response.sendRedirect(redirectUrl);

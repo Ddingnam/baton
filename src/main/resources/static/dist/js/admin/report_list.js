@@ -76,12 +76,13 @@
             desc  : '이 신고를 [' + statusText + '] 처리하시겠습니까?',
             okText: '확인',
             onOk  : function () {
+                var targetIdx = currentReportIdx; // closeModal() 호출 전에 미리 저장
                 closeModal();
                 fetch(CTX + '/admin/report/process', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        reportIdx     : currentReportIdx,
+                        reportIdx     : targetIdx,
                         processStatus : status,
                         adminMemo     : memo
                     })

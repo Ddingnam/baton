@@ -34,7 +34,7 @@
                       action="${pageContext.request.contextPath}/admin/report/list">
                     <div class="status-tabs">
                         <a href="?processStatus=&domainType=${domainType}"
-                           class="status-tab ${empty processStatus or processStatus == '0' ? 'active' : ''}">전체</a>
+                           class="status-tab ${empty processStatus ? 'active' : ''}">전체</a>
                         <a href="?processStatus=0&domainType=${domainType}"
                            class="status-tab ${processStatus == '0' ? 'active' : ''}">
                             <span class="tab-dot red"></span>미처리

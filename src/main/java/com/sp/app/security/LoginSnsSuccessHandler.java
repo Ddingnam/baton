@@ -62,7 +62,8 @@ public class LoginSnsSuccessHandler {
 		    
 		    session.setAttribute("msg", dto.getUserId() + "님, 환영합니다!");
 		    session.setAttribute("isFirstLogin", true);
-		    session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);	
+		    session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
+		    session.setAttribute("member", info); 		    
 		    
 		} catch (Exception e) {
 			log.info("forceLogin : ", e);

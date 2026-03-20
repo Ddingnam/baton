@@ -79,11 +79,13 @@
             desc  : name + ' 님의 탈퇴를 최종 승인합니다.\n이 작업은 되돌릴 수 없습니다.',
             okText: '탈퇴 승인',
             onOk  : function () {
+                var targetWithdrawIdx = pendingWithdrawIdx;
+                var targetUserIdx     = pendingUserIdx;
                 closeModal();
                 fetch(CTX + '/admin/member/withdrawal/approve', {
                     method:  'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body:    JSON.stringify({ withdrawIdx: pendingWithdrawIdx, userIdx: pendingUserIdx })
+                    body:    JSON.stringify({ withdrawIdx: targetWithdrawIdx, userIdx: targetUserIdx })
                 })
                 .then(function (r) { return r.json(); })
                 .then(function (d) {
@@ -107,11 +109,13 @@
             desc  : name + ' 님의 탈퇴 요청을 반려합니다.\n계정 상태가 정상으로 복구됩니다.',
             okText: '반려',
             onOk  : function () {
+                var targetWithdrawIdx = pendingWithdrawIdx;
+                var targetUserIdx     = pendingUserIdx;
                 closeModal();
                 fetch(CTX + '/admin/member/withdrawal/reject', {
                     method:  'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body:    JSON.stringify({ withdrawIdx: pendingWithdrawIdx, userIdx: pendingUserIdx })
+                    body:    JSON.stringify({ withdrawIdx: targetWithdrawIdx, userIdx: targetUserIdx })
                 })
                 .then(function (r) { return r.json(); })
                 .then(function (d) {

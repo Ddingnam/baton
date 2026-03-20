@@ -71,10 +71,10 @@
 
     <update id="updateProcessStatus" parameterType="map">
         UPDATE adminReport
-        SET processStatus = #{processStatus},
+        SET processStatus = #{processStatus, jdbcType=INTEGER},
             processDate   = CURRENT_TIMESTAMP,
-            adminMemo     = #{adminMemo}
-        WHERE reportIdx = #{reportIdx}
+            adminMemo     = #{adminMemo, jdbcType=VARCHAR}
+        WHERE reportIdx = #{reportIdx, jdbcType=NUMERIC}
     </update>
 
 </mapper>

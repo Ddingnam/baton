@@ -57,7 +57,7 @@
                     <div onclick="leaveRoom()" style="padding:13px 16px; color:#555; cursor:pointer; font-size:14px; font-weight:600; text-align:center; transition:background 0.15s;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='transparent'">삭제하기</div>
                     <c:if test="${not empty counterpartIdx}">
                     <div style="height:1px; background:#f0f0f0; margin:0 12px;"></div>
-                    <div onclick="openReportModal('CHAT', ${counterpartIdx}, ${counterpartIdx})" style="padding:13px 16px; color:#FF4D4F; cursor:pointer; font-size:14px; font-weight:600; text-align:center; transition:background 0.15s;" onmouseover="this.style.background='#FFF1F0'" onmouseout="this.style.background='transparent'">신고하기</div>
+                    <div onclick="openReportModal('CHAT', ${roomIdx}, ${counterpartIdx})" style="padding:13px 16px; color:#FF4D4F; cursor:pointer; font-size:14px; font-weight:600; text-align:center; transition:background 0.15s;" onmouseover="this.style.background='#FFF1F0'" onmouseout="this.style.background='transparent'">신고하기</div>
                     </c:if>
                 </div>
             </div>

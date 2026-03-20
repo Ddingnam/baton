@@ -34,7 +34,7 @@ public class AdminReportController {
     @GetMapping("/list")
     public String reportList(
             @RequestParam(value = "page", defaultValue = "1") int current_page,
-            @RequestParam(value = "processStatus", defaultValue = "0") String processStatus,
+            @RequestParam(value = "processStatus", defaultValue = "") String processStatus,
             @RequestParam(value = "domainType", required = false) String domainType,
             @RequestParam(value = "kwd", required = false) String kwd,
             HttpServletRequest req,

@@ -9,5 +9,5 @@ public interface AdminReportService {
     public int dataCount(Map<String, Object> map);
     public List<ReportDto> listReport(Map<String, Object> map);
     public ReportDto getReport(Long reportIdx);
-    public void processReport(Map<String, Object> map);
+    public void processReport(Map<String, Object> map) throws Exception;
 }
