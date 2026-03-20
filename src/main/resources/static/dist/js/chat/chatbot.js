@@ -23,7 +23,7 @@ async function sendMessage() {
 	createAiBubble(aiMsgId);
 
 	try {
-		const response = await fetch(`${pageContext.request.contextPath}/chatbot/question?question=` + encodeURIComponent(question));
+		const response = await fetch(`${ContextPath}/chatbot/question?question=` + encodeURIComponent(question));
 		const reader = response.body.getReader();
 		const decoder = new TextDecoder();
             

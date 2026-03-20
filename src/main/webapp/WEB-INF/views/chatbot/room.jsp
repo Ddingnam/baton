@@ -45,7 +45,11 @@
             <button onclick="sendMessage()"><i class="ri-send-plane-fill"></i></button>
         </div>
     </div>
-    
+
+<script type="text/javascript">
+    const ContextPath = "${pageContext.request.contextPath}";
+</script>
+
 <script src="${pageContext.request.contextPath}/dist/js/chat/chatbot.js"></script>
 </body>
 </html>

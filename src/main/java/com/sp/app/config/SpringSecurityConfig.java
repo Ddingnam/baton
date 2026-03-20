@@ -27,7 +27,7 @@ public class SpringSecurityConfig {
 
 		String[] excludeUri = { "/", "/index.jsp", "/member/**", "/dist/**",
 				"/guest/main", "/guest/list", "/uploads/photo/**", "/favicon.ico", "/WEB-INF/views/**", "/static/**",
-				"/oauth/kakao/callback", "/admin/login", "/js/**" };
+				"/oauth/kakao/callback", "/admin/login", "/js/**", "/chatbot/**" };
 
 		http.cors(Customizer.withDefaults())
 			.csrf(AbstractHttpConfigurer::disable)

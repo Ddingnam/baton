@@ -1,5 +1,6 @@
 package com.sp.app.service;
 
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -15,9 +16,10 @@ public class ChatBotProxyServiceImpl implements ChatBotProxyService{
 	public Flux<String> getChatResponse(String question) {
 		return chatBotWebClient.get()
 	            .uri(uriBuilder -> uriBuilder
-	                .path("/chatBot/question")
+	                .path("/chatbot/question")
 	                .queryParam("question", question)
 	                .build())
+	            .accept(MediaType.TEXT_EVENT_STREAM)
 	            .retrieve()
 	            .bodyToFlux(String.class);
 	}

@@ -23,7 +23,7 @@ public class ChatBotController {
     }
 	
 	@GetMapping(value = "question", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<String> ask(@RequestParam String question) {
+	public Flux<String> ask(@RequestParam("question") String question) {
         return chatBotService.getChatResponse(question);
     }
 }
