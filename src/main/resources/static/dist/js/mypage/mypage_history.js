@@ -41,8 +41,8 @@ function showPointHistoryView(element) {
                 
                 if(item.historyType === 'CHARGE') { typeText = '포인트 충전'; amountColor = '#00B98D'; amountPrefix = '+ '; icon = '<i class="ri-add-circle-fill" style="color:#00B98D; font-size:24px; margin-right:15px;"></i>'; }
                 else if(item.historyType === 'USE_ESCROW') { typeText = '안전결제 사용'; amountColor = '#F86D7D'; amountPrefix = '- '; icon = '<i class="ri-shopping-bag-3-fill" style="color:#F86D7D; font-size:24px; margin-right:15px;"></i>'; }
-                else if(item.historyType === 'REFUND_ESCROW') { typeText = '안전결제 취소 (포인트 반환)'; amountColor = '#00B98D'; amountPrefix = '+ '; icon = '<i class="ri-refund-2-fill" style="color:#00B98D; font-size:24px; margin-right:15px;"></i>'; }
-                else if(item.historyType === 'REFUND') { typeText = '충전 환불 (실제 돈 반환)'; amountColor = '#F86D7D'; amountPrefix = '- '; icon = '<i class="ri-bank-card-fill" style="color:#F86D7D; font-size:24px; margin-right:15px;"></i>'; }
+                else if(item.historyType === 'REFUND_ESCROW') { typeText = '안전결제 취소'; amountColor = '#00B98D'; amountPrefix = '+ '; icon = '<i class="ri-refund-2-fill" style="color:#00B98D; font-size:24px; margin-right:15px;"></i>'; }
+                else if(item.historyType === 'REFUND') { typeText = '결제 취소 환불'; amountColor = '#F86D7D'; amountPrefix = '- '; icon = '<i class="ri-bank-card-fill" style="color:#F86D7D; font-size:24px; margin-right:15px;"></i>'; }
                 else if(item.historyType === 'SELL_ESCROW') { typeText = '판매 정산금 적립'; amountColor = '#3182F6'; amountPrefix = '+ '; icon = '<i class="ri-hand-coin-fill" style="color:#3182F6; font-size:24px; margin-right:15px;"></i>'; }
                 else { 
                     typeText = '기타 내역 (' + (item.historyType || '알수없음') + ')'; 
