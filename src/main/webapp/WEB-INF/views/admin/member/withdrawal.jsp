@@ -33,22 +33,32 @@
             transform: translateY(0) scale(1);
         }
         .wd-modal-head {
-            padding: 22px 28px 18px;
-            border-bottom: 1px solid var(--border-color);
+            padding: 18px 24px 16px;
+            background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%);
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
         }
-        .wd-modal-head-left { display: flex; align-items: center; gap: 12px; }
+        .wd-modal-head::before {
+            content: ''; position: absolute;
+            top: -25px; right: -25px;
+            width: 110px; height: 110px; border-radius: 50%;
+            background: rgba(255,255,255,0.04); pointer-events: none;
+        }
+        .wd-modal-head-left { display: flex; align-items: center; gap: 12px; position: relative; }
         .wd-modal-avt {
-            width: 42px; height: 42px; border-radius: 50%;
-            background: var(--grad-primary); color: white;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(165,180,252,0.18);
+            border: 1px solid rgba(165,180,252,0.25);
+            color: #A5B4FC;
             display: flex; align-items: center; justify-content: center;
             font-size: 17px; font-weight: 800; flex-shrink: 0;
         }
-        .wd-modal-name { font-size: 15px; font-weight: 800; color: var(--text-main); }
-        .wd-modal-id   { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+        .wd-modal-name { font-size: 15px; font-weight: 800; color: #fff; }
+        .wd-modal-id   { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
 
         .wd-modal-body {
             padding: 22px 28px;
@@ -277,9 +287,7 @@
                     <div class="wd-modal-id"   id="rvId"></div>
                 </div>
             </div>
-            <button class="fm-close" id="reviewClose" style="position:relative;top:0;right:0;">
-                <i class="ri-close-line"></i>
-            </button>
+            <button id="reviewClose" style="width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:15px;color:rgba(255,255,255,0.4);cursor:pointer;transition:all 0.15s;flex-shrink:0;" onmouseover="this.style.background='rgba(239,68,68,0.25)';this.style.color='#FCA5A5';" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.4)';"><i class="ri-close-line"></i></button>
         </div>
 
         <div class="wd-modal-body" id="rvBody">

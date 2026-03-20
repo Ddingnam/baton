@@ -8,4 +8,5 @@ import java.util.Map;
 public interface AdminEscrowMapper {
     int dataCount(Map<String, Object> map);
     List<Map<String, Object>> listEscrow(Map<String, Object> map);
+    Map<String, Object> getEscrowDetail(Long tradeIdx);
 }

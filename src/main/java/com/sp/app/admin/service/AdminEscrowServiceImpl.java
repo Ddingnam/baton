@@ -20,4 +20,13 @@ public class AdminEscrowServiceImpl implements AdminEscrowService {
     public List<Map<String, Object>> listEscrow(Map<String, Object> map) {
         return adminEscrowMapper.listEscrow(map);
     }
+    @Override
+    public Map<String, Object> getEscrowDetail(Long tradeIdx) {
+        try {
+            return adminEscrowMapper.getEscrowDetail(tradeIdx);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new java.util.HashMap<>();
+        }
+    }
 }

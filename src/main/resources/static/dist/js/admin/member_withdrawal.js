@@ -132,11 +132,19 @@
     }
 
     function renderBody(data, reason) {
-        var trades  = data.trades  || [];
-        var reports = data.reports || [];
-        var html    = '';
+        var trades     = data.trades  || [];
+        var reports    = data.reports || [];
+        var batonpoint = data.batonpoint || 0;
+        var html       = '';
 
-        // 탈퇴 사유
+        if (batonpoint > 0) {
+            html += '<div style="margin-bottom:14px;background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:14px;padding:14px 18px;display:flex;align-items:flex-start;gap:12px;">';
+            html += '<div style="width:32px;height:32px;border-radius:10px;background:#FED7AA;color:#C2410C;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;"><i class="ri-coins-line"></i></div>';
+            html += '<div><div style="font-size:13px;font-weight:800;color:#C2410C;margin-bottom:3px;">⚠ 잔여 포인트 있음 — 탈퇴 불가</div>';
+            html += '<div style="font-size:12px;color:#92400E;">잔여 바톤 포인트 <strong style="font-size:14px;">' + Number(batonpoint).toLocaleString() + ' P</strong> 가 남아 있습니다.<br>탈퇴 전 포인트를 사용하거나 환불 처리 후 승인해 주세요.</div>';
+            html += '</div></div>';
+        }
+
         html += '<div>';
         html += '<div class="wd-sec-title"><i class="ri-file-text-line"></i> 탈퇴 사유</div>';
         html += '<div class="wd-reason-box">'
@@ -144,7 +152,6 @@
               + '</div>';
         html += '</div>';
 
-        // 진행 중인 거래 (소문자 키 사용)
         html += '<div>';
         html += '<div class="wd-sec-title"><i class="ri-shopping-bag-2-line"></i> 진행 중인 거래'
               + '<span class="wd-cnt ' + (trades.length > 0 ? 'has' : 'none') + '">' + trades.length + '건</span></div>';
@@ -172,7 +179,6 @@
         }
         html += '</div>';
 
-        // 미처리 신고 (소문자 키 사용)
         html += '<div>';
         html += '<div class="wd-sec-title"><i class="ri-alarm-warning-line"></i> 미처리 신고 내역'
               + '<span class="wd-cnt ' + (reports.length > 0 ? 'has' : 'none') + '">' + reports.length + '건</span></div>';
@@ -194,6 +200,19 @@
         html += '</div>';
 
         document.getElementById('rvBody').innerHTML = html;
+
+        var approveBtn = document.getElementById('btnApprove');
+        if (approveBtn) {
+            if (batonpoint > 0) {
+                approveBtn.disabled = true;
+                approveBtn.style.background = '#E2E8F0';
+                approveBtn.style.color = '#94A3B8';
+                approveBtn.style.cursor = 'not-allowed';
+                approveBtn.style.boxShadow = 'none';
+                approveBtn.title = '잔여 포인트 소진 후 승인 가능';
+                approveBtn.removeEventListener('click', doApprove);
+            }
+        }
     }
 
     function esc(str) {

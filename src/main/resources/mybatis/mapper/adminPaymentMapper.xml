@@ -51,4 +51,22 @@
         OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
     </select>
 
+
+    <select id="getPaymentDetail" parameterType="Long" resultType="map">
+        SELECT p.PAYMENTIDX    AS "paymentIdx",
+               p.MERCHANTUID   AS "merchantUid",
+               u.USERID        AS "userId",
+               u.NICKNAME      AS "nickname",
+               u.EMAIL         AS "email",
+               u.BATONPOINT    AS "batonpoint",
+               p.PAYMETHOD     AS "payMethod",
+               p.CHARGEAMOUNT  AS "chargeAmount",
+               TO_CHAR(p.PAIDAT, 'YYYY-MM-DD HH24:MI:SS') AS "paidAt",
+               p.PAYSTATUS     AS "payStatus",
+               p.IMPUID        AS "impUid"
+        FROM PAYMENT p
+        JOIN USERS u ON p.USERIDX = u.USERIDX
+        WHERE p.PAYMENTIDX = #{paymentIdx}
+    </select>
+
 </mapper>

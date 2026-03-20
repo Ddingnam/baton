@@ -83,13 +83,13 @@
             if (m.status == 1) {
                 b.textContent = '정상';
                 b.className   = 'detail-status-badge status-ok';
-                bs.style.display = '';
+                bs.style.display = 'inline-flex';
                 ba.style.display = 'none';
             } else if (m.status == 2) {
                 b.textContent = '제재중';
                 b.className   = 'detail-status-badge status-ban';
                 bs.style.display = 'none';
-                ba.style.display = '';
+                ba.style.display = 'inline-flex';
             } else {
                 b.textContent = '탈퇴';
                 b.className   = 'detail-status-badge status-out';
@@ -98,7 +98,10 @@
             }
 
             swP('paneInfo');
+            var box = document.getElementById('memberModalBox');
+            if (box) { box.style.opacity='0'; box.style.transform='translateY(20px) scale(0.97)'; }
             document.getElementById('detailOverlay').classList.add('show');
+            if (box) { requestAnimationFrame(function(){ box.style.opacity='1'; box.style.transform='translateY(0) scale(1)'; }); }
         })
         .catch(function (e) {
             console.error('상세 정보 조회 실패:', e);
@@ -106,6 +109,7 @@
         });
     }
     window.openDetail = oDt;
+    window.closeMemberModal = function() { document.getElementById('detailClose').click(); };
 
     function fmtDate(v) {
         if (!v) return '-';
@@ -115,10 +119,17 @@
     }
 
     document.getElementById('detailClose').addEventListener('click', function () {
-        document.getElementById('detailOverlay').classList.remove('show');
+        var box2 = document.getElementById('memberModalBox');
+    if (box2) { box2.style.opacity='0'; box2.style.transform='translateY(20px) scale(0.97)'; }
+    setTimeout(function(){ document.getElementById('detailOverlay').classList.remove('show'); }, 280);
     });
     document.getElementById('detailOverlay').addEventListener('click', function (e) {
-        if (e.target === this) this.classList.remove('show');
+        if (e.target === this) document.getElementById('detailClose').click();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.getElementById('detailOverlay').classList.contains('show')) {
+            document.getElementById('detailClose').click();
+        }
     });
 
     document.getElementById('btnSuspend').addEventListener('click', function () {

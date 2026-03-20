@@ -25,6 +25,7 @@ public interface AdminMemberMapper {
 	public List<Map<String, Object>> listWithdrawals(Map<String, Object> map);
 	public int countWithdrawals(Map<String, Object> map);
 	public void updateWithdrawalStatus(Map<String, Object> map);
+	public Long getUserBatonPoint(Long userIdx);
 
 	public void liftSanctionByUserIdx(Long userIdx);
 

@@ -120,7 +120,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="reason-cell" title="${item.subject}">${item.subject}</span>
+                                        <span class="reason-cell community-title-link" title="${item.subject}" onclick="openDetail(${item.id})" style="cursor:pointer;color:var(--color-primary);font-weight:600;">${item.subject}</span>
                                     </td>
                                     <td>
                                         <div class="member-cell">
@@ -183,12 +183,149 @@
     </main>
 </div>
 
+<div class="fullscreen-overlay" id="communityDetailOverlay">
+    <div id="cdModalBox" style="
+        background:#fff;border-radius:24px;width:660px;max-width:96vw;
+        height:82vh;max-height:820px;min-height:480px;display:flex;flex-direction:column;overflow:hidden;
+        box-shadow:0 32px 80px rgba(0,0,0,0.26);
+        transform:translateY(20px) scale(0.97);
+        transition:transform 0.35s cubic-bezier(0.16,1,0.3,1),opacity 0.35s;
+        opacity:0;">
+
+        
+        <div id="cdHeader" style="
+            background:linear-gradient(135deg,#1E1B4B 0%,#312E81 100%);
+            padding:20px 24px 18px;flex-shrink:0;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none;"></div>
+            <div style="position:absolute;bottom:-50px;left:60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.03);pointer-events:none;"></div>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:relative;">
+                <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                    <div style="width:38px;height:38px;border-radius:12px;background:rgba(165,180,252,0.15);border:1px solid rgba(165,180,252,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;color:#A5B4FC;flex-shrink:0;">
+                        <i class="ri-article-line"></i>
+                    </div>
+                    <div style="min-width:0;">
+                        <div style="font-size:9px;font-weight:700;letter-spacing:0.14em;color:rgba(255,255,255,0.3);margin-bottom:4px;">COMMUNITY ARTICLE</div>
+                        <div id="cdTitle" style="font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px;line-height:1.3;word-break:break-word;"></div>
+                    </div>
+                </div>
+                <button id="cdClose" style="
+                    width:30px;height:30px;border-radius:8px;flex-shrink:0;
+                    background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);
+                    display:flex;align-items:center;justify-content:center;
+                    font-size:16px;color:rgba(255,255,255,0.4);cursor:pointer;
+                    transition:all 0.15s;"
+                    onmouseover="this.style.background='rgba(239,68,68,0.25)';this.style.color='#FCA5A5';"
+                    onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.4)';">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            
+            <div style="display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap;position:relative;">
+                <div id="cdCategoryChip"></div>
+                <div id="cdDongChip"></div>
+                <div id="cdDateChip"></div>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+                    <span id="cdViewStat" style="display:flex;align-items:center;gap:4px;font-size:12px;color:rgba(255,255,255,0.45);"></span>
+                    <span id="cdLikeStat" style="display:flex;align-items:center;gap:4px;font-size:12px;color:rgba(255,255,255,0.45);"></span>
+                </div>
+            </div>
+        </div>
+
+        
+        <div style="flex:1;overflow-y:auto;padding:0;" id="cdScrollBody">
+
+            
+            <div style="padding:16px 24px 14px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;gap:12px;">
+                <div id="cdAvatar" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,0.3);"></div>
+                <div>
+                    <div id="cdWriter" style="font-size:14px;font-weight:800;color:#1E293B;"></div>
+                    <div id="cdWriterSub" style="font-size:11px;color:#94A3B8;margin-top:1px;"></div>
+                </div>
+            </div>
+
+            
+            <div style="padding:20px 24px;border-bottom:1px solid #F1F5F9;">
+                <div id="cdContent" style="font-size:14px;color:#334155;line-height:1.85;word-break:break-word;"></div>
+            </div>
+
+            
+            <div id="cdPollWrap" style="display:none;padding:16px 24px;border-bottom:1px solid #F1F5F9;">
+                <div style="background:linear-gradient(135deg,#F5F3FF,#EDE9FE);border:1px solid #DDD6FE;border-radius:16px;padding:18px 20px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                        <div style="width:28px;height:28px;border-radius:8px;background:#7C3AED;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;"><i class="ri-bar-chart-box-line"></i></div>
+                        <span id="cdPollTitle" style="font-size:14px;font-weight:800;color:#4C1D95;"></span>
+                        <span id="cdPollMeta" style="font-size:11px;color:#7C3AED;margin-left:auto;background:rgba(124,58,237,0.1);padding:3px 10px;border-radius:20px;font-weight:700;"></span>
+                    </div>
+                    <div id="cdPollOptions" style="display:flex;flex-direction:column;gap:8px;"></div>
+                    <div id="cdPollFooter" style="margin-top:12px;font-size:11px;color:#7C3AED;display:flex;align-items:center;gap:12px;"></div>
+                </div>
+            </div>
+
+            
+            <div id="cdImageWrap" style="display:none;padding:16px 24px;border-bottom:1px solid #F1F5F9;">
+                <div style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;display:flex;align-items:center;gap:5px;">
+                    <i class="ri-image-line"></i>이미지
+                </div>
+                <div id="cdImages" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+            </div>
+
+            
+            <div id="cdAttachWrap" style="display:none;padding:14px 24px;border-bottom:1px solid #F1F5F9;">
+                <div style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;display:flex;align-items:center;gap:5px;">
+                    <i class="ri-attachment-line"></i>첨부파일
+                </div>
+                <div id="cdAttaches" style="display:flex;flex-direction:column;gap:6px;"></div>
+            </div>
+
+            
+            <div id="cdTagWrap" style="display:none;padding:14px 24px;border-bottom:1px solid #F1F5F9;">
+                <div id="cdTags" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+            </div>
+
+            
+            <div id="cdPlaceWrap" style="display:none;padding:14px 24px;border-bottom:1px solid #F1F5F9;">
+                <div style="display:flex;align-items:center;gap:10px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:12px 14px;cursor:pointer;"
+                     id="cdPlaceBox">
+                    <div style="width:32px;height:32px;border-radius:10px;background:#DBEAFE;color:#3B82F6;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;"><i class="ri-map-pin-2-fill"></i></div>
+                    <div>
+                        <div id="cdPlaceName" style="font-size:13px;font-weight:700;color:#1E293B;"></div>
+                        <div id="cdPlaceAddr" style="font-size:11px;color:#94A3B8;margin-top:2px;"></div>
+                    </div>
+                    <i class="ri-external-link-line" style="margin-left:auto;color:#CBD5E1;font-size:14px;"></i>
+                </div>
+            </div>
+
+            
+            <div style="padding:16px 24px 24px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                    <i class="ri-chat-3-line" style="font-size:15px;color:#94A3B8;"></i>
+                    <span style="font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;">댓글</span>
+                    <span id="cdReplyCount" style="font-size:12px;font-weight:800;color:#7C3AED;background:#EDE9FE;padding:2px 9px;border-radius:20px;"></span>
+                </div>
+                <div id="cdReplies" style="display:flex;flex-direction:column;gap:6px;"></div>
+            </div>
+        </div>
+
+        
+        <div style="padding:12px 20px;border-top:1px solid #F1F5F9;display:flex;justify-content:flex-end;flex-shrink:0;background:#FAFAFA;">
+            <button id="cdCancel" style="
+                display:inline-flex;align-items:center;gap:6px;
+                padding:9px 20px;border-radius:10px;
+                border:1.5px solid #E2E8F0;background:#fff;
+                font-size:13px;font-weight:600;color:#64748B;
+                cursor:pointer;font-family:inherit;transition:all 0.15s;"
+                onmouseover="this.style.background='#F1F5F9';"
+                onmouseout="this.style.background='#fff';">
+                <i class="ri-close-line"></i>닫기
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="fullscreen-overlay" id="deleteOverlay">
     <div class="mini-modal">
         <div class="mini-modal-head">
-            <span class="mini-modal-title">
-                <i class="ri-delete-bin-line" style="color:var(--color-red);margin-right:6px;"></i>게시글 삭제
-            </span>
+            <span class="mini-modal-title"><i class="ri-delete-bin-line"></i>게시글 삭제</span>
             <button class="mini-modal-close" id="deleteClose"><i class="ri-close-line"></i></button>
         </div>
         <div class="mini-modal-body">
@@ -235,5 +372,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/community_list.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/admin/community_detail.js"></script>
 </body>
 </html>

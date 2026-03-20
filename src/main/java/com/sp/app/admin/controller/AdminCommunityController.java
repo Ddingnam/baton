@@ -1,6 +1,9 @@
 package com.sp.app.admin.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sp.app.domain.dto.CommunityDto;
+import com.sp.app.domain.dto.CommunityReplyDto;
+import com.sp.app.service.CommunityReplyService;
 import com.sp.app.service.CommunityService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminCommunityController {
 
     private final CommunityService communityService;
+    private final CommunityReplyService communityReplyService;
 
     @Value("${file.upload-root}/community")
     private String uploadPath;
@@ -74,6 +80,32 @@ public class AdminCommunityController {
         model.addAttribute("category",   category);
 
         return "admin/community/list";
+    }
+
+    @GetMapping("/detail")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> detail(@RequestParam("id") Long id) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        try {
+            CommunityDto post        = communityService.getCommunity(id);
+            List<CommunityReplyDto> replies = communityReplyService.listReply(id);
+
+            result.put("success", true);
+            result.put("post",    post);
+            result.put("replies", replies);
+
+            if (post.getPollTitle() != null) {
+                List<Map<String, Object>> optionStats = communityService.getPollOptionsWithVotes(id);
+                long totalVotes = communityService.getPollTotalVotes(id);
+                result.put("pollOptionStats", optionStats);
+                result.put("pollTotalVotes",  totalVotes);
+            }
+
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", e.getMessage());
+        }
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/delete")

@@ -206,10 +206,14 @@
                 <div class="rpt-header-icon"><i class="ri-alarm-warning-fill"></i></div>
                 <div>
                     <p class="rpt-header-eyebrow">REPORT DETAIL</p>
-                    <p class="rpt-header-title">신고 상세</p>
+                    <p class="rpt-header-title" id="dModalTitle">신고 상세</p>
                 </div>
             </div>
-            <button class="rpt-close-btn" id="detailClose"><i class="ri-close-line"></i></button>
+            <button class="rpt-close-btn" id="detailClose"
+                onmouseover="this.style.background='rgba(239,68,68,0.22)';this.style.color='#FCA5A5';"
+                onmouseout="this.style.background='rgba(255,255,255,0.07)';this.style.color='rgba(255,255,255,0.35)';">
+                <i class="ri-close-line"></i>
+            </button>
         </div>
 
         

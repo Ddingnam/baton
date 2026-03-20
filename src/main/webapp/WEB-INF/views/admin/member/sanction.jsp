@@ -154,9 +154,7 @@
 <div class="fullscreen-overlay" id="liftOverlay">
     <div class="mini-modal">
         <div class="mini-modal-head">
-            <span class="mini-modal-title">
-                <i class="ri-lock-unlock-line" style="color:var(--color-green);margin-right:6px;"></i>제재 해제
-            </span>
+            <span class="mini-modal-title"><i class="ri-lock-unlock-line"></i>제재 해제</span>
             <button class="mini-modal-close" id="liftClose"><i class="ri-close-line"></i></button>
         </div>
         <div class="mini-modal-body">

@@ -129,8 +129,10 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     public Map<String, Object> getWithdrawDetail(Long userIdx) {
         Map<String, Object> result = new HashMap<>();
         try {
-            result.put("trades",  mapper.getActiveTrades(userIdx));
-            result.put("reports", mapper.getPendingReports(userIdx));
+            result.put("trades",      mapper.getActiveTrades(userIdx));
+            result.put("reports",     mapper.getPendingReports(userIdx));
+            Long point = mapper.getUserBatonPoint(userIdx);
+            result.put("batonpoint",  point != null ? point : 0L);
         } catch (Exception e) {
             log.info("getWithdrawDetail error", e);
         }

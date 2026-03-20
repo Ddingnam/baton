@@ -13,6 +13,7 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_main.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_member.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_report.css">
     <style>
         .trade-user-col { display: flex; align-items: center; gap: 8px; }
         .trade-role-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
@@ -139,7 +140,7 @@
                                         </c:choose>
                                     </td>
                                     <td>
-                                        <button class="action-btn" title="상세보기"><i class="ri-eye-line"></i></button>
+                                        <button class="action-btn" title="상세보기" onclick="openEscrowDetail(${escrow.tradeIdx})"><i class="ri-eye-line"></i></button>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -192,6 +193,163 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+</script>
+
+<div class="fullscreen-overlay" id="escrowDetailOverlay">
+    <div id="escrowModalBox" style="
+        background:#fff;border-radius:24px;width:580px;max-width:96vw;
+        height:auto;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;
+        box-shadow:0 32px 80px rgba(0,0,0,0.26);
+        transform:translateY(20px) scale(0.97);opacity:0;
+        transition:transform 0.35s cubic-bezier(0.16,1,0.3,1),opacity 0.35s;">
+
+        
+        <div style="background:linear-gradient(135deg,#1E1B4B 0%,#312E81 100%);
+                    padding:18px 22px;flex-shrink:0;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:-25px;right:-25px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;position:relative;">
+                <div style="display:flex;align-items:center;gap:11px;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:rgba(165,180,252,0.15);border:1px solid rgba(165,180,252,0.22);display:flex;align-items:center;justify-content:center;font-size:16px;color:#A5B4FC;flex-shrink:0;">
+                        <i class="ri-exchange-2-line"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:9px;font-weight:700;letter-spacing:0.14em;color:rgba(255,255,255,0.3);margin-bottom:3px;">ESCROW DETAIL</div>
+                        <div id="escrowModalTitle" style="font-size:14px;font-weight:800;color:#fff;letter-spacing:-0.2px;">에스크로 거래 상세</div>
+                    </div>
+                </div>
+                <button id="escrowDetailClose" style="width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:15px;color:rgba(255,255,255,0.4);cursor:pointer;transition:all 0.15s;"
+                    onmouseover="this.style.background='rgba(239,68,68,0.25)';this.style.color='#FCA5A5';"
+                    onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.4)';">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+        </div>
+
+        
+        <div style="flex:1;overflow-y:auto;padding:0;">
+            
+            <div style="padding:20px 24px 16px;border-bottom:1px solid #F1F5F9;text-align:center;">
+                <div style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">거래 대금</div>
+                <div id="escrowAmount" style="font-size:32px;font-weight:900;color:#7C3AED;letter-spacing:-0.04em;"></div>
+                <div id="escrowStatusBadge" style="margin-top:8px;"></div>
+            </div>
+            
+            <div id="escrowParties" style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#F1F5F9;border-bottom:1px solid #F1F5F9;"></div>
+            
+            <div style="padding:12px 24px 20px;">
+                <div id="escrowInfoRows" style="display:flex;flex-direction:column;"></div>
+            </div>
+        </div>
+
+        
+        <div style="padding:12px 20px;border-top:1px solid #F1F5F9;display:flex;justify-content:flex-end;background:#FAFAFA;">
+            <button id="escrowDetailCancel" style="display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:10px;border:1.5px solid #E2E8F0;background:#fff;font-size:13px;font-weight:600;color:#64748B;cursor:pointer;font-family:inherit;transition:all 0.15s;"
+                onmouseover="this.style.background='#F1F5F9';" onmouseout="this.style.background='#fff';">
+                <i class="ri-close-line"></i>닫기
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(){
+    var overlay = document.getElementById('escrowDetailOverlay');
+    var box     = document.getElementById('escrowModalBox');
+
+    function closeEscrow() {
+        box.style.opacity='0'; box.style.transform='translateY(20px) scale(0.97)';
+        setTimeout(function(){ overlay.classList.remove('show'); }, 280);
+    }
+    document.getElementById('escrowDetailClose').addEventListener('click', closeEscrow);
+    document.getElementById('escrowDetailCancel').addEventListener('click', closeEscrow);
+    overlay.addEventListener('click', function(e){ if(e.target===this) closeEscrow(); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape' && overlay.classList.contains('show')) closeEscrow(); });
+
+    var STATUS_LABEL = { PAY_COMPLETED:'결제완료', SHIPPING:'배송중', CONFIRMED:'구매확정', CANCELED:'취소/환불', COMPLETED:'완료' };
+    var STATUS_COLOR = { PAY_COMPLETED:'#10B981', SHIPPING:'#8B5CF6', CONFIRMED:'#3B82F6', CANCELED:'#EF4444', COMPLETED:'#64748B' };
+
+    function openEscrowDetail(tradeIdx) {
+        document.getElementById('escrowModalTitle').textContent = '#TRD-' + tradeIdx;
+        document.getElementById('escrowAmount').textContent = '불러오는 중...';
+        document.getElementById('escrowStatusBadge').innerHTML = '';
+        document.getElementById('escrowParties').innerHTML = '';
+        document.getElementById('escrowInfoRows').innerHTML = '<div style="padding:20px 0;text-align:center;color:#94A3B8;font-size:13px;"><i class="ri-loader-4-line" style="animation:cdSpin 1s linear infinite;font-size:18px;display:block;margin-bottom:6px;"></i>불러오는 중...</div>';
+        box.style.opacity='0'; box.style.transform='translateY(20px) scale(0.97)';
+        overlay.classList.add('show');
+        requestAnimationFrame(function(){ box.style.opacity='1'; box.style.transform='translateY(0) scale(1)'; });
+
+        fetch(CTX + '/admin/escrow/detail?tradeIdx=' + tradeIdx)
+            .then(function(r){ return r.json(); })
+            .then(function(d){
+                if (!d.success) { document.getElementById('escrowAmount').textContent='오류'; return; }
+                var det = d.detail;
+
+                var amt = det.totalUsedPoint ? Number(det.totalUsedPoint).toLocaleString() + ' P' : '-';
+                document.getElementById('escrowAmount').textContent = amt;
+
+                var st = det.tradeStatus || '';
+                document.getElementById('escrowStatusBadge').innerHTML =
+                    '<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;background:' +
+                    (STATUS_COLOR[st]||'#94A3B8') + '18;color:' + (STATUS_COLOR[st]||'#94A3B8') + ';border:1px solid ' + (STATUS_COLOR[st]||'#94A3B8') + '33;">' +
+                    (STATUS_LABEL[st] || st) + '</span>';
+
+                function partyCard(role, roleColor, nick, id) {
+                    return '<div style="background:#fff;padding:14px 18px;">' +
+                        '<div style="font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">' + role + '</div>' +
+                        '<div style="display:flex;align-items:center;gap:8px;">' +
+                        '<div style="width:30px;height:30px;border-radius:50%;background:' + roleColor + ';color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;">' + (nick||'?').charAt(0) + '</div>' +
+                        '<div><div style="font-size:13px;font-weight:700;color:#1E293B;">' + (nick||'-') + '</div>' +
+                        '<div style="font-size:11px;color:#94A3B8;">' + (id||'-') + '</div></div>' +
+                        '</div></div>';
+                }
+                document.getElementById('escrowParties').innerHTML =
+                    partyCard('구매자','#3B82F6', det.buyerNickname, det.buyerId) +
+                    partyCard('판매자','#EC4899', det.sellerNickname, det.sellerId);
+
+                function infoSection(title, icon, rows) {
+                    var rowsHtml = rows.map(function(r) {
+                        var isHighlight = r[2];
+                        return '<div style="display:flex;align-items:flex-start;padding:9px 0;border-bottom:1px solid #F8FAFC;">' +
+                            '<span style="width:110px;flex-shrink:0;font-size:11px;font-weight:700;color:#94A3B8;padding-top:1px;">' + r[0] + '</span>' +
+                            '<span style="flex:1;font-size:13px;font-weight:' + (isHighlight ? '800' : '500') + ';color:' + (isHighlight ? '#7C3AED' : '#334155') + ';word-break:break-all;">' + r[1] + '</span>' +
+                            '</div>';
+                    }).join('');
+                    return '<div style="margin-bottom:14px;">' +
+                        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;padding-bottom:6px;border-bottom:2px solid #EDE9FE;">' +
+                        '<i class="' + icon + '" style="font-size:13px;color:#7C3AED;"></i>' +
+                        '<span style="font-size:10px;font-weight:800;color:#7C3AED;text-transform:uppercase;letter-spacing:0.1em;">' + title + '</span>' +
+                        '</div>' + rowsHtml + '</div>';
+                }
+
+                var infoHtml = '';
+
+                infoHtml += infoSection('거래 정보', 'ri-exchange-2-line', [
+                    ['거래번호',  '#TRD-' + (det.tradeIdx||'-'), false],
+                    ['상품번호',  '#' + (det.productIdx||'-'), false],
+                    ['상품명',    det.productTitle || '-', false],
+                    ['거래일시',  det.tradeDate || '-', false],
+                ]);
+
+                infoHtml += infoSection('금액 내역', 'ri-money-cny-circle-line', [
+                    ['상품 금액',      det.tradePrice ? Number(det.tradePrice).toLocaleString() + ' P' : '-', false],
+                    ['안전결제 수수료', det.safetyFee  ? Number(det.safetyFee).toLocaleString()  + ' P' : '-', false],
+                    ['총 사용 포인트', amt, true],
+                ]);
+
+                infoHtml += infoSection('배송 정보', 'ri-truck-line', [
+                    ['운송장번호',   det.trackingNumber  || '미등록', false],
+                    ['배송 시작일',  det.shippingDate    || '-', false],
+                    ['수령인',       det.recipientName   || '-', false],
+                    ['수령인 연락처',det.recipientPhone  || '-', false],
+                    ['배송 주소',    det.shippingAddress || '-', false],
+                ]);
+
+                document.getElementById('escrowInfoRows').innerHTML = infoHtml;
+            })
+            .catch(function(){ document.getElementById('escrowAmount').textContent='오류'; });
+    }
+    window.openEscrowDetail = openEscrowDetail;
+})();
 </script>
 </body>
 </html>

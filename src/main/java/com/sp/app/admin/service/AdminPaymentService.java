@@ -6,4 +6,5 @@ import java.util.Map;
 public interface AdminPaymentService {
     int dataCount(Map<String, Object> map);
     List<Map<String, Object>> listPayment(Map<String, Object> map);
+    Map<String, Object> getPaymentDetail(Long paymentIdx);
 }

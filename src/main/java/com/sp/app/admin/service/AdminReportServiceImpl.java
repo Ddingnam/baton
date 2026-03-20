@@ -49,11 +49,11 @@ public class AdminReportServiceImpl implements AdminReportService {
 
     @Override
     public void processReport(Map<String, Object> map) throws Exception {
-        // JSON 역직렬화 시 reportIdx가 Integer로 넘어올 수 있어 Long으로 명시 변환
+
         Object rawIdx = map.get("reportIdx");
         if (rawIdx instanceof Integer) {
             map.put("reportIdx", ((Integer) rawIdx).longValue());
         }
-        mapper.updateProcessStatus(map);  // 예외를 상위로 전파해 Controller가 감지하도록
+        mapper.updateProcessStatus(map);
     }
 }

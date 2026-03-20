@@ -46,4 +46,5 @@ public interface CommunityService {
 	public int getUserTotalLikes(Long memberIdx);
 	public LocalDateTime getUserJoinDate(Long memberIdx);
 	public List<Map<String, Object>> getUserRepliesWithPostTitle(Long memberIdx);
+	public List<Map<String, Object>> getPollOptionsWithVotes(long communityId);
 }

@@ -55,4 +55,30 @@
         OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
     </select>
 
+
+    <select id="getEscrowDetail" parameterType="Long" resultType="map">
+        SELECT t.TRADEIDX                                        AS "tradeIdx",
+               t.PRODUCTIDX                                      AS "productIdx",
+               p.TITLE                                           AS "productTitle",
+               b.USERID                                          AS "buyerId",
+               b.NICKNAME                                        AS "buyerNickname",
+               s.USERID                                          AS "sellerId",
+               s.NICKNAME                                        AS "sellerNickname",
+               t.TRADEPRICE                                      AS "tradePrice",
+               t.SAFETYFEE                                       AS "safetyFee",
+               t.TOTALUSED_POINT                                 AS "totalUsedPoint",
+               t.TRADESTATUS                                     AS "tradeStatus",
+               t.TRACKINGNUMBER                                  AS "trackingNumber",
+               t.RECIPIENTNAME                                   AS "recipientName",
+               t.RECIPIENTPHONE                                  AS "recipientPhone",
+               t.SHIPPINGADDRESS                                 AS "shippingAddress",
+               TO_CHAR(t.TRADEDATE,   'YYYY-MM-DD HH24:MI:SS') AS "tradeDate",
+               TO_CHAR(t.SHIPPINGDATE,'YYYY-MM-DD HH24:MI:SS') AS "shippingDate"
+        FROM TRADETRANSACTION t
+        JOIN users b ON t.BUYERIDX  = b.USERIDX
+        JOIN users s ON t.SELLERIDX = s.USERIDX
+        LEFT JOIN product p ON t.PRODUCTIDX = p.productIdx
+        WHERE t.TRADEIDX = #{tradeIdx}
+    </select>
+
 </mapper>

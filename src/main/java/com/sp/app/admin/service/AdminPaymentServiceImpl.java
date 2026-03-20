@@ -21,4 +21,13 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
     public List<Map<String, Object>> listPayment(Map<String, Object> map) {
         return adminPaymentMapper.listPayment(map);
     }
+    @Override
+    public Map<String, Object> getPaymentDetail(Long paymentIdx) {
+        try {
+            return adminPaymentMapper.getPaymentDetail(paymentIdx);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new java.util.HashMap<>();
+        }
+    }
 }

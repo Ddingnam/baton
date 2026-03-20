@@ -695,6 +695,21 @@ public class CommunityServiceImpl implements CommunityService {
 		return dto;
 	}
 
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Map<String, Object>> getPollOptionsWithVotes(long communityId) {
+		CommunityPoll poll = communityPollRepository.findByCommunityId(communityId);
+		if (poll == null) return new ArrayList<>();
+		return poll.getOptions().stream().map(opt -> {
+			Map<String, Object> m = new java.util.LinkedHashMap<>();
+			m.put("optionId", opt.getOptionId());
+			m.put("content", opt.getContent());
+			m.put("voteCount", pollVoteRepository.countByOptionOptionId(opt.getOptionId()));
+			return m;
+		}).collect(Collectors.toList());
+	}
+
 	private String getDongByRegionCode(String regionCode) {
 		try {
 			RegionDto region = memberService.findRegionByCode(regionCode);

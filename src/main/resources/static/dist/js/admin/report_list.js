@@ -32,6 +32,8 @@
                 var statusClass = STATUS_CLASS[d.processStatus] || 'tag-gray';
 
                 dDomainType.innerHTML    = '<span class="tag ' + domainTagClass(d.domainType) + '">' + domainLabel + '</span>';
+                var titleEl = document.getElementById('dModalTitle');
+                if (titleEl) titleEl.textContent = domainLabel + ' 신고 상세';
                 dReportType.textContent  = d.reportType || '-';
                 dReporter.textContent    = (d.reporterName || '-') + ' (' + (d.reporterId || '-') + ')';
                 dReportedUser.textContent = (d.reportedUserName || '-') + ' (' + (d.reportedUserId || '-') + ')';
@@ -43,8 +45,7 @@
                 if (d.processStatus == 0) {
                     detailFooter.style.display = '';
                 } else {
-                    detailFooter.querySelector('#btnProcess').style.display = 'none';
-                    detailFooter.querySelector('#btnReject').style.display  = 'none';
+                    detailFooter.style.display = 'none';
                 }
 
                 overlay.classList.add('show');
@@ -76,7 +77,7 @@
             desc  : '이 신고를 [' + statusText + '] 처리하시겠습니까?',
             okText: '확인',
             onOk  : function () {
-                var targetIdx = currentReportIdx; // closeModal() 호출 전에 미리 저장
+                var targetIdx = currentReportIdx;
                 closeModal();
                 fetch(CTX + '/admin/report/process', {
                     method: 'POST',
@@ -105,6 +106,7 @@
     function closeModal() {
         overlay.classList.remove('show');
         currentReportIdx = null;
+        if (detailFooter) detailFooter.style.display = '';
         var btnProcess = document.getElementById('btnProcess');
         var btnReject  = document.getElementById('btnReject');
         if (btnProcess) btnProcess.style.display = '';

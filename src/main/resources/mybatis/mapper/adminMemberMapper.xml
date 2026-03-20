@@ -152,7 +152,7 @@
                 SELECT w.withdrawIdx, w.userIdx, w.reason,
                        TO_CHAR(w.requestDate, 'YYYY-MM-DD HH24:MI') AS requestDate,
                        w.withdrawStatus,
-                       u.userId, u.nickname, u.email, u.createdDate,
+                       u.userId, u.nickname, u.email, u.createdDate, u.batonpoint,
                        (SELECT COUNT(*) FROM adminReport r
                         WHERE r.reportedUserIdx = w.userIdx AND r.processStatus = 0) AS pendingReports,
                        (SELECT COUNT(*) FROM TRADETRANSACTION t2

@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_main.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_member.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_ui.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_report.css">
 </head>
 <body>
 <div class="agency-layout">
@@ -183,62 +184,131 @@
 </div>
 
 <div class="fullscreen-overlay" id="detailOverlay">
-    <div class="member-detail-modal">
-        <button class="fm-close" id="detailClose"><i class="ri-close-line"></i></button>
+    <div style="
+        background:#fff;border-radius:24px;width:720px;max-width:96vw;
+        height:82vh;max-height:820px;min-height:520px;
+        display:flex;flex-direction:column;overflow:hidden;
+        box-shadow:0 32px 80px rgba(0,0,0,0.26);
+        transform:translateY(20px) scale(0.97);
+        transition:transform 0.35s cubic-bezier(0.16,1,0.3,1),opacity 0.35s;
+        opacity:0;" id="memberModalBox">
 
-        <div class="detail-left">
-            <div class="detail-avt" id="dAvt"></div>
-            <div class="detail-name" id="dName"></div>
-            <div class="detail-id"   id="dId"></div>
-            <span class="detail-status-badge" id="dStatusBadge"></span>
-            <div class="detail-stats">
-                <div class="detail-stat">
-                    <span class="stat-val" id="dLevel"></span>
-                    <span class="stat-lbl">레벨</span>
+        
+        <div style="background:linear-gradient(135deg,#1E1B4B 0%,#312E81 100%);
+                    padding:20px 24px 16px;flex-shrink:0;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:-30px;right:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none;"></div>
+            <div style="position:absolute;bottom:-50px;left:50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.03);pointer-events:none;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;position:relative;">
+                
+                <div style="display:flex;align-items:center;gap:14px;">
+                    <div id="dAvt" style="width:48px;height:48px;border-radius:50%;
+                        background:var(--grad-primary);color:#fff;
+                        display:flex;align-items:center;justify-content:center;
+                        font-size:20px;font-weight:800;flex-shrink:0;
+                        box-shadow:0 6px 20px rgba(124,58,237,0.4);"></div>
+                    <div>
+                        <div style="font-size:9px;font-weight:700;letter-spacing:0.14em;color:rgba(255,255,255,0.3);margin-bottom:3px;">MEMBER DETAIL</div>
+                        <div id="dName" style="font-size:17px;font-weight:800;color:#fff;letter-spacing:-0.3px;"></div>
+                        <div id="dId"   style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;"></div>
+                    </div>
                 </div>
-                <div class="detail-stat">
-                    <span class="stat-val" id="dScoreText"></span>
-                    <span class="stat-lbl">바톤 점수</span>
-                </div>
-                <div class="detail-stat">
-                    <span class="stat-val" id="dPoint"></span>
-                    <span class="stat-lbl">포인트</span>
-                </div>
-            </div>
-            <div style="width:85%;margin:0 auto 12px;">
-                <div class="manner-bar-bg">
-                    <div class="manner-bar-fill" id="dScoreBar"></div>
-                </div>
-            </div>
-            <div class="detail-actions">
-                <button type="button" class="btn-pill btn-danger"  id="btnSuspend"  style="display:none;">
-                    <i class="ri-forbid-line"></i> 제재하기
+                
+                <button id="detailClose" style="width:30px;height:30px;border-radius:8px;
+                    background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);
+                    display:flex;align-items:center;justify-content:center;
+                    font-size:16px;color:rgba(255,255,255,0.4);cursor:pointer;transition:all 0.15s;"
+                    onmouseover="this.style.background='rgba(239,68,68,0.25)';this.style.color='#FCA5A5';"
+                    onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.4)';">
+                    <i class="ri-close-line"></i>
                 </button>
-                <button type="button" class="btn-pill btn-success" id="btnActivate" style="display:none;">
-                    <i class="ri-check-line"></i> 정상화
-                </button>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap;position:relative;">
+                <span id="dStatusBadge" class="detail-status-badge"></span>
+                <span style="height:14px;width:1px;background:rgba(255,255,255,0.15);"></span>
+                <span style="font-size:11px;color:rgba(255,255,255,0.45);">Lv.<span id="dLevel" style="font-weight:800;color:rgba(255,255,255,0.7);"></span></span>
+                <span style="font-size:11px;color:rgba(255,255,255,0.45);">바톤 점수 <span id="dScoreText" style="font-weight:800;color:rgba(255,255,255,0.7);"></span></span>
+                <span style="font-size:11px;color:rgba(255,255,255,0.45);">포인트 <span id="dPoint" style="font-weight:800;color:#A5B4FC;"></span></span>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+                    <span style="font-size:10px;color:rgba(255,255,255,0.3);">매너</span>
+                    <div style="width:80px;height:5px;background:rgba(255,255,255,0.12);border-radius:10px;overflow:hidden;">
+                        <div class="manner-bar-fill" id="dScoreBar" style="height:100%;border-radius:10px;"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="detail-right">
-            <div class="detail-tabs">
-                <button class="detail-tab-btn active" data-pane="paneInfo">기본 정보</button>
-                <button class="detail-tab-btn"        data-pane="paneSanction">제재 처리</button>
+        
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+            
+            <div style="padding:16px 24px 0;border-bottom:1px solid #F1F5F9;display:flex;gap:4px;flex-shrink:0;">
+                <button class="detail-tab-btn active" data-pane="paneInfo"
+                    style="padding:8px 18px;border-radius:10px 10px 0 0;font-size:13px;font-weight:700;">기본 정보</button>
+                <button class="detail-tab-btn" data-pane="paneSanction"
+                    style="padding:8px 18px;border-radius:10px 10px 0 0;font-size:13px;font-weight:700;">제재 처리</button>
+                
+                <div style="margin-left:auto;display:flex;gap:8px;padding-bottom:4px;">
+                    <button type="button" id="btnSuspend" style="display:none;align-items:center;gap:5px;padding:7px 14px;border-radius:10px;background:#EF4444;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;box-shadow:0 3px 10px rgba(239,68,68,0.25);"
+                        onmouseover="this.style.opacity='0.85';" onmouseout="this.style.opacity='1';">
+                        <i class="ri-forbid-line"></i> 제재하기
+                    </button>
+                    <button type="button" id="btnActivate" style="display:none;align-items:center;gap:5px;padding:7px 14px;border-radius:10px;background:#10B981;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;box-shadow:0 3px 10px rgba(16,185,129,0.25);"
+                        onmouseover="this.style.opacity='0.85';" onmouseout="this.style.opacity='1';">
+                        <i class="ri-check-line"></i> 정상화
+                    </button>
+                </div>
             </div>
 
-            <div class="detail-pane active" id="paneInfo">
-                <h3 class="detail-section-title"><i class="ri-user-3-line"></i> 기본 정보</h3>
-                <div class="detail-info-grid">
-                    <div class="info-row"><span class="info-lbl">이메일</span>      <span class="info-val" id="dEmail"></span></div>
-                    <div class="info-row"><span class="info-lbl">전화번호</span>    <span class="info-val" id="dTel"></span></div>
-                    <div class="info-row"><span class="info-lbl">생년월일</span>    <span class="info-val" id="dBirth"></span></div>
-                    <div class="info-row"><span class="info-lbl">가입일</span>      <span class="info-val" id="dCreated"></span></div>
-                    <div class="info-row"><span class="info-lbl">최근 로그인</span> <span class="info-val" id="dLastLogin"></span></div>
-                    <div class="info-row">
-                        <span class="info-lbl">권한</span>
-                        <span class="info-val">
-                            <div class="adm-dropdown" id="dAuthorityDd" style="display:inline-block;">
-                                <button type="button" class="adm-dropdown-btn" style="height:38px;min-width:110px;font-size:13px;" onclick="admToggle('dAuthorityDd')">
+            
+            <div style="flex:1;overflow-y:auto;padding:24px 28px;">
+
+                <div class="detail-pane active" id="paneInfo">
+
+                    
+                    <div style="background:#F8FAFC;border-radius:16px;padding:6px 4px;margin-bottom:16px;">
+                        <div style="padding:12px 16px 4px;font-size:10px;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;gap:5px;">
+                            <i class="ri-user-3-line" style="font-size:12px;color:#7C3AED;"></i>기본 정보
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#E2E8F0;border-radius:12px;overflow:hidden;margin:8px 4px 4px;">
+                            <div style="background:#fff;padding:14px 16px;">
+                                <div style="font-size:10px;font-weight:700;color:#94A3B8;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em;">이메일</div>
+                                <div id="dEmail" style="font-size:13px;font-weight:600;color:#1E293B;word-break:break-all;"></div>
+                            </div>
+                            <div style="background:#fff;padding:14px 16px;">
+                                <div style="font-size:10px;font-weight:700;color:#94A3B8;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em;">전화번호</div>
+                                <div id="dTel" style="font-size:13px;font-weight:600;color:#1E293B;"></div>
+                            </div>
+                            <div style="background:#fff;padding:14px 16px;">
+                                <div style="font-size:10px;font-weight:700;color:#94A3B8;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em;">생년월일</div>
+                                <div id="dBirth" style="font-size:13px;font-weight:600;color:#1E293B;"></div>
+                            </div>
+                            <div style="background:#fff;padding:14px 16px;">
+                                <div style="font-size:10px;font-weight:700;color:#94A3B8;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em;">가입일</div>
+                                <div id="dCreated" style="font-size:13px;font-weight:600;color:#1E293B;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div style="background:#F8FAFC;border-radius:16px;padding:6px 4px;margin-bottom:16px;">
+                        <div style="padding:12px 16px 4px;font-size:10px;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;gap:5px;">
+                            <i class="ri-time-line" style="font-size:12px;color:#7C3AED;"></i>활동 정보
+                        </div>
+                        <div style="background:#fff;border-radius:12px;margin:8px 4px 4px;overflow:hidden;">
+                            <div style="display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid #F1F5F9;">
+                                <span style="width:90px;flex-shrink:0;font-size:11px;font-weight:700;color:#94A3B8;">최근 로그인</span>
+                                <span id="dLastLogin" style="font-size:13px;font-weight:600;color:#1E293B;"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div style="background:#F8FAFC;border-radius:16px;padding:6px 4px;">
+                        <div style="padding:12px 16px 4px;font-size:10px;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;gap:5px;">
+                            <i class="ri-shield-star-line" style="font-size:12px;color:#7C3AED;"></i>권한 설정
+                        </div>
+                        <div style="background:#fff;border-radius:12px;margin:8px 4px 4px;padding:14px 16px;display:flex;align-items:center;gap:10px;">
+                            <div class="adm-dropdown" id="dAuthorityDd" style="display:inline-block;flex:1;max-width:180px;">
+                                <button type="button" class="adm-dropdown-btn" style="height:40px;width:100%;font-size:13px;" onclick="admToggle('dAuthorityDd')">
                                     <span id="dAuthorityLabel">일반 회원</span>
                                     <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
                                 </button>
@@ -249,94 +319,78 @@
                                 </div>
                             </div>
                             <input type="hidden" id="dAuthority" value="USER">
-                            <button class="btn-pill btn-gradient" style="height:38px;padding:0 16px;font-size:12px;" onclick="saveAuthority()">
-                                저장
+                            <button class="btn-pill btn-gradient" style="height:40px;padding:0 20px;font-size:13px;font-weight:700;" onclick="saveAuthority()">
+                                <i class="ri-save-line" style="margin-right:4px;"></i>저장
                             </button>
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="detail-pane" id="paneSanction">
-                <div class="sanction-panel">
-
-                    <div class="sanction-panel-header">
-                        <div class="sanction-panel-icon"><i class="ri-forbid-2-line"></i></div>
-                        <div>
-                            <div class="sanction-panel-title">제재 처리</div>
-                            <div class="sanction-panel-desc">유형과 기간을 선택하고 사유를 입력하세요.</div>
                         </div>
-                    </div>
-
-                    <div class="sanction-panel-body">
-
-                        <div class="sp-field">
-                            <label class="sp-label"><i class="ri-shield-cross-line"></i> 제재 유형</label>
-                            <div class="adm-dropdown sp-dropdown" id="sanctionTypeDd" style="width:100%;">
-                                <button type="button" class="adm-dropdown-btn sp-dd-btn" onclick="admToggle('sanctionTypeDd')" style="width:100%;">
-                                    <span id="sanctionTypeLabel">기간 정지</span>
-                                    <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
-                                </button>
-                                <div class="adm-dropdown-menu">
-                                    <div class="adm-dropdown-item active" data-value="TEMPORARY"
-                                         onclick="selectSanctionField(this,'sanctionTypeDd','sanctionType','sanctionTypeLabel',handleSanctionTypeChange)">
-                                        <i class="ri-timer-line" style="margin-right:6px;"></i>기간 정지
-                                    </div>
-                                    <div class="adm-dropdown-item" data-value="PERMANENT"
-                                         onclick="selectSanctionField(this,'sanctionTypeDd','sanctionType','sanctionTypeLabel',handleSanctionTypeChange)">
-                                        <i class="ri-forbid-line" style="margin-right:6px;"></i>영구 정지
-                                    </div>
-                                </div>
-                            </div>
-                            <input type="hidden" id="sanctionType" value="TEMPORARY">
-                        </div>
-
-                        <div class="sp-field" id="daysField">
-                            <label class="sp-label"><i class="ri-calendar-close-line"></i> 정지 기간</label>
-                            <div class="adm-dropdown sp-dropdown" id="sanctionDaysDd" style="width:100%;">
-                                <button type="button" class="adm-dropdown-btn sp-dd-btn" onclick="admToggle('sanctionDaysDd')" style="width:100%;">
-                                    <span id="sanctionDaysLabel">7일</span>
-                                    <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
-                                </button>
-                                <div class="adm-dropdown-menu">
-                                    <div class="adm-dropdown-item"        data-value="3"
-                                         onclick="selectSanctionField(this,'sanctionDaysDd','sanctionDays','sanctionDaysLabel',null)">3일</div>
-                                    <div class="adm-dropdown-item active" data-value="7"
-                                         onclick="selectSanctionField(this,'sanctionDaysDd','sanctionDays','sanctionDaysLabel',null)">7일</div>
-                                    <div class="adm-dropdown-item"        data-value="14"
-                                         onclick="selectSanctionField(this,'sanctionDaysDd','sanctionDays','sanctionDaysLabel',null)">14일</div>
-                                    <div class="adm-dropdown-item"        data-value="30"
-                                         onclick="selectSanctionField(this,'sanctionDaysDd','sanctionDays','sanctionDaysLabel',null)">30일</div>
-                                </div>
-                            </div>
-                            <input type="hidden" id="sanctionDays" value="7">
-                        </div>
-
-                        <div class="sp-field">
-                            <label class="sp-label"><i class="ri-file-text-line"></i> 제재 사유</label>
-                            <textarea class="sp-textarea" id="sanctionReason" rows="4"
-                                      placeholder="제재 사유를 구체적으로 입력하세요"></textarea>
-                            <div class="fm-helper error" id="reasonError" style="display:none;">
-                                <i class="ri-error-warning-line"></i> 제재 사유를 입력해주세요.
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="sanction-panel-footer">
-                        <button class="sp-btn-cancel" onclick="switchPane('paneInfo')">
-                            <i class="ri-close-line"></i> 취소
-                        </button>
-                        <button class="sp-btn-submit" onclick="submitSanction()">
-                            <i class="ri-forbid-line"></i> 제재 적용
-                        </button>
                     </div>
 
                 </div>
+
+                <div class="detail-pane" id="paneSanction">
+                    <div class="sanction-panel">
+                        <div class="sanction-panel-header">
+                            <div class="sanction-panel-icon"><i class="ri-forbid-2-line"></i></div>
+                            <div>
+                                <div class="sanction-panel-title">제재 처리</div>
+                                <div class="sanction-panel-desc">유형과 기간을 선택하고 사유를 입력하세요.</div>
+                            </div>
+                        </div>
+                        <div class="sanction-panel-body">
+                            <div class="sp-field">
+                                <label class="sp-label"><i class="ri-shield-cross-line"></i> 제재 유형</label>
+                                <div class="adm-dropdown sp-dropdown" id="sanctionTypeDd" style="width:100%;">
+                                    <button type="button" class="adm-dropdown-btn sp-dd-btn" onclick="admToggle('sanctionTypeDd')" style="width:100%;">
+                                        <span id="sanctionTypeLabel">기간 정지</span>
+                                        <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
+                                    </button>
+                                    <div class="adm-dropdown-menu">
+                                        <div class="adm-dropdown-item active" data-value="TEMPORARY" onclick="selectSanctionField(this,'sanctionTypeDd','sanctionType','sanctionTypeLabel',handleSanctionTypeChange)"><i class="ri-timer-line" style="margin-right:6px;"></i>기간 정지</div>
+                                        <div class="adm-dropdown-item"        data-value="PERMANENT" onclick="selectSanctionField(this,'sanctionTypeDd','sanctionType','sanctionTypeLabel',handleSanctionTypeChange)"><i class="ri-forbid-line" style="margin-right:6px;"></i>영구 정지</div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="sanctionType" value="TEMPORARY">
+                            </div>
+                            <div class="sp-field" id="daysField">
+                                <label class="sp-label"><i class="ri-calendar-close-line"></i> 정지 기간</label>
+                                <div class="adm-dropdown sp-dropdown" id="sanctionDaysDd" style="width:100%;">
+                                    <button type="button" class="adm-dropdown-btn sp-dd-btn" onclick="admToggle('sanctionDaysDd')" style="width:100%;">
+                                        <span id="sanctionDaysLabel">7일</span>
+                                        <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
+                                    </button>
+                                    <div class="adm-dropdown-menu">
+                                        <div class="adm-dropdown-item"        data-value="3"  onclick="selectSanctionField(this,'sanctionDaysDd','sanctionDays','sanctionDaysLabel',null)">3일</div>
+                                        <div class="adm-dropdown-item active" data-value="7"  onclick="selectSanctionField(this,'sanctionDaysDd','sanctionDays','sanctionDaysLabel',null)">7일</div>
+                                        <div class="adm-dropdown-item"        data-value="14" onclick="selectSanctionField(this,'sanctionDaysDd','sanctionDays','sanctionDaysLabel',null)">14일</div>
+                                        <div class="adm-dropdown-item"        data-value="30" onclick="selectSanctionField(this,'sanctionDaysDd','sanctionDays','sanctionDaysLabel',null)">30일</div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="sanctionDays" value="7">
+                            </div>
+                            <div class="sp-field">
+                                <label class="sp-label"><i class="ri-file-text-line"></i> 제재 사유</label>
+                                <textarea class="sp-textarea" id="sanctionReason" rows="4" placeholder="제재 사유를 구체적으로 입력하세요"></textarea>
+                                <div id="reasonError" style="display:none;align-items:center;gap:6px;margin-top:8px;color:#EF4444;font-size:12px;font-weight:600;"><i class="ri-error-warning-line"></i> 제재 사유를 입력해주세요.</div>
+                            </div>
+                        </div>
+                        <div class="sanction-panel-footer">
+                            <button type="button" class="btn-pill btn-light" onclick="closeMemberModal()">
+                                <i class="ri-close-line"></i> 취소
+                            </button>
+                            <button type="button" class="btn-pill btn-gradient" id="btnApplySanction" onclick="submitSanction()">
+                                <i class="ri-forbid-line"></i> 제재 적용
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
+
     </div>
 </div>
+
+div>
 
 <script>var CTX = '${pageContext.request.contextPath}';</script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>

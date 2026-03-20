@@ -13,6 +13,7 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_main.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_member.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_report.css">
 </head>
 <body>
 <div class="agency-layout">
@@ -125,7 +126,7 @@
                                     </td>
                                     
                                     <td>
-                                        <button class="action-btn" title="상세보기"><i class="ri-eye-line"></i></button>
+                                        <button class="action-btn" title="상세보기" onclick="openPayDetail(${pay.paymentIdx})"><i class="ri-eye-line"></i></button>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -178,6 +179,123 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+</script>
+
+<div class="fullscreen-overlay" id="payDetailOverlay">
+    <div id="payModalBox" style="
+        background:#fff;border-radius:24px;width:500px;max-width:96vw;
+        height:auto;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;
+        box-shadow:0 32px 80px rgba(0,0,0,0.26);
+        transform:translateY(20px) scale(0.97);opacity:0;
+        transition:transform 0.35s cubic-bezier(0.16,1,0.3,1),opacity 0.35s;">
+
+        
+        <div style="background:linear-gradient(135deg,#1E1B4B 0%,#312E81 100%);
+                    padding:18px 22px;flex-shrink:0;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:-25px;right:-25px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;position:relative;">
+                <div style="display:flex;align-items:center;gap:11px;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:rgba(165,180,252,0.15);border:1px solid rgba(165,180,252,0.22);display:flex;align-items:center;justify-content:center;font-size:16px;color:#A5B4FC;flex-shrink:0;">
+                        <i class="ri-coin-line"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:9px;font-weight:700;letter-spacing:0.14em;color:rgba(255,255,255,0.3);margin-bottom:3px;">PAYMENT DETAIL</div>
+                        <div style="font-size:14px;font-weight:800;color:#fff;letter-spacing:-0.2px;" id="payModalTitle">포인트 결제 상세</div>
+                    </div>
+                </div>
+                <button id="payDetailClose" style="width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:15px;color:rgba(255,255,255,0.4);cursor:pointer;transition:all 0.15s;"
+                    onmouseover="this.style.background='rgba(239,68,68,0.25)';this.style.color='#FCA5A5';"
+                    onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.4)';">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+        </div>
+
+        
+        <div style="flex:1;overflow-y:auto;padding:0;">
+            
+            <div style="padding:20px 24px 16px;border-bottom:1px solid #F1F5F9;text-align:center;">
+                <div style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">충전 금액</div>
+                <div id="payAmount" style="font-size:32px;font-weight:900;color:#7C3AED;letter-spacing:-0.04em;"></div>
+                <div id="payStatusBadge" style="margin-top:8px;"></div>
+            </div>
+            
+            <div style="padding:12px 24px 20px;">
+                <div id="payInfoRows" style="display:flex;flex-direction:column;"></div>
+            </div>
+        </div>
+
+        
+        <div style="padding:12px 20px;border-top:1px solid #F1F5F9;display:flex;justify-content:flex-end;background:#FAFAFA;">
+            <button id="payDetailCancel" style="display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:10px;border:1.5px solid #E2E8F0;background:#fff;font-size:13px;font-weight:600;color:#64748B;cursor:pointer;font-family:inherit;transition:all 0.15s;"
+                onmouseover="this.style.background='#F1F5F9';" onmouseout="this.style.background='#fff';">
+                <i class="ri-close-line"></i>닫기
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(){
+    var overlay = document.getElementById('payDetailOverlay');
+    var box     = document.getElementById('payModalBox');
+
+    function closePayDetail() {
+        box.style.opacity='0'; box.style.transform='translateY(20px) scale(0.97)';
+        setTimeout(function(){ overlay.classList.remove('show'); }, 280);
+    }
+    document.getElementById('payDetailClose').addEventListener('click', closePayDetail);
+    document.getElementById('payDetailCancel').addEventListener('click', closePayDetail);
+    overlay.addEventListener('click', function(e){ if(e.target===this) closePayDetail(); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape' && overlay.classList.contains('show')) closePayDetail(); });
+
+    function openPayDetail(paymentIdx) {
+        document.getElementById('payModalTitle').textContent = '포인트 결제 상세';
+        document.getElementById('payAmount').textContent = '불러오는 중...';
+        document.getElementById('payStatusBadge').innerHTML = '';
+        document.getElementById('payInfoRows').innerHTML = '<div style="padding:20px 0;text-align:center;color:#94A3B8;font-size:13px;"><i class="ri-loader-4-line" style="animation:cdSpin 1s linear infinite;font-size:18px;display:block;margin-bottom:6px;"></i>불러오는 중...</div>';
+        box.style.opacity='0'; box.style.transform='translateY(20px) scale(0.97)';
+        overlay.classList.add('show');
+        requestAnimationFrame(function(){ box.style.opacity='1'; box.style.transform='translateY(0) scale(1)'; });
+
+        fetch(CTX + '/admin/payment/detail?paymentIdx=' + paymentIdx)
+            .then(function(r){ return r.json(); })
+            .then(function(d){
+                if (!d.success) { document.getElementById('payAmount').textContent='오류'; return; }
+                var det = d.detail;
+                var amt = det.chargeAmount ? Number(det.chargeAmount).toLocaleString() + ' 원' : '-';
+                document.getElementById('payAmount').textContent = amt;
+
+                var statusMap = { PAID:'결제완료', CANCELLED:'취소', REFUND:'환불' };
+                var statusColor = { PAID:'#10B981', CANCELLED:'#EF4444', REFUND:'#F59E0B' };
+                var st = det.payStatus || '';
+                document.getElementById('payStatusBadge').innerHTML =
+                    '<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;background:' +
+                    (statusColor[st]||'#94A3B8') + '18;color:' + (statusColor[st]||'#94A3B8') + ';border:1px solid ' + (statusColor[st]||'#94A3B8') + '33;">' +
+                    (statusMap[st] || st) + '</span>';
+
+                document.getElementById('payModalTitle').textContent = det.merchantUid || '포인트 결제 상세';
+
+                var rows = [
+                    ['주문번호',   det.merchantUid || '-'],
+                    ['결제자',     (det.nickname||'-') + ' (' + (det.userId||'-') + ')'],
+                    ['이메일',     det.email || '-'],
+                    ['결제수단',   (det.payMethod||'CARD').toUpperCase()],
+                    ['잔여 포인트', det.batonpoint != null ? Number(det.batonpoint).toLocaleString() + ' P' : '-'],
+                    ['결제일시',   det.paidAt || '-'],
+                    ['PG 거래번호', det.impUid || '-'],
+                ];
+                document.getElementById('payInfoRows').innerHTML = rows.map(function(r){
+                    return '<div style="display:flex;align-items:center;padding:12px 0;border-bottom:1px solid #F8FAFC;">' +
+                        '<span style="width:110px;flex-shrink:0;font-size:12px;font-weight:600;color:#94A3B8;">' + r[0] + '</span>' +
+                        '<span style="flex:1;font-size:13px;font-weight:500;color:#334155;">' + r[1] + '</span>' +
+                        '</div>';
+                }).join('');
+            })
+            .catch(function(){ document.getElementById('payAmount').textContent='오류'; });
+    }
+    window.openPayDetail = openPayDetail;
+})();
 </script>
 </body>
 </html>
