@@ -269,6 +269,108 @@ a {
     color: var(--primary);
 }
 
+.tl-radius-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tl-radius-pin-icon {
+    color: var(--primary);
+    font-size: 15px;
+    flex-shrink: 0;
+    margin-top: -10px;
+}
+
+.tl-radius-slider-area {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 170px;
+}
+
+.tl-radius-input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 3px;
+    border-radius: 4px;
+    background: linear-gradient(
+        to right,
+        var(--primary) 0%,
+        var(--primary) var(--tl-fill, 50%),
+        var(--border-color) var(--tl-fill, 50%),
+        var(--border-color) 100%
+    );
+    outline: none;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+}
+
+.tl-radius-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--primary);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0, 185, 141, 0.25);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.tl-radius-input::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--primary);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0, 185, 141, 0.25);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.tl-radius-input:hover::-webkit-slider-thumb { transform: scale(1.25); }
+.tl-radius-input:hover::-moz-range-thumb     { transform: scale(1.25); }
+
+.tl-radius-steps {
+    display: flex;
+    justify-content: space-between;
+}
+
+.tl-radius-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1.4;
+    user-select: none;
+}
+
+.tl-radius-step em {
+    font-style: normal;
+    font-size: 9px;
+    font-weight: 400;
+    opacity: 0.75;
+}
+
+.tl-radius-step:hover { color: var(--text-sub); }
+.tl-radius-step.active { color: var(--primary); font-weight: 700; }
+
+@media (max-width: 768px) {
+    .tl-radius-wrap { width: 100%; }
+    .tl-radius-slider-area { flex: 1; min-width: 0; }
+    .tl-radius-pin-icon { margin-top: -10px; }
+}
+
+
+
 .tl-reset-btn {
     padding: 8px 10px;
     background: transparent;

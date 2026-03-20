@@ -18,21 +18,24 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.sp.app.mapper.TradingReviewsMapper;
 import com.sp.app.model.TradingReviews;
 import com.sp.app.security.CustomUserDetails;
+import com.sp.app.service.NotificationService;
 
 @Controller
 @RequestMapping("/review")
 public class TradingReviewsController {
 
     private final TradingReviewsMapper reviewMapper;
+    private final NotificationService notificationService;
 
-    public TradingReviewsController(TradingReviewsMapper reviewMapper) {
+    public TradingReviewsController(TradingReviewsMapper reviewMapper, NotificationService notificationService) {
         this.reviewMapper = reviewMapper;
+        this.notificationService = notificationService;
     }
 
     @GetMapping("/write")
     public String writeForm(
             @RequestParam("productIdx") long productIdx,
-            @RequestParam("role") String role,
+            @RequestParam("role") String role, 
             Model model,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         
@@ -55,26 +58,34 @@ public class TradingReviewsController {
         model.addAttribute("targetUserIdx", targetInfo.get("TARGET_USERIDX"));
         model.addAttribute("targetNickname", targetInfo.get("TARGET_NICKNAME"));
 
-        return "review/write";
+        return "review/write"; 
     }
 
     @PostMapping("/submit")
-    public String writeSubmit(TradingReviews dto, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public String writeSubmit(TradingReviews dto, 
+                              @RequestParam(value="targetUserIdx", defaultValue="0") long targetUserIdx,
+                              @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
             if (userDetails != null) {
                 dto.setUserIdx((int)userDetails.getUserIdx());
                 reviewMapper.insertReview(dto);
+
+                if (targetUserIdx > 0) {
+                    String msg = userDetails.getMember().getNickname() + "님이 따뜻한 거래 후기를 남겼습니다.";
+                    String url = "/review/list?type=RECEIVED";
+                    notificationService.sendNotification(targetUserIdx, "REVIEW", msg, url);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        
         return "redirect:/mypage"; 
     }
 
     @GetMapping("/list")
     public String reviewList(
-            @RequestParam(value = "type", defaultValue = "ALL") String type, 
+            @RequestParam(value = "type", defaultValue = "RECEIVED") String type, 
             Model model) {
         
         long userIdx = 0;
@@ -98,7 +109,6 @@ public class TradingReviewsController {
             if (dto.getRawCreatedDate() != null) {
                 dto.setTimeAgo(calculateTimeAgo(dto.getRawCreatedDate().getTime(), currentTime));
             }
-
             if(dto.getWriterAddr() != null) {
                 String[] addrParts = dto.getWriterAddr().split(" ");
                 if(addrParts.length >= 2) {

@@ -55,6 +55,39 @@
                     <button class="tl-price-apply" onclick="tlApplyFilter()">적용</button>
                     <button class="tl-reset-btn" onclick="tlResetFilters()"><i class="ri-refresh-line"></i> 초기화</button>
                 </div>
+                
+                <div class="tl-radius-wrap">
+				    <span class="tl-radius-icon">
+				        <i class="ri-map-pin-range-line"></i>
+				    </span>
+				    <div class="tl-radius-slider-area">
+				        <input type="range"
+				               id="tlRadiusSlider"
+				               class="tl-radius-input"
+				               min="1" max="3" step="1"
+				               value="${km == 1 ? 1 : km == 5 ? 3 : 2}">
+				        <div class="tl-radius-steps">
+				            <span class="tl-radius-step ${km == 1 ? 'active' : ''}"
+				                  data-step="1" data-km="1">
+				                내 동네만<em>1km</em>
+				            </span>
+				            <span class="tl-radius-step ${(empty km || km == 3) ? 'active' : ''}"
+				                  data-step="2" data-km="3">
+				                가까운 동네<em>3km</em>
+				            </span>
+				            <span class="tl-radius-step ${km == 5 ? 'active' : ''}"
+				                  data-step="3" data-km="5">
+				                먼 동네까지<em>5km</em>
+				            </span>
+				        </div>
+				    </div>
+				    <span class="tl-radius-badge" id="tlRadiusBadge">
+				        <i class="ri-focus-3-line"></i>
+				        <span id="tlRadiusBadgeText">
+				            ${km == 1 ? '1km 이내' : km == 5 ? '5km 이내' : '3km 이내'}
+				        </span>
+				    </span>
+				</div>
 
                 <div class="action-group">
                     <label class="toggle-switch-wrap">

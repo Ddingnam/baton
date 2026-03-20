@@ -82,11 +82,15 @@ public class JobPostingController {
 			if (userDetails != null) {
 				dto.setUserIdx(userDetails.getUserIdx());
 			}
-
+			
+			 // 🔥 추가 (테스트용 필수)
+	        dto.setRegionIdx(1);
+	        
 			postingService.insertPosting(dto);
 
 		} catch (Exception e) {
-			log.info("writeSubmit 에러: ", e);
+			 log.error("writeSubmit 에러", e);
+			 throw e;
 		}
 		return "redirect:/alba/list";
 	}

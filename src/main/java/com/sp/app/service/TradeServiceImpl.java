@@ -384,4 +384,14 @@ public class TradeServiceImpl implements TradeService {
 		return list;
 	}
 
+	@Override
+	public Map<String, Object> findLatLngByRegionCode(String regionCode) {
+		try {
+	        return mapper.findLatLngByRegionCode(regionCode);
+	    } catch (Exception e) {
+	        log.info("findLatLngByRegionCode : ", e);
+	        return null;
+	    }
+	}
+
 }

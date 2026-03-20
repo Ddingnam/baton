@@ -28,7 +28,7 @@
 <jsp:include page="/WEB-INF/views/layout/header.jsp" />
 
 <div class="review-list-wrap">
-    <h2 class="rl-title">받은 거래 후기</h2>
+    <h2 class="rl-title">${currentType == 'SENT' ? '보낸 거래 후기' : '받은 거래 후기'}</h2>
 
     <c:if test="${empty reviewList}">
         <div class="empty-review">

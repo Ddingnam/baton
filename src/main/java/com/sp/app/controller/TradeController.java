@@ -54,12 +54,15 @@ public class TradeController {
 	        @RequestParam(value = "categoryIdx", defaultValue = "") String categoryIdx,
 	        @RequestParam(value = "sort", defaultValue = "newest") String sort,
 	        @RequestParam(value = "isAjax", defaultValue = "false") boolean isAjax,
+	        @RequestParam(value = "km", defaultValue = "1") double km,
 	        @AuthenticationPrincipal CustomUserDetails userDetails,
 	        Model model) {
 		
 		try {
 			
 			String regionCode = userDetails.getMember().getUserRegionInfo().getActiveRegion().getRegionCode();
+			Map<String, Object> latLng = service.findLatLngByRegionCode(regionCode);
+			
 			List<Map<String, Object>> categoryList = service.categoryList();
 	        model.addAttribute("categoryList", categoryList);
 			
@@ -75,6 +78,13 @@ public class TradeController {
 	        map.put("priceMax", priceMax);
 	        map.put("available", available);
 	        map.put("sort", sort);
+	        map.put("regionCode", regionCode);
+	        
+	        if (latLng != null) {
+	            map.put("lat", latLng.get("LAT"));
+	            map.put("lng", latLng.get("LNG"));
+	            map.put("km", km);
+	        }
 	        
 	        if (userDetails != null) {
 	            map.put("userIdx", userDetails.getMember().getUserIdx());
@@ -104,6 +114,7 @@ public class TradeController {
 	        model.addAttribute("priceMax", priceMax);
 	        model.addAttribute("available", available);
 	        model.addAttribute("sort", sort);
+	        model.addAttribute("km", km);
 	        
 	        if (isAjax) {
 	            return "trade/listMore";

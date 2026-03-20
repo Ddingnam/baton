@@ -25,6 +25,8 @@ public class CrewDto {
     private String status;
     private String createdDate;
     
+    private String hostNickname;
+    
     private MultipartFile logoImageFile;
     
     private List<Integer> categoryIdxs; 
