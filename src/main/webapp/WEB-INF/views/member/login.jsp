@@ -102,21 +102,17 @@
             </div>
         </form>
 
-        <c:if test="${not empty loginErrMsg and not isWithdrawPending}">
-            <div class="auth-error-toast">
-                ${loginErrMsg}
+        <div id="errorToast" class="auth-error-toast" style="display:none;">
+아이디 또는 패스워드가 일치하지 않습니다.
             </div>
-        </c:if>
 
-        <c:if test="${isWithdrawPending}">
-            <div class="auth-withdraw-notice">
+        <div id="withdrawNotice" class="auth-withdraw-notice" style="display:none;">
                 <i class="ri-time-line"></i>
                 <div class="auth-withdraw-notice-text">
                     탈퇴 승인 대기 중인 계정입니다.
                     <span>관리자 검토 후 처리 결과를 안내해 드립니다.</span>
                 </div>
             </div>
-        </c:if>
 
         <footer class="auth-footer item-6">
             <div class="join-prompt">
@@ -142,6 +138,20 @@ function sendLogin() {
     if (!f.password.value.trim()) { f.password.focus(); return; }
     f.submit();
 }
+
+(function() {
+    var params = new URLSearchParams(window.location.search);
+
+    if (params.has('withdraw')) {
+        var notice = document.getElementById('withdrawNotice');
+        if (notice) notice.style.display = 'flex';
+    }
+
+    if (params.has('error') && !params.has('withdraw')) {
+        var toast = document.getElementById('errorToast');
+        if (toast) toast.style.display = 'block';
+    }
+})();
 </script>
 
 </body>
