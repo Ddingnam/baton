@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +37,6 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     @Transactional(rollbackFor = Exception.class)
     public void updateMemberStatus(Map<String, Object> map) throws Exception {
         mapper.updateMemberStatus(map);
-
         int status = Integer.parseInt(String.valueOf(map.get("status")));
         if (status == 1) {
             Long userIdx = Long.valueOf(String.valueOf(map.get("userIdx")));
@@ -53,11 +53,11 @@ public class AdminMemberServiceImpl implements AdminMemberService {
 
         String authority = (String) map.get("authority");
         int level = 1;
-        if ("ADMIN".equals(authority))      level = 99;
-        else if ("EMP".equals(authority))   level = 51;
+        if ("ADMIN".equals(authority))           level = 99;
+        else if ("EMP".equals(authority))        level = 51;
         else if ("INSTRUCTOR".equals(authority)) level = 31;
 
-        Map<String, Object> levelMap = new java.util.HashMap<>();
+        Map<String, Object> levelMap = new HashMap<>();
         levelMap.put("userId",    userId);
         levelMap.put("userLevel", level);
         mapper.updateUserLevel(levelMap);
@@ -77,7 +77,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     @Transactional(rollbackFor = Exception.class)
     public void insertSanction(Map<String, Object> map) throws Exception {
         mapper.insertSanction(map);
-        Map<String, Object> statusMap = new java.util.HashMap<>();
+        Map<String, Object> statusMap = new HashMap<>();
         statusMap.put("userIdx", map.get("userIdx"));
         statusMap.put("status", 2);
         mapper.updateMemberStatus(statusMap);
@@ -87,7 +87,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     @Transactional(rollbackFor = Exception.class)
     public void liftSanction(Map<String, Object> map) throws Exception {
         mapper.liftSanction(map);
-        Map<String, Object> statusMap = new java.util.HashMap<>();
+        Map<String, Object> statusMap = new HashMap<>();
         statusMap.put("userIdx", map.get("userIdx"));
         statusMap.put("status", 1);
         mapper.updateMemberStatus(statusMap);
@@ -108,7 +108,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     public void approveWithdrawal(Map<String, Object> map) throws Exception {
         map.put("withdrawStatus", "APPROVED");
         mapper.updateWithdrawalStatus(map);
-        Map<String, Object> statusMap = new java.util.HashMap<>();
+        Map<String, Object> statusMap = new HashMap<>();
         statusMap.put("userIdx", map.get("userIdx"));
         statusMap.put("status", 9);
         mapper.updateMemberStatus(statusMap);
@@ -119,9 +119,21 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     public void rejectWithdrawal(Map<String, Object> map) throws Exception {
         map.put("withdrawStatus", "REJECTED");
         mapper.updateWithdrawalStatus(map);
-        Map<String, Object> statusMap = new java.util.HashMap<>();
+        Map<String, Object> statusMap = new HashMap<>();
         statusMap.put("userIdx", map.get("userIdx"));
         statusMap.put("status", 1);
         mapper.updateMemberStatus(statusMap);
+    }
+
+    @Override
+    public Map<String, Object> getWithdrawDetail(Long userIdx) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result.put("trades",  mapper.getActiveTrades(userIdx));
+            result.put("reports", mapper.getPendingReports(userIdx));
+        } catch (Exception e) {
+            log.info("getWithdrawDetail error", e);
+        }
+        return result;
     }
 }

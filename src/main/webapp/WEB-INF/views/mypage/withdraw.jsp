@@ -5,8 +5,6 @@
 <head>
 <meta charset="UTF-8">
 <title>BATON | 회원 탈퇴</title>
-<meta name="_csrf"        content="${_csrf.token}"/>
-<meta name="_csrf_header" content="${_csrf.headerName}"/>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -35,7 +33,6 @@
 
             <div class="wd-body">
 
-                <%-- 직원·관리자 차단 --%>
                 <c:if test="${blockedByRole}">
                     <div class="wd-role-blocked">
                         <i class="ri-shield-user-line"></i>
@@ -44,7 +41,6 @@
                     </div>
                 </c:if>
 
-                <%-- 이미 요청됨 --%>
                 <c:if test="${alreadyRequested}">
                     <div class="wd-already">
                         <i class="ri-time-line"></i>
@@ -53,10 +49,8 @@
                     </div>
                 </c:if>
 
-                <%-- 정상 요청 폼 --%>
                 <c:if test="${not blockedByRole and not alreadyRequested}">
 
-                    <%-- 진행 중인 거래 안내 (막지 않음, 정보만 제공) --%>
                     <c:if test="${activeTrades > 0}">
                         <div class="wd-info">
                             <i class="ri-shopping-bag-2-line"></i>
@@ -105,7 +99,6 @@
 
 </div>
 
-<%-- 커스텀 Confirm 모달 --%>
 <div class="wd-confirm-backdrop" id="wdConfirmBackdrop">
     <div class="wd-confirm-box">
         <div class="wd-confirm-icon"><i class="ri-logout-circle-r-line"></i></div>
@@ -119,12 +112,9 @@
 </div>
 
 <script>
-var CTX         = '${pageContext.request.contextPath}';
-var CSRF_TOKEN  = document.querySelector('meta[name="_csrf"]').content;
-var CSRF_HEADER = document.querySelector('meta[name="_csrf_header"]').content;
+var CTX = '${pageContext.request.contextPath}';
 
-/* ── 커스텀 Confirm ─────────────────────────── */
-var backdrop       = document.getElementById('wdConfirmBackdrop');
+var backdrop         = document.getElementById('wdConfirmBackdrop');
 var confirmCancelBtn = document.getElementById('wdConfirmCancel');
 var confirmOkBtn     = document.getElementById('wdConfirmOk');
 
@@ -135,9 +125,11 @@ function openConfirm(onOk) {
         onOk();
     };
 }
+
 function closeConfirm() {
     backdrop.classList.remove('show');
 }
+
 if (confirmCancelBtn) {
     confirmCancelBtn.addEventListener('click', closeConfirm);
 }
@@ -147,7 +139,6 @@ if (backdrop) {
     });
 }
 
-/* ── 탈퇴 요청 ──────────────────────────────── */
 var btn = document.getElementById('btnWithdrawSubmit');
 if (btn) {
     btn.addEventListener('click', function () {
@@ -156,12 +147,9 @@ if (btn) {
             btn.disabled = true;
             btn.innerHTML = '<i class="ri-loader-4-line"></i> 처리 중...';
 
-            var headers = { 'Content-Type': 'application/json' };
-            headers[CSRF_HEADER] = CSRF_TOKEN;
-
             fetch(CTX + '/mypage/withdraw/request', {
                 method:  'POST',
-                headers: headers,
+                headers: { 'Content-Type': 'application/json' },
                 body:    JSON.stringify({ reason: reason })
             })
             .then(function (r) { return r.json(); })

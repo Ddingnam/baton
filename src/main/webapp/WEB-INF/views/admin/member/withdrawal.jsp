@@ -13,6 +13,126 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_main.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_member.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_ui.css">
+    <style>
+        :root { --color-red-light: #FEE2E2; }
+
+        .wd-review-modal {
+            width: 680px;
+            max-width: 96vw;
+            max-height: 88vh;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.25);
+            transform: translateY(24px) scale(0.97);
+            transition: all 0.4s var(--spring);
+            display: flex;
+            flex-direction: column;
+        }
+        .fullscreen-overlay.show .wd-review-modal {
+            transform: translateY(0) scale(1);
+        }
+        .wd-modal-head {
+            padding: 22px 28px 18px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .wd-modal-head-left { display: flex; align-items: center; gap: 12px; }
+        .wd-modal-avt {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: var(--grad-primary); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 17px; font-weight: 800; flex-shrink: 0;
+        }
+        .wd-modal-name { font-size: 15px; font-weight: 800; color: var(--text-main); }
+        .wd-modal-id   { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+
+        .wd-modal-body {
+            padding: 22px 28px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+        .wd-modal-body::-webkit-scrollbar { width: 4px; }
+        .wd-modal-body::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+
+        .wd-sec-title {
+            font-size: 12px; font-weight: 800;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 10px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .wd-sec-title i { font-size: 14px; color: var(--color-purple); }
+        .wd-cnt {
+            margin-left: auto;
+            font-size: 11px; font-weight: 700;
+            padding: 2px 8px; border-radius: var(--radius-pill);
+        }
+        .wd-cnt.has  { background: var(--color-red-light); color: var(--color-red); }
+        .wd-cnt.none { background: var(--base-bg); color: var(--text-light); }
+
+        .wd-empty {
+            text-align: center; padding: 18px;
+            color: var(--text-light); font-size: 13px; font-weight: 600;
+            background: var(--base-bg); border-radius: var(--radius-sm);
+        }
+
+        .wd-reason-box {
+            background: var(--base-bg); border-radius: var(--radius-sm);
+            padding: 14px 16px; font-size: 13px; color: var(--text-sub); line-height: 1.6;
+        }
+
+        .wd-trade-item {
+            background: var(--base-bg); border-radius: var(--radius-sm);
+            padding: 13px 16px; display: flex; align-items: center; gap: 12px;
+            margin-bottom: 8px;
+        }
+        .wd-trade-item:last-child { margin-bottom: 0; }
+        .wd-trade-icon {
+            width: 34px; height: 34px; border-radius: 8px;
+            background: #FEF3C7; color: #F59E0B;
+            display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;
+        }
+        .wd-trade-title { font-size: 13px; font-weight: 700; color: var(--text-main); }
+        .wd-trade-sub   { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+        .wd-trade-badge {
+            font-size: 11px; font-weight: 700; padding: 3px 9px;
+            border-radius: var(--radius-pill); background: #FEF3C7; color: #B45309; flex-shrink: 0;
+        }
+
+        .wd-report-item {
+            background: var(--color-red-light); border-radius: var(--radius-sm);
+            padding: 13px 16px; display: flex; align-items: flex-start; gap: 12px;
+            margin-bottom: 8px;
+        }
+        .wd-report-item:last-child { margin-bottom: 0; }
+        .wd-report-icon {
+            width: 34px; height: 34px; border-radius: 8px;
+            background: rgba(239,68,68,0.15); color: var(--color-red);
+            display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;
+        }
+        .wd-report-type    { font-size: 13px; font-weight: 700; color: #991B1B; }
+        .wd-report-content { font-size: 12px; color: #7F1D1D; margin-top: 3px; line-height: 1.5; }
+        .wd-report-meta    { font-size: 11px; color: var(--color-red); margin-top: 4px; opacity: 0.7; }
+
+        .wd-modal-foot {
+            padding: 14px 28px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex; justify-content: flex-end; gap: 10px; flex-shrink: 0;
+        }
+        .wd-loading {
+            text-align: center; padding: 40px;
+            color: var(--text-light); font-size: 13px;
+        }
+        .wd-loading i { font-size: 28px; display: block; margin-bottom: 10px; opacity: 0.4; }
+    </style>
 </head>
 <body>
 <div class="agency-layout">
@@ -32,8 +152,7 @@
                 <form class="toolbar-form" method="get"
                       action="${pageContext.request.contextPath}/admin/member/withdrawal">
                     <div class="status-tabs">
-                        <a href="?kwd=${kwd}"
-                           class="status-tab ${empty wFilter ? 'active' : ''}">전체</a>
+                        <a href="?kwd=${kwd}" class="status-tab ${empty wFilter ? 'active' : ''}">전체</a>
                         <a href="?wFilter=PENDING&kwd=${kwd}"
                            class="status-tab ${wFilter == 'PENDING' ? 'active' : ''}">
                             <span class="tab-dot blue"></span>대기중
@@ -69,16 +188,14 @@
                                 <th>가입일</th>
                                 <th>요청일</th>
                                 <th>탈퇴 사유</th>
-                                <th>진행거래</th>
-                                <th>미처리신고</th>
                                 <th>상태</th>
-                                <th>처리</th>
+                                <th>관리</th>
                             </tr>
                         </thead>
                         <tbody>
                             <c:if test="${empty list}">
                                 <tr>
-                                    <td colspan="9" class="empty-row">
+                                    <td colspan="7" class="empty-row">
                                         <i class="ri-user-follow-line"></i>
                                         <span>탈퇴 요청이 없습니다.</span>
                                     </td>
@@ -103,40 +220,23 @@
                                     </td>
                                     <td>
                                         <c:choose>
-                                            <c:when test="${w.ACTIVETRADES > 0}">
-                                                <span class="tag tag-red">${w.ACTIVETRADES}건</span>
+                                            <c:when test="${w.WITHDRAWSTATUS == 'PENDING'}">
+                                                <span class="tag tag-blue">대기중</span>
                                             </c:when>
-                                            <c:otherwise><span style="color:var(--text-light);font-size:13px;">없음</span></c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${w.PENDINGREPORTS > 0}">
-                                                <span class="tag tag-red">${w.PENDINGREPORTS}건</span>
+                                            <c:when test="${w.WITHDRAWSTATUS == 'APPROVED'}">
+                                                <span class="tag tag-gray">승인됨</span>
                                             </c:when>
-                                            <c:otherwise><span style="color:var(--text-light);font-size:13px;">없음</span></c:otherwise>
+                                            <c:when test="${w.WITHDRAWSTATUS == 'REJECTED'}">
+                                                <span class="tag tag-red">반려됨</span>
+                                            </c:when>
                                         </c:choose>
                                     </td>
                                     <td>
-                                        <c:choose>
-                                            <c:when test="${w.WITHDRAWSTATUS == 'PENDING'}">  <span class="tag tag-blue">대기중</span></c:when>
-                                            <c:when test="${w.WITHDRAWSTATUS == 'APPROVED'}"> <span class="tag tag-gray">승인됨</span></c:when>
-                                            <c:when test="${w.WITHDRAWSTATUS == 'REJECTED'}"> <span class="tag tag-red">반려됨</span></c:when>
-                                        </c:choose>
-                                    </td>
-                                    <td>
-                                        <c:if test="${w.WITHDRAWSTATUS == 'PENDING'}">
-                                            <div class="process-btns">
-                                                <button class="btn-approve"
-                                                        onclick="openApproveModal(${w.WITHDRAWIDX}, ${w.USERIDX}, '${w.NICKNAME}')">
-                                                    승인
-                                                </button>
-                                                <button class="btn-reject"
-                                                        onclick="rejectWithdrawal(${w.WITHDRAWIDX}, ${w.USERIDX}, '${w.NICKNAME}')">
-                                                    반려
-                                                </button>
-                                            </div>
-                                        </c:if>
+                                        <button type="button" class="action-btn"
+                                                onclick="openReviewModal(${w.WITHDRAWIDX}, ${w.USERIDX}, '${w.NICKNAME}', '${w.USERID}', '${w.REASON}', '${w.WITHDRAWSTATUS}')"
+                                                title="상세 검토">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -167,31 +267,29 @@
     </main>
 </div>
 
-<div class="fullscreen-overlay" id="approveOverlay">
-    <div class="mini-modal">
-        <div class="mini-modal-head">
-            <span class="mini-modal-title" style="color:var(--color-red);">
-                <i class="ri-user-unfollow-line" style="margin-right:6px;"></i>탈퇴 승인
-            </span>
-            <button class="mini-modal-close" id="approveClose"><i class="ri-close-line"></i></button>
-        </div>
-        <div class="mini-modal-body">
-            <div class="member-cell" style="margin-bottom:20px;padding:16px;background:var(--base-bg);border-radius:var(--radius-md);">
-                <div class="member-avt" id="approveAvt"></div>
+<div class="fullscreen-overlay" id="reviewOverlay">
+    <div class="wd-review-modal">
+        <div class="wd-modal-head">
+            <div class="wd-modal-head-left">
+                <div class="wd-modal-avt" id="rvAvt"></div>
                 <div>
-                    <div class="member-name" id="approveTargetName"></div>
-                    <div class="member-sub">탈퇴 처리 시 계정이 영구 삭제됩니다.</div>
+                    <div class="wd-modal-name" id="rvName"></div>
+                    <div class="wd-modal-id"   id="rvId"></div>
                 </div>
             </div>
-            <p style="font-size:13px;color:var(--color-red);font-weight:600;background:#FEE2E2;padding:12px 14px;border-radius:var(--radius-sm);">
-                <i class="ri-error-warning-line"></i> 이 작업은 되돌릴 수 없습니다. 신중히 처리해주세요.
-            </p>
-        </div>
-        <div class="mini-modal-foot">
-            <button class="btn-pill btn-light" id="approveCancel">취소</button>
-            <button class="btn-pill" style="background:var(--color-red);color:white;padding:12px 24px;" id="approveConfirm">
-                탈퇴 승인
+            <button class="fm-close" id="reviewClose" style="position:relative;top:0;right:0;">
+                <i class="ri-close-line"></i>
             </button>
+        </div>
+
+        <div class="wd-modal-body" id="rvBody">
+            <div class="wd-loading">
+                <i class="ri-loader-4-line"></i>정보를 불러오는 중...
+            </div>
+        </div>
+
+        <div class="wd-modal-foot" id="rvFoot">
+            <button class="btn-pill btn-light" id="reviewCancel">닫기</button>
         </div>
     </div>
 </div>

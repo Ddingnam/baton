@@ -296,14 +296,14 @@
 
     <insert id="insertWithdrawRequest" parameterType="map">
         INSERT INTO withdrawRequest (withdrawIdx, userIdx, reason, requestDate, withdrawStatus)
-        VALUES (withdrawRequest_seq.NEXTVAL, #{userIdx}, #{reason, jdbcType=VARCHAR}, CURRENT_TIMESTAMP, 'PENDING')
+        VALUES (withdrawRequest_seq.NEXTVAL, #{userIdx}, #{reason, jdbcType=VARCHAR}, SYSDATE, 'PENDING')
     </insert>
 
     <select id="countActiveTrades" parameterType="Long" resultType="int">
-        SELECT COUNT(*) FROM TRADETRANSACTION
-        WHERE (BUYERIDX = #{userIdx} OR SELLERIDX = #{userIdx})
-        AND TRADESTATUS NOT IN ('COMPLETED', 'CANCELLED')
-    </select>
+	    SELECT COUNT(*) FROM TRADETRANSACTION
+	    WHERE (BUYERIDX = #{userIdx} OR SELLERIDX = #{userIdx})
+	    AND TRADESTATUS NOT IN ('COMPLETED', 'CANCELLED')
+	</select>
 
     <select id="countPendingReports" parameterType="Long" resultType="int">
         SELECT COUNT(*) FROM adminReport

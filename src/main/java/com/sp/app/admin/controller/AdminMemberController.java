@@ -193,6 +193,14 @@ public class AdminMemberController {
         return "admin/member/withdrawal";
     }
 
+    @GetMapping("/withdrawal/detail")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> withdrawDetail(
+            @RequestParam("userIdx") Long userIdx) {
+        Map<String, Object> result = adminMemberService.getWithdrawDetail(userIdx);
+        return ResponseEntity.ok(result);
+    }
+
     @PostMapping("/withdrawal/approve")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> approveWithdrawal(@RequestBody Map<String, Object> param) {

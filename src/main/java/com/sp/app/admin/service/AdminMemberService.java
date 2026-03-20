@@ -20,4 +20,6 @@ public interface AdminMemberService {
 	public int countWithdrawals(Map<String, Object> map);
 	public void approveWithdrawal(Map<String, Object> map) throws Exception;
 	public void rejectWithdrawal(Map<String, Object> map) throws Exception;
+
+	public Map<String, Object> getWithdrawDetail(Long userIdx);
 }

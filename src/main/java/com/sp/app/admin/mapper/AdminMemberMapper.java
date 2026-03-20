@@ -27,4 +27,7 @@ public interface AdminMemberMapper {
 	public void updateWithdrawalStatus(Map<String, Object> map);
 
 	public void liftSanctionByUserIdx(Long userIdx);
+
+	public List<Map<String, Object>> getActiveTrades(@Param("userIdx") Long userIdx);
+	public List<Map<String, Object>> getPendingReports(@Param("userIdx") Long userIdx);
 }

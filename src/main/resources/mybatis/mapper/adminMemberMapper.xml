@@ -58,9 +58,9 @@
     </select>
 
     <update id="updateMemberStatus" parameterType="map">
-        UPDATE users SET status = #{status}, updatedDate = CURRENT_TIMESTAMP
-        WHERE userIdx = #{userIdx}
-    </update>
+	    UPDATE users SET status = #{status, jdbcType=NUMERIC}, updatedDate = SYSDATE
+	    WHERE userIdx = #{userIdx, jdbcType=NUMERIC}
+	</update>
 
     <delete id="deleteAuthority">
         DELETE FROM userAuthority WHERE userId = #{userId}
@@ -192,8 +192,9 @@
 
     <update id="updateWithdrawalStatus" parameterType="map">
         UPDATE withdrawRequest
-        SET withdrawStatus = #{withdrawStatus}, processDate = CURRENT_TIMESTAMP
-        WHERE withdrawIdx = #{withdrawIdx}
+        SET withdrawStatus = #{withdrawStatus, jdbcType=VARCHAR},
+            processDate    = SYSDATE
+        WHERE withdrawIdx = #{withdrawIdx, jdbcType=NUMERIC}
     </update>
 
     <update id="liftSanctionByUserIdx" parameterType="Long">
@@ -204,4 +205,39 @@
         WHERE userIdx = #{userIdx} AND isLifted = 0
     </update>
 
+	<select id="getActiveTrades" parameterType="Long" resultType="map">
+        SELECT t.TRADEIDX        AS "tradeIdx",
+               t.TRADESTATUS     AS "tradeStatus",
+               TO_CHAR(t.TRADEDATE, 'YYYY-MM-DD') AS "tradeDate",
+               t.TRADEPRICE      AS "tradePrice",
+               t.BUYERIDX        AS "buyerIdx",
+               t.SELLERIDX       AS "sellerIdx",
+               p.title           AS "productTitle",
+               b.nickname        AS "buyerNickname",
+               b.userId          AS "buyerId",
+               s.nickname        AS "sellerNickname",
+               s.userId          AS "sellerId"
+        FROM TRADETRANSACTION t
+        LEFT JOIN product p ON t.PRODUCTIDX = p.productIdx
+        JOIN users b ON t.BUYERIDX  = b.USERIDX
+        JOIN users s ON t.SELLERIDX = s.USERIDX
+        WHERE (t.BUYERIDX = #{userIdx} OR t.SELLERIDX = #{userIdx})
+        AND t.TRADESTATUS NOT IN ('COMPLETED', 'CANCELLED')
+        ORDER BY t.TRADEDATE DESC
+    </select>
+
+    <select id="getPendingReports" parameterType="Long" resultType="map">
+        SELECT r.reportIdx                                             AS "reportIdx",
+               r.domainType                                            AS "domainType",
+               r.reportType                                            AS "reportType",
+               r.reportContent                                         AS "reportContent",
+               TO_CHAR(r.reportDate, 'YYYY-MM-DD')                    AS "reportDate",
+               u.nickname                                              AS "reporterNickname",
+               u.userId                                                AS "reporterId"
+        FROM adminReport r
+        JOIN users u ON r.reporterIdx = u.userIdx
+        WHERE r.reportedUserIdx = #{userIdx}
+        AND r.processStatus = 0
+        ORDER BY r.reportDate DESC
+    </select>
 </mapper>
