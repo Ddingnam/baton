@@ -27,6 +27,7 @@ public interface TradeService {
 	public List<Trade> tradeList(Map<String, Object> map);
 	public List<Map<String, Object>> categoryList();
 	public int dataCount(Map<String, Object> map);
+	public Map<String, Object> findLatLngByRegionCode(String regionCode);
 	
 	
 	

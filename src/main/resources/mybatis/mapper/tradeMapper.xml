@@ -19,8 +19,15 @@
 				AND p.price &lt;= #{priceMax}
 			</if>
 
-			<if test="regionCode != null">
-				AND p.regionCode = #{regionCode}
+			<if test="lat != null and lng != null and km != null">
+			    AND p.regionCode IN (
+			        SELECT REGIONCODE FROM REGION
+			        WHERE (6371 * acos(
+			            cos(#{lat} * 3.14159 / 180) * cos(REPRESENT_LAT * 3.14159 / 180)
+			            * cos((REPRESENT_LNG * 3.14159 / 180) - (#{lng} * 3.14159 / 180))
+			            + sin(#{lat} * 3.14159 / 180) * sin(REPRESENT_LAT * 3.14159 / 180)
+			        )) &lt;= #{km}
+			    )
 			</if>
 
 			<if test="keyword != null and keyword != ''">
@@ -175,6 +182,12 @@
 	    SELECT COUNT(*) 
 	    FROM product p
 	    <include refid="where-condition"/>
+	</select>
+	
+	<select id="findLatLngByRegionCode" parameterType="String" resultType="map">
+		SELECT REPRESENT_LAT as lat, REPRESENT_LNG as lng
+	    FROM REGION
+	    WHERE REGIONCODE = #{regionCode}
 	</select>
 	
 	<update id="updateHitCount">

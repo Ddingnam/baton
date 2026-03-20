@@ -125,6 +125,56 @@ function tlChangeSort(val) {
     tlNavigate(p);
 }
 
+function initRadiusSlider() {
+    const slider = document.getElementById('tlRadiusSlider');
+    if (!slider) return;
+
+    const badge    = document.getElementById('tlRadiusBadgeText');
+    const steps    = document.querySelectorAll('.tl-radius-step');
+
+    const KM_MAP   = { 1: '1', 2: '3', 3: '5' };
+    const LABEL_MAP = { 1: '1km 이내', 2: '3km 이내', 3: '5km 이내' };
+
+    function updateFill(val) {
+        const pct = ((val - 1) / 2) * 100;
+        slider.style.setProperty('--tl-fill', pct + '%');
+    }
+
+    function updateUI(val) {
+        const v = parseInt(val, 10);
+        updateFill(v);
+        if (badge) badge.textContent = LABEL_MAP[v];
+        steps.forEach(s => {
+            s.classList.toggle('active', parseInt(s.dataset.step, 10) === v);
+        });
+    }
+
+    slider.addEventListener('input', function () {
+        updateUI(this.value);
+    });
+
+    slider.addEventListener('change', function () {
+        tlChangeRadius(KM_MAP[this.value]);
+    });
+
+    steps.forEach(function (step) {
+        step.addEventListener('click', function () {
+            const s = this.dataset.step;
+            slider.value = s;
+            updateUI(s);
+            tlChangeRadius(this.dataset.km);
+        });
+    });
+
+    updateFill(slider.value);
+}
+
+function tlChangeRadius(km) {
+    const p = tlGetParams();
+    p.set('km', km);
+    tlNavigate(p);
+}
+
 function tlApplyFilter() {
     const p = tlGetParams();
     const min = document.getElementById('tlPriceMin').value.trim();
@@ -176,7 +226,8 @@ function LoadMore() {
 		priceMin: priceMin,
 		priceMax: priceMax,
 		sort: sort,
-		available: available
+		available: available,
+		km: p.get('km') || '1'
 	});
 
 	const url = `/trade/list?${params.toString()}`;
@@ -272,6 +323,7 @@ function tlMobileFilter() {
 
 document.addEventListener('DOMContentLoaded', function() {
 	initSortDropdown();
+	initRadiusSlider();
 	initTimeAgo();
 	tlRenderChips();
 	

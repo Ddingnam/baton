@@ -36,6 +36,7 @@ public interface TradeMapper {
 	public Long findTagIdxByName(String tagName);
 	public List<Map<String, Object>> CategoryList();
 	public String findLastUpDateByProductIdx(long productIdx);
+	public Map<String, Object> findLatLngByRegionCode(String regionCode);
 	
 	public List<Trade> tradeList(Map<String, Object> map);
 	public int dataCount(Map<String, Object> map);
