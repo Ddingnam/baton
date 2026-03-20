@@ -28,15 +28,20 @@
         <where>
             R.ISHIDDEN = 0
             <choose>
-                <when test="type == 'BUYER'">
-                    AND R.SALEREVIEWTYPE = 'BUYER'
+                <when test="type == 'RECEIVED'">
+                    AND EXISTS (
+                        SELECT 1 FROM TRADETRANSACTION T 
+                        WHERE T.PRODUCTIDX = R.PRODUCTIDX 
+                        AND ((T.SELLERIDX = #{userIdx} AND R.SALEREVIEWTYPE = 'BUYER') 
+                          OR (T.BUYERIDX = #{userIdx} AND R.SALEREVIEWTYPE = 'SELLER'))
+                    )
                 </when>
-                <when test="type == 'SELLER'">
-                    AND R.SALEREVIEWTYPE = 'SELLER'
-                </when>
-                <when test="type == 'ME'">
+                <when test="type == 'SENT'">
                     AND R.USERIDX = #{userIdx}
                 </when>
+                <otherwise>
+                    AND R.USERIDX = #{userIdx}
+                </otherwise>
             </choose>
         </where>
         ORDER BY R.REVIEWIDX DESC

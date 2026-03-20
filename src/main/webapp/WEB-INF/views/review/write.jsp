@@ -73,7 +73,7 @@
     </div>
 
     <form id="reviewForm" action="${pageContext.request.contextPath}/review/submit" method="post">
-        <input type="hidden" name="userIdx" value="${targetUserIdx}">
+        <input type="hidden" name="targetUserIdx" value="${targetUserIdx}">
         <input type="hidden" name="productIdx" value="${productIdx}">
         <input type="hidden" name="saleReviewType" value="${saleReviewType}"> <input type="hidden" id="score" name="score" value="3">
         <input type="hidden" id="reviewTags" name="reviewTags" value="">
