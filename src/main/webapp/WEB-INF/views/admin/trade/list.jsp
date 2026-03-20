@@ -73,30 +73,23 @@
             <div class="block-card table-block" style="padding:0; border-radius:var(--radius-lg); overflow:hidden;">
                 <div class="modern-table-wrap">
                     <table class="modern-table">
-                        <colgroup>
-                            <col style="width:54px">
-                            <col style="width:54px">
-                            <col>
-                            <col style="width:86px">
-                            <col style="width:76px">
-                            <col style="width:88px">
-                            <col style="width:60px">
-                        </colgroup>
                         <thead>
                             <tr>
                                 <th>번호</th>
                                 <th>이미지</th>
                                 <th>제목</th>
-                                <th style="white-space:nowrap">가격</th>
-                                <th style="white-space:nowrap">상태</th>
-                                <th style="white-space:nowrap">등록일</th>
+                                <th>판매자</th>
+                                <th>가격</th>
+                                <th>상태</th>
+                                <th>동네</th>
+                                <th>등록일</th>
                                 <th>관리</th>
                             </tr>
                         </thead>
                         <tbody>
                             <c:if test="${empty list}">
                                 <tr>
-                                    <td colspan="7" class="empty-row">
+                                    <td colspan="9" class="empty-row">
                                         <i class="ri-shopping-bag-line"></i>
                                         <span>게시글이 없습니다.</span>
                                     </td>
@@ -104,7 +97,7 @@
                             </c:if>
                             <c:forEach var="item" items="${list}">
                                 <tr>
-                                    <td class="font-medium" style="white-space:nowrap">${item.productIdx}</td>
+                                    <td class="font-medium">${item.productIdx}</td>
                                     <td>
                                         <c:choose>
                                             <c:when test="${not empty item.imgUrl}">
@@ -120,29 +113,38 @@
                                         </c:choose>
                                     </td>
                                     <td>
-                                        <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
-                                            <span title="${item.title}" onclick="openDetail(${item.productIdx})"
-                                                  style="cursor:pointer;color:var(--color-primary);font-weight:700;font-size:13px;
-                                                         white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;">${item.title}</span>
-                                            <span style="font-size:11px;color:#94A3B8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.nickName}</span>
+                                        <span class="reason-cell" title="${item.title}"
+                                              onclick="openDetail(${item.productIdx})"
+                                              style="cursor:pointer;color:var(--color-primary);font-weight:600;">${item.title}</span>
+                                    </td>
+                                    <td>
+                                        <div class="member-cell">
+                                            <div class="member-avt">${fn:substring(item.nickName, 0, 1)}</div>
+                                            <div class="member-name">${item.nickName}</div>
                                         </div>
                                     </td>
-                                    <td class="font-medium" style="white-space:nowrap;font-size:12px;">
+                                    <td class="font-medium">
                                         <c:choose>
-                                            <c:when test="${item.price == 0}"><span class="tag tag-green" style="white-space:nowrap;font-size:11px;">무료나눔</span></c:when>
+                                            <c:when test="${item.price == 0}"><span class="tag tag-green">무료나눔</span></c:when>
                                             <c:otherwise><fmt:formatNumber value="${item.price}" pattern="#,###"/>원</c:otherwise>
                                         </c:choose>
                                     </td>
-                                    <td style="white-space:nowrap">
+                                    <td>
                                         <c:choose>
-                                            <c:when test="${item.tradeStatus == '판매중'}"><span class="tag tag-green" style="white-space:nowrap;font-size:11px;">판매중</span></c:when>
-                                            <c:when test="${item.tradeStatus == '예약중'}"><span class="tag tag-blue" style="white-space:nowrap;font-size:11px;">예약중</span></c:when>
-                                            <c:when test="${item.tradeStatus == '판매완료'}"><span class="tag tag-gray" style="white-space:nowrap;font-size:11px;">판매완료</span></c:when>
-                                            <c:when test="${item.tradeStatus == '숨기기'}"><span class="tag" style="background:#FEF2F2;color:#EF4444;white-space:nowrap;font-size:11px;">숨김</span></c:when>
-                                            <c:otherwise><span class="tag tag-gray" style="white-space:nowrap;font-size:11px;">${item.tradeStatus}</span></c:otherwise>
+                                            <c:when test="${item.tradeStatus == '판매중'}"><span class="tag tag-green">판매중</span></c:when>
+                                            <c:when test="${item.tradeStatus == '예약중'}"><span class="tag tag-blue">예약중</span></c:when>
+                                            <c:when test="${item.tradeStatus == '판매완료'}"><span class="tag tag-gray">판매완료</span></c:when>
+                                            <c:when test="${item.tradeStatus == '숨기기'}"><span class="tag" style="background:#FEF2F2;color:#EF4444;">숨김</span></c:when>
+                                            <c:otherwise><span class="tag tag-gray">${item.tradeStatus}</span></c:otherwise>
                                         </c:choose>
                                     </td>
-                                    <td class="font-medium" style="white-space:nowrap;font-size:12px;">
+                                    <td class="font-medium">
+                                        <c:choose>
+                                            <c:when test="${not empty item.dong}">${item.dong}</c:when>
+                                            <c:otherwise><span class="tag tag-gray">미설정</span></c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td class="font-medium">
                                         <c:if test="${not empty item.createdDate}">${fn:substring(item.createdDate.toString(), 0, 10)}</c:if>
                                     </td>
                                     <td>

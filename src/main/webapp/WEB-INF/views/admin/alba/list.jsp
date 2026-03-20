@@ -77,30 +77,23 @@
             <div class="block-card table-block" style="padding:0; border-radius:var(--radius-lg); overflow:hidden;">
                 <div class="modern-table-wrap">
                     <table class="modern-table">
-                        <colgroup>
-                            <col style="width:54px">
-                            <col>
-                            <col style="width:88px">
-                            <col style="width:106px">
-                            <col style="width:86px">
-                            <col style="width:88px">
-                            <col style="width:60px">
-                        </colgroup>
                         <thead>
                             <tr>
                                 <th>번호</th>
                                 <th>공고 제목</th>
-                                <th style="white-space:nowrap">카테고리</th>
-                                <th style="white-space:nowrap">급여</th>
-                                <th style="white-space:nowrap">마감일</th>
-                                <th style="white-space:nowrap">등록일</th>
+                                <th>업체명</th>
+                                <th>카테고리</th>
+                                <th>급여</th>
+                                <th>마감일</th>
+                                <th>근무지</th>
+                                <th>등록일</th>
                                 <th>관리</th>
                             </tr>
                         </thead>
                         <tbody>
                             <c:if test="${empty list}">
                                 <tr>
-                                    <td colspan="7" class="empty-row">
+                                    <td colspan="9" class="empty-row">
                                         <i class="ri-briefcase-line"></i>
                                         <span>공고가 없습니다.</span>
                                     </td>
@@ -108,34 +101,47 @@
                             </c:if>
                             <c:forEach var="item" items="${list}">
                                 <tr>
-                                    <td class="font-medium" style="white-space:nowrap">${item.postingIdx}</td>
+                                    <td class="font-medium">${item.postingIdx}</td>
                                     <td>
-                                        <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
-                                            <span title="${item.title}" onclick="openDetail(${item.postingIdx})"
-                                                  style="cursor:pointer;color:var(--color-primary);font-weight:700;font-size:13px;
-                                                         white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;">${item.title}</span>
-                                            <span style="font-size:11px;color:#94A3B8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.employer}</span>
+                                        <span class="reason-cell" title="${item.title}"
+                                              onclick="openDetail(${item.postingIdx})"
+                                              style="cursor:pointer;color:var(--color-primary);font-weight:600;">${item.title}</span>
+                                    </td>
+                                    <td>
+                                        <div class="member-cell">
+                                            <div class="member-avt" style="background:linear-gradient(135deg,#F59E0B,#D97706);">
+                                                ${fn:substring(item.employer, 0, 1)}
+                                            </div>
+                                            <div class="member-name">${item.employer}</div>
                                         </div>
                                     </td>
-                                    <td style="white-space:nowrap">
-                                        <span class="tag tag-blue" style="white-space:nowrap;font-size:11px;">${not empty item.category ? item.category : '기타'}</span>
+                                    <td>
+                                        <span class="tag tag-blue">${not empty item.category ? item.category : '기타'}</span>
                                     </td>
-                                    <td class="font-medium" style="white-space:nowrap;font-size:12px;">
+                                    <td class="font-medium">
                                         <c:choose>
                                             <c:when test="${not empty item.payType}">
-                                                <span style="font-size:10px;color:#94A3B8;">${item.payType}</span>
+                                                <span style="font-size:11px;color:#94A3B8;">${item.payType}</span>
                                                 <strong><fmt:formatNumber value="${item.pay}" pattern="#,###"/></strong>원
                                             </c:when>
                                             <c:otherwise>-</c:otherwise>
                                         </c:choose>
                                     </td>
-                                    <td class="font-medium" style="white-space:nowrap;font-size:12px;">
+                                    <td class="font-medium">
                                         <c:choose>
                                             <c:when test="${not empty item.deadline}">${fn:substring(item.deadline, 0, 10)}</c:when>
-                                            <c:otherwise><span class="tag tag-green" style="white-space:nowrap;font-size:11px;">상시채용</span></c:otherwise>
+                                            <c:otherwise><span class="tag tag-green">상시채용</span></c:otherwise>
                                         </c:choose>
                                     </td>
-                                    <td class="font-medium" style="white-space:nowrap;font-size:12px;">
+                                    <td class="font-medium">
+                                        <c:choose>
+                                            <c:when test="${not empty item.location}">
+                                                <span title="${item.location}">${item.location}</span>
+                                            </c:when>
+                                            <c:otherwise><span class="tag tag-gray">미설정</span></c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td class="font-medium">
                                         <c:if test="${not empty item.createdDate}">${fn:substring(item.createdDate.toString(), 0, 10)}</c:if>
                                     </td>
                                     <td>

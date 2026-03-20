@@ -148,9 +148,10 @@
                                     </td>
                                     <td>
                                         <button type="button" class="action-btn"
-                                                onclick="confirmDelete(${item.id}, '${fn:escapeXml(item.subject)}')"
-                                                title="삭제">
-                                            <i class="ri-delete-bin-line"></i>
+                                                onclick="openDetail(${item.id})"
+                                                title="상세보기"
+                                                style="color:var(--color-primary);">
+                                            <i class="ri-eye-line"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -307,7 +308,17 @@
         </div>
 
         
-        <div style="padding:12px 20px;border-top:1px solid #F1F5F9;display:flex;justify-content:flex-end;flex-shrink:0;background:#FAFAFA;">
+        <div style="padding:12px 20px;border-top:1px solid #F1F5F9;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:#FAFAFA;">
+            <button id="cdDeleteBtn" style="
+                display:inline-flex;align-items:center;gap:6px;
+                padding:9px 18px;border-radius:10px;
+                border:1.5px solid #FEE2E2;background:#FFF5F5;
+                font-size:13px;font-weight:600;color:#EF4444;
+                cursor:pointer;font-family:inherit;transition:all 0.15s;"
+                onmouseover="this.style.background='#FEE2E2';"
+                onmouseout="this.style.background='#FFF5F5';">
+                <i class="ri-delete-bin-line"></i>삭제
+            </button>
             <button id="cdCancel" style="
                 display:inline-flex;align-items:center;gap:6px;
                 padding:9px 20px;border-radius:10px;
