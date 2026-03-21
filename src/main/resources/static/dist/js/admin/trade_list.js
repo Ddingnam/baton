@@ -106,11 +106,11 @@
 
         var priceHtml;
         if (!t.price || t.price === 0) {
-            priceHtml = '<span style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;background:#DCFCE7;color:#16A34A;font-size:14px;font-weight:800;"><i class="ri-gift-line"></i>\ubb34\ub8cc\ub098\ub214</span>';
+            priceHtml = '<span style="font-size:18px;font-weight:900;color:#10B981;">무료나눔</span>';
         } else {
-            priceHtml = '<span style="font-size:18px;font-weight:900;color:#312E81;">' + numFormat(t.price) + '<span style="font-size:13px;font-weight:600;">\uc6d0</span></span>';
+            priceHtml = '<span style="font-size:18px;font-weight:900;color:#312E81;">' + numFormat(t.price) + '<span style="font-size:13px;font-weight:600;">원</span></span>';
             if (t.shippingFee && t.shippingFee > 0) {
-                priceHtml += '<div style="font-size:11px;color:#94A3B8;text-align:right;margin-top:2px;">\ud0dd\ubc30\ube44 ' + numFormat(t.shippingFee) + '\uc6d0 \ubcc4\ub3c4</div>';
+                priceHtml += '<div style="font-size:11px;color:#94A3B8;text-align:right;margin-top:2px;">택배비 ' + numFormat(t.shippingFee) + '원 별도</div>';
             }
         }
         setHTML('tdPriceBox', '<div style="text-align:right;">' + priceHtml + '</div>');
@@ -229,4 +229,99 @@
         })
         .catch(function(){ showToast('\uc694\uccad \uc911 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4.', 'error'); });
     });
+})();
+(function () {
+    'use strict';
+
+    var overlay  = document.getElementById('tradeAdminOverlay');
+    var taClose  = document.getElementById('taClose');
+    var taCancel = document.getElementById('taCancel');
+
+    var currentId    = null;
+    var currentTitle = '';
+
+    function openAdminPanel(id) {
+        currentId    = id;
+        currentTitle = '';
+        setText('taTitle', '불러오는 중...');
+        setHTML('taInfoList', '<div style="padding:20px 0;text-align:center;color:#94A3B8;font-size:13px;">로딩 중...</div>');
+        setHTML('taContent', '');
+        overlay.classList.add('show');
+
+        fetch(CTX + '/admin/trade/detail?id=' + id)
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (!d.success) { setText('taTitle', '불러오기 실패'); return; }
+                currentTitle = d.trade ? (d.trade.title || '') : '';
+                renderPanel(d.trade, d.tags || []);
+            })
+            .catch(function () {
+                setText('taTitle', '오류 발생');
+                setHTML('taInfoList', '<div style="color:#EF4444;font-size:13px;padding:12px 0;">네트워크 오류가 발생했습니다.</div>');
+            });
+    }
+    window.openAdminPanel = openAdminPanel;
+
+    function closePanel() { overlay.classList.remove('show'); }
+
+    taClose.addEventListener('click',  closePanel);
+    taCancel.addEventListener('click', closePanel);
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) closePanel(); });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay.classList.contains('show')) closePanel();
+    });
+
+    var taDeleteBtn = document.getElementById('taDeleteBtn');
+    if (taDeleteBtn) {
+        taDeleteBtn.addEventListener('click', function () {
+            if (!currentId) return;
+            closePanel();
+            setTimeout(function () { confirmDelete(currentId, currentTitle); }, 250);
+        });
+    }
+
+    var STATUS_COLOR = { '판매중': '#10B981', '예약중': '#3B82F6', '판매완료': '#94A3B8', '숨기기': '#EF4444' };
+
+    function renderPanel(t, tags) {
+        setText('taTitle', t.title || '(제목 없음)');
+        var sc      = STATUS_COLOR[t.tradeStatus] || '#94A3B8';
+        var dateStr = t.createdDate ? String(t.createdDate).substring(0, 10) : '-';
+        var priceStr = (!t.price || t.price === 0) ? '무료나눔' : numFormat(t.price) + '원';
+
+        var rows = [
+            { label: '판매자',   val: t.nickName      || '-' },
+            { label: '거래 상태', val: t.tradeStatus   || '-', color: sc },
+            { label: '가격',     val: priceStr },
+            { label: '거래 유형', val: t.tradeType     || '-' },
+            { label: '상품 상태', val: t.productStatus || '-' },
+            { label: '거래 장소', val: t.tradePlace    || '-' },
+            { label: '동네',     val: t.dong          || '-' },
+            { label: '조회수',   val: (t.hitCount  || 0) + '회' },
+            { label: '관심',     val: (t.likeCount || 0) + '명' },
+            { label: '채팅',     val: (t.chatCount || 0) + '건' },
+            { label: '등록일',   val: dateStr }
+        ];
+        if (tags.length > 0) rows.push({ label: '태그', val: tags.join(', ') });
+
+        setHTML('taInfoList', rows.map(function (row, i) {
+            var valHtml = row.color
+                ? '<span style="font-weight:700;color:' + row.color + ';">' + esc(String(row.val)) + '</span>'
+                : esc(String(row.val));
+            return (i > 0 ? '<div style="height:1px;background:#F1F5F9;"></div>' : '')
+                + '<div class="rpt-info-row"><span class="rpt-info-key">' + row.label + '</span>'
+                + '<span class="rpt-info-val">' + valHtml + '</span></div>';
+        }).join(''));
+
+        var tmp = document.createElement('div');
+        tmp.innerHTML = t.content || '';
+        var plain = (tmp.textContent || tmp.innerText || '').trim();
+        setHTML('taContent', plain
+            ? '<span style="white-space:pre-wrap;word-break:break-word;font-size:13px;color:#475569;line-height:1.8;">' + esc(plain) + '</span>'
+            : '<span style="color:#CBD5E1;font-size:13px;font-style:italic;">본문 내용이 없습니다.</span>');
+    }
+
+    function numFormat(n) { return String(n || 0).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+    function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
+    function setHTML(id, val) { var el = document.getElementById(id); if (el) el.innerHTML = val; }
+    function esc(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 })();

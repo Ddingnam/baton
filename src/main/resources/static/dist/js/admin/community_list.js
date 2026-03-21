@@ -249,3 +249,122 @@
         .catch(function () { showToast('\uc694\uccad \uc911 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4.', 'error'); });
     });
 })();
+(function () {
+    'use strict';
+
+    var overlay  = document.getElementById('communityAdminOverlay');
+    var caClose  = document.getElementById('caClose');
+    var caCancel = document.getElementById('caCancel');
+
+    var currentId    = null;
+    var currentTitle = '';
+
+    var CAT = {
+        '1': '일상', '일상': '일상', '2': '동네질문', '동네질문': '동네질문',
+        '3': '동네맛집', '동네맛집': '동네맛집', '4': '같이해요', '같이해요': '같이해요',
+        '5': '분실/실종', '분실/실종': '분실/실종', '6': '동네사건사고', '동네사건사고': '동네사건사고',
+        '7': '생활정보', '생활정보': '생활정보', '8': '취미생활', '취미생활': '취미생활'
+    };
+
+    function openAdminPanel(id) {
+        currentId    = id;
+        currentTitle = '';
+        setText('caTitle', '불러오는 중...');
+        setHTML('caInfoList', '<div style="padding:20px 0;text-align:center;color:#94A3B8;font-size:13px;">로딩 중...</div>');
+        setHTML('caContent', '');
+        var sec = document.getElementById('caReplySection');
+        if (sec) sec.style.display = 'none';
+        overlay.classList.add('show');
+
+        fetch(CTX + '/admin/community/detail?id=' + id)
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (!d.success) { setText('caTitle', '불러오기 실패'); return; }
+                currentTitle = d.post ? (d.post.subject || '') : '';
+                renderPanel(d.post, d.replies || []);
+            })
+            .catch(function () {
+                setText('caTitle', '오류 발생');
+                setHTML('caInfoList', '<div style="color:#EF4444;font-size:13px;padding:12px 0;">네트워크 오류가 발생했습니다.</div>');
+            });
+    }
+    window.openAdminPanel = openAdminPanel;
+
+    function closePanel() { overlay.classList.remove('show'); }
+
+    caClose.addEventListener('click',  closePanel);
+    caCancel.addEventListener('click', closePanel);
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) closePanel(); });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay.classList.contains('show')) closePanel();
+    });
+
+    var caDeleteBtn = document.getElementById('caDeleteBtn');
+    if (caDeleteBtn) {
+        caDeleteBtn.addEventListener('click', function () {
+            if (!currentId) return;
+            closePanel();
+            setTimeout(function () { confirmDelete(currentId, currentTitle); }, 250);
+        });
+    }
+
+    function renderPanel(post, replies) {
+        setText('caTitle', post.subject || '(제목 없음)');
+
+        var cat     = CAT[post.category] || post.category || '-';
+        var dateStr = post.regDate ? post.regDate.toString().substring(0, 10) : '-';
+        var place   = post.dong || post.placeName || '-';
+
+        var rows = [
+            { label: '작성자',   val: post.writerNickname || '익명' },
+            { label: '카테고리', val: cat },
+            { label: '동네',     val: place },
+            { label: '조회수',   val: (post.hitCount  || 0) + '회' },
+            { label: '좋아요',   val: (post.likeCount || 0) + '개' },
+            { label: '댓글',     val: replies.length + '건' },
+            { label: '작성일',   val: dateStr }
+        ];
+        if (post.tags && post.tags.length > 0) {
+            rows.push({ label: '태그', val: post.tags.join(', ') });
+        }
+
+        setHTML('caInfoList', rows.map(function (row, i) {
+            return (i > 0 ? '<div style="height:1px;background:#F1F5F9;"></div>' : '')
+                + '<div class="rpt-info-row"><span class="rpt-info-key">' + row.label + '</span>'
+                + '<span class="rpt-info-val">' + esc(String(row.val)) + '</span></div>';
+        }).join(''));
+
+        var tmp = document.createElement('div');
+        tmp.innerHTML = post.content || '';
+        var plain = (tmp.textContent || tmp.innerText || '').trim();
+        setHTML('caContent', plain
+            ? '<span style="white-space:pre-wrap;word-break:break-word;font-size:13px;color:#475569;line-height:1.8;">' + esc(plain) + '</span>'
+            : '<span style="color:#CBD5E1;font-size:13px;font-style:italic;">본문 내용이 없습니다.</span>');
+
+        if (replies.length > 0) {
+            setText('caReplyCount', replies.length);
+            setHTML('caReplies', replies.map(function (r) {
+                var nick  = r.writerNickname || '익명';
+                var rDate = r.regDate ? r.regDate.toString().substring(0, 10) : '-';
+                var isChild = r.depth > 0;
+                return '<div style="' + (isChild ? 'padding-left:20px;margin-top:4px;' : 'margin-top:6px;') + '">'
+                    + '<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:10px 12px;' + (isChild ? 'border-left:2px solid #A5B4FC;' : '') + '">'
+                    + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">'
+                    + (isChild ? '<span style="font-size:10px;color:#7C3AED;font-weight:700;">↳ 답글</span>' : '')
+                    + '<span style="font-size:12px;font-weight:700;color:#1E293B;">' + esc(nick) + '</span>'
+                    + '<span style="font-size:11px;color:#CBD5E1;margin-left:auto;">' + rDate + '</span>'
+                    + '</div>'
+                    + (r.deleted
+                        ? '<p style="font-size:12px;color:#94A3B8;font-style:italic;margin:0;">삭제된 댓글입니다.</p>'
+                        : '<p style="font-size:12px;color:#475569;margin:0;line-height:1.6;white-space:pre-wrap;word-break:break-word;">' + esc(r.content || '') + '</p>')
+                    + '</div></div>';
+            }).join(''));
+            var sec = document.getElementById('caReplySection');
+            if (sec) sec.style.display = '';
+        }
+    }
+
+    function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
+    function setHTML(id, val) { var el = document.getElementById(id); if (el) el.innerHTML = val; }
+    function esc(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+})();

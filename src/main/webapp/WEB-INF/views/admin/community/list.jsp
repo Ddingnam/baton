@@ -85,9 +85,6 @@
                                 <th>카테고리</th>
                                 <th>제목</th>
                                 <th>작성자</th>
-                                <th>동네(장소)</th>
-                                <th>조회</th>
-                                <th>좋아요</th>
                                 <th>작성일</th>
                                 <th>관리</th>
                             </tr>
@@ -95,7 +92,7 @@
                         <tbody>
                             <c:if test="${empty list}">
                                 <tr>
-                                    <td colspan="9" class="empty-row">
+                                    <td colspan="6" class="empty-row">
                                         <i class="ri-article-line"></i>
                                         <span>게시글이 없습니다.</span>
                                     </td>
@@ -129,27 +126,14 @@
                                         </div>
                                     </td>
                                     <td class="font-medium">
-                                        <c:choose>
-                                            <c:when test="${not empty item.dong}">
-                                                <span>${item.dong}</span>
-                                            </c:when>
-                                            <c:when test="${not empty item.placeName}">
-                                                <span title="${item.address}">${item.placeName}</span>
-                                            </c:when>
-                                            <c:otherwise><span class="tag tag-gray">미설정</span></c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                    <td class="font-medium">${item.hitCount}</td>
-                                    <td class="font-medium">${item.likeCount}</td>
-                                    <td class="font-medium">
                                         <c:if test="${not empty item.regDate}">
                                             ${fn:substring(item.regDate.toString(), 0, 10)}
                                         </c:if>
                                     </td>
                                     <td>
                                         <button type="button" class="action-btn"
-                                                onclick="openDetail(${item.id})"
-                                                title="상세보기"
+                                                onclick="openAdminPanel(${item.id})"
+                                                title="관리"
                                                 style="color:var(--color-primary);">
                                             <i class="ri-eye-line"></i>
                                         </button>
@@ -350,6 +334,50 @@
             <button class="btn-pill" style="background:var(--color-red);color:white;padding:12px 24px;" id="deleteConfirm">
                 <i class="ri-delete-bin-line"></i> 삭제
             </button>
+        </div>
+    </div>
+</div>
+
+<div class="fullscreen-overlay" id="communityAdminOverlay">
+    <div class="rpt-modal" style="width:480px;">
+        <div class="rpt-modal-header">
+            <div class="rpt-header-left">
+                <div class="rpt-header-icon"><i class="ri-article-line"></i></div>
+                <div>
+                    <p class="rpt-header-eyebrow">COMMUNITY DETAIL</p>
+                    <p class="rpt-header-title" id="caTitle">커뮤니티 관리</p>
+                </div>
+            </div>
+            <button class="rpt-close-btn" id="caClose"
+                onmouseover="this.style.background='rgba(239,68,68,0.22)';this.style.color='#FCA5A5';"
+                onmouseout="this.style.background='rgba(255,255,255,0.07)';this.style.color='rgba(255,255,255,0.35)';">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        <div class="rpt-modal-body">
+            <div class="rpt-info-list" id="caInfoList">
+                <div style="padding:20px 0;text-align:center;color:#94A3B8;font-size:13px;">로딩 중...</div>
+            </div>
+            <div class="rpt-divider"></div>
+            <div class="rpt-field">
+                <p class="rpt-field-label">본문 내용</p>
+                <div class="rpt-field-box" id="caContent">-</div>
+            </div>
+            <div id="caReplySection" style="display:none;">
+                <div class="rpt-divider"></div>
+                <div class="rpt-field">
+                    <p class="rpt-field-label">댓글 <span id="caReplyCount" style="color:var(--color-primary);font-weight:800;"></span></p>
+                    <div id="caReplies"></div>
+                </div>
+            </div>
+        </div>
+        <div class="rpt-modal-footer">
+            <button class="rpt-btn-cancel" id="caCancel">닫기</button>
+            <div class="rpt-footer-actions">
+                <button class="rpt-btn-reject" id="caDeleteBtn">
+                    <i class="ri-delete-bin-line"></i> 삭제
+                </button>
+            </div>
         </div>
     </div>
 </div>

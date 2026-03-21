@@ -200,3 +200,101 @@
         .catch(function(){ showToast('\uc694\uccad \uc911 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4.', 'error'); });
     });
 })();
+(function () {
+    'use strict';
+
+    var overlay  = document.getElementById('albaAdminOverlay');
+    var aaClose  = document.getElementById('aaClose');
+    var aaCancel = document.getElementById('aaCancel');
+
+    var currentId    = null;
+    var currentTitle = '';
+
+    function openAdminPanel(id) {
+        currentId    = id;
+        currentTitle = '';
+        setText('aaTitle', '불러오는 중...');
+        setHTML('aaInfoList', '<div style="padding:20px 0;text-align:center;color:#94A3B8;font-size:13px;">로딩 중...</div>');
+        setHTML('aaContent', '');
+        overlay.classList.add('show');
+
+        fetch(CTX + '/admin/alba/detail?id=' + id)
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (!d.success) { setText('aaTitle', '불러오기 실패'); return; }
+                currentTitle = d.posting ? (d.posting.title || '') : '';
+                renderPanel(d.posting, d.images || []);
+            })
+            .catch(function () {
+                setText('aaTitle', '오류 발생');
+                setHTML('aaInfoList', '<div style="color:#EF4444;font-size:13px;padding:12px 0;">네트워크 오류가 발생했습니다.</div>');
+            });
+    }
+    window.openAdminPanel = openAdminPanel;
+
+    function closePanel() { overlay.classList.remove('show'); }
+
+    aaClose.addEventListener('click',  closePanel);
+    aaCancel.addEventListener('click', closePanel);
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) closePanel(); });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay.classList.contains('show')) closePanel();
+    });
+
+    var aaDeleteBtn = document.getElementById('aaDeleteBtn');
+    if (aaDeleteBtn) {
+        aaDeleteBtn.addEventListener('click', function () {
+            if (!currentId) return;
+            closePanel();
+            setTimeout(function () { confirmDelete(currentId, currentTitle); }, 250);
+        });
+    }
+
+    function renderPanel(p, images) {
+        setText('aaTitle', p.title || '(제목 없음)');
+
+        var dlVal  = p.deadline ? p.deadline.substring(0, 10) + ' 마감' : '상시채용';
+        var payVal = (p.payType && p.pay) ? (p.payType + ' ' + numFormat(p.pay) + '원') : '-';
+        var timeVal = (p.startTime && p.endTime)
+            ? p.startTime + ' ~ ' + p.endTime + (p.timeNegotiable === 'Y' ? ' (협의가능)' : '')
+            : '-';
+
+        var rows = [
+            { label: '업체명',   val: p.employer  || '-' },
+            { label: '카테고리', val: p.category  || '기타' },
+            { label: '급여',     val: payVal },
+            { label: '근무기간', val: p.workPeriod || '-' },
+            { label: '근무요일', val: p.workDays   || '-' },
+            { label: '근무시간', val: timeVal },
+            { label: '근무지',   val: p.location  || '-' },
+            { label: '마감일',   val: dlVal, color: p.deadline ? '#EF4444' : '#10B981' },
+            { label: '복리후생', val: p.benefits  || '-' },
+            { label: '연락처',   val: p.contact   || '-' },
+            { label: '조회수',   val: (p.hitCount || 0) + '회' }
+        ];
+
+        setHTML('aaInfoList', rows.map(function (row, i) {
+            var valHtml = row.color
+                ? '<span style="font-weight:700;color:' + row.color + ';">' + esc(String(row.val)) + '</span>'
+                : esc(String(row.val));
+            return (i > 0 ? '<div style="height:1px;background:#F1F5F9;"></div>' : '')
+                + '<div class="rpt-info-row"><span class="rpt-info-key">' + row.label + '</span>'
+                + '<span class="rpt-info-val">' + valHtml + '</span></div>';
+        }).join(''));
+
+        var desc = p.description ? String(p.description).trim() : '';
+        if (desc) {
+            var tmp = document.createElement('div');
+            tmp.innerHTML = desc;
+            var plain = (tmp.textContent || tmp.innerText || '').trim() || desc;
+            setHTML('aaContent', '<span style="white-space:pre-wrap;word-break:break-word;font-size:13px;color:#475569;line-height:1.8;">' + esc(plain) + '</span>');
+        } else {
+            setHTML('aaContent', '<span style="color:#CBD5E1;font-size:13px;font-style:italic;">공고 내용이 없습니다.</span>');
+        }
+    }
+
+    function numFormat(n) { return String(n || 0).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+    function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
+    function setHTML(id, val) { var el = document.getElementById(id); if (el) el.innerHTML = val; }
+    function esc(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+})();

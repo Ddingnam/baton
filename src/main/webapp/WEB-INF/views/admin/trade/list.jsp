@@ -76,12 +76,10 @@
                         <thead>
                             <tr>
                                 <th>번호</th>
-                                <th>이미지</th>
                                 <th>제목</th>
                                 <th>판매자</th>
                                 <th>가격</th>
                                 <th>상태</th>
-                                <th>동네</th>
                                 <th>등록일</th>
                                 <th>관리</th>
                             </tr>
@@ -89,7 +87,7 @@
                         <tbody>
                             <c:if test="${empty list}">
                                 <tr>
-                                    <td colspan="9" class="empty-row">
+                                    <td colspan="7" class="empty-row">
                                         <i class="ri-shopping-bag-line"></i>
                                         <span>게시글이 없습니다.</span>
                                     </td>
@@ -98,20 +96,6 @@
                             <c:forEach var="item" items="${list}">
                                 <tr>
                                     <td class="font-medium">${item.productIdx}</td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${not empty item.imgUrl}">
-                                                <img src="${pageContext.request.contextPath}${item.imgUrl}"
-                                                     style="width:44px;height:44px;object-fit:cover;border-radius:10px;border:1px solid #E2E8F0;display:block;"
-                                                     onerror="this.style.display='none'">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <div style="width:44px;height:44px;border-radius:10px;background:#F1F5F9;display:flex;align-items:center;justify-content:center;">
-                                                    <i class="ri-image-line" style="color:#CBD5E1;font-size:18px;"></i>
-                                                </div>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
                                     <td>
                                         <span class="reason-cell" title="${item.title}"
                                               onclick="openDetail(${item.productIdx})"
@@ -125,7 +109,7 @@
                                     </td>
                                     <td class="font-medium">
                                         <c:choose>
-                                            <c:when test="${item.price == 0}"><span class="tag tag-green">무료나눔</span></c:when>
+                                            <c:when test="${item.price == 0}">무료나눔</c:when>
                                             <c:otherwise><fmt:formatNumber value="${item.price}" pattern="#,###"/>원</c:otherwise>
                                         </c:choose>
                                     </td>
@@ -139,18 +123,12 @@
                                         </c:choose>
                                     </td>
                                     <td class="font-medium">
-                                        <c:choose>
-                                            <c:when test="${not empty item.dong}">${item.dong}</c:when>
-                                            <c:otherwise><span class="tag tag-gray">미설정</span></c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                    <td class="font-medium">
                                         <c:if test="${not empty item.createdDate}">${fn:substring(item.createdDate.toString(), 0, 10)}</c:if>
                                     </td>
                                     <td>
                                         <button type="button" class="action-btn"
-                                                onclick="openDetail(${item.productIdx})"
-                                                title="상세보기"
+                                                onclick="openAdminPanel(${item.productIdx})"
+                                                title="관리"
                                                 style="color:var(--color-primary);">
                                             <i class="ri-eye-line"></i>
                                         </button>
@@ -316,6 +294,43 @@
             <button class="btn-pill" style="background:var(--color-red);color:white;padding:12px 24px;" id="tradeDeleteConfirm">
                 <i class="ri-delete-bin-line"></i> 삭제
             </button>
+        </div>
+    </div>
+</div>
+
+<div class="fullscreen-overlay" id="tradeAdminOverlay">
+    <div class="rpt-modal" style="width:480px;">
+        <div class="rpt-modal-header">
+            <div class="rpt-header-left">
+                <div class="rpt-header-icon"><i class="ri-shopping-bag-3-line"></i></div>
+                <div>
+                    <p class="rpt-header-eyebrow">TRADE DETAIL</p>
+                    <p class="rpt-header-title" id="taTitle">중고거래 관리</p>
+                </div>
+            </div>
+            <button class="rpt-close-btn" id="taClose"
+                onmouseover="this.style.background='rgba(239,68,68,0.22)';this.style.color='#FCA5A5';"
+                onmouseout="this.style.background='rgba(255,255,255,0.07)';this.style.color='rgba(255,255,255,0.35)';">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        <div class="rpt-modal-body">
+            <div class="rpt-info-list" id="taInfoList">
+                <div style="padding:20px 0;text-align:center;color:#94A3B8;font-size:13px;">로딩 중...</div>
+            </div>
+            <div class="rpt-divider"></div>
+            <div class="rpt-field">
+                <p class="rpt-field-label">본문 내용</p>
+                <div class="rpt-field-box" id="taContent">-</div>
+            </div>
+        </div>
+        <div class="rpt-modal-footer">
+            <button class="rpt-btn-cancel" id="taCancel">닫기</button>
+            <div class="rpt-footer-actions">
+                <button class="rpt-btn-reject" id="taDeleteBtn">
+                    <i class="ri-delete-bin-line"></i> 삭제
+                </button>
+            </div>
         </div>
     </div>
 </div>

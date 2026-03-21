@@ -518,7 +518,7 @@ ul, li { list-style: none; }
 .font-medium { font-weight: 600; color: var(--text-sub); }
 .font-num { font-family: 'Montserrat', monospace; font-weight: 700; color: var(--text-main); }
 
-.tag { display: inline-flex; padding: 6px 12px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 800; }
+.tag { display: inline-flex; align-items: center; justify-content: center; min-width: 72px; padding: 5px 12px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 800; white-space: nowrap; }
 .tag-blue { background: var(--color-blue-light); color: var(--color-blue); }
 .tag-gray { background: var(--border-color); color: var(--text-sub); }
 .tag-red { background: var(--color-red-light); color: var(--color-red); }
