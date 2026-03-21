@@ -219,7 +219,7 @@
             <div class="sidebar-stat-box">
               <div class="stat-row">
                 <span>모집 중</span>
-                <strong><span id="resultCount">0</span>건</strong>
+				<strong><span id="sidebarResultCount">0</span>건</strong>
               </div>
             </div>
 
@@ -276,10 +276,6 @@
   </script>
 
   <script src="${pageContext.request.contextPath}/dist/js/alba/alba-list.js"></script>
-
-
   
-  
-
 </body>
 </html>

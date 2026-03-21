@@ -24,6 +24,10 @@ function getRelativeTime(dateStr) {
 }
 
 function applyFilters() {
+	
+	const rc2 = document.getElementById('sidebarResultCount');
+	if (rc2) rc2.textContent = jobs.length
+	
 	const keywordEl = document.getElementById('searchInput');
 	const keyword = keywordEl ? keywordEl.value.trim().toLowerCase() : '';
 
@@ -62,7 +66,7 @@ function applyFilters() {
 	}
 
 	if (minPay > 0) {
-		jobs = jobs.filter(j => j.payType !== 'hour' || j.pay >= minPay);
+		jobs = jobs.filter(j => j.payType !== '시급' || j.pay >= minPay);
 	}
 
 	if (sort === 'pay_high') {
@@ -362,6 +366,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function applyAreaFilter() {
+		const rc2 = document.getElementById('sidebarResultCount');
+		if (rc2) rc2.textContent = jobs.length;
+	
 		const sido = normalizeSido(
 			document.querySelector('#col-sido li.active')?.textContent || ''
 		);

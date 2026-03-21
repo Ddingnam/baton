@@ -950,3 +950,90 @@ body {
   opacity: 0.35;
   cursor: not-allowed;
 }
+
+/* ===== JOB LIST (renderList 대응) ===== */
+.job-list-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.18s;
+}
+
+.job-list-item:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+  border-color: var(--primary-border);
+}
+
+.job-area-col {
+  min-width: 130px;
+  max-width: 150px;
+}
+
+.job-area-text {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+.job-article-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.job-employer {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-bottom: 4px;
+}
+
+.job-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.job-salary-col {
+  min-width: 100px;
+  text-align: right;
+}
+
+.pay-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid var(--primary-border);
+  margin-bottom: 4px;
+}
+
+.pay-amount {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.job-time-col {
+  min-width: 90px;
+  font-size: 13px;
+  color: var(--text-sub);
+  text-align: center;
+}
+
+.job-date-col {
+  min-width: 60px;
+  font-size: 12px;
+  color: var(--text-light);
+  text-align: right;
+}
