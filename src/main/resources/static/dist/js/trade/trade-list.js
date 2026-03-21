@@ -1,379 +1,276 @@
-function tlGetParams() {
-    return new URL(location.href).searchParams;
-}
+const { createApp, ref, computed, onMounted, watch } = Vue;
 
-function tlGetQueryString(params) {
-    params.delete('page');
-    return params.toString();
-}
+createApp({
+    setup() {
+        const products = ref([]);
+        const categories = ref([]);
+        const isLoading = ref(false);
+        const isLoadingMore = ref(false);
 
-function tlNavigate(params) {
-    const qs = tlGetQueryString(params);
-    history.pushState(null, '', '/trade/list?' + qs);
-    tlFetchList(qs);
-}
+        const keyword = ref('');
+        const priceMin = ref('');
+        const priceMax = ref('');
+        const availableOnly = ref(false);
+        const categoryIdx = ref('');
+        const sort = ref('newest');
+        const km = ref('1');
+        const sortDropdownOpen = ref(false);
 
-function tlSyncCategoryButtons() {
-    const p = tlGetParams();
-    const currentCat = p.get('categoryIdx') || '';
-    document.querySelectorAll('.tl-filter-list .filter-btn').forEach(function(btn) {
-        const onclick = btn.getAttribute('onclick') || '';
-        const match = onclick.match(/tlSetCategory\(['"]?(.*?)['"]?\)/);
-        const btnCat = match ? match[1] : '';
-        btn.classList.toggle('active', btnCat === currentCat);
-    });
-}
+        const currentPage = ref(1);
+        const totalPage = ref(1);
 
-function tlSyncSortDropdown() {
-    const p = tlGetParams();
-    const currentSort = p.get('sort') || 'newest';
+        const CAT_NAMES = {
+            '1': '전자기기', '2': '남성의류', '3': '여성의류', '4': '뷰티',
+            '5': '스타굿즈', '6': '가구/인테리어', '7': '도서', '8': '게임',
+            '9': '스포츠/레저', '10': '가전제품', '11': '취미/수집',
+            '12': '반려동물', '13': '식품', '14': '유아동', '15': '티켓/상품권'
+        };
+        const SORT_LABELS = {
+            'newest': '최신순', 'latest': '최신순',
+            'lowPrice': '낮은 가격순', 'highPrice': '높은 가격순', 'hitCount': '인기순'
+        };
+        const KM_LABELS = {
+            '1': '내 동네만', '3': '가까운 동네', '5': '먼 동네까지'
+        };
 
-    const sortLabels = {
-        'newest': '최신순', 'latest': '최신순',
-        'lowPrice': '낮은 가격순', 'highPrice': '높은 가격순', 'hitCount': '인기순'
-    };
+        const activeChips = computed(() => {
+            const chips = [];
+            if (keyword.value)
+                chips.push({ label: '검색: ' + keyword.value, key: 'keyword' });
+            if (categoryIdx.value)
+                chips.push({ label: CAT_NAMES[categoryIdx.value] || '카테고리', key: 'categoryIdx' });
+            if (priceMin.value || priceMax.value)
+                chips.push({ label: (priceMin.value || '0') + '원 ~ ' + (priceMax.value || '∞') + '원', keys: ['priceMin', 'priceMax'] });
+            if (availableOnly.value)
+                chips.push({ label: '거래 가능', key: 'available' });
+            if (sort.value && sort.value !== 'newest' && sort.value !== 'latest')
+                chips.push({ label: '정렬: ' + (SORT_LABELS[sort.value] || sort.value), key: 'sort' });
+            if (km.value && km.value !== '1')
+                chips.push({ label: KM_LABELS[km.value] || km.value + 'km', key: 'km' });
+            return chips;
+        });
 
-    const selectedText = document.getElementById('selectedSortText');
-    if (selectedText) {
-        selectedText.textContent = sortLabels[currentSort] || '최신순';
-    }
+        const sortLabel = computed(() => SORT_LABELS[sort.value] || '최신순');
+        const hasMore = computed(() => currentPage.value < totalPage.value);
 
-    document.querySelectorAll('#sortDropdown .dropdown-menu li').forEach(function(li) {
-        const val = li.getAttribute('data-value');
-        const isActive = val === currentSort || (currentSort === 'newest' && val === 'latest');
-        li.classList.toggle('active', isActive);
-    });
-}
+        function readFromUrl() {
+            const p = new URL(location.href).searchParams;
+            keyword.value = p.get('keyword') || '';
+            priceMin.value = p.get('priceMin') || '';
+            priceMax.value = p.get('priceMax') || '';
+            availableOnly.value = p.get('available') === 'true';
+            categoryIdx.value = p.get('categoryIdx') || '';
+            sort.value = p.get('sort') || 'newest';
+            km.value = p.get('km') || '1';
+        }
 
-function tlSyncRadiusBtns() {
-    const p = tlGetParams();
-    const currentKm = p.get('km') || '1';
-    document.querySelectorAll('.tl-radius-btn').forEach(function(btn) {
-        btn.classList.toggle('active', btn.dataset.km === currentKm);
-    });
-}
+        function buildQueryString() {
+            const p = new URLSearchParams();
+            if (keyword.value) p.set('keyword', keyword.value);
+            if (priceMin.value) p.set('priceMin', priceMin.value);
+            if (priceMax.value) p.set('priceMax', priceMax.value);
+            if (availableOnly.value) p.set('available', 'true');
+            if (categoryIdx.value) p.set('categoryIdx', categoryIdx.value);
+            if (sort.value) p.set('sort', sort.value);
+            if (km.value) p.set('km', km.value);
+            return p.toString();
+        }
 
-function tlSyncUI() {
-    tlSyncCategoryButtons();
-    tlSyncSortDropdown();
-    tlSyncRadiusBtns();
+        function pushUrl() {
+            const qs = buildQueryString();
+            history.pushState(null, '', '/trade/list' + (qs ? '?' + qs : ''));
+        }
 
-    const container = document.getElementById('tlActiveFilters');
-    if (container) {
-        container.innerHTML = '';
-        tlRenderChips();
-    }
-}
+        async function fetchList(page = 1, append = false) {
+            if (page === 1) isLoading.value = true;
+            else isLoadingMore.value = true;
 
-function tlFetchList(queryString) {
-    const grid = document.querySelector('.tl-product-grid');
-    const moreBtnContainer = document.getElementById('more-btn-container');
+            try {
+                const p = new URLSearchParams();
+                if (keyword.value) p.set('keyword', keyword.value);
+                if (priceMin.value) p.set('priceMin', priceMin.value);
+                if (priceMax.value) p.set('priceMax', priceMax.value);
+                if (availableOnly.value) p.set('available', 'true');
+                if (categoryIdx.value) p.set('categoryIdx', categoryIdx.value);
+                if (sort.value) p.set('sort', sort.value);
+                if (km.value) p.set('km', km.value);
+                p.set('page', page);
 
-    if (grid) {
-        grid.style.opacity = '0.4';
-        grid.style.transition = 'opacity 0.2s';
-    }
+                const res = await fetch('/trade/listJson?' + p.toString());
+                if (!res.ok) throw new Error('HTTP_ERROR');
+                const data = await res.json();
 
-    fetch('/trade/list?' + queryString + '&isAjax=true&page=1')
-        .then(r => { if (!r.ok) throw new Error(); return r.text(); })
-        .then(html => {
-            if (grid) {
-                const cleanHtml = html.replace(/<!--TOTAL_PAGE:\d+-->/g, '').trim();
-                if (cleanHtml.length === 0) {
-                    grid.innerHTML = `
-                        <div class="tl-empty-state">
-                            <i class="ri-shopping-basket-line empty-icon"></i>
-                            <p>아직 등록된 상품이 없어요</p>
-                            <small>첫 번째 판매자가 되어보세요!</small>
-                        </div>`;
+                if (append) {
+                    products.value = [...products.value, ...data.tradeList];
                 } else {
-                    grid.innerHTML = cleanHtml;
-                    initTimeAgo();
+                    products.value = data.tradeList || [];
+                    currentPage.value = 1;
                 }
-                grid.style.opacity = '1';
+
+                totalPage.value = data.totalPage || 1;
+                currentPage.value = data.currentPage || page;
+
+                if (data.categoryList) {
+                    categories.value = data.categoryList;
+                }
+            } catch (e) {
+                console.error('fetchList 오류:', e);
+            } finally {
+                isLoading.value = false;
+                isLoadingMore.value = false;
             }
-
-            const cp = document.getElementById('currentPage');
-            const tp = document.getElementById('totalPage');
-            const match = html.match(/<!--TOTAL_PAGE:(\d+)-->/);
-            const totalPage = match ? parseInt(match[1]) : 1;
-            if (tp) tp.value = totalPage;
-            if (cp) cp.value = '1';
-            if (moreBtnContainer) {
-                moreBtnContainer.style.display = totalPage > 1 ? '' : 'none';
-            }
-
-            tlSyncUI();
-        })
-        .catch(() => {
-            if (grid) grid.style.opacity = '1';
-        });
-}
-
-function formatTimeAgo(dateString) {
-    if (!dateString) return "";
-    let cleanDate = dateString.trim().split('.')[0].replace(/-/g, '/');
-    const date = new Date(cleanDate);
-    const now = new Date();
-    const diff = Math.floor((now - date) / 1000);
-    if (isNaN(date.getTime())) return dateString;
-    if (diff < 60) return "방금 전";
-    if (diff < 3600) return Math.floor(diff / 60) + "분 전";
-    if (diff < 86400) return Math.floor(diff / 3600) + "시간 전";
-    if (diff < 2592000) return Math.floor(diff / 86400) + "일 전";
-    return dateString.split(' ')[0];
-}
-
-function initTimeAgo() {
-    document.querySelectorAll('.time-ago').forEach(function(el) {
-        const rawDate = el.getAttribute('data-time') || el.innerText;
-        if (rawDate && !el.getAttribute('data-formatted')) {
-            el.setAttribute('data-time', rawDate);
-            el.innerText = formatTimeAgo(rawDate);
-            el.setAttribute('data-formatted', 'true');
         }
-    });
-}
 
-function initSortDropdown() {
-    const sortDropdown = document.getElementById('sortDropdown');
-    if (!sortDropdown) return;
-
-    const selected = sortDropdown.querySelector('.dropdown-selected');
-    const menuItems = sortDropdown.querySelectorAll('.dropdown-menu li');
-
-    selected.addEventListener('click', function(e) {
-        e.stopPropagation();
-        sortDropdown.classList.toggle('active');
-    });
-
-    menuItems.forEach(item => {
-        item.addEventListener('click', function() {
-            tlChangeSort(this.getAttribute('data-value'));
-        });
-    });
-
-    document.addEventListener('click', function() {
-        sortDropdown.classList.remove('active');
-    });
-}
-
-function tlRenderChips() {
-    const p = tlGetParams();
-    const container = document.getElementById('tlActiveFilters');
-    if (!container) return;
-
-    const catNames = {
-        '1': '전자기기', '2': '남성의류', '3': '여성의류', '4': '뷰티',
-        '5': '스타굿즈', '6': '가구/인테리어', '7': '도서', '8': '게임',
-        '9': '스포츠/레저', '10': '가전제품', '11': '취미/수집',
-        '12': '반려동물', '13': '식품', '14': '유아동', '15': '티켓/상품권'
-    };
-    const sortLabels = {
-        'newest': '최신순', 'latest': '최신순',
-        'lowPrice': '낮은 가격순', 'highPrice': '높은 가격순', 'hitCount': '인기순'
-    };
-    const kmLabels = { '1': '내 동네만', '3': '가까운 동네', '5': '먼 동네까지' };
-
-    const chips = [];
-
-    if (p.get('keyword'))
-        chips.push({ label: '검색: ' + p.get('keyword'), key: 'keyword' });
-    if (p.get('categoryIdx'))
-        chips.push({ label: catNames[p.get('categoryIdx')] || '카테고리', key: 'categoryIdx' });
-    if (p.get('priceMin') || p.get('priceMax'))
-        chips.push({ label: (p.get('priceMin') || '0') + '원 ~ ' + (p.get('priceMax') || '∞') + '원', keys: ['priceMin', 'priceMax'] });
-    if (p.get('available') === 'true')
-        chips.push({ label: '거래 가능', key: 'available' });
-
-    const currentSort = p.get('sort');
-    if (currentSort && currentSort !== 'newest' && currentSort !== 'latest')
-        chips.push({ label: '정렬: ' + (sortLabels[currentSort] || currentSort), key: 'sort' });
-
-    const currentKm = p.get('km');
-    if (currentKm && currentKm !== '3')
-        chips.push({ label: kmLabels[currentKm] || (currentKm + 'km'), key: 'km' });
-
-    chips.forEach(function(chip) {
-        const el = document.createElement('span');
-        el.className = 'tl-filter-chip';
-        el.innerHTML = chip.label
-            + ' <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">'
-            + '<path d="M18 6 6 18M6 6l12 12"/></svg>';
-        el.addEventListener('click', function() {
-            const pp = tlGetParams();
-            if (chip.keys) chip.keys.forEach(function(k) { pp.delete(k); });
-            else pp.delete(chip.key);
-            tlNavigate(pp);
-        });
-        container.appendChild(el);
-    });
-}
-
-function tlSetCategory(idx) {
-    const p = tlGetParams();
-    if (idx) p.set('categoryIdx', idx);
-    else p.delete('categoryIdx');
-    tlNavigate(p);
-}
-
-function tlChangeSort(val) {
-    const p = tlGetParams();
-    p.set('sort', val);
-    tlNavigate(p);
-}
-
-function tlApplyFilter() {
-    const p = tlGetParams();
-    const min = document.getElementById('tlPriceMin').value.trim();
-    const max = document.getElementById('tlPriceMax').value.trim();
-    const avail = document.getElementById('tlAvailableOnly').checked;
-    const kw = document.getElementById('tlSearchInput')?.value.trim();
-    if (min) p.set('priceMin', min); else p.delete('priceMin');
-    if (max) p.set('priceMax', max); else p.delete('priceMax');
-    if (avail) p.set('available', 'true'); else p.delete('available');
-    if (kw) p.set('keyword', kw); else p.delete('keyword');
-    tlNavigate(p);
-}
-
-function tlResetFilters() {
-    const priceMin = document.getElementById('tlPriceMin');
-    const priceMax = document.getElementById('tlPriceMax');
-    const avail = document.getElementById('tlAvailableOnly');
-    if (priceMin) priceMin.value = '';
-    if (priceMax) priceMax.value = '';
-    if (avail) avail.checked = false;
-    history.pushState(null, '', '/trade/list?km=3');
-    tlFetchList('km=3');
-}
-
-let isLoading = false;
-
-function LoadMore() {
-    if (isLoading) return;
-
-    const currentPageInput = document.getElementById('currentPage');
-    const totalPageEl = document.getElementById('totalPage');
-    if (!currentPageInput || !totalPageEl) return;
-
-    let currentPage = parseInt(currentPageInput.value, 10) || 1;
-    const totalPage = parseInt(totalPageEl.value, 10) || 1;
-    let nextPage = currentPage + 1;
-    if (nextPage > totalPage) return;
-
-    isLoading = true;
-    const btn = document.getElementById('btn-load-more');
-    if (btn) btn.innerHTML = '로딩 중... <i class="ri-loader-4-line"></i>';
-
-    const p = tlGetParams();
-    const params = new URLSearchParams({
-        page: nextPage,
-        isAjax: 'true',
-        keyword: document.getElementById('tlSearchInput')?.value || p.get('keyword') || '',
-        categoryIdx: p.get('categoryIdx') || '',
-        priceMin: document.getElementById('tlPriceMin')?.value || p.get('priceMin') || '',
-        priceMax: document.getElementById('tlPriceMax')?.value || p.get('priceMax') || '',
-        sort: p.get('sort') || 'newest',
-        available: p.get('available') || 'false',
-        km: p.get('km') || '3'
-    });
-
-    fetch('/trade/list?' + params.toString())
-        .then(response => {
-            if (!response.ok) throw new Error("HTTP_ERROR");
-            return response.text();
-        })
-        .then(html => {
-            const cleanHtml = html.replace(/<!--TOTAL_PAGE:\d+-->/g, '').trim();
-            if (cleanHtml.length > 0) {
-                const grid = document.querySelector('.tl-product-grid');
-                if (grid) {
-                    grid.insertAdjacentHTML('beforeend', cleanHtml);
-                    initTimeAgo();
-                }
-                currentPageInput.value = nextPage;
-                if (nextPage >= totalPage) {
-                    const container = document.getElementById('more-btn-container');
-                    if (container) container.style.display = 'none';
-                }
-            }
-            isLoading = false;
-            if (btn) btn.innerHTML = '더보기 <i class="ri-arrow-down-s-line"></i>';
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            isLoading = false;
-            if (btn) btn.innerHTML = '더보기 <i class="ri-arrow-down-s-line"></i>';
-        });
-}
-
-function tlToggleWish(e, productIdx) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const btn = e.currentTarget;
-    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
-    const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
-    if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
-
-    fetch('/trade/toggleLike', {
-        method: 'POST',
-        headers: headers,
-        body: new URLSearchParams({ productIdx: productIdx })
-    })
-    .then(response => {
-        if (!response.ok) throw new Error("HTTP_ERROR");
-        return response.json();
-    })
-    .then(data => {
-        if (data.status === 'loginRequired') {
-            alert('로그인이 필요한 서비스입니다.');
-            return;
+        function goTo(path) {
+            location.href = (typeof CTX !== 'undefined' ? CTX : '') + path;
         }
-        if (data.status === 'success') {
-            const icon = btn.querySelector('i');
-            btn.classList.toggle('active', data.isLiked);
-            if (data.isLiked) {
-                icon.classList.replace('ri-heart-3-line', 'ri-heart-3-fill');
+
+        function navigate() {
+            pushUrl();
+            fetchList(1);
+        }
+
+        function setCategory(idx) {
+            categoryIdx.value = idx;
+            navigate();
+        }
+
+        function setSort(val) {
+            sort.value = val;
+            sortDropdownOpen.value = false;
+            navigate();
+        }
+
+        function setKm(val) {
+            km.value = val;
+            navigate();
+        }
+
+        function applyFilter() {
+            navigate();
+        }
+
+        function removeChip(chip) {
+            if (chip.keys) {
+                chip.keys.forEach(k => {
+                    if (k === 'priceMin') priceMin.value = '';
+                    if (k === 'priceMax') priceMax.value = '';
+                });
             } else {
-                icon.classList.replace('ri-heart-3-fill', 'ri-heart-3-line');
+                if (chip.key === 'keyword') keyword.value = '';
+                if (chip.key === 'categoryIdx') categoryIdx.value = '';
+                if (chip.key === 'available') availableOnly.value = false;
+                if (chip.key === 'sort') sort.value = 'newest';
+                if (chip.key === 'km') km.value = '1';
             }
-            const card = btn.closest('.trade-card');
-            if (card) {
-                const wishIcon = card.querySelector('.wish-icon');
-                if (wishIcon) {
-                    wishIcon.parentElement.innerHTML = '<i class="ri-heart-3-line wish-icon"></i> ' + data.likeCount;
-                }
-            }
-            showBatonToast(data.isLiked ? "관심 목록에 추가되었습니다." : "관심 목록에서 제거되었습니다.");
+            navigate();
         }
-    })
-    .catch(err => {
-        console.error("찜하기 상세 에러:", err);
-        showBatonToast('다시 시도하여 주세요.');
-    });
-}
 
-function tlMobileFilter() {
-    ['tlCard1', 'tlCard2', 'tlCard3'].forEach(function(id) {
-        document.getElementById(id).classList.toggle('is-open');
-    });
-}
+        function resetFilters() {
+            keyword.value = '';
+            priceMin.value = '';
+            priceMax.value = '';
+            availableOnly.value = false;
+            categoryIdx.value = '';
+            sort.value = 'newest';
+            km.value = '1';
+            navigate();
+        }
 
-function initRadiusBtns() {
-    document.querySelectorAll('.tl-radius-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            const p = tlGetParams();
-            p.set('km', this.dataset.km);
-            tlNavigate(p);
+        async function loadMore() {
+            if (isLoadingMore.value || !hasMore.value) return;
+            await fetchList(currentPage.value + 1, true);
+        }
+
+        async function toggleWish(e, product) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+            const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+            if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+            try {
+                const res = await fetch('/trade/toggleLike', {
+                    method: 'POST',
+                    headers,
+                    body: new URLSearchParams({ productIdx: product.productIdx })
+                });
+                const data = await res.json();
+
+                if (data.status === 'loginRequired') {
+                    alert('로그인이 필요한 서비스입니다.');
+                    return;
+                }
+                if (data.status === 'success') {
+                    product.isLiked = data.isLiked;
+                    product.likeCount = data.likeCount;
+                    showBatonToast(data.isLiked ? '관심 목록에 추가되었습니다.' : '관심 목록에서 제거되었습니다.');
+                }
+            } catch (e) {
+                showBatonToast('다시 시도하여 주세요.');
+            }
+        }
+
+        function formatTimeAgo(dateString) {
+            if (!dateString) return '';
+            const cleanDate = dateString.trim().split('.')[0].replace(/-/g, '/');
+            const date = new Date(cleanDate);
+            const diff = Math.floor((Date.now() - date) / 1000);
+            if (isNaN(date.getTime())) return dateString;
+            if (diff < 60) return '방금 전';
+            if (diff < 3600) return Math.floor(diff / 60) + '분 전';
+            if (diff < 86400) return Math.floor(diff / 3600) + '시간 전';
+            if (diff < 2592000) return Math.floor(diff / 86400) + '일 전';
+            return dateString.split(' ')[0];
+        }
+
+        function formatPrice(price) {
+            if (price === 0) return '나눔';
+            return Number(price).toLocaleString('ko-KR') + '원';
+        }
+
+        function getTradePlace(item) {
+            if (item.tradeType === '둘다가능') {
+                return (item.tradePlace || '택배 거래만 가능') + ' · 택배 거래';
+            }
+            return item.tradePlace || '택배 거래만 가능';
+        }
+
+        window.addEventListener('popstate', () => {
+            readFromUrl();
+            fetchList(1);
         });
-    });
-}
 
-document.addEventListener('DOMContentLoaded', function() {
-    initSortDropdown();
-    initRadiusBtns();
-    initTimeAgo();
-    tlSyncUI();
-});
+        let debounceTimer = null;
+        function debounceNavigate() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => navigate(), 0);
+        }
+
+        watch(keyword, () => debounceNavigate());
+        watch(priceMin, () => debounceNavigate());
+        watch(priceMax, () => debounceNavigate());
+        watch(availableOnly, () => navigate());
+
+        onMounted(() => {
+            readFromUrl();
+            fetchList(1);
+            document.addEventListener('click', () => { sortDropdownOpen.value = false; });
+        });
+
+        return {
+            products, categories, isLoading, isLoadingMore,
+            keyword, priceMin, priceMax, availableOnly,
+            categoryIdx, sort, km,
+            currentPage, totalPage,
+            activeChips, sortLabel, hasMore,
+            CAT_NAMES, SORT_LABELS, KM_LABELS,
+            sortDropdownOpen,
+            setCategory, setSort, setKm,
+            applyFilter, removeChip, resetFilters, loadMore, toggleWish, goTo,
+            formatTimeAgo, formatPrice, getTradePlace
+        };
+    }
+}).mount('#trade-list-app');

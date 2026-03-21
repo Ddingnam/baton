@@ -126,6 +126,73 @@ public class TradeController {
 		return "trade/list";
 	}
 	
+	@GetMapping("listJson")
+	@ResponseBody
+	public Map<String, Object> listJson(
+	        @RequestParam(value = "page",        defaultValue = "1")  int current_page,
+	        @RequestParam(value = "keyword",     defaultValue = "")   String keyword,
+	        @RequestParam(value = "priceMin",    required = false)    String priceMin,
+	        @RequestParam(value = "priceMax",    required = false)    String priceMax,
+	        @RequestParam(value = "available",   required = false)    String available,
+	        @RequestParam(value = "categoryIdx", defaultValue = "")   String categoryIdx,
+	        @RequestParam(value = "sort",        defaultValue = "newest") String sort,
+	        @RequestParam(value = "km",          defaultValue = "1")  double km,
+	        @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+	    Map<String, Object> result = new HashMap<>();
+	    try {
+	        String regionCode = userDetails.getMember().getUserRegionInfo()
+	                .getActiveRegion().getRegionCode();
+	        Map<String, Object> latLng = service.findLatLngByRegionCode(regionCode);
+
+	        List<Map<String, Object>> categoryList = service.categoryList();
+
+	        int size = 12;
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("keyword", keyword);
+	        map.put("regionCode", regionCode);
+	        map.put("categoryIdx", categoryIdx);
+	        map.put("priceMin",priceMin);
+	        map.put("priceMax", priceMax);
+	        map.put("available", available);
+	        map.put("sort", sort);
+
+	        if (latLng != null) {
+	            map.put("lat", latLng.get("LAT"));
+	            map.put("lng", latLng.get("LNG"));
+	            map.put("km", km);
+	        }
+	        if (userDetails != null) {
+	            map.put("userIdx", userDetails.getMember().getUserIdx());
+	        }
+
+	        int dataCount = service.dataCount(map);
+	        int total_page = dataCount == 0 ? 0 : dataCount / size + (dataCount % size > 0 ? 1 : 0);
+
+	        if (current_page > total_page && total_page > 0) current_page = total_page;
+
+	        int start = (current_page - 1) * size + 1;
+	        int end   = current_page * size;
+	        map.put("start", start);
+	        map.put("end", end);
+
+	        List<Trade> list = service.tradeList(map);
+
+	        result.put("tradeList", list);
+	        result.put("categoryList", categoryList);
+	        result.put("currentPage", current_page);
+	        result.put("totalPage", total_page);
+	        result.put("dataCount", dataCount);
+
+	    } catch (Exception e) {
+	        log.info("listJson : ", e);
+	        result.put("tradeList", new java.util.ArrayList<>());
+	        result.put("totalPage", 0);
+	        result.put("currentPage", 1);
+	    }
+	    return result;
+	}
+	
 	@GetMapping("article")
 	public String article(@RequestParam("productIdx") long productIdx, 
 			@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
