@@ -128,7 +128,6 @@
                     <small>첫 번째 판매자가 되어보세요!</small>
                 </div>
 
-                <!-- 상품 카드 -->
                 <div v-for="item in products" :key="item.productIdx"
                      class="trade-card tl-product-card"
                      @click="goTo('/trade/article?productIdx=' + item.productIdx)">
