@@ -10,9 +10,7 @@
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/trade/trade-list.css">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
-<!-- Vue 3 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
-<!-- contextPath를 JS 변수로 노출 (Vue 템플릿 안에서는 JSP EL 사용 불가) -->
 <script>
     const CTX = '${pageContext.request.contextPath}';
 </script>
@@ -22,10 +20,8 @@
 
 <main class="trade-main-container">
 
-    <!-- ★ Vue 앱 마운트 포인트 — hero 섹션까지 포함 ★ -->
     <div id="trade-list-app">
 
-        <!-- 히어로 / 검색 -->
         <section class="trade-hero-section">
             <div class="container hero-inner">
                 <div class="hero-text-box">
@@ -44,7 +40,6 @@
 
         <div class="content-wrapper">
             <div class="trade-toolbar">
-                <!-- 카테고리 + 판매하기 -->
                 <div class="toolbar-top">
                     <div class="filter-group tl-filter-list">
                         <button class="filter-btn" :class="{ active: categoryIdx === '' }"
@@ -61,7 +56,6 @@
                     </button>
                 </div>
 
-                <!-- 필터 바 -->
                 <div class="toolbar-bottom">
                     <div class="price-select-group">
                         <input type="number" class="tl-price-input" placeholder="최소 금액"
@@ -89,7 +83,6 @@
                         </label>
                         <span class="divider">|</span>
 
-                        <!-- 정렬 드롭다운 -->
                         <div class="custom-dropdown sort-dropdown" style="width:140px;"
                              :class="{ active: sortDropdownOpen }"
                              @click.stop="sortDropdownOpen = !sortDropdownOpen">
@@ -112,7 +105,6 @@
                 </div>
             </div>
 
-            <!-- 활성 필터 칩 -->
             <div class="tl-active-filters">
                 <span v-for="chip in activeChips" :key="chip.label"
                       class="tl-filter-chip" @click="removeChip(chip)">
@@ -124,15 +116,12 @@
                 </span>
             </div>
 
-            <!-- 로딩 -->
             <div v-if="isLoading" class="tl-loading">
                 <i class="ri-loader-4-line"></i>
             </div>
 
-            <!-- 상품 그리드 -->
             <div v-else class="trade-grid tl-product-grid">
 
-                <!-- 빈 상태 -->
                 <div v-if="products.length === 0" class="tl-empty-state">
                     <i class="ri-shopping-basket-line empty-icon"></i>
                     <p>아직 등록된 상품이 없어요</p>
@@ -192,7 +181,6 @@
                 </div>
             </div>
 
-            <!-- 더보기 버튼 -->
             <div v-if="hasMore" class="more-btn-wrap">
                 <button type="button" class="btn-more" @click="loadMore" :disabled="isLoadingMore">
                     <span v-if="isLoadingMore">로딩 중... <i class="ri-loader-4-line"></i></span>
@@ -200,8 +188,8 @@
                 </button>
             </div>
 
-        </div><!-- .content-wrapper -->
-    </div><!-- #trade-list-app -->
+        </div>
+    </div>
 
 </main>
 
