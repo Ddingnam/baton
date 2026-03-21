@@ -4,10 +4,11 @@ import java.util.List;
 import com.sp.app.model.Notification;
 
 public interface NotificationService {
-    void sendNotification(Long userIdx, String notifType, String content, String url);
-    List<Notification> listNotification(Long userIdx);
-    void updateNotificationRead(Long notifIdx);
-    void updateAllNotificationRead(Long userIdx);
-    int unreadNotificationCount(Long userIdx);
-    void deleteAllNotifications(Long userIdx);
+	public void sendNotification(Long userIdx, String notifType, String content, String url);
+	public List<Notification> listNotification(Long userIdx);
+	public void updateNotificationRead(Long notifIdx);
+	public void updateAllNotificationRead(Long userIdx);
+	public int unreadNotificationCount(Long userIdx);
+	public void deleteAllNotifications(Long userIdx);
+	public void deleteNotification(Long notifIdx);
 }

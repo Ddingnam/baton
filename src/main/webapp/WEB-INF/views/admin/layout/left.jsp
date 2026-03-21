@@ -79,6 +79,14 @@
             </div>
         </div>
 
+        <div class="nav-category">알림</div>
+
+        <div class="nav-box">
+            <a href="${pageContext.request.contextPath}/admin/notifications" class="nav-btn">
+                <div class="nav-content">알림 전체보기</div>
+            </a>
+        </div>
+
         <div class="nav-category">고객센터</div>
 
         <div class="nav-box has-child">

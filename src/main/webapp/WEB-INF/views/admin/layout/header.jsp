@@ -168,7 +168,7 @@
                     <i class="ri-settings-4-fill"></i>시스템
                 </button>
                 <button class="fm-nav-item" data-tab="appearance">
-                    <i class="ri-palette-fill"></i>테마 / 언어
+                    <i class="ri-palette-fill"></i>컬러 테마
                 </button>
                 <button class="fm-nav-item" data-tab="permissions">
                     <i class="ri-shield-user-fill"></i>권한 관리
@@ -219,23 +219,36 @@
             </div>
 
             <div class="fm-tab" id="tab-appearance">
-                <h2 class="fm-tab-title">테마 / 언어</h2>
-                <p class="fm-tab-desc">관리자 페이지의 표시 설정을 변경합니다.</p>
+                <h2 class="fm-tab-title">컬러 테마</h2>
+                <p class="fm-tab-desc">관리자 페이지의 색상 테마를 변경합니다.</p>
                 <div class="fm-section">
                     <div class="fm-field">
-                        <label class="fm-label">인터페이스 언어</label>
-                        <select class="fm-input">
-                            <option selected>한국어</option>
-                            <option>English</option>
-                        </select>
-                    </div>
-                    <div class="fm-field">
-                        <label class="fm-label">컬러 테마</label>
-                        <div class="fm-theme-row">
-                            <button class="fm-theme-chip active" style="background:linear-gradient(135deg,#7C3AED,#EC4899)">기본</button>
-                            <button class="fm-theme-chip" style="background:linear-gradient(135deg,#3B82F6,#06B6D4)">블루</button>
-                            <button class="fm-theme-chip" style="background:linear-gradient(135deg,#10B981,#3B82F6)">그린</button>
-                            <button class="fm-theme-chip" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">선셋</button>
+                        <label class="fm-label">테마 선택</label>
+                        <div class="theme-grid" id="themeGrid">
+                            <div class="theme-card active" data-theme="purple">
+                                <div class="theme-preview" style="background:linear-gradient(135deg,#7C3AED,#EC4899);"></div>
+                                <span class="theme-name">퍼플 (기본)</span>
+                            </div>
+                            <div class="theme-card" data-theme="blue">
+                                <div class="theme-preview" style="background:linear-gradient(135deg,#1D4ED8,#06B6D4);"></div>
+                                <span class="theme-name">오션 블루</span>
+                            </div>
+                            <div class="theme-card" data-theme="emerald">
+                                <div class="theme-preview" style="background:linear-gradient(135deg,#059669,#3B82F6);"></div>
+                                <span class="theme-name">에메랄드</span>
+                            </div>
+                            <div class="theme-card" data-theme="sunset">
+                                <div class="theme-preview" style="background:linear-gradient(135deg,#C2410C,#EA580C,#F59E0B);"></div>
+                                <span class="theme-name">선셋</span>
+                            </div>
+                            <div class="theme-card" data-theme="rose">
+                                <div class="theme-preview" style="background:linear-gradient(135deg,#BE185D,#F43F5E);"></div>
+                                <span class="theme-name">로즈</span>
+                            </div>
+                            <div class="theme-card" data-theme="slate">
+                                <div class="theme-preview" style="background:linear-gradient(135deg,#334155,#64748B);"></div>
+                                <span class="theme-name">슬레이트</span>
+                            </div>
                         </div>
                     </div>
                     <div class="fm-field">
@@ -250,7 +263,7 @@
                     </div>
                 </div>
                 <div class="fm-actions">
-                    <button class="btn-pill btn-gradient">변경사항 저장</button>
+                    <button class="btn-pill btn-gradient" id="saveThemeBtn">변경사항 저장</button>
                 </div>
             </div>
 

@@ -24,9 +24,7 @@ public class NotificationServiceImpl implements NotificationService {
         notif.setNotifType(notifType);
         notif.setContent(content);
         notif.setUrl(url);
-
         mapper.insertNotification(notif);
-
         messagingTemplate.convertAndSend("/topic/alarms/" + userIdx, notif);
     }
 
@@ -49,9 +47,14 @@ public class NotificationServiceImpl implements NotificationService {
     public int unreadNotificationCount(Long userIdx) {
         return mapper.unreadNotificationCount(userIdx);
     }
-    
+
     @Override
     public void deleteAllNotifications(Long userIdx) {
         mapper.deleteAllNotifications(userIdx);
+    }
+
+    @Override
+    public void deleteNotification(Long notifIdx) {
+        mapper.deleteNotification(notifIdx);
     }
 }

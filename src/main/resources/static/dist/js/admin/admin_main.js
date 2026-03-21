@@ -458,22 +458,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    function buildChartGradients(ctx2d) {
+        const style = getComputedStyle(document.documentElement);
+        const c1  = style.getPropertyValue('--chart-c1').trim()  || '#7C3AED';
+        const c2  = style.getPropertyValue('--chart-c2').trim()  || '#EC4899';
+        const bg1 = style.getPropertyValue('--chart-bg1').trim() || 'rgba(124,58,237,0.2)';
+        const stroke = ctx2d.createLinearGradient(0, 0, 600, 0);
+        stroke.addColorStop(0, c1);
+        stroke.addColorStop(1, c2);
+        const fill = ctx2d.createLinearGradient(0, 0, 0, 400);
+        fill.addColorStop(0, bg1);
+        fill.addColorStop(1, 'rgba(0,0,0,0)');
+        return { stroke, fill, c1 };
+    }
+
     const ctx = document.getElementById('gradientChart');
     if (ctx) {
-        const strokeGrad = ctx.getContext('2d').createLinearGradient(0, 0, 600, 0);
-        strokeGrad.addColorStop(0, '#7C3AED');
-        strokeGrad.addColorStop(1, '#EC4899');
-        const bgGrad = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
-        bgGrad.addColorStop(0, 'rgba(124, 58, 237, 0.2)');
-        bgGrad.addColorStop(1, 'rgba(236, 72, 153, 0)');
+        const ctx2d = ctx.getContext('2d');
+        const g = buildChartGradients(ctx2d);
         window.dashChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: ['월', '화', '수', '목', '금', '토', '일'],
                 datasets: [{
                     label: '매출', data: [32000, 45000, 38000, 52000, 48000, 65000, 58000],
-                    borderColor: strokeGrad, borderWidth: 4, backgroundColor: bgGrad, fill: true,
-                    pointBackgroundColor: '#FFFFFF', pointBorderColor: '#7C3AED', pointBorderWidth: 3,
+                    borderColor: g.stroke, borderWidth: 4, backgroundColor: g.fill, fill: true,
+                    pointBackgroundColor: '#FFFFFF', pointBorderColor: g.c1, pointBorderWidth: 3,
                     pointRadius: 6, pointHoverRadius: 8, tension: 0.5
                 }]
             },
@@ -504,6 +514,72 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+
+    (function() {
+        var saved = localStorage.getItem('baton-admin-theme') || 'purple';
+        applyTheme(saved);
+        var activeCard = document.querySelector('.theme-card[data-theme="' + saved + '"]');
+        if (activeCard) {
+            document.querySelectorAll('.theme-card').forEach(function(c) { c.classList.remove('active'); });
+            activeCard.classList.add('active');
+        }
+    })();
+
+    document.querySelectorAll('.theme-card[data-theme]').forEach(function(card) {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.theme-card').forEach(function(c) { c.classList.remove('active'); });
+            card.classList.add('active');
+        });
+    });
+
+    var THEME_NAMES = {
+        purple: '퍼플 (기본)', blue: '오션 블루', emerald: '에메랄드',
+        sunset: '선셋', rose: '로즈', slate: '슬레이트'
+    };
+
+    var saveThemeBtn = document.getElementById('saveThemeBtn');
+    if (saveThemeBtn) {
+        saveThemeBtn.addEventListener('click', function() {
+            var active = document.querySelector('.theme-card.active');
+            if (!active) return;
+            var theme = active.dataset.theme;
+            var prevTheme = localStorage.getItem('baton-admin-theme') || 'purple';
+            applyTheme(theme);
+            localStorage.setItem('baton-admin-theme', theme);
+            var name = THEME_NAMES[theme] || theme;
+            if (typeof showToast === 'function') {
+                if (theme === prevTheme) {
+                    showToast('이미 적용된 테마입니다.', 'info');
+                } else {
+                    showToast('테마가 [' + name + ']으로 변경되었습니다.', 'success');
+                }
+            }
+            saveThemeBtn.textContent = '✓ ' + name + ' 적용됨';
+            saveThemeBtn.style.opacity = '0.8';
+            setTimeout(function() {
+                saveThemeBtn.textContent = '변경사항 저장';
+                saveThemeBtn.style.opacity = '';
+            }, 2000);
+        });
+    }
+
+    function applyTheme(theme) {
+        if (theme === 'purple') {
+            document.documentElement.removeAttribute('data-theme');
+        } else {
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+        if (window.dashChart) {
+            const c = document.getElementById('gradientChart');
+            if (c) {
+                const g = buildChartGradients(c.getContext('2d'));
+                window.dashChart.data.datasets[0].borderColor = g.stroke;
+                window.dashChart.data.datasets[0].backgroundColor = g.fill;
+                window.dashChart.data.datasets[0].pointBorderColor = g.c1;
+                window.dashChart.update();
+            }
+        }
+    }
 
     function escHtml(s) {
         return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
