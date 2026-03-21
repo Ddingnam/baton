@@ -20,12 +20,20 @@
 			</if>
 
 			<if test="lat != null and lng != null and km != null">
-			    AND p.regionCode IN (
-			        SELECT REGIONCODE FROM REGION
-			        WHERE (6371 * acos(
-			            cos(#{lat} * 3.14159 / 180) * cos(REPRESENT_LAT * 3.14159 / 180)
-			            * cos((REPRESENT_LNG * 3.14159 / 180) - (#{lng} * 3.14159 / 180))
-			            + sin(#{lat} * 3.14159 / 180) * sin(REPRESENT_LAT * 3.14159 / 180)
+			    AND (
+			        p.regionCode IN (
+			            SELECT REGIONCODE FROM REGION
+			            WHERE (6371 * acos(
+			                cos(#{lat} * 3.14159 / 180) * cos(REPRESENT_LAT * 3.14159 / 180)
+			                * cos((REPRESENT_LNG * 3.14159 / 180) - (#{lng} * 3.14159 / 180))
+			                + sin(#{lat} * 3.14159 / 180) * sin(REPRESENT_LAT * 3.14159 / 180)
+			            )) &lt;= #{km}
+			        )
+					OR 
+			        (6371 * acos(
+			            cos(#{lat} * 3.14159 / 180) * cos(p.latitude * 3.14159 / 180)
+			            * cos((p.longitude * 3.14159 / 180) - (#{lng} * 3.14159 / 180))
+			            + sin(#{lat} * 3.14159 / 180) * sin(p.latitude * 3.14159 / 180)
 			        )) &lt;= #{km}
 			    )
 			</if>
@@ -139,7 +147,7 @@
 	    SELECT * FROM (
 	        SELECT ROWNUM rnum, tb.* FROM (
 	            SELECT 
-	                p.productIdx, p.title, p.price, p.userIdx, p.tradePlace, p.tradeType, 
+	                p.productIdx, p.title, p.price, p.userIdx, u.nickName, p.tradePlace, p.tradeType, 
 	                p.tradeStatus, p.productStatus, p.createdDate, p.lastUpDate, 
 	                p.updatedDate, p.hitCount, p.likeCount, p.chatCount, p.regionCode, r.dong, 
 	                (SELECT imgUrl 
@@ -153,6 +161,7 @@
 	                </choose> as isLiked
 	            FROM product p
 	            LEFT JOIN region r ON p.regionCode = r.regionCode
+	            LEFT JOIN users u ON p.userIdx = u.userIdx
 	            <include refid="where-condition"/>
 	            <choose>
 	                <when test="sort == 'lowPrice'">

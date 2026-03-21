@@ -24,7 +24,7 @@
                 <p class="desc">어떤 물건을 찾고 있나요? 동네에서 따뜻한 거래를 시작해보세요.</p>
             </div>
             <div class="hero-search-box">
-                <input type="text" id="tlSearchInput" placeholder="관심있는 상품과 태그를 검색해보세요" value="${param.keyword}" onkeypress="if(event.keyCode==13) tlApplyFilter();">
+                <input type="text" id="tlSearchInput" placeholder="관심있는 상품과 태그를 검색해보세요" value="${param.keyword}" >
                 <button class="search-btn" onclick="tlApplyFilter()">검색</button>
             </div>
         </div>
@@ -53,41 +53,15 @@
                     <span class="tl-price-sep">~</span>
                     <input type="number" class="tl-price-input" id="tlPriceMax" placeholder="최대 금액" value="${param.priceMax}" min="0">
                     <button class="tl-price-apply" onclick="tlApplyFilter()">적용</button>
+                    <span class="tl-divider-thin"></span>
+                    <div class="tl-radius-btns">
+                        <button class="tl-radius-btn ${km == 1 ? 'active' : ''}" data-km="1">내 동네만</button>
+                        <button class="tl-radius-btn ${(empty km || km == 3) ? 'active' : ''}" data-km="3">가까운 동네</button>
+                        <button class="tl-radius-btn ${km == 5 ? 'active' : ''}" data-km="5">먼 동네까지</button>
+                    </div>
                     <button class="tl-reset-btn" onclick="tlResetFilters()"><i class="ri-refresh-line"></i> 초기화</button>
                 </div>
-                
-                <div class="tl-radius-wrap">
-				    <span class="tl-radius-icon">
-				        <i class="ri-map-pin-range-line"></i>
-				    </span>
-				    <div class="tl-radius-slider-area">
-				        <input type="range"
-				               id="tlRadiusSlider"
-				               class="tl-radius-input"
-				               min="1" max="3" step="1"
-				               value="${km == 1 ? 1 : km == 5 ? 3 : 2}">
-				        <div class="tl-radius-steps">
-				            <span class="tl-radius-step ${km == 1 ? 'active' : ''}"
-				                  data-step="1" data-km="1">
-				                내 동네만<em>1km</em>
-				            </span>
-				            <span class="tl-radius-step ${(empty km || km == 3) ? 'active' : ''}"
-				                  data-step="2" data-km="3">
-				                가까운 동네<em>3km</em>
-				            </span>
-				            <span class="tl-radius-step ${km == 5 ? 'active' : ''}"
-				                  data-step="3" data-km="5">
-				                먼 동네까지<em>5km</em>
-				            </span>
-				        </div>
-				    </div>
-				    <span class="tl-radius-badge" id="tlRadiusBadge">
-				        <i class="ri-focus-3-line"></i>
-				        <span id="tlRadiusBadgeText">
-				            ${km == 1 ? '1km 이내' : km == 5 ? '5km 이내' : '3km 이내'}
-				        </span>
-				    </span>
-				</div>
+
 
                 <div class="action-group">
                     <label class="toggle-switch-wrap">
@@ -195,7 +169,7 @@
                                 <div class="card-footer">
                                     <div class="host-info">
                                         <div class="host-avatar"><i class="ri-user-smile-line"></i></div>
-                                        <span class="host-name">동네이웃</span>
+                                        <span class="host-name">${item.nickName}</span>
                                     </div>
                                     <div class="interaction-info tl-card-stats">
                                         <span><i class="ri-eye-line"></i> ${item.hitCount}</span>
