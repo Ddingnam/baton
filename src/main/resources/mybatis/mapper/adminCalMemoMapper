@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sp.app.admin.mapper.AdminCalMemoMapper">
+
+    <select id="getMemo" resultType="com.sp.app.admin.model.AdminCalMemo">
+        SELECT memoIdx, adminIdx, memoDate, content,
+               TO_CHAR(createdAt, 'YYYY-MM-DD HH24:MI') AS createdAt,
+               TO_CHAR(updatedAt, 'YYYY-MM-DD HH24:MI') AS updatedAt
+        FROM ADMIN_CAL_MEMO
+        WHERE adminIdx = #{adminIdx} AND memoDate = #{memoDate}
+    </select>
+
+    <select id="getMemosByMonth" resultType="com.sp.app.admin.model.AdminCalMemo">
+        SELECT memoIdx, adminIdx, memoDate, content,
+               TO_CHAR(createdAt, 'YYYY-MM-DD HH24:MI') AS createdAt
+        FROM ADMIN_CAL_MEMO
+        WHERE adminIdx = #{adminIdx}
+          AND memoDate LIKE #{yearMonth} || '%'
+        ORDER BY memoDate ASC
+    </select>
+
+    <insert id="saveMemo" parameterType="com.sp.app.admin.model.AdminCalMemo">
+        MERGE INTO ADMIN_CAL_MEMO tgt
+        USING (SELECT #{adminIdx} AS adminIdx, #{memoDate} AS memoDate FROM DUAL) src
+        ON (tgt.adminIdx = src.adminIdx AND tgt.memoDate = src.memoDate)
+        WHEN MATCHED THEN
+            UPDATE SET content = #{content}, updatedAt = SYSTIMESTAMP
+        WHEN NOT MATCHED THEN
+            INSERT (memoIdx, adminIdx, memoDate, content, createdAt, updatedAt)
+            VALUES (admin_cal_memo_seq.NEXTVAL, #{adminIdx}, #{memoDate}, #{content}, SYSTIMESTAMP, SYSTIMESTAMP)
+    </insert>
+
+    <delete id="deleteMemo">
+        DELETE FROM ADMIN_CAL_MEMO
+        WHERE adminIdx = #{adminIdx} AND memoDate = #{memoDate}
+    </delete>
+
+</mapper>

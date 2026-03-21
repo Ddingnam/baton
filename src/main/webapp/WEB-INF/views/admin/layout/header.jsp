@@ -13,7 +13,8 @@
     <div class="head-right">
         <div class="noti-btn" id="notiTrigger">
             <i class="ri-notification-3-fill"></i>
-            <div class="noti-ring"></div>
+            <div class="noti-ring" id="notiRing"></div>
+            <span class="noti-count-badge" id="notiCountBadge" style="display:none;"></span>
         </div>
 
         <div class="user-avt-btn" id="profileTrigger">A</div>
@@ -44,49 +45,10 @@
 
         <div class="pop-modal noti-modal" id="notiModal">
             <div class="noti-modal-head">
-                <span class="noti-modal-title">알림</span>
-                <button class="noti-read-all">모두 읽음</button>
+                <span class="noti-modal-title">알림 <span class="noti-modal-count" id="notiModalCount"></span></span>
+                <button class="noti-read-all" id="notiReadAll">모두 읽음</button>
             </div>
-            <div class="noti-list">
-                <div class="noti-item unread">
-                    <div class="noti-icon-wrap bg-orange"><i class="ri-error-warning-fill"></i></div>
-                    <div class="noti-content">
-                        <p class="noti-text"><strong>신규 신고</strong>가 접수되었습니다</p>
-                        <span class="noti-meta">커뮤니티 · 5분 전</span>
-                    </div>
-                    <div class="noti-dot"></div>
-                </div>
-                <div class="noti-item unread">
-                    <div class="noti-icon-wrap bg-purple"><i class="ri-refund-2-fill"></i></div>
-                    <div class="noti-content">
-                        <p class="noti-text">환불 요청이 <strong>2건</strong> 대기 중입니다</p>
-                        <span class="noti-meta">결제 · 22분 전</span>
-                    </div>
-                    <div class="noti-dot"></div>
-                </div>
-                <div class="noti-item unread">
-                    <div class="noti-icon-wrap bg-blue"><i class="ri-customer-service-2-fill"></i></div>
-                    <div class="noti-content">
-                        <p class="noti-text">미답변 <strong>1:1 문의</strong>가 있습니다</p>
-                        <span class="noti-meta">고객센터 · 1시간 전</span>
-                    </div>
-                    <div class="noti-dot"></div>
-                </div>
-                <div class="noti-item">
-                    <div class="noti-icon-wrap bg-green"><i class="ri-user-add-fill"></i></div>
-                    <div class="noti-content">
-                        <p class="noti-text">신규 회원 <strong>127명</strong>이 가입했습니다</p>
-                        <span class="noti-meta">회원 · 어제</span>
-                    </div>
-                </div>
-                <div class="noti-item">
-                    <div class="noti-icon-wrap bg-pink"><i class="ri-shield-check-fill"></i></div>
-                    <div class="noti-content">
-                        <p class="noti-text">시스템 <strong>보안 점검</strong>이 완료되었습니다</p>
-                        <span class="noti-meta">시스템 · 2일 전</span>
-                    </div>
-                </div>
-            </div>
+            <div class="noti-list" id="notiList"></div>
             <div class="noti-footer">
                 <a href="${pageContext.request.contextPath}/admin/notifications" class="noti-all-link">전체 알림 보기 <i class="ri-arrow-right-line"></i></a>
             </div>
@@ -95,61 +57,107 @@
 </header>
 
 <div class="huge-modal" id="systemUtilityModal">
-    <div class="wg-box">
-        <div class="wg-tl">
-            <span id="modalMonth"></span>
-            <div class="cal-nav">
-                <button class="cal-nav-btn" id="calPrev"><i class="ri-arrow-left-s-line"></i></button>
-                <button class="cal-nav-btn" id="calToday"><i class="ri-calendar-event-fill" style="color:var(--color-purple);"></i></button>
-                <button class="cal-nav-btn" id="calNext"><i class="ri-arrow-right-s-line"></i></button>
+
+    <div class="wg-hero">
+        <div style="position:relative;z-index:1;">
+            <div class="wg-hero-label">BATON STUDIO</div>
+            <div class="wg-hero-time" id="modalHeroTime">00:00</div>
+        </div>
+        <div class="wg-hero-right">
+            <div class="wg-hero-date" id="modalHeroDate">날짜</div>
+            <div class="wg-hero-status">
+                <span class="wg-hero-status-dot"></span>시스템 정상
             </div>
         </div>
-        <div class="cal-wrap" id="miniCalGrid"></div>
+        <div class="wg-hero-orb wg-hero-orb-1"></div>
+        <div class="wg-hero-orb wg-hero-orb-2"></div>
     </div>
 
-    <div class="wg-box">
-        <div class="wg-tl">팀 현황<span class="team-count-badge">5명</span></div>
-        <div class="team-rows">
-            <div class="t-row">
-                <div class="t-avt">OD</div>
-                <div class="t-info">오다은</div>
-                <div class="t-status-pill online"><span class="t-status-dot"></span>온라인</div>
+    <div class="wg-cols">
+
+        <div class="wg-panel" style="border-right:1px solid #F1F5F9;">
+            <div class="wg-panel-head">
+                <span id="modalMonth" class="wg-panel-title"></span>
+                <div class="cal-nav">
+                    <button class="cal-nav-btn" id="calPrev"><i class="ri-arrow-left-s-line"></i></button>
+                    <button class="cal-nav-btn" id="calToday"><i class="ri-calendar-event-fill" style="color:var(--color-purple);"></i></button>
+                    <button class="cal-nav-btn" id="calNext"><i class="ri-arrow-right-s-line"></i></button>
+                </div>
             </div>
-            <div class="t-row">
-                <div class="t-avt">JY</div>
-                <div class="t-info">이지영</div>
-                <div class="t-status-pill online"><span class="t-status-dot"></span>온라인</div>
+            <div class="cal-wrap" id="miniCalGrid"></div>
+
+            <div class="cal-memo-panel" id="calMemoPanel">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <div class="cal-memo-date-label" id="calMemoDateLabel"></div>
+                    <span id="calMemoBadge" style="font-size:10px;font-weight:700;color:#94A3B8;"></span>
+                </div>
+                <div id="calMemoPreview" style="display:none;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:10px 12px;margin-bottom:8px;"></div>
+                <textarea class="cal-memo-input" id="calMemoInput" placeholder="메모할 일정을 적어주세요"></textarea>
+                <div class="cal-memo-actions">
+                    <button type="button" class="cal-memo-clear" id="calMemoClear">지우기</button>
+                    <button type="button" class="cal-memo-save" id="calMemoSave">저장</button>
+                </div>
             </div>
-            <div class="t-row">
-                <div class="t-avt">HN</div>
-                <div class="t-info">최하늘</div>
-                <div class="t-status-pill online"><span class="t-status-dot"></span>온라인</div>
+        </div>
+
+        <div class="wg-right-col">
+
+            <div class="wg-panel">
+                <div class="wg-panel-head">
+                    <span class="wg-panel-title">팀 현황</span>
+                    <span class="team-count-badge">5명</span>
+                </div>
+                <div class="team-rows">
+                    <div class="t-row">
+                        <div class="t-avt">OD</div>
+                        <div class="t-info">오다은</div>
+                        <div class="t-status-pill online"><span class="t-status-dot"></span>온라인</div>
+                    </div>
+                    <div class="t-row">
+                        <div class="t-avt">JY</div>
+                        <div class="t-info">이지영</div>
+                        <div class="t-status-pill online"><span class="t-status-dot"></span>온라인</div>
+                    </div>
+                    <div class="t-row">
+                        <div class="t-avt">HN</div>
+                        <div class="t-info">최하늘</div>
+                        <div class="t-status-pill online"><span class="t-status-dot"></span>온라인</div>
+                    </div>
+                    <div class="t-row">
+                        <div class="t-avt">MN</div>
+                        <div class="t-info t-away">정명남</div>
+                        <div class="t-status-pill away"><span class="t-status-dot"></span>자리비움</div>
+                    </div>
+                    <div class="t-row">
+                        <div class="t-avt">HS</div>
+                        <div class="t-info t-away">함형서</div>
+                        <div class="t-status-pill away"><span class="t-status-dot"></span>자리비움</div>
+                    </div>
+                </div>
             </div>
-            <div class="t-row">
-                <div class="t-avt">MN</div>
-                <div class="t-info" style="color:var(--text-light);">정명남</div>
-                <div class="t-status-pill away"><span class="t-status-dot"></span>자리비움</div>
+
+            <div class="wg-panel" style="flex:1;">
+                <div class="wg-panel-head">
+                    <span class="wg-panel-title">오늘 할 일</span>
+                    <span class="team-count-badge" id="todoCount">0건</span>
+                </div>
+                <div class="todo-list" id="todoList"></div>
+                <div class="todo-add-row">
+                    <input type="text" class="todo-add-input" id="todoInput" placeholder="할 일 추가...">
+                    <button type="button" class="todo-add-btn" id="todoAddBtn"><i class="ri-add-line"></i></button>
+                </div>
             </div>
-            <div class="t-row">
-                <div class="t-avt">HS</div>
-                <div class="t-info" style="color:var(--text-light);">함형서</div>
-                <div class="t-status-pill away"><span class="t-status-dot"></span>자리비움</div>
-            </div>
+
         </div>
     </div>
 
-    <div class="wg-box">
-        <div class="wg-tl">세계 시각</div>
-        <div class="wt-row"><span class="wt-lbl">서울</span><span class="wt-val" id="timeSeoul"></span></div>
-        <div class="wt-row"><span class="wt-lbl">뉴욕</span><span class="wt-val" id="timeNY"></span></div>
-        <div class="wt-row"><span class="wt-lbl">런던</span><span class="wt-val" id="timeLDN"></span></div>
-    </div>
-
-    <div class="wg-box">
-        <div class="wg-tl">메모장</div>
-        <textarea class="memo-pad" placeholder="간단히 메모하세요..."></textarea>
-    </div>
 </div>
+
+<script>
+    if (typeof window.CTX === 'undefined') {
+        window.CTX = '${pageContext.request.contextPath}';
+    }
+</script>
 
 <div class="fullscreen-overlay" id="setupOverlay">
     <div class="fullscreen-modal" id="setupModal">
