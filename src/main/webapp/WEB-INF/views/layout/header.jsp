@@ -5,6 +5,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/layout/header.css">
+<link rel="stylesheet" href="${ContextPath}/dist/css/chat/chatbotSlide.css">
 
 <header id="baton-header">
 	<div class="header-container">
@@ -142,6 +143,7 @@
 			<i class="ri-chat-smile-3-fill"></i> <span class="notification-dot" style="display: none;"></span>
 		</div>
 	</div>
+	<jsp:include page="${ContextPath}/WEB-INF/views/chatbot/slidePanel.jsp"/>
 </c:if>
 
 <div id="batonAuthLayer" class="bt-overlay" style="display: none;">
@@ -208,3 +210,4 @@
 </sec:authorize>
 
 <script src="${pageContext.request.contextPath}/dist/js/layout/header.js"></script>
+<script src="${ContextPath}/dist/js/chat/chatbotSlide.js"></script>

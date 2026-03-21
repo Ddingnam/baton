@@ -34,4 +34,10 @@ public class AboutController {
         model.addAttribute("title", "개인정보처리방침");
         return "about/intro";
     }
+    
+    @GetMapping("support")
+    public String support() {
+        
+        return "about/support";
+    }
 }
