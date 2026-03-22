@@ -16,36 +16,66 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/mypage/mypage_main.css?v=final">
     
     <style>
-        /* ★ 1. 배경색 오류 해결: 마이페이지 기본 배경색(회색톤) 강제 적용 */
         body, #baton-layout-container, .mp-main-wrapper {
-            background-color: #F4F6F8 !important;
+            background-color: var(--baton-bg) !important;
         }
 
-        /* ★ 2. 하얀색 카드가 꽉 차는 현상 해결: max-width와 margin 복구 */
         .review-list-wrap { 
             background: #fff; 
             border-radius: 16px; 
             padding: 40px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
             font-family: 'Pretendard', sans-serif; 
-            max-width: 850px;       /* 카드의 최대 넓이 고정 */
-            margin: 40px auto 80px; /* 가운데 정렬 및 여백 띄우기 */
+            max-width: 850px;       
+            margin: 40px auto 80px; 
         }
         
-        .rl-title { font-size: 1.4rem; font-weight: 800; color: #1A1A1A; margin-bottom: 25px; border-bottom: 2px solid #1A1A1A; padding-bottom: 15px; }
-        
-        /* 탭(Tab) 디자인 */
-        .inner-tabs { display: flex; gap: 10px; margin-bottom: 30px; }
-        .inner-tab { padding: 10px 20px; font-size: 1rem; font-weight: 600; color: #8C8C8C; background: transparent; border: 1px solid #E6E6E6; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
-        .inner-tab:hover { background: #FBFBFB; color: #555; }
-        .inner-tab.active { background: #1A1A1A; color: #fff; border-color: #1A1A1A; }
+        .rl-title { 
+            font-size: 1.4rem; 
+            font-weight: 800; 
+            color: #1A1A1A; 
+            margin-bottom: 25px; 
+            border-bottom: 2px solid #1A1A1A; 
+            padding-bottom: 15px; 
+        }
+
+        .inner-tabs { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 40px; 
+            border-bottom: none !important; 
+        }
+        .inner-tab { 
+            padding: 12px 24px !important; 
+            font-size: 1rem; 
+            font-weight: 600; 
+            color: #8C8C8C; 
+            background: #F4F6F8 !important; 
+            border: none !important; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+        }
+        .inner-tab::after {
+            display: none !important; 
+        }
+        .inner-tab:hover { 
+            background: #EAECEF !important; 
+            color: #555; 
+        }
+
+        .inner-tab.active { 
+            background: #00B98D !important; 
+            color: #fff !important; 
+            font-weight: 700;
+        }
         
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 후기 아이템 공통 디자인 */
         .review-item { border-bottom: 1px solid #F0F0F0; padding: 25px 0; }
+        .review-item:first-child { padding-top: 0; }
         .review-item:last-child { border-bottom: none; }
         .ri-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
         
@@ -55,10 +85,8 @@
         .ri-name { font-weight: 800; font-size: 1.05rem; color: #333; margin-bottom: 4px; }
         .ri-meta { font-size: 0.85rem; color: #8C8C8C; }
         
-        /* 중고거래 초록색(#00B98D) 적용 */
         .ri-product { font-size: 0.85rem; color: #00B98D; font-weight: 700; margin-top: 4px; }
         
-        /* 태그 배경 및 글씨 중고거래 초록색 테마(#E6F8F3, #00B98D) */
         .ri-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
         .tag-badge { background: #E6F8F3; color: #00B98D; font-size: 0.85rem; padding: 6px 12px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(0, 185, 141, 0.15); }
         
@@ -195,5 +223,6 @@
     const CONTEXT_PATH = '${pageContext.request.contextPath}';
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/review/review_list.js"></script>
+
 </body>
 </html>
