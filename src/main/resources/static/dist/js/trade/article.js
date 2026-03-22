@@ -29,7 +29,7 @@ function useTradeArticle(shared) {
     const shipping = reactive({ company: 'CJ대한통운', trackingNumber: '' });
     const report = reactive({ type: '', content: '' });
 
-    const mainImgSrc = computed(() => articleImages.value[currentImg.value]  || (ContextPath + '/dist/images/noimage.png'));
+    const mainImgSrc = computed(() => articleImages.value[currentImg.value]  || ('/dist/images/noimage.png'));
     const lightboxSrc = computed(() => articleImages.value[lightboxIdx.value] || '');
     const articleStatusLabel = computed(() => {
         const s = article.value?.tradeStatus;
@@ -212,20 +212,32 @@ function useTradeArticle(shared) {
 		}
 	}
 	
-    function openChatList() { window.open(ContextPath + '/chat/tradeList?tradeIdx=' + article.value.productIdx, 'chatList', 'width=450,height=850,left=200,top=100,scrollbars=no,resizable=yes'); }
-    function openChatRoom() { window.open(ContextPath + '/chat/room?tradeIdx=' + article.value.productIdx + '&toUserIdx=' + article.value.userIdx, 'chatRoom', 'width=450,height=850,left=200,top=100,scrollbars=yes,resizable=yes'); }
+    function openChatList() { window.open('/chat/tradeList?tradeIdx=' + article.value.productIdx, 'chatList', 'width=450,height=850,left=200,top=100,scrollbars=no,resizable=yes'); }
+    function openChatRoom() { window.open('/chat/room?tradeIdx=' + article.value.productIdx + '&toUserIdx=' + article.value.userIdx, 'chatRoom', 'width=450,height=850,left=200,top=100,scrollbars=yes,resizable=yes'); }
 
     function shareArticle() {
         if (navigator.share) navigator.share({ title: article.value?.title, url: location.href });
         else { navigator.clipboard?.writeText(location.href); if (typeof showBatonToast === 'function') showBatonToast('링크가 복사되었습니다.'); }
     }
+	
+	function goToCheckout(productIdx) {
+		window.location.href = '/escrow/checkout?productIdx=' + productIdx;
+	}
+	
+	function goToMyPage() {
+		window.location.href = '/mypage';
+	}
+	
+	function goToTradePage(userIdx) {
+		window.location.href = '/mypage/tradeUserMain?userIdx=' + userIdx;
+	}
 
     async function submitShipping() {
         if (!shipping.trackingNumber.trim()) { 
 			alert('운송장 번호를 입력해주세요.'); 
 			return; 
 		}
-        const res  = await fetch(ContextPath + '/escrow/shipping', { 
+        const res  = await fetch('/escrow/shipping', { 
 			method: 'POST', 
 			headers: csrfHeaders(), 
 			body: new URLSearchParams({ productIdx: article.value.productIdx, deliveryCompany: shipping.company, trackingNumber: shipping.trackingNumber }) 
@@ -238,7 +250,7 @@ function useTradeArticle(shared) {
     async function cancelTrade() {
         if (!confirm('정말 거래를 취소하시겠습니까?')) return;
 		
-        const res  = await fetch(ContextPath + '/escrow/cancel', { 
+        const res  = await fetch('/escrow/cancel', { 
 			method: 'POST', 
 			headers: csrfHeaders(), 
 			body: new URLSearchParams({ productIdx: article.value.productIdx }) 
@@ -251,14 +263,14 @@ function useTradeArticle(shared) {
 
     async function confirmPurchase() {
         if (!confirm('물건을 무사히 받으셨나요? 구매 확정 시 환불이 불가능합니다.')) return;
-        const res  = await fetch(ContextPath + '/escrow/confirm', { 
+        const res  = await fetch('/escrow/confirm', { 
 			method: 'POST', 
 			headers: csrfHeaders(), 
 			body: new URLSearchParams({ productIdx: article.value.productIdx }) 
 		});
         const data = await res.json();
         alert(data.message);
-        if (data.state === 'true') location.href = ContextPath + '/review/write?productIdx=' + article.value.productIdx + '&role=BUYER';
+        if (data.state === 'true') location.href = '/review/write?productIdx=' + article.value.productIdx + '&role=BUYER';
     }
 
     function requestRefund() {
@@ -268,14 +280,22 @@ function useTradeArticle(shared) {
 
     async function submitReport() {
         if (!report.type) { alert('신고 사유를 선택해주세요.'); return; }
-        await fetch(ContextPath + '/report/submit', { 
+        await fetch('/report/submit', { 
 			method: 'POST', 
 			headers: csrfHeaders(), 
-			body: new URLSearchParams({ domainType: 'TRADE', targetIdx: article.value.productIdx, reportedUserIdx: article.value.userIdx, reportType: report.type, content: report.content }) 
+			body: new URLSearchParams({ 
+				domainType: 'TRADE', 
+				targetIdx: article.value.productIdx, 
+				reportedUserIdx: article.value.userIdx, 
+				reportType: report.type, 
+				content: report.content 
+			}) 
 		});
 		
         alert('신고가 접수되었습니다.');
-        reportOpen.value = false; report.type = ''; report.content = '';
+        reportOpen.value = false; 
+		report.type = ''; 
+		report.content = '';
     }
 
     return {
@@ -285,7 +305,7 @@ function useTradeArticle(shared) {
         statusOpen, shippingOpen, reportOpen, shipping, report, articleStatusLabel,
         loadArticle, openLightbox, lightboxPrev, lightboxNext,
         toggleWishArticle, updateStatus, pullUp, doDelete,
-        openChatList, openChatRoom, shareArticle,
+        openChatList, openChatRoom, shareArticle, goToCheckout, goToMyPage, goToTradePage,
         submitShipping, cancelTrade, confirmPurchase, requestRefund, submitReport
     };
 }

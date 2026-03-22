@@ -96,10 +96,10 @@
                     </div>
                     <div class="ta-seller-actions">
                         <template v-if="articleIsOwner">
-                            <button class="ta-seller-btn" @click="location.href = ContextPath + '/mypage'">내정보 보기</button>
+                            <button class="ta-seller-btn" @click="goToMyPage()">내정보 보기</button>
                         </template>
                         <template v-else>
-                            <button class="ta-seller-btn" @click="location.href = ${pageContext.request.contextPath} + '/mypage/tradeUserMain?userIdx=' + article.userIdx">프로필 보기</button>
+                            <button class="ta-seller-btn" @click="goToTradePage(article.userIdx)">프로필 보기</button>
                             <button type="button" class="ta-report-btn" @click="reportOpen = true">
                                 <i class="ri-alarm-warning-line"></i><span>신고</span>
                             </button>
@@ -140,7 +140,7 @@
                         <button v-else class="chat-btn" @click="openChatRoom"><i class="ri-chat-3-line"></i> 채팅으로 거래하기</button>
                         <template v-if="article.price > 0">
                             <template v-if="!escrowInfo || escrowInfo.TRADESTATUS === 'CANCELED'">
-                                <button type="button" class="pay-btn" @click="location.href = ContextPath + '/escrow/checkout?productIdx=' + article.productIdx">
+                                <button type="button" class="pay-btn" @click="goToCheckout(article.productIdx)">
                                     <i class="ri-shield-check-line"></i> 안전 결제하기
                                 </button>
                             </template>
