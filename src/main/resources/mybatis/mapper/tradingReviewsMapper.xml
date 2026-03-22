@@ -20,7 +20,11 @@
             R.SCORE, R.USERIDX, R.PRODUCTIDX,
             U.NICKNAME AS writerNickname,
             U.PROFILE_PHOTO AS profilePhoto,
-            U.ADDR AS writerAddr,
+            (SELECT REG.DONG 
+             FROM USERREGION UR 
+             JOIN REGION REG ON UR.REGIONCODE = REG.REGIONCODE 
+             WHERE UR.USERIDX = U.USERIDX AND UR.IS_ACTIVE = 1 
+             FETCH FIRST 1 ROWS ONLY) AS writerAddr,
             P.TITLE AS productTitle
         FROM TRADINGREVIEWS R
         LEFT JOIN USERS U ON R.USERIDX = U.USERIDX 
