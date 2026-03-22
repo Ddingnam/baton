@@ -83,8 +83,7 @@ public class JobPostingController {
 				dto.setUserIdx(userDetails.getUserIdx());
 			}
 			
-			 // 🔥 추가 (테스트용 필수)
-	        dto.setRegionIdx(1);
+			dto.setRecruitStatus("모집중");
 	        
 			postingService.insertPosting(dto);
 
@@ -221,6 +220,31 @@ public class JobPostingController {
 	    System.out.println("dong list = " + list);
 
 	    return list;
+	}
+	
+	@PostMapping("status")
+	@ResponseBody
+	public String updateStatus(@RequestParam long postingIdx,
+	                           @RequestParam String status,
+	                           @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+	    try {
+	        JobPosting dto = postingService.findById(postingIdx);
+
+	        // ✅ 작성자 검증 (이거 핵심)
+	        if (dto == null || userDetails == null || dto.getUserIdx() != userDetails.getUserIdx()) {
+	            return "fail";
+	        }
+
+	        dto.setRecruitStatus(status);
+	        postingService.updatePosting(dto);
+
+	        return "success";
+
+	    } catch (Exception e) {
+	        log.error("상태 변경 실패", e);
+	        return "fail";
+	    }
 	}
 	
 }

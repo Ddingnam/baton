@@ -28,14 +28,13 @@ public class JobPosting {
     private String timeNegotiable;
     private String workTime;
     private String startDate;
-    private String endDate;
     private String subwayInfo;
     
     private String location;
     private String locationDetail;
     
-    //private String locationLat;
-    //private String locationLng;
+    private Double latitude;
+    private Double longitude;
     private Double locationLat;
     private Double locationLng;
     

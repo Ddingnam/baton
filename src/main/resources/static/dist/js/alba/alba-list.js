@@ -366,9 +366,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function applyAreaFilter() {
-		const rc2 = document.getElementById('sidebarResultCount');
-		if (rc2) rc2.textContent = jobs.length;
 	
+		let jobs = [...serverData];
+		const rc2 = document.getElementById('sidebarResultCount');
+		if (rc2) rc2.textContent = filteredJobs.length;	
+		
 		const sido = normalizeSido(
 			document.querySelector('#col-sido li.active')?.textContent || ''
 		);

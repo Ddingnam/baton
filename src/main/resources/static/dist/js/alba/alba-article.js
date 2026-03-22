@@ -1,15 +1,16 @@
 const Gallery = (function () {
 
     let current = 0;
+    let timer = null;
 
     function init(){
         const dots = document.querySelectorAll(".indicator-dot");
         if(dots.length <= 1) return;
-        setInterval(next,4000);
+
+        timer = setInterval(next, 4000);
     }
 
     function go(index){
-
         const main = document.getElementById("mainImage");
         const dots = document.querySelectorAll(".indicator-dot");
 
@@ -25,8 +26,11 @@ const Gallery = (function () {
 
     function next(){
         const dots = document.querySelectorAll(".indicator-dot");
+        if(!dots.length) return;
+
         let nextIndex = current + 1;
         if(nextIndex >= dots.length) nextIndex = 0;
+
         go(nextIndex);
     }
 
@@ -39,6 +43,7 @@ document.addEventListener("DOMContentLoaded", Gallery.init);
 const WishModule = (function () {
     let wished = false;
     let albaIdx = 0;
+    let isLoading = false;
 
     function init(initialWished, idx) {
         wished = initialWished;
@@ -47,13 +52,19 @@ const WishModule = (function () {
     }
 
     function toggle() {
-        fetch('/alba/wish', {
+        if(isLoading) return;
+        isLoading = true;
+
+        fetch(CONTEXT_PATH + '/alba/wish', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ albaIdx: albaIdx })
         })
         .then(res => {
-            if (res.status === 401) { Toast.show('로그인이 필요합니다.'); return null; }
+            if (res.status === 401) {
+                Toast.show('로그인이 필요합니다.');
+                return null;
+            }
             return res.json();
         })
         .then(data => {
@@ -62,12 +73,14 @@ const WishModule = (function () {
             updateUI();
             Toast.show(wished ? '관심 알바에 담았습니다.' : '관심 알바에서 제외했습니다.');
         })
-        .catch(() => Toast.show('오류가 발생했습니다.'));
+        .catch(() => Toast.show('오류가 발생했습니다.'))
+        .finally(() => isLoading = false);
     }
 
     function updateUI() {
         const btn = document.getElementById('wishBtnLarge');
         if (!btn) return;
+
         btn.classList.toggle('active', wished);
         btn.innerHTML = wished
             ? '<i class="ri-heart-3-fill"></i>'
@@ -82,12 +95,18 @@ const StatusModule = (function () {
 
     function open() {
         const modal = getModal();
-        if (modal) { modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
+        if (modal) {
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
     }
 
     function close() {
         const modal = getModal();
-        if (modal) { modal.classList.remove('open'); document.body.style.overflow = ''; }
+        if (modal) {
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+        }
     }
 
     function update(albaIdx, status) {
@@ -95,7 +114,7 @@ const StatusModule = (function () {
         params.append('albaIdx', albaIdx);
         params.append('status', status);
 
-        fetch(`${window.location.origin}/alba/updateStatus`, {
+        fetch(CONTEXT_PATH + '/alba/updateStatus', {
             method: 'POST',
             body: params
         })
@@ -120,7 +139,7 @@ const PullUpModule = (function () {
         const params = new URLSearchParams();
         params.append('albaIdx', albaIdx);
 
-        fetch(`${window.location.origin}/alba/pullUp`, {
+        fetch(CONTEXT_PATH + '/alba/pullUp', {
             method: 'POST',
             body: params
         })
@@ -266,41 +285,40 @@ document.addEventListener("DOMContentLoaded", function() {
 
       const options = {
           location: coords,
-          radius: 2000, 
+          radius: 2000,
           sort: kakao.maps.services.SortBy.DISTANCE
       };
 
       ps.categorySearch('SW8', function(data, status) {
-          console.log("API 응답 상태:", status);
-          console.log("받아온 데이터 개수:", data ? data.length : 0);
 
           if (status === kakao.maps.services.Status.OK && data.length > 0) {
               let html = '';
-              
-              data.forEach(place => {
+
+              data.slice(0, 5).forEach(place => {
                   const distance = parseInt(place.distance);
                   const walkTime = Math.ceil(distance / 80);
-                  
+
                   html += `
                       <div class="nearby-item">
                           <strong>${place.place_name}</strong> 
                           도보 ${walkTime}분 (${distance}m)
                       </div>`;
               });
+
               container.innerHTML = html;
           } else {
-              container.innerHTML = '<div class="nearby-item">인근 지하철역 정보를 찾을 수 없습니다. (2km 내)</div>';
+              container.innerHTML = '<div class="nearby-item">인근 지하철역 정보를 찾을 수 없습니다.</div>';
           }
       }, options);
   }
   
   const SalaryCalc = (function() {
       const getModal = () => document.getElementById('salaryModal');
-      
+
       function open() {
           getModal().classList.add('open');
           document.body.style.overflow = 'hidden';
-          calculate(); 
+          calculate();
       }
 
       function close() {
@@ -314,16 +332,17 @@ document.addEventListener("DOMContentLoaded", function() {
           const days = parseInt(document.getElementById('calc-monthly-days').value) || 0;
 
           const totalHours = hours * days;
-          
-          let weekHours = hours * (days / 4); 
           let result = hourly * totalHours;
+
+          const weekHours = hours * (days / 4);
 
           if (weekHours >= 15) {
               const weeklyBonus = (Math.min(weekHours, 40) / 40) * 8 * hourly;
-              result += (weeklyBonus * 4.345); 
+              result += (weeklyBonus * 4.345);
           }
 
-          document.getElementById('result-month-pay').textContent = Math.round(result).toLocaleString() + '원';
+          document.getElementById('result-month-pay').textContent =
+              Math.round(result).toLocaleString() + '원';
       }
 
       return { open, close, calculate };
@@ -370,37 +389,27 @@ document.addEventListener("DOMContentLoaded", function() {
   function submitResume() {
       const resumeIdx = document.getElementById('resumeSelect').value;
       const message = document.getElementById('applyMessage').value;
-      const postingIdx = document.getElementById('articleData').getAttribute('data-alba-idx');
+      const postingIdx = document.getElementById('articleData').dataset.albaIdx;
 
       if (!resumeIdx) {
           alert('지원할 이력서를 선택해주세요.');
-          document.getElementById('resumeSelect').focus();
           return;
       }
 
-      fetch(`${window.contextPath}/alba/apply`, {
+      fetch(CONTEXT_PATH + '/alba/apply', {
           method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-              postingIdx: postingIdx,
-              resumeIdx: resumeIdx,
-              message: message
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postingIdx, resumeIdx, message })
       })
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => {
           if(data.success) {
-              alert('지원이 완료되었습니다. 좋은 결과가 있기를 바랍니다!');
+              alert('지원이 완료되었습니다.');
               closeResumeModal();
               location.reload();
           } else {
-              alert(data.message || '지원 처리 중 문제가 발생했습니다.');
+              alert(data.message || '오류 발생');
           }
       })
-      .catch(error => {
-          console.error('Error:', error);
-          alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
-      });
+      .catch(() => alert('네트워크 오류'));
   }

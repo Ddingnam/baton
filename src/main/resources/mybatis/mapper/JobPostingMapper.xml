@@ -2,231 +2,222 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.JobPostingMapper">
 
-<insert id="insertPosting" parameterType="com.sp.app.model.JobPosting">
-    <selectKey keyProperty="postingIdx" resultType="long" order="BEFORE">
-        SELECT seq_job_posting.NEXTVAL FROM dual
-    </selectKey>
+    <insert id="insertPosting" parameterType="com.sp.app.model.JobPosting">
+        <selectKey keyProperty="postingIdx" resultType="long" order="BEFORE">
+            SELECT seq_job_posting.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO job_posting (
+            posting_idx, title, employer, description, pay, pay_type,
+            work_period, work_days, start_time, end_time, time_negotiable,
+            location, location_detail,
+            latitude, longitude,
+            sido, gugun, dong,
+            subway_info,
+            contact, benefits, user_idx, region_idx, category,
+            deadline, recruit_status, created_date
+        )
+        VALUES (
+            #{postingIdx}, #{title},
+            #{employer},
+            #{description, jdbcType=CLOB},
+            #{pay},
+            #{payType},
+            #{workPeriod},
+            #{workDays},
+            #{startTime},
+            #{endTime},
+            #{timeNegotiable},
+            #{location},
+            #{locationDetail},
+            #{latitude},
+            #{longitude},
+            #{sido},
+            #{gugun},
+            #{dong},
+            #{subwayInfo},
+            #{contact},
+            #{benefits},
+            #{userIdx},
+            #{regionIdx},
+            #{category},
+            #{deadline, jdbcType=DATE},
+            #{recruitStatus},
+            SYSDATE
+        )
+    </insert>
 
-    INSERT INTO job_posting (
-    posting_idx, title, employer, description, pay, pay_type,
-    work_period, work_days, start_time, end_time, time_negotiable,
-    location, location_detail,
-    location_lat, location_lng,
-    sido, gugun, dong,
-    subway_info,
-    contact, benefits, user_idx, region_idx, category,
-    deadline, created_date
-)
-VALUES (
-    #{postingIdx}, #{title},
-    #{employer},
-    #{description, jdbcType=CLOB},
-    #{pay},
-    #{payType},
-    #{workPeriod},
-    #{workDays},
-    #{startTime},
-    #{endTime},
-    #{timeNegotiable},
-    #{location},
-    #{locationDetail},
-    #{locationLat},
-    #{locationLng},
-    #{sido},
-    #{gugun},
-    #{dong},
-    #{subwayInfo},
-    #{contact},
-    #{benefits},
-    #{userIdx},
-    #{regionIdx},
-    #{category},
-    #{deadline, jdbcType=DATE},
-    SYSDATE
-)
-</insert>
-	
+    <insert id="insertPostingImage">
+        INSERT INTO job_posting_image(
+            img_idx,
+            posting_idx,
+            img_url,
+            created_date
+        ) VALUES(
+            seq_job_posting_img.NEXTVAL,
+            #{postingIdx},
+            #{imgUrl},
+            SYSDATE
+        )
+    </insert>
 
-	<insert id="insertPostingImage">
-		INSERT INTO job_posting_image(
-		img_idx,
-		posting_idx,
-		img_url,
-		created_date
-		) VALUES(
-		seq_job_posting_img.NEXTVAL,
-		#{postingIdx},
-		#{imgUrl},
-		SYSDATE
-		)
-	</insert>
+    <update id="updatePosting" parameterType="com.sp.app.model.JobPosting">
+        UPDATE job_posting
+        SET title=#{title},
+            description=#{description, jdbcType=CLOB}, 
+            pay=#{pay},
+            pay_type=#{payType},
+            work_period=#{workPeriod}, 
+            work_days=#{workDays},
+            start_time=#{startTime},
+            end_time=#{endTime, jdbcType=VARCHAR},
+            time_negotiable=#{timeNegotiable, jdbcType=VARCHAR}, 
+            location=#{location, jdbcType=VARCHAR},
+            location_detail=#{locationDetail, jdbcType=VARCHAR},
+            latitude=#{latitude},
+            longitude=#{longitude},
+            sido=#{sido},
+            gugun=#{gugun},
+            dong=#{dong},
+            contact=#{contact, jdbcType=VARCHAR}, 
+            benefits=#{benefits, jdbcType=VARCHAR}, 
+            category=#{category}, 
+            deadline=#{deadline, jdbcType=DATE},
+            recruit_status=#{recruitStatus}
+        WHERE posting_idx = #{postingIdx}
+    </update>
 
-	<update id="updatePosting" parameterType="com.sp.app.model.JobPosting">
-	    UPDATE job_posting
-	    SET title=#{title},
-	    description=#{description, jdbcType=CLOB}, 
-	    pay=#{pay},
-	    pay_type=#{payType},
-	    work_period=#{workPeriod}, 
-	    work_days=#{workDays},
-	    start_time=#{startTime, jdbcType=VARCHAR},
-	    end_time=#{endTime, jdbcType=VARCHAR},
-	    time_negotiable=#{timeNegotiable, jdbcType=VARCHAR}, 
-	
-	    location=#{location, jdbcType=VARCHAR},
-	    location_detail=#{locationDetail, jdbcType=VARCHAR},
-	    location_lat=#{locationLat, jdbcType=VARCHAR},
-	    location_lng=#{locationLng, jdbcType=VARCHAR},
-	
-	    🔥🔥🔥 여기 추가
-	    sido=#{sido},
-	    gugun=#{gugun},
-	    dong=#{dong},
-	
-	    contact=#{contact, jdbcType=VARCHAR}, 
-	    benefits=#{benefits, jdbcType=VARCHAR}, 
-	    category=#{category}, 
-	    deadline=#{deadline, jdbcType=VARCHAR}
-	    WHERE posting_idx = #{postingIdx}
-	</update>
+    <delete id="deletePosting" parameterType="long">
+        DELETE FROM job_posting
+        WHERE posting_idx = #{postingIdx}
+    </delete>
 
-	<delete id="deletePosting" parameterType="long">
-		DELETE FROM job_posting
-		WHERE posting_idx = #{postingIdx}
-	</delete>
+    <select id="dataCount" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM job_posting
+    </select>
 
-	<select id="dataCount" parameterType="map" resultType="int">
-		SELECT
-		COUNT(*) FROM job_posting
-	</select>
+    <select id="listPosting" parameterType="map" resultType="com.sp.app.model.JobPosting">
+        SELECT * FROM (
+            SELECT a.*, ROWNUM rnum FROM (
+                SELECT
+                    posting_idx AS postingIdx,
+                    title, employer, pay,
+                    pay_type AS payType,
+                    location, created_date AS createdDate,
+                    category, work_period AS workPeriod,
+                    recruit_status AS recruitStatus,
+                    work_days AS workDays,
+                    start_time AS startTime,
+                    end_time AS endTime,
+                    deadline 
+                FROM job_posting
+                <where>
+                    <if test="sido != null and sido != ''">
+                        sido = #{sido}
+                    </if>
+                    <if test="gugun != null and gugun != '' and !gugun.contains('전체')">
+                        gugun = #{gugun}
+                    </if>
+                    <if test="dong != null and dong != '' and !dong.contains('전체')">
+                        dong = #{dong}
+                    </if>
+                </where>
+                ORDER BY posting_idx DESC
+            ) a WHERE ROWNUM &lt;= #{offset} + #{size}
+        ) WHERE rnum &gt; #{offset}
+    </select>
 
-	<select id="listPosting" parameterType="map" resultType="com.sp.app.model.JobPosting">
-    SELECT * FROM (
-        SELECT a.*, ROWNUM rnum FROM (
-            SELECT
-                posting_idx AS postingIdx,
-                title, employer, pay,
-                pay_type AS payType,
-                location, created_date AS createdDate,
-                category, work_period AS workPeriod,
-                work_days AS workDays,
-                start_time AS startTime,
-                end_time AS endTime,
-                deadline 
-            FROM job_posting
-            <where>
-               <if test="sido != null and sido != ''">
-				    AND sido = #{sido}
-				</if>
-				<if test="gugun != null and gugun != '' and !gugun.contains('전체')">
-				    AND gugun = #{gugun}
-				</if>
-				<if test="dong != null and dong != '' and !dong.contains('전체')">
-				    AND dong = #{dong}
-				</if>
-            </where>
-            ORDER BY posting_idx DESC
-        ) a WHERE ROWNUM &lt;= #{offset} + #{size}
-    ) WHERE rnum &gt; #{offset}
-</select>
+    <select id="findById" resultType="com.sp.app.model.JobPosting">
+        SELECT
+            posting_idx AS postingIdx,
+            user_idx AS userIdx,
+            region_idx AS regionIdx,
+            pay_type AS payType,
+            work_period AS workPeriod,
+            work_days AS workDays,
+            start_time AS startTime,
+            end_time AS endTime,
+            time_negotiable AS timeNegotiable,
+            title, employer, description, pay,
+            location, 
+            location_detail AS locationDetail,
+            latitude, longitude,
+            subway_info AS subwayInfo,
+            contact, benefits,
+            category, deadline, recruit_status, created_date,
+            hit_count AS hitCount
+        FROM job_posting
+        WHERE posting_idx = #{postingIdx}
+    </select>
 
-	<select id="findById" resultType="com.sp.app.model.JobPosting">
-		SELECT
-		posting_idx AS postingIdx,
-		user_idx AS userIdx,
-		region_idx AS regionIdx,
-		pay_type AS payType,
-		work_period AS workPeriod,
-		work_days AS workDays,
-		start_time AS startTime,
-		end_time AS endTime,
-		time_negotiable AS timeNegotiable,
-		title, employer, description, pay,
-		location, 
-		location_detail AS locationDetail,
-    	location_lat AS locationLat,
-    	location_lng AS locationLng,
-    	subway_info AS subwayInfo,
-		contact, benefits,
-		category, deadline, created_date,
-		hit_count AS hitCount FROM job_posting
-		WHERE posting_idx = #{postingIdx}
-	</select>
+    <update id="updateHitCount" parameterType="long">
+        UPDATE job_posting
+        SET hit_count = hit_count + 1
+        WHERE posting_idx = #{postingIdx}
+    </update>
 
-	<update id="updateHitCount" parameterType="long">
-		UPDATE job_posting
-		SET
-		hit_count = hit_count + 1
-		WHERE posting_idx = #{postingIdx}
-	</update>
-	
-	<select id="findImagesByPostingIdx" resultType="String">
-    SELECT img_url
-    FROM job_posting_image
-    WHERE posting_idx = #{postingIdx}
-	</select>
-	
-		<select id="listPostingByArea" parameterType="map" resultType="com.sp.app.model.JobPosting">
-		    SELECT
-		        posting_idx AS postingIdx,
-		        title, employer, pay,
-		        pay_type AS payType,
-		        location, created_date AS createdDate,
-		        category, work_period AS workPeriod,
-		        work_days AS workDays,
-		        start_time AS startTime,
-		        end_time AS endTime,
-		        deadline
-		    FROM job_posting
-	    <where>
-			<if test="sido != null and sido != ''">
-			    AND sido = #{sido}
-			</if>
-			<if test="gugun != null and gugun != '' and !gugun.contains('전체')">
-			    AND gugun = #{gugun}
-			</if>
-			<if test="dong != null and dong != '' and !dong.contains('전체')">
-			    AND dong = #{dong}
-			</if>
-	    </where>
-	    ORDER BY created_date DESC
-	</select>
-	
-	<select id="listDong" parameterType="map" resultType="String">
-	    SELECT DISTINCT
-	        SUBSTR(location, INSTR(location, #{gugun}) + LENGTH(#{gugun}) + 1) AS dong
-	    FROM job_posting
-	    WHERE location LIKE '%' || #{sido} || '%'
-	    AND location LIKE '%' || #{gugun} || '%'
-	</select>
-	
-	<select id="postListByUserIdx" parameterType="long" resultType="com.sp.app.model.JobPosting">
-		SELECT 
-			posting_idx AS postingIdx,
-			user_idx AS userIdx,
-			region_idx AS regionIdx,
-			pay_type AS payType,
-			work_period AS workPeriod,
-			work_days AS workDays,
-			start_time AS startTime,
-			end_time AS endTime,
-			time_negotiable AS timeNegotiable,
-			title, employer, description, pay,
-			location, 
-			location_detail AS locationDetail,
-	    	location_lat AS locationLat,
-	    	location_lng AS locationLng,
-	    	subway_info AS subwayInfo,
-			contact, benefits,
-			category, deadline, created_date,
-			hit_count AS hitCount,
-			created_date AS createdDate
-		FROM job_posting
-		WHERE user_idx = #{userIdx}
-		ORDER BY created_date DESC
-	</select>
-	
+    <select id="findImagesByPostingIdx" resultType="String">
+        SELECT img_url
+        FROM job_posting_image
+        WHERE posting_idx = #{postingIdx}
+    </select>
 
-	
+    <select id="listPostingByArea" parameterType="map" resultType="com.sp.app.model.JobPosting">
+        SELECT
+            posting_idx AS postingIdx,
+            title, employer, pay,
+            pay_type AS payType,
+            location, created_date AS createdDate,
+            category, work_period AS workPeriod,
+            recruit_status AS recruitStatus,
+            work_days AS workDays,
+            start_time AS startTime,
+            end_time AS endTime,
+            deadline
+        FROM job_posting
+        <where>
+            <if test="sido != null and sido != ''">
+                sido = #{sido}
+            </if>
+            <if test="gugun != null and gugun != '' and !gugun.contains('전체')">
+                gugun = #{gugun}
+            </if>
+            <if test="dong != null and dong != '' and !dong.contains('전체')">
+                dong = #{dong}
+            </if>
+        </where>
+        ORDER BY created_date DESC
+    </select>
+
+    <select id="listDong" parameterType="map" resultType="String">
+        SELECT DISTINCT
+            SUBSTR(location, INSTR(location, #{gugun}) + LENGTH(#{gugun}) + 1) AS dong
+        FROM job_posting
+        WHERE location LIKE '%' || #{sido} || '%'
+        AND location LIKE '%' || #{gugun} || '%'
+    </select>
+
+    <select id="postListByUserIdx" parameterType="long" resultType="com.sp.app.model.JobPosting">
+        SELECT 
+            posting_idx AS postingIdx,
+            user_idx AS userIdx,
+            region_idx AS regionIdx,
+            pay_type AS payType,
+            work_period AS workPeriod,
+            work_days AS workDays,
+            start_time AS startTime,
+            end_time AS endTime,
+            time_negotiable AS timeNegotiable,
+            title, employer, description, pay,
+            location, 
+            location_detail AS locationDetail,
+            latitude, longitude,
+            subway_info AS subwayInfo,
+            contact, benefits,
+            category, deadline, created_date AS createdDate,
+            hit_count AS hitCount
+        FROM job_posting
+        WHERE user_idx = #{userIdx}
+        ORDER BY created_date DESC
+    </select>
 
 </mapper>

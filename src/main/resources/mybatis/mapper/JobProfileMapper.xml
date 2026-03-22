@@ -2,53 +2,109 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.JobProfileMapper">
 
+<!-- 공통 resultMap -->
+<resultMap id="jobProfileMap" type="com.sp.app.model.JobProfile">
+    <id     property="profileIdx"    column="PROFILEIDX"/>
+    <result property="userIdx"       column="USERIDX"/>
+    <result property="photoUrl"      column="PHOTOURL"/>
+    <result property="userName"      column="NAME"/>
+    <result property="phone"         column="TEL"/>
+    <result property="email"         column="EMAIL"/>
+    <result property="gender"        column="GENDER"/>
+    <result property="birth"         column="BIRTH"/>
+    <result property="introduce"     column="INTRODUCTION"/>
+    <result property="strengths"     column="STRENGTHS"/>
+    <result property="additionalInfo" column="ADDITIONALINFO"/>
+    <result property="profileStatus" column="PROFILESTATUS"/>
+    <result property="title"         column="PROFILETITLE"/>
+    <result property="isDefault"     column="ISDEFAULT"/>
+    <result property="isPublic"      column="ISPUBLIC"/>
+    <result property="createdDate"   column="CREATEDDATE"/>
+    <result property="updatedDate"   column="UPDATEDDATE"/>
+</resultMap>
+
+<!-- 등록 -->
 <insert id="insertJobProfile" parameterType="com.sp.app.model.JobProfile">
     <selectKey keyProperty="profileIdx" resultType="long" order="BEFORE">
         SELECT seq_job_profile.NEXTVAL FROM dual
     </selectKey>
-
     INSERT INTO JOBPROFILE (
-        PROFILEIDX,
-        USERIDX,
-        PROFILETITLE,
-        INTRODUCTION,
-        NAME,
-        TEL,
-        EMAIL,
-        GENDER,
-        BIRTH,
-        STRENGTHS,
-        ADDITIONALINFO,
-        PROFILESTATUS,
-        ISDEFAULT,
-        ISPUBLIC,
-        CREATEDDATE,
-        UPDATEDDATE
+        PROFILEIDX, USERIDX,
+        PHOTOURL, NAME, TEL, EMAIL, GENDER, BIRTH,
+        INTRODUCTION, STRENGTHS, ADDITIONALINFO,
+        PROFILESTATUS, PROFILETITLE,
+        ISDEFAULT, ISPUBLIC,
+        CREATEDDATE, UPDATEDDATE
     ) VALUES (
-        #{profileIdx},
-        #{userIdx},
-        #{title},
+        #{profileIdx}, #{userIdx},
+        #{photoUrl, jdbcType=VARCHAR},
+        #{userName}, #{phone}, #{email},
+        #{gender, jdbcType=CHAR},
+        TO_DATE(#{birth, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
         #{introduce, jdbcType=CLOB},
-        #{userName},
-        #{phone},
-        #{email},
-        #{gender},
-        #{birth},
-        #{strengths},
-        #{additionalInfo},
-        1,
-        'N',
-        'Y',
-        SYSDATE,
-        SYSDATE
+        #{strengths, jdbcType=VARCHAR},
+        #{additionalInfo, jdbcType=VARCHAR},
+        1, #{title},
+        'N', 'Y',
+        SYSDATE, SYSDATE
     )
 </insert>
 
-<select id="getResumeCount" parameterType="Long" resultType="Integer">
-    SELECT NVL(COUNT(*), 0) 
-    FROM JOBPROFILE 
-    WHERE userIdx = #{userIdx}
+<!-- 이력서 개수 -->
+<select id="getResumeCount" parameterType="long" resultType="int">
+    SELECT NVL(COUNT(*), 0)
+    FROM JOBPROFILE
+    WHERE USERIDX = #{userIdx}
 </select>
 
+<!-- 나의 이력서 목록 -->
+<select id="listJobProfile" parameterType="long" resultMap="jobProfileMap">
+    SELECT PROFILEIDX, USERIDX,
+           PHOTOURL, NAME, TEL, EMAIL, GENDER,
+           TO_CHAR(BIRTH, 'YYYY-MM-DD')    AS BIRTH,
+           INTRODUCTION, STRENGTHS, ADDITIONALINFO,
+           PROFILESTATUS, PROFILETITLE,
+           ISDEFAULT, ISPUBLIC,
+           TO_CHAR(CREATEDDATE, 'YYYY-MM-DD') AS CREATEDDATE,
+           TO_CHAR(UPDATEDDATE, 'YYYY-MM-DD') AS UPDATEDDATE
+    FROM JOBPROFILE
+    WHERE USERIDX = #{userIdx}
+    ORDER BY CREATEDDATE DESC
+</select>
+
+<!-- 단건 조회 -->
+<select id="findById" parameterType="long" resultMap="jobProfileMap">
+    SELECT PROFILEIDX, USERIDX,
+           PHOTOURL, NAME, TEL, EMAIL, GENDER,
+           TO_CHAR(BIRTH, 'YYYY-MM-DD')    AS BIRTH,
+           INTRODUCTION, STRENGTHS, ADDITIONALINFO,
+           PROFILESTATUS, PROFILETITLE,
+           ISDEFAULT, ISPUBLIC,
+           TO_CHAR(CREATEDDATE, 'YYYY-MM-DD') AS CREATEDDATE,
+           TO_CHAR(UPDATEDDATE, 'YYYY-MM-DD') AS UPDATEDDATE
+    FROM JOBPROFILE
+    WHERE PROFILEIDX = #{profileIdx}
+</select>
+
+<!-- 수정 -->
+<update id="updateJobProfile" parameterType="com.sp.app.model.JobProfile">
+    UPDATE JOBPROFILE SET
+        PROFILETITLE  = #{title},
+        INTRODUCTION  = #{introduce, jdbcType=CLOB},
+        TEL           = #{phone},
+        EMAIL         = #{email},
+        GENDER        = #{gender, jdbcType=CHAR},
+        BIRTH         = TO_DATE(#{birth, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
+        STRENGTHS     = #{strengths, jdbcType=VARCHAR},
+        ADDITIONALINFO= #{additionalInfo, jdbcType=VARCHAR},
+        PHOTOURL      = #{photoUrl, jdbcType=VARCHAR},
+        UPDATEDDATE   = SYSDATE
+    WHERE PROFILEIDX = #{profileIdx}
+</update>
+
+<!-- 삭제 -->
+<delete id="deleteJobProfile" parameterType="long">
+    DELETE FROM JOBPROFILE WHERE PROFILEIDX = #{profileIdx}
+</delete>
 
 </mapper>

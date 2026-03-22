@@ -31,8 +31,8 @@
     <header class="detail-recruit-header">
         <h1 class="recruit-title">
             ${dto.title}
-            <span class="status-text ${dto.recruitStatus == '모집완료' ? 'closed' : 'open'}">${dto.recruitStatus}</span>
-        </h1>
+		<span class="status-text open">모집중</span>       
+		</h1>
         <div class="recruit-company">
             <span>${dto.employer}</span>
         </div>
@@ -115,14 +115,14 @@
 	                <i class="ri-map-pin-line" style="vertical-align: middle; margin-right: 4px; font-size: 16px;"></i> 
 	                ${dto.location}
 	            </span>
-	            <button type="button" onclick="copyAddress('${dto.location}')" style="white-space:nowrap; background: #fff; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; color: var(--text-main); cursor: pointer; transition: background 0.2s;">
+	            <button type="button" onclick="copyAddress(`${dto.location}`)" style="white-space:nowrap; background: #fff; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; color: var(--text-main); cursor: pointer; transition: background 0.2s;">
 	                주소 복사
 	            </button>
 	        </div>
 	        
 	        <div id="map" style="width: 100%; height: 220px; border-radius: 10px; border: 1px solid var(--border-color); z-index: 1;"></div>
 	        
-	        <input type="hidden" id="mapAddress" value="${dto.location}">
+	        <input type="hidden" id="mapAddress" value="${fn:escapeXml(dto.location)}">
 	        <input type="hidden" id="mapPlaceName" value="${dto.employer}">
 
 	        <div class="nearby-info-card">
@@ -161,7 +161,9 @@
                 </div>
             </c:if>
 
-        <div class="article-text">${dto.description}</div>
+        <div class="article-text">
+		   <c:out value="${dto.description}" escapeXml="true"/>
+		</div>
 
         <div class="article-stats">
             <span><i class="ri-eye-line"></i> 조회 ${dto.hitCount}</span>
@@ -343,7 +345,7 @@
     <div class="modal-content" onclick="event.stopPropagation()">
         <div class="modal-header"><h3>모집 상태 변경</h3><button type="button" class="close-modal" onclick="StatusModule.close()"><i class="ri-close-line"></i></button></div>
         <div class="status-options">
-            <button type="button" class="status-opt ${dto.recruitStatus == '모집중' ? 'active' : ''}" onclick="StatusModule.update('${dto.postingIdx}', '모집중')">모집중</button>
+            <button type="button" class="status-opt ${dto.recruitStatus == '모집중' ? 'active' : ''}" onclick="StatusModule.update(${dto.postingIdx}, '모집중')">모집중</button>
             <button type="button" class="status-opt ${dto.recruitStatus == '모집완료' ? 'active' : ''}" onclick="StatusModule.update('${dto.postingIdx}', '모집완료')">모집완료</button>
         </div>
     </div>

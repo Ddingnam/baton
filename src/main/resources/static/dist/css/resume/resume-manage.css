@@ -1,0 +1,62 @@
+/* 컨테이너 */
+.resume-manage-container { padding: 60px 24px 80px; min-height: 80vh; background: var(--bg-color); }
+.manage-inner { max-width: 900px; margin: 0 auto; }
+.page-title { font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 24px; }
+
+/* 대시보드 박스 */
+.resume-dashboard {
+  display: flex; justify-content: space-between; align-items: center;
+  background-color: var(--surface); border: 1px solid var(--border-color);
+  padding: 16px 24px; border-radius: 12px; margin-bottom: 30px; box-shadow: var(--shadow);
+}
+.resume-dashboard__count { font-size: 16px; font-weight: 700; color: var(--text-main); }
+.resume-dashboard__number { color: #ff6b6b; font-weight: 800; font-size: 18px; margin: 0 4px; }
+.text-limit { font-size: 13px; color: var(--text-light); font-weight: 500; margin-left: 8px; }
+
+.resume-dashboard__state.open {
+  background: var(--primary); color: #fff; text-decoration: none; padding: 10px 18px;
+  border-radius: 8px; font-size: 14px; font-weight: 700; transition: background 0.2s;
+}
+.resume-dashboard__state.open:hover { background: var(--accent); }
+
+/* 이력서 리스트 */
+.resume-list { list-style: none; padding: 0; margin: 0; }
+.resume-item {
+  background: var(--surface); border: 1px solid var(--border-color); border-radius: 12px;
+  padding: 24px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.resume-item:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); border-color: var(--primary-border); }
+
+.resume-item-main { flex: 1; }
+.resume-title { font-size: 18px; font-weight: 700; color: var(--text-main); text-decoration: none; display: block; margin-bottom: 8px; }
+.resume-title:hover { color: var(--primary); text-decoration: underline; }
+.resume-date { font-size: 13px; color: var(--text-light); }
+
+.resume-item-actions { display: flex; align-items: center; gap: 30px; }
+
+/* 관리 버튼 */
+.action-buttons { display: flex; gap: 8px; }
+.btn-edit, .btn-delete {
+  padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 6px;
+  background: #fff; font-size: 13px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: all 0.2s;
+}
+.btn-edit:hover { background: var(--bg-color); color: var(--text-main); }
+.btn-delete:hover { background: #fff0f0; color: #ff6b6b; border-color: #ffcaca; }
+
+/* 공개여부 토글 스위치 (iOS 스타일) */
+.toggle-wrap { display: flex; align-items: center; gap: 10px; }
+.toggle-label { font-size: 13px; font-weight: 700; color: var(--text-sub); }
+.toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; }
+input:checked + .slider { background-color: var(--primary); }
+input:checked + .slider:before { transform: translateX(20px); }
+.slider.round { border-radius: 34px; }
+.slider.round:before { border-radius: 50%; }
+
+/* 데이터 없음 */
+.no-data { text-align: center; padding: 60px 0; background: var(--surface); border: 1px solid var(--border-color); border-radius: 12px; }
+.no-data i { font-size: 40px; color: var(--border-color); margin-bottom: 12px; }
+.no-data p { font-size: 15px; color: var(--text-sub); line-height: 1.5; }
