@@ -21,6 +21,13 @@
     --color-red: #EF4444;
     
     --grad-primary: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+
+    /* ── 알림 아이콘 그라디언트 (테마 변경 시 자동 반영) ── */
+    --grad-icon-1: linear-gradient(135deg, #7C3AED, #A855F7);
+    --grad-icon-2: linear-gradient(135deg, #7C3AED, #EC4899);
+    --grad-icon-3: linear-gradient(135deg, #5B21B6, #7C3AED);
+    --grad-icon-4: linear-gradient(135deg, #7C3AED, #0EA5E9);
+    --shadow-icon: rgba(124,58,237,0.32);
     
     --radius-pill: 9999px;
     --radius-lg: 24px;
@@ -1041,30 +1048,55 @@ ul, li { list-style: none; }
     --color-purple-light: #DBEAFE;
     --grad-primary: linear-gradient(135deg, #1D4ED8 0%, #06B6D4 100%);
     --shadow-glow: 0 10px 30px -10px rgba(29,78,216,0.4);
+    --grad-icon-1: linear-gradient(135deg, #1D4ED8, #3B82F6);
+    --grad-icon-2: linear-gradient(135deg, #1D4ED8, #06B6D4);
+    --grad-icon-3: linear-gradient(135deg, #1E3A8A, #1D4ED8);
+    --grad-icon-4: linear-gradient(135deg, #1D4ED8, #6366F1);
+    --shadow-icon: rgba(29,78,216,0.32);
 }
 [data-theme="emerald"] {
     --color-purple: #059669;
     --color-purple-light: #D1FAE5;
     --grad-primary: linear-gradient(135deg, #059669 0%, #3B82F6 100%);
     --shadow-glow: 0 10px 30px -10px rgba(5,150,105,0.4);
+    --grad-icon-1: linear-gradient(135deg, #059669, #10B981);
+    --grad-icon-2: linear-gradient(135deg, #059669, #3B82F6);
+    --grad-icon-3: linear-gradient(135deg, #065F46, #059669);
+    --grad-icon-4: linear-gradient(135deg, #059669, #6366F1);
+    --shadow-icon: rgba(5,150,105,0.32);
 }
 [data-theme="sunset"] {
     --color-purple: #EA580C;
     --color-purple-light: #FEF3C7;
     --grad-primary: linear-gradient(135deg, #EA580C 0%, #EF4444 100%);
     --shadow-glow: 0 10px 30px -10px rgba(234,88,12,0.4);
+    --grad-icon-1: linear-gradient(135deg, #EA580C, #F97316);
+    --grad-icon-2: linear-gradient(135deg, #EA580C, #EF4444);
+    --grad-icon-3: linear-gradient(135deg, #9A3412, #EA580C);
+    --grad-icon-4: linear-gradient(135deg, #EA580C, #F59E0B);
+    --shadow-icon: rgba(234,88,12,0.32);
 }
 [data-theme="rose"] {
     --color-purple: #BE185D;
     --color-purple-light: #FCE7F3;
     --grad-primary: linear-gradient(135deg, #BE185D 0%, #F43F5E 100%);
     --shadow-glow: 0 10px 30px -10px rgba(190,24,93,0.4);
+    --grad-icon-1: linear-gradient(135deg, #BE185D, #F43F5E);
+    --grad-icon-2: linear-gradient(135deg, #BE185D, #EC4899);
+    --grad-icon-3: linear-gradient(135deg, #831843, #BE185D);
+    --grad-icon-4: linear-gradient(135deg, #BE185D, #8B5CF6);
+    --shadow-icon: rgba(190,24,93,0.32);
 }
 [data-theme="slate"] {
     --color-purple: #475569;
     --color-purple-light: #F1F5F9;
     --grad-primary: linear-gradient(135deg, #334155 0%, #64748B 100%);
     --shadow-glow: 0 10px 30px -10px rgba(71,85,105,0.4);
+    --grad-icon-1: linear-gradient(135deg, #475569, #64748B);
+    --grad-icon-2: linear-gradient(135deg, #334155, #64748B);
+    --grad-icon-3: linear-gradient(135deg, #1E293B, #475569);
+    --grad-icon-4: linear-gradient(135deg, #475569, #0EA5E9);
+    --shadow-icon: rgba(71,85,105,0.32);
 }
 
 .theme-grid {
@@ -1099,6 +1131,11 @@ ul, li { list-style: none; }
     --chart-c1: #1D4ED8;
     --chart-c2: #06B6D4;
     --chart-bg1: rgba(29,78,216,0.2);
+    --grad-icon-1: linear-gradient(135deg, #1D4ED8, #3B82F6);
+    --grad-icon-2: linear-gradient(135deg, #1D4ED8, #06B6D4);
+    --grad-icon-3: linear-gradient(135deg, #1E3A8A, #1D4ED8);
+    --grad-icon-4: linear-gradient(135deg, #1D4ED8, #6366F1);
+    --shadow-icon: rgba(29,78,216,0.32);
 }
 [data-theme="emerald"] {
     --color-purple: #059669;
@@ -1109,6 +1146,11 @@ ul, li { list-style: none; }
     --chart-c1: #059669;
     --chart-c2: #3B82F6;
     --chart-bg1: rgba(5,150,105,0.2);
+    --grad-icon-1: linear-gradient(135deg, #059669, #10B981);
+    --grad-icon-2: linear-gradient(135deg, #059669, #3B82F6);
+    --grad-icon-3: linear-gradient(135deg, #065F46, #059669);
+    --grad-icon-4: linear-gradient(135deg, #059669, #6366F1);
+    --shadow-icon: rgba(5,150,105,0.32);
 }
 [data-theme="sunset"] {
     --color-purple: #EA580C;
@@ -1119,6 +1161,11 @@ ul, li { list-style: none; }
     --chart-c1: #EA580C;
     --chart-c2: #F59E0B;
     --chart-bg1: rgba(234,88,12,0.18);
+    --grad-icon-1: linear-gradient(135deg, #EA580C, #F97316);
+    --grad-icon-2: linear-gradient(135deg, #EA580C, #EF4444);
+    --grad-icon-3: linear-gradient(135deg, #9A3412, #EA580C);
+    --grad-icon-4: linear-gradient(135deg, #EA580C, #F59E0B);
+    --shadow-icon: rgba(234,88,12,0.32);
 }
 [data-theme="rose"] {
     --color-purple: #BE185D;
@@ -1129,6 +1176,11 @@ ul, li { list-style: none; }
     --chart-c1: #BE185D;
     --chart-c2: #F43F5E;
     --chart-bg1: rgba(190,24,93,0.2);
+    --grad-icon-1: linear-gradient(135deg, #BE185D, #F43F5E);
+    --grad-icon-2: linear-gradient(135deg, #BE185D, #EC4899);
+    --grad-icon-3: linear-gradient(135deg, #831843, #BE185D);
+    --grad-icon-4: linear-gradient(135deg, #BE185D, #8B5CF6);
+    --shadow-icon: rgba(190,24,93,0.32);
 }
 [data-theme="slate"] {
     --color-purple: #475569;
@@ -1139,7 +1191,13 @@ ul, li { list-style: none; }
     --chart-c1: #475569;
     --chart-c2: #94A3B8;
     --chart-bg1: rgba(71,85,105,0.2);
+    --grad-icon-1: linear-gradient(135deg, #475569, #64748B);
+    --grad-icon-2: linear-gradient(135deg, #334155, #64748B);
+    --grad-icon-3: linear-gradient(135deg, #1E293B, #475569);
+    --grad-icon-4: linear-gradient(135deg, #475569, #0EA5E9);
+    --shadow-icon: rgba(71,85,105,0.32);
 }
+
 .theme-grid {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
 }

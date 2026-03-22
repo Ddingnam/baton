@@ -30,6 +30,7 @@ import com.sp.app.mail.MailSender;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.security.LoginSnsSuccessHandler;
 import com.sp.app.service.MemberService;
+import com.sp.app.service.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,7 @@ public class MemberRestController {
 	private final MailSender mailSender;
 	
 	private final LoginSnsSuccessHandler successHandler;
+	private final NotificationService notificationService; 
 	
 	@Value("${file.upload-root}/trade")
     private String uploadPath;
@@ -226,6 +228,11 @@ public class MemberRestController {
 			
 			guestInfo.setCompleteUserId(dto.getUserId());
 			guestInfo.setCompleteNickname(dto.getNickname());
+ 
+			try {
+				String content = "신규 회원 가입: " + dto.getNickname() + " (" + dto.getUserId() + ")";
+				notificationService.sendMemberJoinNotification(content, "/admin/member/list");
+			} catch (Exception ignored) {}
 			
 			model.put("state", "success");
         	return ResponseEntity.ok(model);
