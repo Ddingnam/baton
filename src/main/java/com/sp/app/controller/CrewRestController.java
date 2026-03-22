@@ -13,12 +13,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sp.app.domain.dto.CrewDto;
+import com.sp.app.domain.dto.RegionDto;
 import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.CrewService;
+import com.sp.app.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping(value = "/api/crew/*")
 public class CrewRestController {
 	private final CrewService service;
+	private final MemberService memberService;
 	
 	@Value("${file.upload-root}/crew")
     private String uploadPath;
@@ -66,27 +70,53 @@ public class CrewRestController {
     }
 	
 	@GetMapping("list")
-    public ResponseEntity<?> getAllCrews() {
-		Map<String, Object> model = new HashMap<>();
-        try {
-            List<CrewDto> list = service.listAllCrew();
-            if(list != null) {
-            	model.put("crewList", list);
-            	model.put("count", list.size());
-            } else {
-            	model.put("crewList", new ArrayList<>());
-            	model.put("count", 0);
-            }
-            
-            model.put("state", "success");
-            return ResponseEntity.ok(model);
-        } catch (Exception e) {
-            log.error("getAllCrews error : ", e);
-            model.put("state", "error");
-            
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
-        }
-    }
+	public ResponseEntity<?> crewList(
+	        @RequestParam(value = "categoryIdx", defaultValue = "0") int categoryIdx,
+	        @RequestParam(value = "distance", required = false, defaultValue = "") String distance,
+	        @RequestParam(value = "joinType", defaultValue = "all") String joinType,
+	        @RequestParam(value = "isRecruiting", defaultValue = "true") boolean isRecruiting,
+	        @RequestParam(value = "sortType", defaultValue = "latest") String sortType,
+	        @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
+	        @RequestParam(value = "page", defaultValue = "1") int page,
+	        @RequestParam(value = "size", defaultValue = "9") int size,
+	        @AuthenticationPrincipal CustomUserDetails userDetails
+	    ) {
+	    Map<String, Object> model = new HashMap<>();
+	    
+	    try {
+	        Map<String, Object> params = new HashMap<>();
+	        params.put("categoryIdx", categoryIdx);
+	        params.put("distance", distance);
+	        params.put("joinType", joinType);
+	        params.put("isRecruiting", isRecruiting);
+	        params.put("sortType", sortType);
+	        params.put("keyword", keyword);
+	        
+	        int offset = (page - 1) * size;
+	        params.put("offset", offset);
+	        params.put("size", size);
+	        
+	        SessionInfo info = userDetails.getMember();
+	        RegionDto region = memberService.findRegionByCode(info.getUserRegionInfo().getActiveRegion().getRegionCode());
+	        params.put("userRegionCode", region.getRegionCode());
+	        params.put("userRegionLat", region.getLat());
+	        params.put("userRegionLng", region.getLng());
+
+	        List<CrewDto> list = service.listCrew(params);
+	        int totalCount = service.getCrewCount(params);
+
+	        model.put("state", "success");
+	        model.put("crewList", list != null ? list : new ArrayList<>());
+	        model.put("count", totalCount);
+	        
+	        return ResponseEntity.ok(model);
+	        
+	    } catch (Exception e) {
+	        log.error("crewList error : ", e);
+	        model.put("state", "error");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
+	    }
+	}
 	
 	
 }

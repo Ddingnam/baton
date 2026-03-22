@@ -244,7 +244,7 @@
     </select>
 
     <select id="findRegionbyCode" parameterType="String" resultType="com.sp.app.domain.dto.RegionDto">
-        SELECT regionCode, sido, sigungu, dong, represent_lat, represent_lng,
+        SELECT regionCode, sido, sigungu, dong, represent_lat AS lat, represent_lng AS lng,
         	   (sido || ' ' || sigungu || ' ' || dong) AS fullAddress,
         	   dong AS coreAddress
         FROM region

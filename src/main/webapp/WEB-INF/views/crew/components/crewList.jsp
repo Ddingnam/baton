@@ -21,48 +21,95 @@
                 </div>
             </div>
 
-            <div class="cl-toolbar">
-                <div class="cl-toolbar-top">
-                    <div class="cl-carousel-wrapper">
-                        <button class="cl-carousel-nav left" @click="scrollTags('left')">
-                            <i class="ri-arrow-left-s-line"></i>
-                        </button>
-                        
-                        <div class="cl-filter-container" ref="tagCarousel">
-                            <div class="cl-filter-group">
-                                <button class="cl-filter-btn active">전체</button>
-                                <button class="cl-filter-btn">스터디</button>
-                                <button class="cl-filter-btn">운동</button>
-                                <button class="cl-filter-btn">반려동물</button>
-                                <button class="cl-filter-btn">자기계발</button>
-                                <button class="cl-filter-btn">취미/게임</button>
-                                <button class="cl-filter-btn">경제/재테크</button>
-                                <button class="cl-filter-btn">맛집/카페</button>
-                                <button class="cl-filter-btn">기타</button>
-                            </div>
-                        </div>
+			<div class="cl-glass-toolbar">
+			    
+			    <div class="cl-filter-row">
+			        <div class="cl-filter-label">카테고리</div>
+			        <div class="cl-filter-content">
+			            <div class="cl-carousel-wrapper">
+			                <button class="cl-carousel-nav left" @click="scrollTags('left')">
+			                    <i class="ri-arrow-left-s-line"></i>
+			                </button>
+			                
+			                <div class="cl-filter-container" ref="tagCarousel">
+			                    <div class="cl-filter-group">
+			                        <button class="cl-filter-btn" :class="{ active: params.categoryIdx === 0 }" @click="changeCategory(0)">전체</button>
+			                        <button class="cl-filter-btn" :class="{ active: params.categoryIdx === 1 }" @click="changeCategory(1)">스터디</button>
+			                        <button class="cl-filter-btn" :class="{ active: params.categoryIdx === 2 }" @click="changeCategory(2)">운동</button>
+			                        <button class="cl-filter-btn" :class="{ active: params.categoryIdx === 3 }" @click="changeCategory(3)">독서</button>
+			                        <button class="cl-filter-btn" :class="{ active: params.categoryIdx === 4 }" @click="changeCategory(4)">맛집/카페</button>
+			                        <button class="cl-filter-btn" :class="{ active: params.categoryIdx === 5 }" @click="changeCategory(5)">산책/반려동물</button>
+			                        <button class="cl-filter-btn" :class="{ active: params.categoryIdx === 6 }" @click="changeCategory(6)">공예/만들기</button>
+			                        <button class="cl-filter-btn" :class="{ active: params.categoryIdx === 7 }" @click="changeCategory(7)">음악/악기</button>
+			                        <button class="cl-filter-btn" :class="{ active: params.categoryIdx === 8 }" @click="changeCategory(8)">게임/오락</button>
+			                        <button class="cl-filter-btn" :class="{ active: params.categoryIdx === 9 }" @click="changeCategory(9)">자유 주제</button>
+			                    </div>
+			                </div>
 
-                        <button class="cl-carousel-nav right" @click="scrollTags('right')">
-                            <i class="ri-arrow-right-s-line"></i>
-                        </button>
-                    </div>
-                </div>
+			                <button class="cl-carousel-nav right" @click="scrollTags('right')">
+			                    <i class="ri-arrow-right-s-line"></i>
+			                </button>
+			            </div>
+			        </div>
+			    </div>
 
-                <div class="cl-toolbar-bottom">
-                    <div class="cl-action-group">
-                        <label class="cl-toggle-switch-wrap"> 
-                            <input type="checkbox" class="cl-pink-switch" checked> 
-                            <span class="cl-toggle-label">모집 중만 보기</span>
-                        </label> 
-                        <span class="cl-divider">|</span> 
-                        <select class="cl-detail-select cl-sort-select">
-                            <option>최신순</option>
-                            <option>인기순</option>
-                            <option>마감임박순</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+			    <div class="cl-filter-row cl-split-row">
+			        <div class="cl-filter-col">
+			            <div class="cl-filter-label">가입방식</div>
+			            <div class="cl-filter-content">
+			                <div class="cl-join-type-filter">
+			                    <button class="cl-filter-btn" :class="{ active: params.joinType === 'all' }" @click="changeJoinType('all')">전체</button>
+			                    <button class="cl-filter-btn" :class="{ active: params.joinType === 'F' }" @click="changeJoinType('F')">자유가입</button>
+			                    <button class="cl-filter-btn" :class="{ active: params.joinType === 'A' }" @click="changeJoinType('A')">승인제</button>
+			                </div>
+			            </div>
+			        </div>
+
+			        <div class="cl-filter-col">
+			            <div class="cl-filter-label">거리</div>
+			            <div class="cl-filter-content">
+			                <div class="cl-distance-filter">
+			                    <button class="cl-filter-btn" :class="{ active: params.distance === 'local' }" @click="changeDistance('local')">내 동네</button>
+			                    <button class="cl-filter-btn" :class="{ active: params.distance === 'near' }" @click="changeDistance('near')">가까운 동네</button>
+			                    <button class="cl-filter-btn" :class="{ active: params.distance === 'far' }" @click="changeDistance('far')">먼 동네</button>
+			                </div>
+			            </div>
+			        </div>
+			    </div>
+
+			    <div class="cl-filter-row cl-footer-row">
+			        <div class="cl-filter-label">적용옵션</div>
+			        <div class="cl-filter-content cl-flex-between">
+			            
+			            <div class="cl-active-filters">
+			                <template v-if="activeFilters.length > 0">
+			                    <span class="cl-active-badge" v-for="filter in activeFilters" :key="filter.id">
+			                        <button class="cl-badge-remove" @click="removeFilter(filter.id)">
+			                            <i class="ri-close-line"></i>
+			                        </button>
+			                        {{ filter.text }}
+			                    </span>
+			                </template>
+			                <template v-else>
+			                    <span class="cl-no-filter-text">선택된 추가 필터가 없습니다.</span>
+			                </template>
+			            </div>
+
+			            <div class="cl-filter-controls">
+			                <label class="cl-toggle-switch-wrap"> 
+			                    <input type="checkbox" class="cl-pink-switch" v-model="params.isRecruiting" @change="resetAndFetch"> 
+			                    <span class="cl-toggle-label">모집 중만 보기</span>
+			                </label> 
+			                <span class="cl-divider">|</span> 
+			                <select class="cl-detail-select cl-sort-select" v-model="params.sortType" @change="resetAndFetch">
+			                    <option value="latest">최신순</option>
+			                    <option value="popular">인기순</option>
+			                    <option value="imminent">마감임박순</option>
+			                </select>
+			            </div>
+			        </div>
+			    </div>
+			</div>
 
             <div class="cl-grid-container" v-if="crews.length > 0">
                 <div class="cl-card" v-for="crew in crews" :key="crew.crewIdx" @click="$router.push('/article/' + crew.crewIdx)">
@@ -117,9 +164,24 @@
                 </div>
             </div>
             
-            <div v-else class="cl-empty-state">
-                <p>현재 등록된 크루가 없습니다.</p>
-            </div>
+			<div v-else-if="!isLoading" class="cl-empty-state">
+			    <div class="cl-empty-inner">
+			        <div class="cl-empty-icon-box">
+			            <i class="ri-search-eye-line"></i>
+			            <div class="cl-empty-icon-bg"></div>
+			        </div>
+			        <div class="cl-empty-text-group">
+			            <h3 class="cl-empty-title">찾으시는 모임이 없어요</h3>
+			            <p class="cl-empty-desc">
+			                필터를 조정하거나 다른 키워드로 <br>
+			                새로운 모임을 찾아보시는 건 어떨까요?
+			            </p>
+			        </div>
+			        <button class="cl-reset-btn" @click="resetFilters">
+			            <i class="ri-refresh-line"></i> 필터 초기화하기
+			        </button>
+			    </div>
+			</div>
 
             <div class="cl-pagination-container" v-if="totalCount > 0">${paging}</div>
         </div>

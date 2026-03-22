@@ -1,35 +1,25 @@
 @charset "UTF-8";
 
-/* ==============================================
-   Crew List Component Styles
-   Prefix: cl-
-   ============================================== */
-
-/* --- 0. 컨테이너 --- */
 .cl-content-wrapper {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-/* --- 1. 신규 유저 가이드라인 카드 (Ultra Glassmorphism) --- */
 .cl-welcome-card {
     position: relative;
-    /* 1. 배경: 반투명 화이트 + 아주 미세한 노이즈 질감 느낌 */
     background: rgba(255, 255, 255, 0.45); 
     border-radius: 32px;
     padding: 50px 60px;
     margin-bottom: 30px;
     
-    /* 2. 글래스모피즘의 핵심: 강력한 블러 효과 */
     backdrop-filter: blur(25px) saturate(180%);
     -webkit-backdrop-filter: blur(25px) saturate(180%);
     
-    /* 3. 테두리: 안쪽으로 빛이 맺히는 하이라이트 효과 (중요) */
     border: 1px solid rgba(255, 255, 255, 0.5);
     box-shadow: 
         0 20px 50px rgba(0, 0, 0, 0.05),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.4); /* 안쪽 광택 라인 */
+        inset 0 0 0 1px rgba(255, 255, 255, 0.4);
     
     display: flex;
     justify-content: space-between;
@@ -38,7 +28,6 @@
     animation: clFadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 
-/* 4. 유리알 뒤에 비치는 '컬러 오라' (이게 있어야 유리 느낌이 납니다) */
 .cl-welcome-card::before {
     content: '';
     position: absolute;
@@ -51,7 +40,6 @@
     border-radius: 50%;
 }
 
-/* 텍스트 스택 */
 .cl-welcome-content {
     position: relative;
     z-index: 2;
@@ -69,7 +57,7 @@
 
 .cl-welcome-title {
     font-size: 32px;
-    font-weight: 900; /* 더 묵직하게 */
+    font-weight: 900;
     color: #191F28;
     margin-bottom: 15px;
     line-height: 1.2;
@@ -88,7 +76,6 @@
     line-height: 1.6;
 }
 
-/* 버튼 그룹 */
 .cl-welcome-actions {
     display: flex;
     gap: 15px;
@@ -123,64 +110,111 @@
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
 }
 
-/* --- 2. 툴바 및 필터 (Toolbar & Carousel) --- */
-.cl-toolbar {
-    margin-bottom: 20px;
+.cl-glass-toolbar {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 24px;
+    padding: 0 28px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 
+                inset 0 0 0 1px rgba(255, 255, 255, 0.5);
 }
 
-.cl-toolbar-top {
+.cl-filter-row {
+    display: flex;
+    align-items: center;
+    min-height: 70px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 10px 0;
+}
+
+.cl-filter-row:last-child {
+    border-bottom: none;
+}
+
+.cl-filter-label {
+    width: 100px;
+    font-weight: 700;
+    color: #4E5968;
+    font-size: 15px;
+    flex-shrink: 0;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    
     position: relative;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 20px;
+    border-right: 1px solid rgba(0, 0, 0, 0.08); 
+    margin-right: 20px; 
+    
+    padding-right: 0; 
+    height: 100%;
 }
 
-/* 캐러셀 감싸는 영역 */
+.cl-filter-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.cl-split-row {
+    display: flex;
+    gap: 20px;
+}
+
+.cl-split-row .cl-filter-col:last-child {
+    padding-left: 20px;
+}
+
+.cl-filter-col {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.cl-flex-between {
+    justify-content: space-between;
+    width: 100%;
+}
+
 .cl-carousel-wrapper {
     position: relative;
     display: flex;
     align-items: center;
-    padding: 15px 0;
-    overflow: visible;
+    width: 100%;
 }
 
-/* ⭐ 수정: 태그 컨테이너 - 버튼 영역을 침범하지 않도록 물리적 마진 부여 */
 .cl-filter-container {
-    flex: 1; /* 가용한 중앙 공간 모두 차지 */
+    flex: 1;
     overflow-x: auto;
     scroll-behavior: smooth;
     -ms-overflow-style: none;
     scrollbar-width: none;
-    
-    /* 버튼 크기(38px) + 여백(12px)만큼 양옆을 완전히 비움 */
-    margin: 0 50px; 
-    
-    /* 이 안에서만 글자가 보이고 잘리도록 설정 */
-    overflow: hidden; 
+    margin: 0 40px;
 }
-
-.cl-filter-container::-webkit-scrollbar {
-    display: none;
-}
+.cl-filter-container::-webkit-scrollbar { display: none; }
 
 .cl-filter-group {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     white-space: nowrap;
-    /* 스크롤 영역 내부에서 부드럽게 움직이도록 함 */
-    padding: 5px 0; 
+    padding: 5px 0;
 }
 
 .cl-filter-btn {
-    padding: 8px 18px;
+    padding: 8px 16px;
     border-radius: 100px;
     border: 1px solid var(--border-color);
     background: #fff;
     font-weight: 600;
     color: var(--text-sub);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    font-size: 15px;
+    transition: all 0.2s ease;
+    font-size: 14px;
 }
 
 .cl-filter-btn.active, 
@@ -188,11 +222,10 @@
     background: var(--crew-pink);
     color: #fff;
     border-color: var(--crew-pink);
-    transform: translateY(-4px);
-    box-shadow: 0 6px 15px rgba(248, 109, 125, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(248, 109, 125, 0.2);
 }
 
-/* ⭐ 수정: 텍스트 기반 미니멀 내비게이션 버튼 */
 .cl-carousel-nav {
     position: absolute;
     top: 50%;
@@ -201,60 +234,67 @@
     border: none;
     padding: 0;
     cursor: pointer;
-    z-index: 100;
-    color: var(--text-light); /* 평소에는 연한 컬러 */
-    font-size: 26px;
-    font-weight: 300;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    z-index: 10;
+    color: var(--text-light);
+    font-size: 24px;
+    transition: color 0.2s;
 }
-
-.cl-carousel-nav:hover {
-    color: var(--text-main); /* 호버 시 진하게 */
-    transform: translateY(-50%) scale(1.1);
-}
-
+.cl-carousel-nav:hover { color: var(--text-main); }
 .cl-carousel-nav.left { left: 0; }
 .cl-carousel-nav.right { right: 0; }
 
-/* 비활성화 상태 (스크롤 끝에 도달했을 때 - 옵션) */
-.cl-carousel-nav:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-.cl-toolbar-bottom {
+.cl-distance-filter, 
+.cl-join-type-filter {
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
+    gap: 8px;
 }
 
-.cl-action-group {
+.cl-active-filters {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 16px;
+    gap: 8px;
 }
 
-.cl-detail-select {
-    padding: 8px 28px 8px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    outline: none;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-sub);
-    appearance: none;
-    background: #fff url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5" stroke="%238B95A1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat right 8px center;
-    background-size: 16px;
+.cl-no-filter-text {
+    font-size: 13px;
+    color: #8B95A1;
+    font-weight: 500;
+}
+
+.cl-active-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(248, 109, 125, 0.08);
+    color: var(--crew-pink);
+    padding: 6px 12px 6px 8px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    border: 1px solid rgba(248, 109, 125, 0.15);
+}
+
+.cl-badge-remove {
+    background: none;
+    border: none;
+    color: var(--crew-pink);
     cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    transition: transform 0.2s;
+}
+.cl-badge-remove:hover { transform: scale(1.2); font-weight: 900; }
+
+.cl-filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
-.cl-divider {
-    color: var(--border-color);
-}
+.cl-divider { color: var(--border-color); }
 
 .cl-toggle-switch-wrap {
     display: flex;
@@ -299,7 +339,20 @@
 .cl-pink-switch:checked { background: var(--crew-pink); }
 .cl-pink-switch:checked::after { transform: translateX(18px); }
 
-/* --- 3. 카드 그리드 영역 (A안) --- */
+.cl-detail-select {
+    padding: 8px 28px 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    outline: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-sub);
+    appearance: none;
+    background: #fff url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5" stroke="%238B95A1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat right 8px center;
+    background-size: 16px;
+    cursor: pointer;
+}
+
 .cl-grid-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -533,7 +586,85 @@
     margin-top: 20px;
 }
 
-/* --- 애니메이션 --- */
+.cl-empty-state {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 420px;
+    padding: 60px 40px;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 32px;
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.03),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+    margin: 40px 0;
+    text-align: center;
+	animation: clFadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+
+.cl-empty-icon-box i {
+    font-size: 48px;
+    color: #ff6b6b;
+}
+
+.cl-empty-icon-box {
+    margin-bottom: 24px;
+    font-size: 64px;
+    color: #ff6b6b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cl-empty-text-group {
+    margin-bottom: 32px;
+}
+
+.cl-empty-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #2d3436;
+    margin: 0 0 12px 0;
+}
+
+.cl-empty-desc {
+    font-size: 1.05rem;
+    color: #636e72;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.cl-reset-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cl-reset-btn:hover {
+    background: #fa5252;
+    transform: scale(1.05);
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
 @keyframes clFadeInUp {
     0% { opacity: 0; transform: translateY(30px); }
     100% { opacity: 1; transform: translateY(0); }

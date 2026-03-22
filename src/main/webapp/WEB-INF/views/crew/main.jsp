@@ -52,6 +52,7 @@
 <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_form.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_detail.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/crew/crew_hero.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_list.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_chat.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_app.js"></script>

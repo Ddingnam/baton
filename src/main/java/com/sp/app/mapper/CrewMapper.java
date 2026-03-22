@@ -28,7 +28,9 @@ public interface CrewMapper {
 	public void deleteCrewCategories(long crewIdx) throws Exception;
 	
 	public CrewDto findByCrewIdx(Long crewIdx);
-	public List<CrewDto> listAllCrew();
+	
+	public int getCrewCount(Map<String, Object> map);
+	public List<CrewDto> listCrew(Map<String, Object> map);
 	
 	public List<CategoryDto> listCrewCategories(Long crewIdx);
 	public List<RegionDto> listCrewRegions(Long crewIdx);

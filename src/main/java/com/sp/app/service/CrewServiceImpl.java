@@ -1,6 +1,7 @@
 package com.sp.app.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -118,11 +119,11 @@ public class CrewServiceImpl implements CrewService {
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
-	public List<CrewDto> listAllCrew() {
+	public List<CrewDto> listCrew(Map<String, Object> map) {
 		List<CrewDto> crewList = null;
 		long crewIdx = 0;
 		try {
-			crewList = mapper.listAllCrew();
+			crewList = mapper.listCrew(map);
 			for(CrewDto crew : crewList) {
 				crewIdx = crew.getCrewIdx();
 				crew.setCategories(mapper.listCrewCategories(crewIdx));
@@ -133,5 +134,17 @@ public class CrewServiceImpl implements CrewService {
 			throw e;
 		}
 		return crewList;
+	}
+
+	@Override
+	public int getCrewCount(Map<String, Object> map) {
+		int count = 0;
+		try {
+			count = mapper.getCrewCount(map);
+		} catch (Exception e) {
+			log.info("getCrewCount : ", e);
+			throw e;
+		}
+		return count;
 	}
 }

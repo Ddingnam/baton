@@ -1,5 +1,3 @@
-const CrewHero = { template: '#crew-hero-template' };
-
 const router = VueRouter.createRouter({
     history: VueRouter.createWebHashHistory(),
     routes: [

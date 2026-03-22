@@ -81,15 +81,84 @@
 	    WHERE crewIdx = #{crewIdx}
 	</select>
 	
-	<select id="listAllCrew" resultType="com.sp.app.domain.dto.CrewDto">
-	    SELECT 
-	        c.crewIdx, c.userIdx, c.name, c.description, c.logoImage, 
-	        c.maxMember, c.currentMember, c.joinType, c.chatRoomId, 
-	        c.viewCount, c.status, TO_CHAR(c.createdDate, 'YYYY-MM-DD') AS createdDate, u.nickname AS hostNickname
-	    FROM crew c INNER JOIN users u
-	    ON c.userIdx = u.userIdx 
-	    WHERE c.status = '1'
-	    ORDER BY c.createdDate DESC
+	<select id="listCrew" parameterType="map" resultType="com.sp.app.domain.dto.CrewDto">
+	    SELECT DISTINCT
+	        c.crewIdx, c.userIdx, c.name, TO_CHAR(c.description) AS description, c.logoImage, 
+	        c.maxMember, c.currentMember, c.joinType, c.chatRoomId,
+	        c.viewCount, c.status, TO_CHAR(c.createdDate, 'YYYY-MM-DD') AS createdDate, 
+	        u.nickname AS hostNickname
+	    FROM crew c 
+	    INNER JOIN users u ON c.userIdx = u.userIdx
+	    <where>
+	        c.status = '1'
+	        <if test="distance != null and distance != ''">
+			    AND c.crewIdx IN (
+			        SELECT cr.crewIdx 
+			        FROM crew_region_mapping cr
+			        <where>
+			            <choose>
+			                <when test="distance == 'local'">
+			                    AND cr.regionCode = #{userRegionCode}
+			                </when>
+			                
+			                <when test="distance == 'near'">
+			                    AND (
+			                        cr.regionCode = #{userRegionCode} 
+			                        OR cr.regionCode IN (
+			                            SELECT r.regionCode FROM region r
+			                            WHERE (
+			                                6371 * acos(
+			                                    LEAST(1, GREATEST(-1, 
+	                                                cos(#{userRegionLat} * 3.14159265 / 180) * cos(r.represent_lat * 3.14159265 / 180) 
+	                                                * cos((r.represent_lng * 3.14159265 / 180) - (#{userRegionLng} * 3.14159265 / 180)) 
+	                                                + sin(#{userRegionLat} * 3.14159265 / 180) * sin(r.represent_lat * 3.14159265 / 180)
+                                            	))
+			                                )
+			                            ) &lt;= 7
+			                        )
+			                    )
+			                </when>
+			                
+			                <otherwise>
+			                    AND (
+			                        cr.regionCode = #{userRegionCode} 
+			                        OR cr.regionCode IN (
+			                            SELECT r.regionCode FROM region r
+			                            WHERE (
+			                                6371 * acos(
+			                                    LEAST(1, GREATEST(-1, 
+	                                                cos(#{userRegionLat} * 3.14159265 / 180) * cos(r.represent_lat * 3.14159265 / 180) 
+	                                                * cos((r.represent_lng * 3.14159265 / 180) - (#{userRegionLng} * 3.14159265 / 180)) 
+	                                                + sin(#{userRegionLat} * 3.14159265 / 180) * sin(r.represent_lat * 3.14159265 / 180)
+                                            	))
+			                                )
+			                            ) &lt;= 25
+			                        )
+			                    )
+			                </otherwise>
+			            </choose>
+			        </where>
+			    )
+			</if>
+			<if test="joinType != null and joinType != 'all'">
+			    AND c.joinType = #{joinType}
+			</if>
+	        <if test="categoryIdx != null and categoryIdx != 0">
+            AND EXISTS (
+                SELECT 1 FROM crew_category_mapping cc 
+                WHERE cc.crewIdx = c.crewIdx AND cc.categoryIdx = #{categoryIdx}
+            )
+	        </if>
+	        <if test="keyword != null and keyword != ''">
+	            AND (c.name LIKE '%' || #{keyword} || '%' OR c.description LIKE '%' || #{keyword} || '%')
+	        </if>
+    	</where>	
+	    ORDER BY
+	    <choose>
+	        <when test="sortType == 'popular'">c.viewCount DESC</when>
+	        <otherwise>c.createdDate DESC</otherwise>
+	    </choose>
+	    OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
 	</select>
 	
 	<select id="listCrewCategories" parameterType="long" resultType="com.sp.app.domain.dto.CategoryDto">
@@ -114,9 +183,75 @@
 	    ORDER BY r.regionCode ASC
 	</select>
 	
-	
-	
-	
+	<select id="getCrewCount" parameterType="map" resultType="int">
+	    SELECT COUNT(c.crewIdx)
+	    FROM crew c 
+	    INNER JOIN users u ON c.userIdx = u.userIdx
+	    <where>
+	        c.status = '1'
+			<if test="distance != null and distance != ''">
+			    AND c.crewIdx IN (
+			        SELECT cr.crewIdx 
+			        FROM crew_region_mapping cr
+			        <where>
+			            <choose>
+			                <when test="distance == 'local'">
+			                    AND cr.regionCode = #{userRegionCode}
+			                </when>
+			                
+			                <when test="distance == 'near'">
+			                    AND (
+			                        cr.regionCode = #{userRegionCode} 
+			                        OR cr.regionCode IN (
+			                            SELECT r.regionCode FROM region r
+			                            WHERE (
+			                                6371 * acos(
+			                                    LEAST(1, GREATEST(-1, 
+	                                                cos(#{userRegionLat} * 3.14159265 / 180) * cos(r.represent_lat * 3.14159265 / 180) 
+	                                                * cos((r.represent_lng * 3.14159265 / 180) - (#{userRegionLng} * 3.14159265 / 180)) 
+	                                                + sin(#{userRegionLat} * 3.14159265 / 180) * sin(r.represent_lat * 3.14159265 / 180)
+                                            	))
+			                                )
+			                            ) &lt;= 7
+			                        )
+			                    )
+			                </when>
+			                
+			                <otherwise>
+			                    AND (
+			                        cr.regionCode = #{userRegionCode} 
+			                        OR cr.regionCode IN (
+			                            SELECT r.regionCode FROM region r
+			                            WHERE (
+			                                6371 * acos(
+			                                    LEAST(1, GREATEST(-1, 
+	                                                cos(#{userRegionLat} * 3.14159265 / 180) * cos(r.represent_lat * 3.14159265 / 180) 
+	                                                * cos((r.represent_lng * 3.14159265 / 180) - (#{userRegionLng} * 3.14159265 / 180)) 
+	                                                + sin(#{userRegionLat} * 3.14159265 / 180) * sin(r.represent_lat * 3.14159265 / 180)
+                                            	))
+			                                )
+			                            ) &lt;= 25
+			                        )
+			                    )
+			                </otherwise>
+			            </choose>
+			        </where>
+			    )
+			</if>
+			<if test="joinType != null and joinType != 'all'">
+			    AND c.joinType = #{joinType}
+			</if>
+	        <if test="categoryIdx != null and categoryIdx != 0">
+            AND EXISTS (
+                SELECT 1 FROM crew_category_mapping cc 
+                WHERE cc.crewIdx = c.crewIdx AND cc.categoryIdx = #{categoryIdx}
+            )
+	        </if>
+	        <if test="keyword != null and keyword != ''">
+	            AND (c.name LIKE '%' || #{keyword} || '%' OR c.description LIKE '%' || #{keyword} || '%')
+	        </if>
+    	</where>
+	</select>	
 	
 	<select id="isLinkedSnsUser" parameterType="map" resultType="com.sp.app.domain.dto.SnsUserDto">
 		SELECT authIdx, userIdx, provider, oauthId, linkedDate
