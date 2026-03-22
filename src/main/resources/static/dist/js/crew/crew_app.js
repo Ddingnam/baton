@@ -9,16 +9,39 @@ const router = VueRouter.createRouter({
             }
         },
         { 
-            path: '/article/:id', 
-            components: {
-                default: CrewDetail 
-            }
+            path: '/article/:crewIdx', 
+            component: CrewDetail,
+            children: [
+				{
+                    path: '', 
+                    redirect: to => `/article/${to.params.crewIdx}/dashboard`
+                },
+                {
+                    path: 'dashboard',
+                    name: 'crew-dashboard',
+                    component: CrewDashboard,
+                    props: true 
+                },
+                {
+                    path: 'board',
+                    name: 'crew-board',
+                    component: { template: '<div class="cd-glass-card" style="padding:20px;">게시판 준비 중입니다.</div>' }
+                },
+                {
+                    path: 'schedule',
+                    name: 'crew-schedule',
+                    component: { template: '<div class="cd-glass-card" style="padding:20px;">일정 준비 중입니다.</div>' }
+                },
+                {
+                    path: 'chat',
+                    name: 'crew-chat-tab',
+                    component: { template: '<div class="cd-glass-card" style="padding:20px;">채팅 준비 중입니다.</div>' }
+                }
+            ]
         },
         { 
             path: '/write', 
-            components: {
-                default: CrewForm
-            }
+            component: CrewForm
         }
     ]
 });

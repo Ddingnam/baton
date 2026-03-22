@@ -1,0 +1,452 @@
+@charset "UTF-8";
+
+/* ==============================================
+   Crew Detail Component Styles (Slim & Modular)
+   Prefix: cd-
+   ============================================== */
+
+:root {
+    --crew-pink: #F86D7D;
+    --text-sub: #8B95A1;
+    --bg-color: #f5f7f9;
+}
+
+/* --- 0. 컨테이너 --- */
+.cd-content-wrapper {
+    max-width: 1200px;
+    margin: 66px auto 100px auto;
+    padding: 0 20px;
+}
+
+.cd-layout-container {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+/* --- 1. 공통 글래스모피즘 --- */
+.cd-glass-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.4); 
+    border-radius: 28px;
+    backdrop-filter: blur(20px) saturate(200%);
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.02), 
+        inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    overflow: hidden;
+}
+
+/* 핑크 오라 효과 (프로필 카드에 적용) */
+.cd-profile-card::before {
+    content: '';
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(248, 109, 125, 0.12) 0%, rgba(248, 109, 125, 0) 70%);
+    top: -80px;
+    right: -40px;
+    z-index: -1;
+    border-radius: 50%;
+}
+
+/* --- 2. 사이드바 영역 (280px 슬림 & 3단 분리) --- */
+.cd-sidebar {
+    flex: 0 0 280px;
+    position: sticky;
+    top: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* 분리된 각 카드의 패딩 */
+.cd-profile-card { padding: 30px 20px 24px; text-align: center; }
+.cd-tab-card { padding: 12px; }
+.cd-action-card { padding: 16px; }
+
+.cd-profile-wrapper {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    border: 6px solid #ffffff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    background: var(--bg-color);
+}
+
+/* 지역 리스트 컨테이너 */
+.cd-region-list-container {
+    display: flex;
+    flex-direction: column; /* 수직 나열 */
+    align-items: center;
+    gap: 8px; /* 배지 사이 간격 살짝 넓힘 */
+    margin-bottom: 16px;
+}
+
+/* 회색조 배지 디자인 (사이즈 업) */
+.cd-region-tag span {
+    font-size: 12px; /* 💡 크기 키움 */
+    font-weight: 700;
+    color: #4E5968; /* 💡 차분한 회색조 텍스트 */
+    background: #f1f3f5; /* 💡 연한 회색 배경 */
+    padding: 6px 14px; /* 💡 패딩도 키워서 여유있게 */
+    border-radius: 12px;
+    white-space: nowrap;
+    display: inline-block;
+    border: 1px solid rgba(0, 0, 0, 0.03); /* 아주 연한 테두리만 추가 */
+}
+
+.cd-profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cd-details-table {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    /* 그림자 농도를 낮춰서 탁한 느낌 제거 */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
+}
+
+.cd-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.cd-detail-label {
+    color: #8B95A1;
+    font-weight: 600;
+}
+
+.cd-detail-value {
+    color: #191F28;
+    font-weight: 700;
+}
+
+.cd-category-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.cd-cat-badge {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--crew-pink);
+    background: rgba(248, 109, 125, 0.1);
+    padding: 5px 12px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.cd-crew-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #191F28;
+    margin-bottom: 12px;
+    line-height: 1.3;
+}
+
+.cd-crew-desc {
+    font-size: 14px;
+    font-weight: 500;
+    color: #4E5968;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
+
+/* 진행바 */
+.cd-member-status {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 12px;
+    border-radius: 16px;
+    text-align: left;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.cd-member-count {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-sub);
+    margin-bottom: 8px;
+}
+
+.cd-member-count strong {
+    color: var(--crew-pink);
+    font-weight: 800;
+}
+
+.cd-progress-bg {
+    height: 6px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.cd-progress-fill {
+    height: 100%;
+    background: var(--crew-pink);
+    border-radius: 3px;
+    transition: width 0.5s ease-out;
+}
+
+/* 탭 네비게이션 */
+.cd-tab-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cd-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    background: transparent;
+    font-size: 15px;
+    font-weight: 700;
+    color: #4E5968;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.cd-tab-btn:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: translateX(5px);
+}
+
+.cd-tab-btn.active {
+    background: #ffffff;
+    color: var(--crew-pink);
+    border-color: rgba(0,0,0,0.05);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+}
+
+.cd-tab-btn i { font-size: 18px; }
+
+/* 액션 버튼 (💡 누락되었던 secondary 버튼 및 통합 호버 효과 복구) */
+.cd-action-btn {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: none;
+}
+
+.cd-action-btn.primary {
+    background: #191F28;
+    color: #fff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.cd-action-btn.secondary {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    color: #4E5968;
+}
+
+.cd-action-btn:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+/* --- 3. 메인 콘텐츠 및 대시보드 --- */
+.cd-main-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.cd-dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.cd-dashboard-bottom-row {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 24px;
+}
+
+/* 위젯 공통 */
+.cd-widget { padding: 24px; }
+.cd-widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.cd-widget-header h4 { font-size: 17px; font-weight: 800; color: #191F28; display: flex; align-items: center; gap: 8px; }
+.cd-widget-header h4 i { color: var(--crew-pink); }
+
+/* 💡 누락되었던 아이콘 중앙 정렬 복구 */
+.cd-icon-btn { 
+    background: #fff; border: 1px solid rgba(0,0,0,0.05); width: 32px; height: 32px; 
+    border-radius: 10px; cursor: pointer; transition: 0.2s; 
+    display: flex; align-items: center; justify-content: center; 
+}
+.cd-icon-btn:hover { background: var(--crew-pink); color: #fff; border-color: var(--crew-pink); }
+
+/* 💡 누락되었던 텍스트 수직 정렬 복구 */
+.cd-view-more { 
+    font-size: 13px; font-weight: 600; color: #8B95A1; cursor: pointer; 
+    transition: 0.2s; display: flex; align-items: center; 
+}
+.cd-view-more:hover { color: var(--crew-pink); }
+
+/* 공지사항 위젯 */
+.cd-notice-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(248, 109, 125, 0.08);
+    padding: 16px 20px;
+    border-radius: 14px;
+    border: 1px solid rgba(248, 109, 125, 0.15);
+    cursor: pointer;
+}
+.cd-notice-title { font-size: 15px; font-weight: 700; color: #191F28; margin: 0; }
+.cd-notice-date { font-size: 13px; font-weight: 600; color: var(--crew-pink); }
+
+/* 날씨 위젯 */
+.cd-weather-body { display: flex; align-items: center; gap: 12px; justify-content: center; padding: 10px 0; }
+.cd-temp { font-size: 32px; font-weight: 900; color: #191F28; }
+.cd-weather-text { font-size: 13px; font-weight: 600; color: #4E5968; }
+
+/* 일정 리스트 */
+.cd-schedule-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.cd-schedule-item { 
+    display: flex; 
+    align-items: center; 
+    gap: 14px; 
+    background: rgba(255,255,255,0.5); 
+    padding: 14px; 
+    border-radius: 18px; 
+    border: 1px solid rgba(255,255,255,0.7);
+}
+.cd-sch-date { 
+    width: 50px; height: 50px; background: #fff; border-radius: 12px; 
+    display: flex; flex-direction: column; align-items: center; justify-content: center; 
+}
+.cd-sch-date .day { font-size: 18px; font-weight: 900; color: #191F28; }
+.cd-sch-date .month { font-size: 11px; font-weight: 700; color: var(--crew-pink); }
+.cd-sch-info strong { font-size: 15px; font-weight: 800; color: #191F28; display: block; }
+.cd-sch-info span { font-size: 12px; color: #4E5968; }
+
+/* 게시글 위젯 */
+.cd-post-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.cd-post-item { background: rgba(255,255,255,0.5); padding: 18px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.7); cursor: pointer; transition: 0.3s; }
+.cd-post-item:hover { background: #fff; border-color: var(--crew-pink); transform: translateY(-4px); box-shadow: 0 12px 25px rgba(0,0,0,0.05); }
+.cd-post-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: #8B95A1; }
+.cd-post-title { font-size: 15px; font-weight: 800; color: #191F28; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* --- 4. 기타 및 애니메이션 --- */
+.cd-loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    color: var(--text-sub);
+    font-weight: 600; /* 💡 누락되었던 폰트 굵기 복구 */
+}
+.cd-spin {
+    font-size: 3rem;
+    color: var(--crew-pink);
+    margin-bottom: 20px;
+    animation: spin 1s linear infinite;
+}
+
+.cd-fade-enter-active, .cd-fade-leave-active { transition: opacity 0.3s, transform 0.3s; }
+.cd-fade-enter-from, .cd-fade-leave-to { opacity: 0; transform: translateY(10px); }
+
+/* =========================================
+   누락된 클래스 추가 (기존 코드 하단에 복사해서 붙여넣으세요)
+   ========================================= */
+
+/* 1. 일정 상태 배지 (누락된 부분) */
+.cd-status-badge {
+    background: var(--crew-pink, #F86D7D);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+/* 2. 대시보드 그리드 구조 복구 및 너비 설정 */
+.cd-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.cd-full-width {
+    grid-column: span 3;
+}
+
+.cd-dashboard-bottom-row {
+    grid-column: span 3;
+    display: grid;
+    grid-template-columns: 280px 1fr; /* 날씨 280px, 게시글 1fr */
+    gap: 24px;
+}
+
+/* 3. 기타 누락된 세부 요소 */
+.cd-page-container {
+    width: 100%;
+}
+
+.cd-sidebar-footer {
+    width: 100%;
+}
+
+.cd-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cd-view-more {
+    display: flex;
+    align-items: center;
+}
+
+.cd-post-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+@keyframes cdFadeInUp {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

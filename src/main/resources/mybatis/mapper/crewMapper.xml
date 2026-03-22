@@ -176,7 +176,8 @@
 	    	r.sigungu,
 	    	r.dong,
 	    	r.represent_lat AS lnt,
-	    	r.represent_lng AS lng
+	    	r.represent_lng AS lng,
+	    	(r.sido || ' ' || r.sigungu || ' ' || r.dong) AS fullAddress
 	    FROM region r INNER JOIN crew_region_mapping m
 	    ON r.regionCode = m.regionCode 
 	    WHERE m.crewIdx = #{crewIdx}

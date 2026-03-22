@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -117,6 +118,20 @@ public class CrewRestController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
 	    }
 	}
+	
+	@GetMapping("article/{crewIdx}")
+    public ResponseEntity<?> getCrewDetail(@PathVariable("crewIdx") long crewIdx) {
+        try {
+            CrewDto crew = service.findByCrewIdx(crewIdx); 
+            if (crew != null) {
+                return ResponseEntity.ok(crew);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("모임을 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 	
 	
 }

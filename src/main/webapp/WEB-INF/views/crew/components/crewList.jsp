@@ -163,27 +163,26 @@
                     </div>
                 </div>
             </div>
+			
+			<div ref="loadTrigger" class="cl-load-trigger" v-show="crews.length > 0 && !isLastPage">
+			    <div v-if="isLoading" class="cl-loading-spinner">
+			        <i class="ri-loader-4-line"></i> 로딩 중...
+			    </div>
+			</div>
             
-			<div v-else-if="!isLoading" class="cl-empty-state">
+			<div v-if="!isLoading && crews.length === 0 && totalCount === 0" class="cl-empty-state">
 			    <div class="cl-empty-inner">
 			        <div class="cl-empty-icon-box">
 			            <i class="ri-search-eye-line"></i>
-			            <div class="cl-empty-icon-bg"></div>
 			        </div>
 			        <div class="cl-empty-text-group">
 			            <h3 class="cl-empty-title">찾으시는 모임이 없어요</h3>
-			            <p class="cl-empty-desc">
-			                필터를 조정하거나 다른 키워드로 <br>
-			                새로운 모임을 찾아보시는 건 어떨까요?
-			            </p>
+			            <p class="cl-empty-desc">필터를 조정하거나 다른 키워드로 검색해 보세요.</p>
 			        </div>
-			        <button class="cl-reset-btn" @click="resetFilters">
-			            <i class="ri-refresh-line"></i> 필터 초기화하기
-			        </button>
+			        <button class="cl-reset-btn" @click="resetFilters">필터 초기화하기</button>
 			    </div>
 			</div>
-
-            <div class="cl-pagination-container" v-if="totalCount > 0">${paging}</div>
+			
         </div>
     </div>
 </template>

@@ -665,6 +665,29 @@
     50% { transform: translateY(-10px); }
 }
 
+.cl-load-trigger {
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.cl-loading-spinner {
+    color: #ff6b6b;
+    font-weight: 600;
+}
+
+.cl-loading-spinner i {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 @keyframes clFadeInUp {
     0% { opacity: 0; transform: translateY(30px); }
     100% { opacity: 1; transform: translateY(0); }
