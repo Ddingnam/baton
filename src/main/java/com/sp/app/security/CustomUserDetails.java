@@ -106,4 +106,7 @@ public class CustomUserDetails implements UserDetails{
 		return member.getName();
 	}
 
+	public int getUserLevel() {
+		return member.getUserLevel();
+	}
 }

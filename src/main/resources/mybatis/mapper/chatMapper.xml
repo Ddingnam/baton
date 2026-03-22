@@ -21,8 +21,14 @@
     </select>
 
     <update id="updateLastReadDate" parameterType="map">
-        UPDATE chatMember SET lastReadDate = SYSTIMESTAMP
-        WHERE roomIdx = #{roomIdx} AND userIdx = #{userIdx}
+        MERGE INTO chatMember cm
+        USING (SELECT #{roomIdx} AS roomIdx, #{userIdx} AS userIdx FROM dual) src
+        ON (cm.roomIdx = src.roomIdx AND cm.userIdx = src.userIdx)
+        WHEN MATCHED THEN
+            UPDATE SET cm.lastReadDate = SYSTIMESTAMP
+        WHEN NOT MATCHED THEN
+            INSERT (roomIdx, userIdx, lastReadDate)
+            VALUES (src.roomIdx, src.userIdx, SYSTIMESTAMP)
     </update>
 
     <select id="findChatRoom" parameterType="map" resultType="Long">

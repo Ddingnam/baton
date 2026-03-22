@@ -2,37 +2,155 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.admin.mapper.AdminChatMapper">
 
-    <select id="listAdminRooms" resultType="com.sp.app.model.ChatRoom">
+    
+    <select id="listMyChannels" resultType="com.sp.app.model.ChatRoom">
         SELECT
-            cr.roomIdx,
-            cr.roomName,
-            (
-                SELECT content
-                FROM (
-                    SELECT content 
-                    FROM chatMessage 
-                    WHERE roomIdx = cr.roomIdx
-                    ORDER BY msgIdx DESC
-                ) WHERE ROWNUM = 1
-            ) AS recentMessage,
-            0 AS unreadCount
+            cr.roomIdx, cr.roomName,
+            (SELECT content FROM (SELECT content FROM chatMessage
+             WHERE roomIdx = cr.roomIdx ORDER BY msgIdx DESC) WHERE ROWNUM = 1) AS recentMessage,
+            (SELECT COUNT(*) FROM chatMessage m
+             WHERE m.roomIdx = cr.roomIdx
+             AND m.sendDate > NVL((SELECT lastReadDate FROM chatMember
+                                   WHERE roomIdx = cr.roomIdx AND userIdx = #{myUserIdx}),
+                                  TO_DATE('1900-01-01','YYYY-MM-DD'))
+            ) AS unreadCount
+        FROM chatRoom cr
+        JOIN chatMember cm ON cr.roomIdx = cm.roomIdx AND cm.userIdx = #{myUserIdx}
+        WHERE cr.roomType = 2
+        ORDER BY cr.roomIdx ASC
+    </select>
+
+    
+    <select id="listAllChannels" resultType="com.sp.app.model.ChatRoom">
+        SELECT
+            cr.roomIdx, cr.roomName,
+            (SELECT content FROM (SELECT content FROM chatMessage
+             WHERE roomIdx = cr.roomIdx ORDER BY msgIdx DESC) WHERE ROWNUM = 1) AS recentMessage,
+            (SELECT COUNT(*) FROM chatMessage m
+             WHERE m.roomIdx = cr.roomIdx
+             AND m.sendDate > NVL((SELECT lastReadDate FROM chatMember
+                                   WHERE roomIdx = cr.roomIdx AND userIdx = #{myUserIdx}),
+                                  TO_DATE('1900-01-01','YYYY-MM-DD'))
+            ) AS unreadCount
         FROM chatRoom cr
         WHERE cr.roomType = 2
         ORDER BY cr.roomIdx ASC
     </select>
 
+    
     <select id="listAdminMembers" resultType="com.sp.app.domain.dto.UserDto">
-        SELECT 
-            u.userIdx, 
-            u.userId, 
-            u.name, 
-            u.nickname, 
-            u.profile_photo,
-            a.authority
+        SELECT u.userIdx, u.userId, u.name, u.nickname, u.profile_photo,
+               a.authority, u.userLevel
         FROM users u
         JOIN userAuthority a ON u.userId = a.userId
         WHERE a.authority IN ('ROLE_ADMIN', 'ADMIN', 'ROLE_EMP', 'EMP')
-        ORDER BY u.userIdx ASC
+        ORDER BY u.userLevel DESC, u.userIdx ASC
     </select>
+
+    
+    <select id="findDMRoom" resultType="Long">
+        SELECT cr.roomIdx FROM chatRoom cr
+        JOIN chatMember m1 ON cr.roomIdx = m1.roomIdx AND m1.userIdx = #{userIdxA}
+        JOIN chatMember m2 ON cr.roomIdx = m2.roomIdx AND m2.userIdx = #{userIdxB}
+        WHERE cr.roomType = 3 AND ROWNUM = 1
+    </select>
+
+    
+    <insert id="insertDMRoom" parameterType="map">
+        <selectKey keyProperty="roomIdx" resultType="Long" order="BEFORE">
+            SELECT chatRoomSeq.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO chatRoom(roomIdx, roomType, roomName) VALUES (#{roomIdx}, 3, 'DM')
+    </insert>
+    <insert id="insertDMRoomMember" parameterType="map">
+        INSERT INTO chatMember(roomIdx, userIdx) VALUES (#{roomIdx}, #{userIdx})
+    </insert>
+
+    
+    <select id="listDMRooms" resultType="com.sp.app.model.ChatRoom">
+        SELECT cr.roomIdx, u.userIdx, u.nickname, u.profile_photo AS profilePhoto,
+            (SELECT content FROM (SELECT content FROM chatMessage
+             WHERE roomIdx = cr.roomIdx ORDER BY msgIdx DESC) WHERE ROWNUM = 1) AS recentMessage,
+            (SELECT TO_CHAR(sendDate, 'MM-DD HH24:MI') FROM (SELECT sendDate FROM chatMessage
+             WHERE roomIdx = cr.roomIdx ORDER BY msgIdx DESC) WHERE ROWNUM = 1) AS recentDate,
+            (SELECT COUNT(*) FROM chatMessage m
+             WHERE m.roomIdx = cr.roomIdx AND m.userIdx != #{myUserIdx}
+             AND m.sendDate > NVL((SELECT lastReadDate FROM chatMember
+                                   WHERE roomIdx = cr.roomIdx AND userIdx = #{myUserIdx}),
+                                  TO_DATE('1900-01-01','YYYY-MM-DD'))
+            ) AS unreadCount
+        FROM chatRoom cr
+        JOIN chatMember cm ON cr.roomIdx = cm.roomIdx AND cm.userIdx = #{myUserIdx}
+        JOIN chatMember cm2 ON cr.roomIdx = cm2.roomIdx AND cm2.userIdx != #{myUserIdx}
+        JOIN users u ON cm2.userIdx = u.userIdx
+        JOIN userAuthority a ON u.userId = a.userId
+        WHERE cr.roomType = 3
+        AND a.authority IN ('ROLE_ADMIN','ADMIN','ROLE_EMP','EMP')
+        ORDER BY cr.roomIdx DESC
+    </select>
+
+    
+    <insert id="insertChannel" parameterType="map">
+        <selectKey keyProperty="roomIdx" resultType="Long" order="BEFORE">
+            SELECT chatRoomSeq.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO chatRoom(roomIdx, roomType, roomName) VALUES (#{roomIdx}, 2, #{roomName})
+    </insert>
+    <insert id="insertChannelMember" parameterType="map">
+        INSERT INTO chatMember(roomIdx, userIdx) VALUES (#{roomIdx}, #{userIdx})
+    </insert>
+
+    
+
+    
+    <select id="listChannelMembers" resultType="com.sp.app.domain.dto.UserDto">
+        SELECT u.userIdx, u.nickname, u.profile_photo, u.userLevel,
+               NVL(a.authority, '') AS authority
+        FROM chatMember cm
+        JOIN users u ON cm.userIdx = u.userIdx
+        LEFT JOIN userAuthority a ON u.userId = a.userId
+        WHERE cm.roomIdx = #{roomIdx}
+        ORDER BY u.userLevel DESC, u.userIdx ASC
+    </select>
+
+    
+    <select id="listNonMembers" resultType="com.sp.app.domain.dto.UserDto">
+        SELECT u.userIdx, u.nickname, u.profile_photo, u.userLevel,
+               NVL(a.authority, '') AS authority
+        FROM users u
+        LEFT JOIN userAuthority a ON u.userId = a.userId
+        WHERE a.authority IN ('ROLE_ADMIN','ADMIN','ROLE_EMP','EMP')
+        AND u.userIdx NOT IN (
+            SELECT userIdx FROM chatMember WHERE roomIdx = #{roomIdx}
+        )
+        ORDER BY u.userLevel DESC, u.userIdx ASC
+    </select>
+
+    
+    <insert id="addMemberToChannel" parameterType="map">
+        INSERT INTO chatMember(roomIdx, userIdx) VALUES (#{roomIdx}, #{userIdx})
+    </insert>
+
+    
+    <delete id="removeMemberFromChannel">
+        DELETE FROM chatMember WHERE roomIdx = #{roomIdx} AND userIdx = #{userIdx}
+    </delete>
+
+    
+    <delete id="deleteChannelMessages">
+        DELETE FROM chatMessage WHERE roomIdx = #{roomIdx}
+    </delete>
+    <delete id="deleteChannelMembers">
+        DELETE FROM chatMember WHERE roomIdx = #{roomIdx}
+    </delete>
+    <delete id="deleteChannelRoom">
+        DELETE FROM chatRoom WHERE roomIdx = #{roomIdx} AND roomType = 2
+    </delete>
+
+    
+    <update id="renameChannel">
+        UPDATE chatRoom SET roomName = #{roomName}
+        WHERE roomIdx = #{roomIdx} AND roomType = 2
+    </update>
 
 </mapper>
