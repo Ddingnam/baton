@@ -2,14 +2,14 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 
 <aside class="agency-sidebar">
-    <div class="brand-logo" onclick="location.reload()" style="cursor:pointer;">
+    <div class="brand-logo" onclick="location.href='${pageContext.request.contextPath}/admin'" style="cursor:pointer;">
         BATON<span class="dot">.</span>
     </div>
 
     <nav class="nav-wrapper">
         <div class="nav-category">개요</div>
         <div class="nav-box">
-            <a href="${pageContext.request.contextPath}/admin" class="nav-btn active">
+            <a href="${pageContext.request.contextPath}/admin" class="nav-btn" id="nav-dashboard">
                 <div class="nav-content">대시보드</div>
             </a>
         </div>
@@ -104,20 +104,37 @@
     <script>
     (function() {
         var path = window.location.pathname;
+        var ctx  = '${pageContext.request.contextPath}';
+        var adminRoot = ctx + '/admin';
+
+        var matched = false;
+
         document.querySelectorAll('.sub-list .sub-item').forEach(function(link) {
             var href = link.getAttribute('href');
             if (!href) return;
             var hrefPath = href.split('?')[0];
-            if (path === hrefPath || path.startsWith(hrefPath)) {
+            if (path === hrefPath || path.startsWith(hrefPath + '/')) {
                 link.classList.add('active');
                 var parentBox = link.closest('.nav-box');
                 if (parentBox) parentBox.classList.add('open');
+                matched = true;
             }
         });
+
         document.querySelectorAll('.nav-box:not(.has-child) .nav-btn').forEach(function(btn) {
             var href = btn.getAttribute('href');
-            if (href && path === href) btn.classList.add('active');
+            if (!href || href === '#') return;
+            var hrefPath = href.split('?')[0];
+            if (path === hrefPath) {
+                btn.classList.add('active');
+                matched = true;
+            }
         });
+
+        if (!matched && (path === adminRoot || path === adminRoot + '/')) {
+            var dash = document.getElementById('nav-dashboard');
+            if (dash) dash.classList.add('active');
+        }
     })();
     </script>
     <div class="sidebar-foot">

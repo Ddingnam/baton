@@ -45,23 +45,21 @@
 
         <div class="pop-modal noti-modal" id="notiModal">
             <div class="noti-modal-head">
-                <div style="display:flex;align-items:center;gap:8px;">
+                <div style="display:flex;align-items:center;">
                     <span class="noti-modal-title">알림</span>
                     <span class="noti-modal-count" id="notiModalCount" style="display:none;"></span>
                 </div>
-                <div style="display:flex;align-items:center;gap:6px;">
-                    <button class="noti-read-all" id="notiReadAll" title="모두 읽음 처리">
-                        <i class="ri-check-double-line"></i> 모두 읽음
-                    </button>
-                </div>
+                <button class="noti-read-all" id="notiReadAll">
+                    <i class="ri-check-double-line"></i> 모두 읽음
+                </button>
             </div>
             <div class="noti-list" id="notiList"></div>
-            <div class="noti-footer" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 12px;">
+            <div class="noti-footer">
                 <a href="${pageContext.request.contextPath}/admin/notifications" class="noti-all-link">
                     전체 보기 <i class="ri-arrow-right-line"></i>
                 </a>
                 <button onclick="document.getElementById('profileModal').classList.remove('show');document.getElementById('setupTrigger').click();setTimeout(function(){document.querySelector('.fm-nav-item[data-tab=notifications]').click();},100);"
-                    style="border:none;background:none;font-size:12px;color:#94A3B8;cursor:pointer;display:flex;align-items:center;gap:3px;font-weight:600;">
+                    style="border:none;background:var(--base-bg);font-size:11px;color:var(--text-light);cursor:pointer;display:flex;align-items:center;gap:4px;font-weight:700;padding:5px 10px;border-radius:20px;transition:all 0.2s;">
                     <i class="ri-settings-3-line"></i> 알림 설정
                 </button>
             </div>
@@ -321,85 +319,125 @@
 
             <div class="fm-tab" id="tab-notifications">
                 <h2 class="fm-tab-title">알림 설정</h2>
-                <p class="fm-tab-desc">수신할 알림 유형을 선택하고, 알림 방식을 설정합니다.</p>
+                <p class="fm-tab-desc">수신할 알림 유형과 방식을 설정합니다.</p>
 
                 <div class="fm-section">
-                    <p style="font-size:11px;font-weight:700;color:#94A3B8;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px;">수신 유형 설정</p>
+                    <p class="noti-set-section-label">수신 유형</p>
+                    <div class="noti-set-grid">
 
-                    <div class="fm-field">
-                        <label class="fm-label"><i class="ri-error-warning-fill" style="color:#F97316;margin-right:6px;"></i>신규 신고 접수</label>
-                        <div class="fm-toggle-row">
-                            <span class="fm-toggle-desc">커뮤니티·거래 신고 발생 시 알림</span>
+                        <div class="noti-set-card">
+                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#F97316,#EF4444);">
+                                <i class="ri-error-warning-fill"></i>
+                            </div>
+                            <div class="noti-set-info">
+                                <span class="noti-set-name">신규 신고</span>
+                                <span class="noti-set-desc">커뮤니티·거래</span>
+                            </div>
                             <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="REPORT" checked><span class="fm-toggle-track"></span></label>
                         </div>
-                    </div>
-                    <div class="fm-field">
-                        <label class="fm-label"><i class="ri-refund-2-fill" style="color:#7C3AED;margin-right:6px;"></i>환불 요청</label>
-                        <div class="fm-toggle-row">
-                            <span class="fm-toggle-desc">미처리 환불 요청 발생 시 알림</span>
+
+                        <div class="noti-set-card">
+                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#7C3AED,#A855F7);">
+                                <i class="ri-refund-2-fill"></i>
+                            </div>
+                            <div class="noti-set-info">
+                                <span class="noti-set-name">환불 요청</span>
+                                <span class="noti-set-desc">미처리 환불</span>
+                            </div>
                             <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="REFUND" checked><span class="fm-toggle-track"></span></label>
                         </div>
-                    </div>
-                    <div class="fm-field">
-                        <label class="fm-label"><i class="ri-question-answer-fill" style="color:#3B82F6;margin-right:6px;"></i>1:1 문의</label>
-                        <div class="fm-toggle-row">
-                            <span class="fm-toggle-desc">미답변 고객 문의 접수 시 알림</span>
+
+                        <div class="noti-set-card">
+                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#6366F1,#3B82F6);">
+                                <i class="ri-question-answer-fill"></i>
+                            </div>
+                            <div class="noti-set-info">
+                                <span class="noti-set-name">1:1 문의</span>
+                                <span class="noti-set-desc">미답변 문의</span>
+                            </div>
                             <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="INQUIRY" checked><span class="fm-toggle-track"></span></label>
                         </div>
-                    </div>
-                    <div class="fm-field">
-                        <label class="fm-label"><i class="ri-coin-fill" style="color:#3B82F6;margin-right:6px;"></i>결제·충전</label>
-                        <div class="fm-toggle-row">
-                            <span class="fm-toggle-desc">결제 및 포인트 충전 발생 시 알림</span>
+
+                        <div class="noti-set-card">
+                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#6366F1,#3B82F6);">
+                                <i class="ri-coin-fill"></i>
+                            </div>
+                            <div class="noti-set-info">
+                                <span class="noti-set-name">결제·충전</span>
+                                <span class="noti-set-desc">포인트·결제</span>
+                            </div>
                             <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="PAYMENT" checked><span class="fm-toggle-track"></span></label>
                         </div>
-                    </div>
-                    <div class="fm-field">
-                        <label class="fm-label"><i class="ri-chat-3-fill" style="color:#3B82F6;margin-right:6px;"></i>채팅 메시지</label>
-                        <div class="fm-toggle-row">
-                            <span class="fm-toggle-desc">팀 채팅 및 1:1 채팅 메시지 알림</span>
+
+                        <div class="noti-set-card">
+                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#7C3AED,#6366F1);">
+                                <i class="ri-chat-3-fill"></i>
+                            </div>
+                            <div class="noti-set-info">
+                                <span class="noti-set-name">채팅</span>
+                                <span class="noti-set-desc">팀·1:1 채팅</span>
+                            </div>
                             <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="CHAT" checked><span class="fm-toggle-track"></span></label>
                         </div>
-                    </div>
-                    <div class="fm-field">
-                        <label class="fm-label"><i class="ri-user-add-fill" style="color:#10B981;margin-right:6px;"></i>신규 회원 가입</label>
-                        <div class="fm-toggle-row">
-                            <span class="fm-toggle-desc">신규 가입자 발생 시 알림</span>
+
+                        <div class="noti-set-card">
+                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#0EA5E9,#10B981);">
+                                <i class="ri-user-add-fill"></i>
+                            </div>
+                            <div class="noti-set-info">
+                                <span class="noti-set-name">신규 회원</span>
+                                <span class="noti-set-desc">가입자 발생</span>
+                            </div>
                             <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="MEMBER"><span class="fm-toggle-track"></span></label>
                         </div>
-                    </div>
-                    <div class="fm-field">
-                        <label class="fm-label"><i class="ri-task-fill" style="color:#7C3AED;margin-right:6px;"></i>할 일 / 캘린더</label>
-                        <div class="fm-toggle-row">
-                            <span class="fm-toggle-desc">개인 할 일 및 캘린더 메모 알림</span>
+
+                        <div class="noti-set-card">
+                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#7C3AED,#EC4899);">
+                                <i class="ri-task-fill"></i>
+                            </div>
+                            <div class="noti-set-info">
+                                <span class="noti-set-name">할 일·캘린더</span>
+                                <span class="noti-set-desc">일정·메모</span>
+                            </div>
                             <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="TODO" checked><span class="fm-toggle-track"></span></label>
                         </div>
-                    </div>
-                    <div class="fm-field">
-                        <label class="fm-label"><i class="ri-shield-flash-fill" style="color:#F97316;margin-right:6px;"></i>시스템 알림</label>
-                        <div class="fm-toggle-row">
-                            <span class="fm-toggle-desc">서버·점검·오류 등 시스템 알림</span>
+
+                        <div class="noti-set-card">
+                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#F97316,#EF4444);">
+                                <i class="ri-shield-flash-fill"></i>
+                            </div>
+                            <div class="noti-set-info">
+                                <span class="noti-set-name">시스템</span>
+                                <span class="noti-set-desc">서버·점검·오류</span>
+                            </div>
                             <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="SYSTEM" checked><span class="fm-toggle-track"></span></label>
                         </div>
+
                     </div>
                 </div>
 
-                <div class="fm-section" style="margin-top:4px;">
-                    <p style="font-size:11px;font-weight:700;color:#94A3B8;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px;">알림 방식</p>
+                <div class="fm-section" style="margin-top:20px;">
+                    <p class="noti-set-section-label">알림 방식</p>
+                    <div class="noti-method-grid">
 
-                    <div class="fm-field">
-                        <label class="fm-label"><i class="ri-volume-up-fill" style="color:#7C3AED;margin-right:6px;"></i>알림음</label>
-                        <div class="fm-toggle-row">
-                            <span class="fm-toggle-desc">새 알림 도착 시 소리 재생</span>
+                        <div class="noti-method-card">
+                            <div class="noti-method-icon" style="background:linear-gradient(135deg,#7C3AED,#A855F7);">
+                                <i class="ri-volume-up-fill"></i>
+                            </div>
+                            <span class="noti-method-name">알림음</span>
+                            <span class="noti-method-desc">새 알림 도착 시 소리</span>
                             <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="sound"><span class="fm-toggle-track"></span></label>
                         </div>
-                    </div>
-                    <div class="fm-field">
-                        <label class="fm-label"><i class="ri-notification-4-fill" style="color:#7C3AED;margin-right:6px;"></i>브라우저 알림</label>
-                        <div class="fm-toggle-row">
-                            <span class="fm-toggle-desc">탭 밖에서도 팝업 알림 수신 (권한 필요)</span>
+
+                        <div class="noti-method-card">
+                            <div class="noti-method-icon" style="background:linear-gradient(135deg,#7C3AED,#EC4899);">
+                                <i class="ri-notification-4-fill"></i>
+                            </div>
+                            <span class="noti-method-name">브라우저 알림</span>
+                            <span class="noti-method-desc">탭 밖에서도 팝업</span>
                             <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="browser"><span class="fm-toggle-track"></span></label>
                         </div>
+
                     </div>
                 </div>
 
