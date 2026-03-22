@@ -15,9 +15,13 @@
     --shadow: 0 4px 24px rgba(0,0,0,0.06);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+.page-wrap * { box-sizing: border-box; }
 
-body { font-family: 'Noto Sans KR', sans-serif; color: var(--text-main); line-height: 1.5; }
+.page-wrap { 
+	font-family: 'Noto Sans KR', sans-serif; 
+	color: var(--text-main); 
+	line-height: 1.5; 
+}
 
 .header-content {
 	display: flex;
@@ -119,14 +123,14 @@ body { font-family: 'Noto Sans KR', sans-serif; color: var(--text-main); line-he
 
 .field label { display: block; font-size: 14px; font-weight: 600; color: var(--text-sub); margin-bottom: 10px; }
 
-input[type="text"], input[type="number"], select, textarea {
+.page-wrap input[type="text"], .page-wrap input[type="number"], .page-wrap select, .page-wrap textarea {
     width: 100%; padding: 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
     font-size: 15px; outline: none; transition: all .2s;
 }
 
-input:focus, textarea:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 185, 141, 0.15); }
+.page-wrap input:focus, .page-wrap textarea:focus, .page-wrap select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 185, 141, 0.15); }
 
-textarea { resize: vertical; min-height: 400px; }
+.page-wrap textarea { resize: vertical; min-height: 400px; }
 
 .content-count-wrap {
     text-align: right;
@@ -169,7 +173,7 @@ textarea { resize: vertical; min-height: 400px; }
     user-select: none;
 }
 
-input[readonly] {
+.page-wrap input[readonly] {
     background-color: #F2F4F6 !important;
     color: var(--text-muted) !important;
     cursor: not-allowed;
@@ -194,6 +198,17 @@ input[readonly] {
 
 .pill-group input:checked + label, .trade-type-group input:checked + label {
     background: var(--primary-light); border-color: var(--primary); color: var(--primary); font-weight: 700;
+}
+
+.price-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.price-input-wrapper input {
+    flex: 1;
+    min-width: 0;
 }
 
 .custom-dropdown {
@@ -232,13 +247,9 @@ input[readonly] {
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    
-    /* 기본적으로 숨김 */
     display: none; 
     max-height: 250px;
     overflow-y: auto;
-    
-    /* 지도가 카카오맵인 경우 매우 높은 z-index가 필요함 */
     z-index: 999;
 }
 
@@ -265,6 +276,15 @@ input[readonly] {
 .tag-wrap { border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 8px; min-height: 50px; background: white; }
 
 .tag-chip { background: var(--primary-light); color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
 
 #tagInput { border: none !important; box-shadow: none !important; flex: 1; min-width: 100px; background: transparent; }
 
@@ -308,12 +328,12 @@ input[readonly] {
 
 .sticky-side .card:first-child {
     position: relative;
-    z-index: 10; /* 카테고리가 있는 카드 */
+    z-index: 10;
 }
 
 .sticky-side .card:last-child {
     position: relative;
-    z-index: 1; /* 지도가 있는 카드 */
+    z-index: 1;
 }
 
 
@@ -416,4 +436,69 @@ input[readonly] {
 @media (max-width: 992px) {
     .grid-layout { grid-template-columns: 1fr; }
     .submit-container { position: static; margin-top: 20px; }
+}
+
+.tag-outer-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    align-items: center;
+}
+
+.tag-item {
+    display: flex;
+    align-items: center;
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.tag-hash { margin-right: 2px; }
+
+.tag-remove {
+    margin-left: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    opacity: 0.7;
+}
+
+.tag-input-field {
+    border: none !important;
+    outline: none !important;
+    padding: 5px;
+    flex: 1;
+    min-width: 120px;
+}
+
+
+.price-input-wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+}
+
+.price-input-wrapper input {
+    width: 100%;
+    padding-right: 40px !important;
+    height: 48px;
+    text-align: left;
+}
+
+.price-unit {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-main);
+    font-weight: bold;
+    pointer-events: none; 
+    z-index: 10;
 }

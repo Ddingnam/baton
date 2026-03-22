@@ -30,17 +30,18 @@ a {
 }
 
 .trade-main-container {
-    padding-top: 76px;
+	padding-top: 80px;
     background-color: var(--bg-color);
     min-height: 100vh;
-    padding-bottom: 80px;
 }
 
 .trade-hero-section {
     background: #fff;
-    padding: 50px 0;
+    padding: 125px 0;
     border-bottom: 1px solid var(--border-color);
+    opacity: 0;
     animation: fadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    animation-delay: 0.1s;
 }
 
 .hero-inner {
@@ -826,7 +827,6 @@ a {
     .trade-grid { grid-template-columns: 1fr; }
 }
 
-/* AJAX 필터 전환 */
 .tl-product-grid {
     transition: opacity 0.2s ease;
 }
@@ -834,16 +834,3 @@ a {
 .tl-product-grid .trade-card {
     animation: fadeInUp 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
-
-.tl-product-grid .trade-card:nth-child(1)  { animation-delay: 0.03s; }
-.tl-product-grid .trade-card:nth-child(2)  { animation-delay: 0.06s; }
-.tl-product-grid .trade-card:nth-child(3)  { animation-delay: 0.09s; }
-.tl-product-grid .trade-card:nth-child(4)  { animation-delay: 0.12s; }
-.tl-product-grid .trade-card:nth-child(5)  { animation-delay: 0.15s; }
-.tl-product-grid .trade-card:nth-child(6)  { animation-delay: 0.18s; }
-.tl-product-grid .trade-card:nth-child(7)  { animation-delay: 0.21s; }
-.tl-product-grid .trade-card:nth-child(8)  { animation-delay: 0.24s; }
-.tl-product-grid .trade-card:nth-child(9)  { animation-delay: 0.27s; }
-.tl-product-grid .trade-card:nth-child(10) { animation-delay: 0.30s; }
-.tl-product-grid .trade-card:nth-child(11) { animation-delay: 0.33s; }
-.tl-product-grid .trade-card:nth-child(12) { animation-delay: 0.36s; }

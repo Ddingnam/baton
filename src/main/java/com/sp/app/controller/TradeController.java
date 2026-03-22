@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/trade/*")
+//@RequestMapping("/trade/*")
 public class TradeController {
 	private final TradeService service;	
 	private final EscrowService escrowService;
@@ -45,6 +45,7 @@ public class TradeController {
 	@Value("${file.upload-root}/trade")
     private String uploadPath;
 	
+	/*
 	@GetMapping("list")
 	public String list(@RequestParam(value = "page", defaultValue = "1") int current_page,
 	        @RequestParam(value = "keyword", defaultValue = "") String keyword,
@@ -129,14 +130,14 @@ public class TradeController {
 	@GetMapping("listJson")
 	@ResponseBody
 	public Map<String, Object> listJson(
-	        @RequestParam(value = "page",        defaultValue = "1")  int current_page,
-	        @RequestParam(value = "keyword",     defaultValue = "")   String keyword,
-	        @RequestParam(value = "priceMin",    required = false)    String priceMin,
-	        @RequestParam(value = "priceMax",    required = false)    String priceMax,
-	        @RequestParam(value = "available",   required = false)    String available,
-	        @RequestParam(value = "categoryIdx", defaultValue = "")   String categoryIdx,
-	        @RequestParam(value = "sort",        defaultValue = "newest") String sort,
-	        @RequestParam(value = "km",          defaultValue = "1")  double km,
+	        @RequestParam(value = "page", defaultValue = "1")  int current_page,
+	        @RequestParam(value = "keyword", defaultValue = "") String keyword,
+	        @RequestParam(value = "priceMin", required = false) String priceMin,
+	        @RequestParam(value = "priceMax", required = false) String priceMax,
+	        @RequestParam(value = "available", required = false) String available,
+	        @RequestParam(value = "categoryIdx", defaultValue = "") String categoryIdx,
+	        @RequestParam(value = "sort", defaultValue = "newest") String sort,
+	        @RequestParam(value = "km", defaultValue = "1")  double km,
 	        @AuthenticationPrincipal CustomUserDetails userDetails) {
 
 	    Map<String, Object> result = new HashMap<>();
@@ -241,6 +242,7 @@ public class TradeController {
 		return "trade/write";
 	}
 	
+	
 	@PostMapping("write")
 	public String writeSubmit(Trade dto, 
 			@AuthenticationPrincipal CustomUserDetails userDetails) throws Exception{
@@ -251,8 +253,9 @@ public class TradeController {
 		} catch (Exception e) {
 			log.info("writeSubmit : ", e);
 		}
-		return "redirect:/trade/list";
+		return "redirect:/trade/main";
 	}
+	
 	
 	@GetMapping("update")
 	public String updateForm(@RequestParam("productIdx") long productIdx, 
@@ -277,11 +280,13 @@ public class TradeController {
 			
 		} catch (Exception e) {
 			log.info("updateForm : ", e);
-			return "redirect:/trade/list";
+			return "redirect:/trade/main";
 		}
 	}
-	
+	*/
+	/*
 	@PostMapping("update")
+	@ResponseBody
 	public String updateSubmit(Trade dto, 
 			@AuthenticationPrincipal CustomUserDetails userDetails) {
 		try {
@@ -290,14 +295,14 @@ public class TradeController {
 			if (originDto != null && userDetails != null && originDto.getUserIdx() == userDetails.getUserIdx()) {
 	            service.updateTradePost(dto, uploadPath);
 
-	            return "redirect:/trade/article?productIdx=" + dto.getProductIdx();
+	            return "redirect:/api/trade/article/" + dto.getProductIdx();
 	        }
 			
 		} catch (Exception e) {
 			log.info("updateSubmit : ", e);
 		}
 		
-		return "redirect:/trade/list";
+		return "redirect:/trade/main";
 	}
 	
 	@GetMapping("updateData")
@@ -330,6 +335,7 @@ public class TradeController {
 		
 		return "redirect:/trade/list";
 	}
+	
 	
 	@PostMapping("updateStatus")
 	@ResponseBody
@@ -469,4 +475,5 @@ public class TradeController {
         
         return model;
     }
+    */
 }
