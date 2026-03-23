@@ -11,12 +11,16 @@ public interface AdminChatService {
 	public List<ChatRoom> listDMRooms(Long myUserIdx);
 	public Long createChannel(String roomName, Long creatorIdx);
 
-    
 	public List<ChatRoom> listAllChannels(Long myUserIdx);
-	public List<UserDto> listChannelMembers(Long roomIdx);
-	public List<UserDto> listNonMembers(Long roomIdx);
+	public List<UserDto>  listChannelMembers(Long roomIdx);
+	public List<UserDto>  listNonMembers(Long roomIdx);
 	public void addMemberToChannel(Long roomIdx, Long userIdx);
 	public void removeMemberFromChannel(Long roomIdx, Long userIdx);
 	public void deleteChannel(Long roomIdx);
 	public void renameChannel(Long roomIdx, String newName);
+
+	public Long getChannelCreator(Long roomIdx);
+	public void leaveChannel(Long roomIdx, Long userIdx);
+	public int  toggleMute(Long roomIdx, Long userIdx);
+	public void transferOwnership(Long roomIdx, Long newOwnerIdx);
 }

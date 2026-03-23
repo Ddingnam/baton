@@ -636,6 +636,51 @@ ul, li { list-style: none; }
 .chat-entry-btn:hover { background: var(--grad-primary); color: white; transform: translateY(-1px); box-shadow: var(--shadow-glow); }
 .chat-entry-btn.active { background: var(--grad-primary); color: white; box-shadow: var(--shadow-glow); }
 .chat-entry-btn.active .chat-unread-badge { background: rgba(255,255,255,0.3); color: white; }
+
+.channel-item-actions {
+    display: none;
+    align-items: center;
+    gap: 2px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+.chat-room-item:hover .channel-item-actions { display: flex; }
+.chat-room-item.active .channel-item-actions { display: flex; }
+
+.channel-mute-btn {
+    width: 26px; height: 26px;
+    border-radius: 6px; border: none;
+    background: none; color: var(--text-light);
+    font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.15s;
+    opacity: 0;
+}
+.chat-room-item:hover .channel-mute-btn,
+.chat-room-item.active .channel-mute-btn { opacity: 1; }
+.chat-room-item:not(.active) .channel-mute-btn:hover { background: none; color: var(--color-purple); }
+.chat-room-item.active .channel-mute-btn:hover { background: none; color: #fff; }
+.channel-mute-btn.muted { color: var(--color-orange); opacity: 1; }
+.chat-room-item.active .channel-mute-btn.muted { color: #FFD580; }
+
+.transfer-member-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px;
+    border: 1.5px solid var(--border-color);
+    cursor: pointer; transition: all 0.15s;
+}
+.transfer-member-row:hover { border-color: var(--color-purple); background: var(--color-purple-light); }
+.transfer-member-row.selected { border-color: var(--color-purple); background: var(--color-purple-light); }
+
+.settings-action-btn {
+    flex: 1; padding: 11px 0; border-radius: 10px;
+    border: 1.5px solid var(--border-color);
+    background: var(--card-bg); color: var(--text-sub);
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.2s;
+}
 .chat-unread-badge {
     position: absolute;
     right: 12px;

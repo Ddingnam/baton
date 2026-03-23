@@ -59,11 +59,17 @@
                             <c:if test="${room.unreadCount > 0}">
                                 <span class="chat-room-badge" id="badge-${room.roomIdx}">${room.unreadCount}</span>
                             </c:if>
-                            <c:if test="${myUserLevel >= 99}">
-                                <button class="channel-manage-btn" data-roomidx="${room.roomIdx}" data-roomname="${room.roomName}" title="채널 관리">
-                                    <i class="ri-settings-3-line"></i>
+                            <div class="channel-item-actions">
+                                <button class="channel-mute-btn" data-roomidx="${room.roomIdx}" title="알림 끄기/켜기"
+                                        onclick="event.stopPropagation(); toggleMuteInline(${room.roomIdx}, this)">
+                                    <i class="ri-notification-3-line"></i>
                                 </button>
-                            </c:if>
+                                <c:if test="${myUserLevel >= 99}">
+                                    <button class="channel-manage-btn" data-roomidx="${room.roomIdx}" data-roomname="${room.roomName}" title="채널 관리">
+                                        <i class="ri-settings-3-line"></i>
+                                    </button>
+                                </c:if>
+                            </div>
                         </div>
                     </c:forEach>
                 </div>
@@ -310,22 +316,41 @@
                 <div id="nonMemberList" style="display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;"></div>
             </div>
             
-            <div id="manageTabSettings" style="padding:16px 20px;display:none;">
-                <label class="chat-modal-label">채널 이름 변경</label>
-                <div class="chat-modal-input-wrap" style="margin-bottom:16px;">
-                    <i class="ri-hashtag"></i>
-                    <input type="text" id="renameChannelInput" class="chat-modal-input" placeholder="새 채널 이름" maxlength="30">
-                </div>
-                <button onclick="doRenameChannel()" style="width:100%;padding:10px;border-radius:10px;border:none;background:var(--grad-primary);color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:20px;font-family:inherit;">
-                    이름 변경
-                </button>
-                <div style="border-top:1px solid var(--border-color);padding-top:16px;">
-                    <p style="font-size:13px;font-weight:700;color:#EF4444;margin-bottom:8px;">위험 구역</p>
-                    <p style="font-size:12px;color:var(--text-light);margin-bottom:12px;">채널을 삭제하면 모든 메시지와 멤버 정보가 영구 삭제됩니다.</p>
-                    <button onclick="doDeleteChannel()" style="width:100%;padding:10px;border-radius:10px;border:1.5px solid #FEE2E2;background:#FEF2F2;color:#EF4444;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">
-                        <i class="ri-delete-bin-line"></i> 채널 삭제
+            <div id="manageTabSettings" style="padding:20px;display:none;">
+
+                <p style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light);margin-bottom:12px;">채널 이름 변경</p>
+                <div style="display:flex;gap:8px;margin-bottom:20px;">
+                    <div class="chat-modal-input-wrap" style="flex:1;margin:0;">
+                        <i class="ri-hashtag"></i>
+                        <input type="text" id="renameChannelInput" class="chat-modal-input" placeholder="새 채널 이름" maxlength="30">
+                    </div>
+                    <button onclick="doRenameChannel()" style="padding:0 18px;border-radius:10px;border:none;background:var(--grad-primary);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;">
+                        변경
                     </button>
                 </div>
+
+                <p style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light);margin-bottom:12px;">내 설정</p>
+                <div style="display:flex;gap:8px;margin-bottom:20px;">
+                    <button id="muteToggleBtn" onclick="doToggleMute()"
+                        class="settings-action-btn"
+                        onmouseover="this.style.background='var(--grad-primary)';this.style.color='#fff';this.style.borderColor='transparent';"
+                        onmouseout="this.style.background='';this.style.color='';this.style.borderColor='';">
+                        <i class="ri-notification-3-line" style="font-size:16px;"></i> 알림 끄기
+                    </button>
+                    <button onclick="doLeaveChannel()"
+                        class="settings-action-btn"
+                        onmouseover="this.style.background='var(--grad-primary)';this.style.color='#fff';this.style.borderColor='transparent';"
+                        onmouseout="this.style.background='';this.style.color='';this.style.borderColor='';">
+                        <i class="ri-logout-box-r-line" style="font-size:16px;"></i> 나가기
+                    </button>
+                </div>
+
+                <p style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light);margin-bottom:12px;">위험 구역</p>
+                <button onclick="doDeleteChannel()" class="settings-action-btn" style="width:100%;"
+                    onmouseover="this.style.background='#FEF2F2';this.style.color='#EF4444';this.style.borderColor='#FCA5A5';"
+                    onmouseout="this.style.background='';this.style.color='';this.style.borderColor='';">
+                    <i class="ri-delete-bin-line"></i> 채널 삭제
+                </button>
             </div>
         </div>
     </div>
@@ -417,6 +442,33 @@
                     </c:if>
                 </c:forEach>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="chat-modal-overlay" id="transferOwnerOverlay" style="display:none;z-index:100000;">
+    <div class="chat-modal" style="width:400px;">
+        <div class="chat-modal-head">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <i class="ri-user-shared-fill" style="color:var(--color-purple);font-size:18px;"></i>
+                <span style="font-size:15px;font-weight:800;">방장 위임 후 나가기</span>
+            </div>
+            <button class="chat-modal-close" onclick="document.getElementById('transferOwnerOverlay').style.display='none'">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        <div class="chat-modal-body">
+            <p style="font-size:13px;color:var(--text-sub);font-weight:500;margin-bottom:16px;">
+                새 방장을 선택해 주세요. 위임 후 채널에서 나가게 됩니다.
+            </p>
+            <div id="transferMemberList" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;margin-bottom:20px;"></div>
+        </div>
+        <div class="chat-modal-actions">
+            <button class="chat-modal-cancel" onclick="document.getElementById('transferOwnerOverlay').style.display='none'">취소</button>
+            <button class="chat-modal-confirm" onclick="doTransferAndLeave()"
+                    onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity=''">
+                <i class="ri-user-shared-line"></i> 위임하고 나가기
+            </button>
         </div>
     </div>
 </div>

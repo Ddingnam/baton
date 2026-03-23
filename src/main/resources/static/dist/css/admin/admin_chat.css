@@ -598,8 +598,9 @@
     font-size: 14px; opacity: 0; flex-shrink: 0; transition: all 0.2s var(--spring);
 }
 .chat-room-item:hover .channel-manage-btn { opacity: 1; }
-.channel-manage-btn:hover { transform: scale(1.15) rotate(20deg); color: white; }
+.chat-room-item:not(.active) .channel-manage-btn:hover { transform: scale(1.15) rotate(20deg); color: var(--color-purple); }
 .chat-room-item.active .channel-manage-btn { color: rgba(255,255,255,0.7); }
+.chat-room-item.active .channel-manage-btn:hover { transform: scale(1.15) rotate(20deg); color: #fff; }
 
 .manage-member-row {
     display: flex; align-items: center; gap: 10px;

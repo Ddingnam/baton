@@ -19,17 +19,11 @@ public class AdminChatServiceImpl implements AdminChatService {
 
     @Override
     public List<ChatRoom> listAdminRooms(Long myUserIdx, int myUserLevel) {
-        
-        if (myUserLevel >= 99) {
-            return mapper.listAllChannels(myUserIdx);
-        }
+        if (myUserLevel >= 99) return mapper.listAllChannels(myUserIdx);
         return mapper.listMyChannels(myUserIdx);
     }
 
-    @Override
-    public List<UserDto> listAdminMembers() {
-        return mapper.listAdminMembers();
-    }
+    @Override public List<UserDto> listAdminMembers() { return mapper.listAdminMembers(); }
 
     @Override
     public Long createOrGetDMRoom(Long userIdxA, Long userIdxB) {
@@ -38,11 +32,9 @@ public class AdminChatServiceImpl implements AdminChatService {
             Map<String, Object> map = new HashMap<>();
             mapper.insertDMRoom(map);
             roomIdx = (Long) map.get("roomIdx");
-
             Map<String, Object> m1 = new HashMap<>();
             m1.put("roomIdx", roomIdx); m1.put("userIdx", userIdxA);
             mapper.insertDMRoomMember(m1);
-
             Map<String, Object> m2 = new HashMap<>();
             m2.put("roomIdx", roomIdx); m2.put("userIdx", userIdxB);
             mapper.insertDMRoomMember(m2);
@@ -50,42 +42,25 @@ public class AdminChatServiceImpl implements AdminChatService {
         return roomIdx;
     }
 
-    @Override
-    public List<ChatRoom> listDMRooms(Long myUserIdx) {
-        return mapper.listDMRooms(myUserIdx);
-    }
+    @Override public List<ChatRoom> listDMRooms(Long myUserIdx) { return mapper.listDMRooms(myUserIdx); }
 
     @Override
     public Long createChannel(String roomName, Long creatorIdx) {
         Map<String, Object> map = new HashMap<>();
-        map.put("roomName", roomName);
+        map.put("roomName",    roomName);
+        map.put("creatorIdx",  creatorIdx);
         mapper.insertChannel(map);
         Long roomIdx = (Long) map.get("roomIdx");
-
-        
         Map<String, Object> m = new HashMap<>();
         m.put("roomIdx", roomIdx);
         m.put("userIdx", creatorIdx);
         mapper.insertChannelMember(m);
-
         return roomIdx;
     }
 
-    
-    @Override
-    public List<ChatRoom> listAllChannels(Long myUserIdx) {
-        return mapper.listAllChannels(myUserIdx);
-    }
-
-    @Override
-    public List<UserDto> listChannelMembers(Long roomIdx) {
-        return mapper.listChannelMembers(roomIdx);
-    }
-
-    @Override
-    public List<UserDto> listNonMembers(Long roomIdx) {
-        return mapper.listNonMembers(roomIdx);
-    }
+    @Override public List<ChatRoom> listAllChannels(Long myUserIdx)    { return mapper.listAllChannels(myUserIdx); }
+    @Override public List<UserDto>  listChannelMembers(Long roomIdx)   { return mapper.listChannelMembers(roomIdx); }
+    @Override public List<UserDto>  listNonMembers(Long roomIdx)       { return mapper.listNonMembers(roomIdx); }
 
     @Override
     public void addMemberToChannel(Long roomIdx, Long userIdx) {
@@ -95,10 +70,7 @@ public class AdminChatServiceImpl implements AdminChatService {
         mapper.addMemberToChannel(map);
     }
 
-    @Override
-    public void removeMemberFromChannel(Long roomIdx, Long userIdx) {
-        mapper.removeMemberFromChannel(roomIdx, userIdx);
-    }
+    @Override public void removeMemberFromChannel(Long roomIdx, Long userIdx) { mapper.removeMemberFromChannel(roomIdx, userIdx); }
 
     @Override
     public void deleteChannel(Long roomIdx) {
@@ -107,8 +79,19 @@ public class AdminChatServiceImpl implements AdminChatService {
         mapper.deleteChannelRoom(roomIdx);
     }
 
+    @Override public void renameChannel(Long roomIdx, String newName) { mapper.renameChannel(roomIdx, newName); }
+
+    @Override public Long getChannelCreator(Long roomIdx) { return mapper.getChannelCreator(roomIdx); }
+
+    @Override public void leaveChannel(Long roomIdx, Long userIdx) { mapper.leaveChannel(roomIdx, userIdx); }
+
     @Override
-    public void renameChannel(Long roomIdx, String newName) {
-        mapper.renameChannel(roomIdx, newName);
+    public int toggleMute(Long roomIdx, Long userIdx) {
+        int current = mapper.getMuted(roomIdx, userIdx);
+        int next    = (current == 0) ? 1 : 0;
+        mapper.setMuted(roomIdx, userIdx, next);
+        return next;
     }
+
+    @Override public void transferOwnership(Long roomIdx, Long newOwnerIdx) { mapper.transferOwnership(roomIdx, newOwnerIdx); }
 }

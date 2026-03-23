@@ -544,12 +544,14 @@
 (function() {
     if (typeof CHAT_MY_LEVEL === 'undefined' || CHAT_MY_LEVEL < 99) return;
 
-    var manageRoomIdx  = null;
-    var manageRoomName = null;
+    var manageRoomIdx    = null;
+    var manageRoomName   = null;
+    var manageCreatorIdx = null;
 
     function openManageModal(roomIdx, roomName) {
-        manageRoomIdx  = roomIdx;
-        manageRoomName = roomName;
+        manageRoomIdx    = roomIdx;
+        manageRoomName   = roomName;
+        manageCreatorIdx = null;
         document.getElementById('manageChannelName').textContent = '# ' + roomName;
         document.getElementById('renameChannelInput').value = roomName;
         switchManageTab('members');
@@ -597,6 +599,7 @@
                     if (nonEl)     nonEl.innerHTML     = '';
                     return;
                 }
+                manageCreatorIdx = d.creatorIdx || null;
                 renderCurrentMembers(d.members, roomIdx);
                 renderNonMembers(d.nonMembers, roomIdx);
             })
@@ -617,16 +620,20 @@
             el.innerHTML = '<p style="font-size:12px;color:var(--text-light);padding:8px 0;">멤버가 없습니다</p>';
             return;
         }
+        var amICreator = (manageCreatorIdx !== null && manageCreatorIdx === CHAT_MY_IDX);
         el.innerHTML = members.map(function(m) {
-            var isSuper = m.userLevel >= 99;
+            var isCreator = (manageCreatorIdx !== null && m.userIdx === manageCreatorIdx);
+            var isMe      = (m.userIdx === CHAT_MY_IDX);
+            var badge     = isCreator ? '<span class="manage-member-lv99">방장</span>' : (m.userLevel >= 99 ? '<span class="manage-member-lv99">ADMIN</span>' : '');
+            var kickBtn   = (amICreator && !isCreator)
+                ? '<button class="manage-member-action remove" onclick="removeMember(' + roomIdx + ',' + m.userIdx + ')" title="강퇴"><i class="ri-user-unfollow-line"></i></button>'
+                : '';
             return '<div class="manage-member-row">'
                 + avt(m.nickname)
-                + '<span class="manage-member-name">' + esc(m.nickname) + '</span>'
-                + (isSuper ? '<span class="manage-member-lv99">SUPER</span>' : '')
+                + '<span class="manage-member-name">' + esc(m.nickname) + (isMe ? ' <span style="font-size:10px;color:var(--text-light)">(나)</span>' : '') + '</span>'
+                + badge
                 + '<span class="manage-member-role">' + esc(m.authority || '') + '</span>'
-                + (!isSuper
-                    ? '<button class="manage-member-action remove" onclick="removeMember(' + roomIdx + ',' + m.userIdx + ')" title="제거"><i class="ri-close-line"></i></button>'
-                    : '')
+                + kickBtn
                 + '</div>';
         }).join('');
     }
@@ -688,18 +695,176 @@
         customConfirm({
             icon: '<i class="ri-user-unfollow-fill" style="color:#fff;"></i>',
             iconBg: 'linear-gradient(135deg,#F97316,#EF4444)',
-            title: '멤버 제거',
-            desc: '이 멤버를 채널에서 제거하시겠습니까?',
-            okLabel: '제거',
+            title: '멤버 강퇴',
+            desc: '이 멤버를 채널에서 강퇴하시겠습니까?',
+            okLabel: '강퇴',
             okBg: '#EF4444'
         }, function() {
             fetch(CHAT_CTX + '/admin/chat/channel/' + roomIdx + '/member/remove', {
                 method: 'POST', credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
                 body: 'userIdx=' + userIdx
             }).then(function(r) { return r.json(); }).then(function(d) {
-                if (d.success) loadChannelMembers(roomIdx);
+                if (d.success) {
+                    loadChannelMembers(roomIdx);
+                    if (typeof showToast === 'function') showToast('멤버를 강퇴했습니다.', 'success');
+                } else {
+                    if (typeof showToast === 'function') showToast(d.msg || '강퇴에 실패했습니다.', 'error');
+                }
             });
+        });
+    };
+
+    window.doLeaveChannel = function() {
+        if (!manageRoomIdx) return;
+
+        var isCreator = (manageCreatorIdx !== null && manageCreatorIdx === CHAT_MY_IDX);
+
+        if (isCreator) {
+            // 방장이면 위임 모달 먼저
+            openTransferModal();
+            return;
+        }
+
+        // 일반 멤버 나가기
+        customConfirm({
+            icon: '<i class="ri-logout-box-r-line" style="color:#fff;"></i>',
+            iconBg: 'linear-gradient(135deg,#64748B,#334155)',
+            title: '채널 나가기',
+            desc: '채널에서 나가면 다시 초대받아야 합니다.',
+            okLabel: '나가기',
+            okBg: '#475569'
+        }, function() {
+            fetch(CHAT_CTX + '/admin/chat/channel/' + manageRoomIdx + '/leave', {
+                method: 'POST', credentials: 'same-origin',
+                headers: { 'Accept': 'application/json' }
+            }).then(function(r) { return r.json(); }).then(function(d) {
+                if (d.success) {
+                    var item = document.querySelector('.channel-item[data-roomidx="' + manageRoomIdx + '"]');
+                    if (item) item.remove();
+                    closeManageModal();
+                    if (manageRoomIdx === CHAT_ROOM_IDX) window.location.href = CHAT_CTX + '/admin/chat';
+                } else {
+                    if (typeof showToast === 'function') showToast(d.msg || '나가기에 실패했습니다.', 'error');
+                }
+            });
+        });
+    };
+
+    // 방장 위임 모달 열기
+    function openTransferModal() {
+        var overlay = document.getElementById('transferOwnerOverlay');
+        var list    = document.getElementById('transferMemberList');
+        if (!overlay || !list) return;
+
+        // 현재 멤버 목록 렌더 (본인 제외)
+        var rows = document.querySelectorAll('#currentMemberList .manage-member-row');
+        var html = '';
+        rows.forEach(function(row) {
+            var nameEl = row.querySelector('.manage-member-name');
+            var name   = nameEl ? nameEl.textContent.replace('(나)', '').trim() : '';
+            var btn    = row.querySelector('.manage-member-action.remove');
+            if (!btn) return; // 본인(강퇴버튼 없는) 제외
+            var userIdx = btn.getAttribute('onclick').match(/removeMember\(\d+,(\d+)\)/);
+            if (!userIdx) return;
+            var uid = userIdx[1];
+            html += '<div class="transfer-member-row" onclick="selectTransferMember(' + uid + ', this)">'
+                  + '<div class="manage-member-avt">' + name.substring(0,2) + '</div>'
+                  + '<span style="font-size:13px;font-weight:600;color:var(--text-main);">' + name + '</span>'
+                  + '<i class="ri-checkbox-blank-circle-line" style="margin-left:auto;font-size:18px;color:var(--text-light);"></i>'
+                  + '</div>';
+        });
+
+        if (!html) {
+            if (typeof showToast === 'function') showToast('위임할 다른 멤버가 없습니다. 채널을 삭제해 주세요.', 'error');
+            return;
+        }
+
+        list.innerHTML = html;
+        overlay.style.display = 'flex';
+        window._selectedTransferUserIdx = null;
+    }
+
+    window.selectTransferMember = function(userIdx, rowEl) {
+        document.querySelectorAll('.transfer-member-row').forEach(function(r) {
+            r.classList.remove('selected');
+            var ico = r.querySelector('i');
+            if (ico) ico.className = 'ri-checkbox-blank-circle-line';
+            ico.style.color = 'var(--text-light)';
+        });
+        rowEl.classList.add('selected');
+        var ico = rowEl.querySelector('i');
+        if (ico) { ico.className = 'ri-checkbox-circle-fill'; ico.style.color = 'var(--color-purple)'; }
+        window._selectedTransferUserIdx = userIdx;
+    };
+
+    window.doTransferAndLeave = function() {
+        var newOwner = window._selectedTransferUserIdx;
+        if (!newOwner) {
+            if (typeof showToast === 'function') showToast('위임할 멤버를 선택해 주세요.', 'error');
+            return;
+        }
+        // 1. 방장 위임
+        fetch(CHAT_CTX + '/admin/chat/channel/' + manageRoomIdx + '/transfer', {
+            method: 'POST', credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+            body: 'newOwnerIdx=' + newOwner
+        }).then(function(r) { return r.json(); }).then(function(d) {
+            if (!d.success) {
+                if (typeof showToast === 'function') showToast(d.msg || '위임에 실패했습니다.', 'error');
+                return;
+            }
+            // 2. 나가기
+            return fetch(CHAT_CTX + '/admin/chat/channel/' + manageRoomIdx + '/leave', {
+                method: 'POST', credentials: 'same-origin',
+                headers: { 'Accept': 'application/json' }
+            });
+        }).then(function(r) { return r && r.json(); }).then(function(d) {
+            if (d && d.success) {
+                document.getElementById('transferOwnerOverlay').style.display = 'none';
+                var item = document.querySelector('.channel-item[data-roomidx="' + manageRoomIdx + '"]');
+                if (item) item.remove();
+                closeManageModal();
+                if (manageRoomIdx === CHAT_ROOM_IDX) window.location.href = CHAT_CTX + '/admin/chat';
+            }
+        });
+    };
+
+    window.doToggleMute = function() {
+        if (!manageRoomIdx) return;
+        fetch(CHAT_CTX + '/admin/chat/channel/' + manageRoomIdx + '/mute', {
+            method: 'POST', credentials: 'same-origin',
+            headers: { 'Accept': 'application/json' }
+        }).then(function(r) { return r.json(); }).then(function(d) {
+            if (d.success) {
+                var isMuted = d.isMuted === 1;
+                var btn = document.getElementById('muteToggleBtn');
+                if (btn) {
+                    btn.innerHTML = (isMuted ? '<i class="ri-notification-off-line" style="font-size:16px;"></i> 알림 켜기' : '<i class="ri-notification-3-line" style="font-size:16px;"></i> 알림 끄기');
+                    btn.style.color      = isMuted ? 'var(--color-orange)' : 'var(--text-sub)';
+                    btn.style.borderColor = isMuted ? 'var(--color-orange)' : 'var(--border-color)';
+                }
+                var inlineBtn = document.querySelector('.channel-mute-btn[data-roomidx="' + manageRoomIdx + '"]');
+                if (inlineBtn) {
+                    inlineBtn.innerHTML = isMuted ? '<i class="ri-notification-off-line"></i>' : '<i class="ri-notification-3-line"></i>';
+                    inlineBtn.classList.toggle('muted', isMuted);
+                }
+                if (typeof showToast === 'function') showToast(isMuted ? '알림이 꺼졌습니다.' : '알림이 켜졌습니다.', 'info');
+            }
+        });
+    };
+
+    window.toggleMuteInline = function(roomIdx, btnEl) {
+        fetch(CHAT_CTX + '/admin/chat/channel/' + roomIdx + '/mute', {
+            method: 'POST', credentials: 'same-origin',
+            headers: { 'Accept': 'application/json' }
+        }).then(function(r) { return r.json(); }).then(function(d) {
+            if (d.success) {
+                var isMuted = d.isMuted === 1;
+                btnEl.innerHTML = isMuted ? '<i class="ri-notification-off-line"></i>' : '<i class="ri-notification-3-line"></i>';
+                btnEl.classList.toggle('muted', isMuted);
+                if (typeof showToast === 'function') showToast(isMuted ? '알림이 꺼졌습니다.' : '알림이 켜졌습니다.', 'info');
+            }
         });
     };
 
