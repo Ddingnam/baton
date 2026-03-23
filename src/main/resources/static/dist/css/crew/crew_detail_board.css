@@ -1,0 +1,295 @@
+@charset "UTF-8";
+
+/* ==============================================
+   Crew Board (cdb-) 전용 스타일
+   ============================================== */
+.cdb-container { padding: 32px; min-height: 600px; }
+
+/* --- 1. 통합 메인 헤더 --- */
+/* 1. 헤더 카드: 하단 여백을 주어 본문과 분리 */
+.cdb-header-card {
+    padding: 24px 32px;
+    margin-bottom: 20px; /* 💡 두 카드 사이의 간격 */
+    border-radius: 24px;
+}
+
+/* 2. 본문 카드: 헤더와 독립된 느낌 강조 */
+.cdb-content-card {
+    padding: 32px;
+    min-height: 500px;
+    border-radius: 24px;
+}
+
+/* 3. 헤더 내부 스타일 미세 조정 (카드가 분리되었으므로 보더 제거) */
+.cdb-main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: none; /* 💡 카드가 나뉘었으므로 구분선 제거 */
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* 4. 브레드크럼 위치 조정 */
+.cdb-breadcrumb {
+    display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700;
+    color: var(--text-sub); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.cdb-breadcrumb i { font-size: 14px; }
+.cdb-breadcrumb strong { color: var(--crew-pink); }
+.cdb-header-title { font-size: 26px; font-weight: 900; color: #191F28; margin: 0; }
+.cdb-header-right { display: flex; align-items: center; gap: 12px; }
+
+/* 검색바 및 공통 버튼 */
+.cdb-search-wrapper {
+    position: relative; background: rgba(0, 0, 0, 0.03); border-radius: 14px;
+    padding: 10px 16px; display: flex; align-items: center; gap: 8px; border: 1px solid transparent; transition: 0.3s;
+}
+.cdb-search-wrapper:focus-within { background: #fff; border-color: var(--crew-pink); box-shadow: 0 8px 20px rgba(248, 109, 125, 0.1); }
+.cdb-search-wrapper i { color: var(--text-sub); font-size: 18px; }
+.cdb-search-wrapper input { border: none; background: transparent; outline: none; font-size: 14px; font-weight: 600; width: 180px; }
+
+.cdb-btn-primary {
+    background: #191F28; color: #fff; padding: 12px 20px; border-radius: 14px;
+    font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer;
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: none;
+}
+.cdb-btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); background: var(--crew-pink); }
+
+.cdb-btn-outline {
+    background: #fff; color: #4E5968; border: 1px solid rgba(0,0,0,0.08);
+    padding: 12px 20px; border-radius: 14px; font-weight: 700; display: flex;
+    align-items: center; gap: 6px; cursor: pointer; transition: 0.2s;
+}
+.cdb-btn-outline:hover { background: #f8f9fa; color: #191F28; }
+
+/* --- 2. 리스트 뷰 --- */
+.cdb-list { display: flex; flex-direction: column; gap: 8px; }
+.cdb-list-header { 
+    display: flex; padding: 14px 20px; background: rgba(0,0,0,0.03); 
+    border-radius: 14px; font-size: 13px; font-weight: 700; color: var(--text-sub); 
+}
+.cdb-list-item { 
+    display: flex; align-items: center; padding: 18px 20px; 
+    background: rgba(255, 255, 255, 0.5); border-radius: 18px; 
+    border: 1px solid rgba(255, 255, 255, 0.8); cursor: pointer; 
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+}
+.cdb-list-item:hover { 
+    background: #ffffff; border-color: var(--crew-pink); 
+    transform: translateY(-4px); box-shadow: 0 12px 25px rgba(0,0,0,0.05); 
+}
+.col-id { flex: 0 0 55px; text-align: center; color: var(--text-sub); font-size: 13px; }
+.col-title { flex: 1; font-weight: 700; color: #191F28; padding: 0 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; }
+.col-author { flex: 0 0 100px; text-align: center; font-size: 14px; color: #4E5968; font-weight: 600; }
+.col-date { flex: 0 0 90px; text-align: center; font-size: 13px; color: var(--text-sub); }
+.col-view { flex: 0 0 55px; text-align: center; font-size: 13px; color: var(--text-sub); }
+
+.cdb-badge-notice { background: var(--crew-pink); color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 6px; margin-right: 8px; font-weight: 800; }
+.cdb-comment-count { color: var(--crew-pink); font-size: 13px; font-weight: 800; margin-left: 5px; }
+.cd-no-data { padding: 60px 0; text-align: center; color: var(--text-sub); font-weight: 600; background: rgba(255,255,255,0.4); border-radius: 16px; border: 1px dashed rgba(0,0,0,0.1); }
+
+/* --- 3. 상세 뷰 --- */
+.cdb-detail-nav { display: flex; justify-content: flex-end; margin-bottom: 25px; }
+.cdb-detail-actions { display: flex; gap: 15px; }
+.cdb-text-btn { background: none; border: none; font-size: 14px; font-weight: 700; color: var(--text-sub); cursor: pointer; transition: 0.2s; }
+.cdb-text-btn:hover { color: #191F28; }
+.cdb-text-btn.danger:hover { color: var(--crew-pink); }
+
+.cdb-post-head { margin-bottom: 30px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 20px; }
+.cdb-post-head h2 { font-size: 24px; font-weight: 800; color: #191F28; margin-bottom: 15px; }
+.cdb-post-meta { display: flex; gap: 18px; font-size: 14px; font-weight: 600; color: #4E5968; }
+.cdb-post-meta span { display: flex; align-items: center; gap: 5px; }
+
+.cdb-post-body { font-size: 16px; line-height: 1.8; color: #191F28; min-height: 300px; margin-bottom: 40px; }
+
+/* 댓글 영역 */
+.cdb-comment-area h4 { font-size: 17px; font-weight: 800; margin-bottom: 20px; }
+.cdb-comment-area h4 span { color: var(--crew-pink); }
+.cdb-comment-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
+.cdb-comment-item { padding: 16px 20px; background: rgba(255,255,255,0.4); border-radius: 16px; border: 1px solid rgba(255,255,255,0.7); }
+.cdb-comment-info { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.cdb-comment-info strong { font-size: 14px; font-weight: 700; color: #191F28; }
+.cdb-comment-info span { font-size: 12px; color: var(--text-sub); font-weight: 600; }
+.cdb-comment-item p { font-size: 14px; color: #4E5968; margin: 0; line-height: 1.5; }
+
+.cdb-comment-form { display: flex; gap: 10px; background: #fff; padding: 10px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.05); }
+.cdb-comment-form input { flex: 1; border: none; outline: none; padding: 0 10px; font-size: 14px; font-weight: 500; }
+.cdb-comment-form button { width: 44px; height: 44px; background: #191F28; color: #fff; border: none; border-radius: 12px; cursor: pointer; transition: 0.3s; }
+.cdb-comment-form button:hover { background: var(--crew-pink); transform: scale(1.05); }
+
+/* --- 4. 작성 뷰 --- */
+.cdb-form { display: flex; flex-direction: column; gap: 20px; }
+
+.cdb-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    color: #4E5968;
+    user-select: none;
+}
+.cdb-checkbox-label input { display: none; }
+.cdb-check-custom { width: 20px; height: 20px; border: 2px solid rgba(0,0,0,0.1); border-radius: 6px; position: relative; transition: 0.2s; background: #fff; }
+.cdb-checkbox-label input:checked + .cdb-check-custom { background: var(--crew-pink); border-color: var(--crew-pink); }
+.cdb-checkbox-label input:checked + .cdb-check-custom::after { content: '✔'; color: #fff; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+.cdb-select-wrapper { position: relative; width: 140px; }
+.cdb-select { width: 100%; padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08); background: rgba(255,255,255,0.8); font-size: 13px; font-weight: 700; color: #191F28; cursor: pointer; appearance: none; -webkit-appearance: none; }
+.cdb-select-wrapper i { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-sub); }
+
+.cdb-input, .cdb-textarea { width: 100%; border-radius: 16px; border: 1px solid rgba(0,0,0,0.08); background: rgba(255,255,255,0.8); padding: 16px 20px; font-size: 15px; outline: none; transition: 0.3s; font-family: inherit; }
+.cdb-input:focus, .cdb-textarea:focus { border-color: var(--crew-pink); background: #fff; box-shadow: 0 0 0 4px rgba(248, 109, 125, 0.1); }
+.cdb-textarea { height: 350px; resize: vertical; line-height: 1.6; }
+.cdb-form-btns {
+    display: flex;
+    align-items: center; /* 💡 체크박스와 버튼들의 수평 정렬을 맞춤 */
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* --- 5. 화면 전환 애니메이션 (0.15s) --- */
+.cdb-fade-enter-active, .cdb-fade-leave-active { transition: all 0.15s ease-out; }
+.cdb-fade-enter-from { opacity: 0; transform: translateY(10px); }
+.cdb-fade-leave-to { opacity: 0; transform: translateY(-10px); }
+
+/* ==============================================
+   Quill Editor Custom Design (cdb-quill)
+   ============================================== */
+
+/* 1. 에디터 전체 컨테이너 (툴바 + 편집영역) */
+.cdb-form-item .quill-editor {
+    border: none !important;
+}
+
+/* 2. 상단 툴바 디자인 */
+.ql-toolbar.ql-snow {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-radius: 16px 16px 0 0; /* 상단만 둥글게 */
+    padding: 10px 15px !important;
+    transition: all 0.3s ease;
+}
+
+/* 3. 편집 영역 디자인 (Glassmorphism 적용) */
+.ql-container.ql-snow {
+    background: rgba(255, 255, 255, 0.6) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-top: none !important; /* 툴바와 자연스럽게 연결 */
+    border-radius: 0 0 16px 16px; /* 하단만 둥글게 */
+    min-height: 400px;
+    font-family: inherit;
+    font-size: 15px;
+}
+
+/* --- 6. 페이징 요소 (Crew Board 테마 통합) --- */
+.cdb-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px; /* 요소 간 간격 최적화 */
+    margin-top: 40px;
+    padding-bottom: 20px;
+}
+
+/* 숫자 및 화살표 버튼 공통 */
+.cdb-pagination button, 
+.cdb-pagination .page-number {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 38px;
+    height: 38px;
+    padding: 0 10px;
+    
+    /* 기존 리스트 아이템과 통일감 부여 (Glassmorphism) */
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 12px; /* cdb-btn-primary 보다는 약간 작은 라운딩 */
+    
+    color: #4E5968; /* var(--text-main) 급 */
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+/* 호버 시: 리스트 아이템 호버와 동일한 피드백 */
+.cdb-pagination button:hover:not(:disabled),
+.cdb-pagination .page-number:hover {
+    background: #ffffff;
+    border-color: var(--crew-pink);
+    color: var(--crew-pink);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* 💡 현재 선택된 페이지: Crew Pink 그라데이션 적용 */
+.cdb-pagination .page-number.active {
+    background: var(--crew-pink);
+    color: #fff;
+    border-color: var(--crew-pink);
+    font-weight: 800;
+    box-shadow: 0 6px 15px rgba(248, 109, 125, 0.3); /* 핑크빛 그림자 */
+}
+
+/* 이전/다음 화살표 전용 (아이콘 강조) */
+.cdb-pagination button i {
+    font-size: 16px;
+    font-weight: 900;
+}
+
+/* 비활성화 상태: 토스 스타일의 연한 회색 처리 */
+.cdb-pagination button:disabled {
+    background: rgba(0, 0, 0, 0.02);
+    color: rgba(0, 0, 0, 0.15);
+    border-color: transparent;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none;
+}
+
+/* 5. 툴바 버튼 호버 및 활성화 색상 */
+.ql-snow.ql-toolbar button:hover,
+.ql-snow .ql-toolbar button:hover,
+.ql-snow.ql-toolbar button.ql-active,
+.ql-snow .ql-toolbar button.ql-active,
+.ql-snow.ql-toolbar .ql-picker-label:hover,
+.ql-snow .ql-toolbar .ql-picker-label:hover,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active,
+.ql-snow .ql-toolbar .ql-picker-label.ql-active {
+    color: var(--crew-pink) !important;
+}
+
+.ql-snow.ql-toolbar button:hover .ql-stroke,
+.ql-snow .ql-toolbar button:hover .ql-stroke,
+.ql-snow.ql-toolbar button.ql-active .ql-stroke,
+.ql-snow .ql-toolbar button.ql-active .ql-stroke {
+    stroke: var(--crew-pink) !important;
+}
+
+.ql-snow.ql-toolbar button:hover .ql-fill,
+.ql-snow .ql-toolbar button:hover .ql-fill,
+.ql-snow.ql-toolbar button.ql-active .ql-fill,
+.ql-snow .ql-toolbar button.ql-active .ql-fill {
+    fill: var(--crew-pink) !important;
+}
+
+/* 6. 플레이스홀더 색상 */
+.ql-editor.ql-blank::before {
+    color: var(--text-sub) !important; /* #8B95A1 */
+    font-style: normal;
+    font-weight: 500;
+}
+
+/* 7. 에디터 내부 스크롤바 커스텀 */
+.ql-editor::-webkit-scrollbar {
+    width: 6px;
+}
+.ql-editor::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}

@@ -25,12 +25,14 @@ const router = VueRouter.createRouter({
                 {
                     path: 'board',
                     name: 'crew-board',
-                    component: { template: '<div class="cd-glass-card" style="padding:20px;">게시판 준비 중입니다.</div>' }
+                    component: CrewBoard,
+					props: true
                 },
                 {
                     path: 'schedule',
                     name: 'crew-schedule',
-                    component: { template: '<div class="cd-glass-card" style="padding:20px;">일정 준비 중입니다.</div>' }
+                    component: CrewCalendar,
+					props: true
                 },
                 {
                     path: 'chat',

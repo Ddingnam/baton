@@ -128,7 +128,7 @@
 						            <img :src="'/uploads/crew/' + crew.logoImage" :alt="crew.crewName" loading="lazy">
 						        </template>
 						        <template v-else>
-						            <i class="ri-user-fill"></i>
+						            <i class="ri-team-fill"></i>
 						        </template>
 						    </div>
 						</div>

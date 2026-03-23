@@ -1,91 +1,147 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/crew/crew_detail_main.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/crew/crew_detail_board.css">
 
-<template id="crew-detail-main-template">
-	<div class="cd-page-container">
-	    <div v-if="crew" class="cd-content-wrapper">
-	        <div class="cd-layout-container">
-	            
-	            <aside class="cd-sidebar">
-	                
-					<div class="cd-profile-card cd-glass-card">
-					    <div class="cd-profile-wrapper">
-					        <img :src="'/uploads/crew/' + crew.logoImage" alt="크루 프로필" class="cd-profile-img">
-					    </div>
-					    
-					    <h2 class="cd-crew-title">{{ crew.name }}</h2>
-					    
-						<div class="cd-category-tags">
-					        <span v-for="cat in crew.categories" :key="cat.categoryId" class="cd-cat-badge">
-					            {{ cat.name }}
-					        </span>
-					    </div>
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
-						<div class="cd-region-list-container" v-if="crew.regions && crew.regions.length > 0">
-						    <div v-for="(reg, index) in crew.regions" :key="index" class="cd-region-tag">
-						        <span>{{ reg.fullAddress }}</span>
-						    </div>
-						</div>
-					    
-					    <div class="cd-details-table">
-					        <div class="cd-detail-row">
-					            <span class="cd-detail-label">리더</span>
-					            <span class="cd-detail-value">{{ crew.hostNickname || '크루장' }}</span>
-					        </div>
-					        <div class="cd-detail-row">
-					            <span class="cd-detail-label">가입방식</span>
-					            <span class="cd-detail-value">{{ crew.joinType === 'A' ? '승인제' : '자유가입' }}</span>
-					        </div>
-					        <div class="cd-detail-row">
-					            <span class="cd-detail-label">생성일자</span>
-					            <span class="cd-detail-value">{{ crew.createDate || '2026.03.22' }}</span>
-					        </div>
-					    </div>
-					    
-					    <div class="cd-member-status">
-					        <div class="cd-member-count">
-					            <span>현재 참여 인원</span>
-					            <strong>{{ crew.currentMember }} / {{ crew.maxMember }}명</strong>
-					        </div>
-					        <div class="cd-progress-bg">
-					            <div class="cd-progress-fill" :style="{ width: (crew.currentMember / crew.maxMember * 100) + '%' }"></div>
-					        </div>
-					    </div>
-					</div>
+<template id="crew-board-template">
+	<div class="cdb-board-wrapper">
+	    <div class="cdb-header-card cd-glass-card">
+	        <header class="cdb-main-header">
+	            <div class="cdb-header-left">
+	                <div class="cdb-breadcrumb">
+	                    <span>Crew</span>
+	                    <i class="ri-arrow-right-s-line"></i>
+	                    <strong v-if="viewMode === 'list'">List</strong>
+	                    <strong v-else-if="viewMode === 'detail'">Detail</strong>
+	                    <strong v-else-if="viewMode === 'write'">New Post</strong>
+	                </div>
+	                <h2 class="cdb-header-title">
+	                    <template v-if="viewMode === 'list'">크루 게시판</template>
+	                    <template v-else-if="viewMode === 'detail'">게시글 상세보기</template>
+	                    <template v-else-if="viewMode === 'write'">새 글 작성하기</template>
+	                </h2>
+	            </div>
 	
-					<nav class="cd-tab-card cd-glass-card cd-tab-nav">
-	                    <router-link :to="`/crew/${crew.id}/dashboard`" class="cd-tab-btn" active-class="active">
-	                        <i class="ri-dashboard-fill"></i> 대시보드
-	                    </router-link>
-	                    <router-link :to="`/crew/${crew.id}/board`" class="cd-tab-btn" active-class="active">
-	                        <i class="ri-clipboard-fill"></i> 게시판
-	                    </router-link>
-	                    <router-link :to="`/crew/${crew.id}/schedule`" class="cd-tab-btn" active-class="active">
-	                        <i class="ri-calendar-event-fill"></i> 일정
-	                    </router-link>
-	                    <router-link :to="`/crew/${crew.id}/chat`" class="cd-tab-btn" active-class="active">
-	                        <i class="ri-chat-smile-3-fill"></i> 채팅
-	                    </router-link>
-	                </nav>
-	
-	                <div class="cd-action-card cd-glass-card cd-sidebar-footer">
-	                    <button class="cd-action-btn primary">모임 가입하기</button>
+	            <div class="cdb-header-right">
+	                <div v-if="viewMode === 'list'" class="cdb-search-wrapper">
+	                    <i class="ri-search-line"></i>
+	                    <input type="text" placeholder="제목 또는 내용 검색" @keyup.enter="onSearch">
 	                </div>
 	                
-	            </aside>
-	
-				<main class="cd-main-content">
-	                <transition name="cd-fade" mode="out-in">
-                        <router-view></router-view>
-	                </transition>
-	            </main>
-	        </div>
+	                <button v-if="viewMode === 'list'" class="cdb-btn-primary" @click="viewMode = 'write'">
+	                    <i class="ri-add-line"></i> <span>글쓰기</span>
+	                </button>
+	                <button v-else class="cdb-btn-outline" @click="viewMode = 'list'">
+	                    <i class="ri-list-check"></i> <span>목록으로</span>
+	                </button>
+	            </div>
+	        </header>
 	    </div>
-		
-		<div v-else class="cd-loading-state">
-	        <i class="ri-loader-4-line cd-spin"></i>
-	        <p>데이터를 불러오고 있습니다...</p>
+	    <div class="cdb-content-card cd-glass-card">
+            <div v-if="viewMode === 'list'" key="list" class="cdb-list-view">
+			    <div class="cdb-list">
+			        <div class="cdb-list-header">
+			            <span class="col-id">번호</span>
+			            <span class="col-title">제목</span>
+			            <span class="col-author">작성자</span>
+			            <span class="col-date">등록일</span>
+			            <span class="col-view">조회</span>
+			        </div>
+			        
+			        <div v-for="(post, index) in posts" :key="post.crewBoardIdx" class="cdb-list-item" @click="goToDetail(post)">
+			            <span class="col-id">{{ totalElements - ((currentPage - 1) * pageSize) - index }}</span>
+			            <span class="col-title">
+			                <span v-if="post.isNotice === 'Y'" class="cdb-badge-notice">공지</span>
+			                {{ post.title }}
+			                </span>
+			            <span class="col-author">{{ post.authorNickname || '익명' }}</span>
+			            <span class="col-date">{{ post.createdDate }}</span>
+			            <span class="col-view">{{ post.viewCount }}</span>
+			        </div>
+			        
+			        <div v-if="posts.length === 0" class="cd-no-data">
+			            등록된 게시글이 없습니다. 첫 글을 남겨보세요!
+			        </div>
+			    </div>
+			
+			    <div class="cdb-pagination" v-if="totalPages > 0">
+				    <button @click="changePage(1)" :disabled="currentPage === 1">&lt;&lt;</button>
+				    <button @click="changePage(startPage - 1)" :disabled="startPage === 1">이전</button>
+				    <span v-for="page in pageNumbers" :key="page"
+				          :class="['page-number', { active: page === currentPage }]"
+				          @click="changePage(page)">
+				        {{ page }}
+				    </span>
+				    <button @click="changePage(endPage + 1)" :disabled="endPage === totalPages">다음</button>
+				    <button @click="changePage(totalPages)" :disabled="currentPage === totalPages">&gt;&gt;</button>
+				</div>
+			</div>
+
+            <div v-else-if="viewMode === 'detail' && currentPost" key="detail" class="cdb-detail-view">
+                <div class="cdb-detail-nav">
+                    <div class="cdb-detail-actions" style="margin-left: auto;">
+                        <button class="cdb-text-btn">수정</button>
+                        <button class="cdb-text-btn danger">삭제</button>
+                    </div>
+                </div>
+                
+                <div class="cdb-post-head">
+                    <h2>{{ currentPost.title }}</h2>
+                    <div class="cdb-post-meta">
+                        <span><i class="ri-user-smile-line"></i> {{ currentPost.author }}</span>
+                        <span><i class="ri-time-line"></i> {{ currentPost.date }}</span>
+                        <span><i class="ri-eye-line"></i> {{ currentPost.views }}</span>
+                    </div>
+                </div>
+                
+                <div class="cdb-post-body">
+                    {{ currentPost.content }}
+                </div>
+                
+                <div class="cdb-comment-area">
+                    <h4>댓글 <span>{{ currentPost.commentCount || 0 }}</span></h4>
+                    <ul class="cdb-comment-list">
+                        <li v-for="reply in currentPost.comments" :key="reply.id" class="cdb-comment-item">
+                            <div class="cdb-comment-info">
+                                <strong>{{ reply.author }}</strong>
+                                <span>{{ reply.date }}</span>
+                            </div>
+                            <p>{{ reply.text }}</p>
+                        </li>
+                    </ul>
+                    <div class="cdb-comment-form">
+                        <input type="text" v-model="newComment" placeholder="따뜻한 댓글을 남겨주세요." @keyup.enter="submitComment">
+                        <button @click="submitComment"><i class="ri-send-plane-fill"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div v-else-if="viewMode === 'write'" key="write" class="cdb-write-view">
+			    <div class="cdb-form">
+			        <div class="cdb-form-item">
+			            <input type="text" v-model="writeForm.title" placeholder="제목을 입력하세요" class="cdb-input">
+			        </div>
+			
+			        <div class="cdb-form-item">
+					    <div id="quill-editor" ref="quillEditor" class="cdb-quill-container"></div>
+					</div>
+			
+			        <div class="cdb-form-btns">
+			            <label class="cdb-checkbox-label" style="margin-right: auto;">
+			                <input type="checkbox" v-model="writeForm.isNotice" true-value="Y" false-value="N">
+			                <span class="cdb-check-custom"></span>
+			                <span class="label-text">공지사항으로 등록</span>
+			            </label>
+			
+			            <button class="cdb-btn-outline" @click="viewMode = 'list'" style="width: auto;">취소</button>
+			            <button class="cdb-btn-primary" @click="submitPost" style="width: auto;">
+			                <i class="ri-check-line"></i> 등록하기
+			            </button>
+			        </div>
+			    </div>
+			</div>
 	    </div>
 	</div>
 </template>

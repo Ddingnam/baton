@@ -2,7 +2,7 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/crew/crew_detail_main.css">
 
-<template id="crew-detail-main-template">
+<template id="crew-calendar-template">
 	<div class="cd-page-container">
 	    <div v-if="crew" class="cd-content-wrapper">
 	        <div class="cd-layout-container">
