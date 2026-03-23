@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="c"   uri="jakarta.tags.core"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
 <aside class="agency-sidebar">
     <div class="brand-logo" onclick="location.href='${pageContext.request.contextPath}/admin'" style="cursor:pointer;">
@@ -133,5 +134,10 @@
             if (chatBtn) chatBtn.classList.add('active');
         }
     })();
+
+        window.CTX          = '${pageContext.request.contextPath}';
+        <sec:authorize access="isAuthenticated()">
+        window.ADMIN_USER_IDX = '<sec:authentication property="principal.userIdx"/>';
+        </sec:authorize>
     </script>
 </aside>

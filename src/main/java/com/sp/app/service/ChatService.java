@@ -1,24 +1,23 @@
 package com.sp.app.service;
-
 import com.sp.app.model.ChatMessage;
 import com.sp.app.model.ChatRoom;
-
 import java.util.List;
 import java.util.Map;
 
 public interface ChatService {
-    void insertMessage(ChatMessage message);
-    List<ChatMessage> listChatMessage(Long roomIdx);
-    void updateLastReadDate(Long roomIdx, Long userIdx);
-    Long createOrGetRoom(Long tradeIdx, Long sellerIdx, Long buyerIdx);
-    String getCounterpartNickname(Long roomIdx, Long myUserIdx);
-    List<ChatRoom> listTradeChatRoom(Long tradeIdx, Long myUserIdx);
-    Map<String, Object> getTradeInfo(Long tradeIdx);
-    List<ChatRoom> listAllChatRoom(Long myUserIdx);
-    int getUnreadTotalCount(Long myUserIdx);
-    List<Long> getRoomMembers(Long roomIdx);
-    void deleteChatRoom(Long roomIdx, Long userIdx);
-    Long createOrGetAlbaRoom(Long albaIdx, Long sellerIdx, Long buyerIdx);
-    Map<String, Object> getAlbaInfo(Long albaIdx);
-    List<ChatRoom> listAlbaChatRoom(Long albaIdx, Long myUserIdx);
+	public void insertMessage(ChatMessage message);
+	public List<ChatMessage> listChatMessage(Long roomIdx);
+	public void updateLastReadDate(Long roomIdx, Long userIdx);
+	public Long createOrGetRoom(Long tradeIdx, Long sellerIdx, Long buyerIdx);
+	public String getCounterpartNickname(Long roomIdx, Long myUserIdx);
+	public List<ChatRoom> listTradeChatRoom(Long tradeIdx, Long myUserIdx);
+	public Map<String, Object> getTradeInfo(Long tradeIdx);
+	public List<ChatRoom> listAllChatRoom(Long myUserIdx);
+	public int getUnreadTotalCount(Long myUserIdx);
+	public List<Long> getRoomMembers(Long roomIdx);
+	public void deleteChatRoom(Long roomIdx, Long userIdx);
+	public Long createOrGetAlbaRoom(Long albaIdx, Long sellerIdx, Long buyerIdx);
+	public Map<String, Object> getAlbaInfo(Long albaIdx);
+	public List<ChatRoom> listAlbaChatRoom(Long albaIdx, Long myUserIdx);
+	public String getSenderNickname(Long userIdx);
 }

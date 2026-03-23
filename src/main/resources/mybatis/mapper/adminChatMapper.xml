@@ -25,11 +25,11 @@
         ORDER BY cr.roomIdx ASC
     </select>
 
-    <!-- ★ is_online 추가: users 테이블 기준으로 chatMember에서 온라인 여부 조회 -->
+    
     <select id="listAdminMembers" resultType="com.sp.app.domain.dto.UserDto">
         SELECT u.userIdx, u.userId, u.name, u.nickname, u.profile_photo,
                a.authority, u.userLevel,
-               NVL((SELECT MAX(is_online) FROM chatMember WHERE userIdx = u.userIdx), 0) AS isOnline
+               NVL(u.is_online, 0) AS isOnline
         FROM users u
         JOIN userAuthority a ON u.userId = a.userId
         WHERE a.authority IN ('ROLE_ADMIN', 'ADMIN', 'ROLE_EMP', 'EMP')
@@ -60,8 +60,8 @@
             (SELECT COUNT(*) FROM chatMessage m WHERE m.roomIdx = cr.roomIdx AND m.userIdx != #{myUserIdx}
              AND m.sendDate > NVL((SELECT lastReadDate FROM chatMember WHERE roomIdx = cr.roomIdx AND userIdx = #{myUserIdx}), TO_DATE('1900-01-01','YYYY-MM-DD'))
             ) AS unreadCount,
-            <!-- ★ DM 상대방의 온라인 여부 -->
-            NVL((SELECT MAX(is_online) FROM chatMember WHERE userIdx = u.userIdx), 0) AS isOnline
+            
+            NVL(u.is_online, 0) AS isOnline
         FROM chatRoom cr
         JOIN chatMember cm  ON cr.roomIdx = cm.roomIdx  AND cm.userIdx = #{myUserIdx}
         JOIN chatMember cm2 ON cr.roomIdx = cm2.roomIdx AND cm2.userIdx != #{myUserIdx}
@@ -86,8 +86,8 @@
     <select id="listChannelMembers" resultType="com.sp.app.domain.dto.UserDto">
         SELECT u.userIdx, u.nickname, u.profile_photo, u.userLevel,
                NVL(a.authority, '') AS authority,
-               <!-- ★ 채널 멤버 온라인 여부 -->
-               NVL((SELECT MAX(is_online) FROM chatMember WHERE userIdx = u.userIdx), 0) AS isOnline
+               
+               NVL(u.is_online, 0) AS isOnline
         FROM chatMember cm
         JOIN users u ON cm.userIdx = u.userIdx
         LEFT JOIN userAuthority a ON u.userId = a.userId
@@ -149,15 +149,17 @@
         WHERE roomIdx = #{roomIdx} AND roomType = 2
     </update>
 
+    
     <update id="setOnlineStatus">
-        UPDATE chatMember
+        UPDATE users
         SET is_online = #{isOnline}
         WHERE userIdx = #{userIdx}
     </update>
 
+    
     <select id="getOnlineStatus" resultType="int">
-        SELECT NVL(MAX(is_online), 0)
-        FROM chatMember
+        SELECT NVL(is_online, 0)
+        FROM users
         WHERE userIdx = #{userIdx}
     </select>
 

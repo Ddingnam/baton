@@ -90,7 +90,7 @@
                              data-roomidx="${dm.roomIdx}" data-roomname="${dm.nickname}" data-type="dm">
                             <div class="chat-dm-avt-wrap">
                                 <div class="chat-dm-avt-sm" id="avt-dm-${dm.userIdx}">${fn:substring(dm.nickname, 0, 2)}</div>
-                                <span class="chat-dm-status-dot ${dm.isOnline == 1 ? 'online' : ''}" id="status-${dm.userIdx}"></span>
+                                <span class="chat-dm-status-dot ${dm.isOnline == 1 ? 'online' : dm.isOnline == 2 ? 'away' : ''}" id="status-${dm.userIdx}"></span>
                             </div>
                             <div class="chat-room-info">
                                 <span class="chat-room-name">${dm.nickname}</span>
@@ -194,7 +194,7 @@
                             <c:set var="lastDate" value="${msgDate}"/>
                         </c:if>
                         <c:choose>
-                            <c:when test="${chat.userIdx == myUserIdx}">
+                            <c:when test="${chat.userIdx.toString() == myUserIdx.toString()}">
                                 <div class="chat-msg-group mine">
                                     <div class="chat-msg-body">
                                         <div class="chat-msg-meta right">
@@ -269,7 +269,7 @@
                 <c:forEach var="member" items="${memberList}">
                     <div class="chat-member-item" id="member-${member.userIdx}"
                          data-useridx="${member.userIdx}" data-nickname="${member.nickname}">
-                        <div class="chat-dm-avt ${member.isOnline == 1 ? 'online' : 'away'}"
+                        <div class="chat-dm-avt ${member.isOnline == 1 ? 'online' : member.isOnline == 2 ? 'away' : ''}" 
                              id="avt-${member.userIdx}">
                             ${fn:substring(member.nickname, 0, 2)}
                         </div>
@@ -494,6 +494,9 @@ var CHAT_MY_NAME  = '${myNickname}';
 var CHAT_ROOM_IDX = Number('${currentRoomIdx}');
 var CHAT_ROOM_TYPE  = '${currentRoomType}';
 var CHAT_MY_LEVEL  = Number('${myUserLevel}');
+
+window.CTX = CHAT_CTX;
+window.ADMIN_USER_IDX = CHAT_MY_IDX;
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_chat.js"></script>

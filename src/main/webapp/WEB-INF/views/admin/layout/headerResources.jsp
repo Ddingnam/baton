@@ -1,7 +1,15 @@
 ﻿<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
+<meta name="ctx" content="${pageContext.request.contextPath}">
+<script>
+window.CTX = '${pageContext.request.contextPath}';
+<sec:authorize access="isAuthenticated()">
+window.ADMIN_USER_IDX = Number('<sec:authentication property="principal.userIdx"/>');
+</sec:authorize>
+</script>
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <!-- Favicons -->
 <link href="${pageContext.request.contextPath}/dist/images/h.png" rel="icon">

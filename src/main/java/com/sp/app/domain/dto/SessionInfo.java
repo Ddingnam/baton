@@ -5,14 +5,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.io.Serializable;
 
-// 세션에 저장할 정보(아이디, 이름, 역할(권한) 등)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SessionInfo {
+public class SessionInfo implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private long userIdx;
 	private String userId;
 	private String pwd;

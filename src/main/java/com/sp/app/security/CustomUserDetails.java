@@ -103,7 +103,7 @@ public class CustomUserDetails implements UserDetails{
     }
 
 	public String getNickname() {
-		return member.getName();
+		return member.getNickname();
 	}
 
 	public int getUserLevel() {

@@ -161,4 +161,9 @@
         ORDER BY recentDate DESC NULLS LAST
     </select>
         
+
+    <select id="getSenderNickname" parameterType="Long" resultType="String">
+        SELECT nickname FROM users WHERE userIdx = #{userIdx}
+    </select>
+
 </mapper>

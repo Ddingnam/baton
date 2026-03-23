@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-
-    const BASE = (typeof window.CTX !== 'undefined' ? window.CTX : '');
-
+    const BASE      = (typeof window.CTX !== 'undefined' ? window.CTX : '');
+    const THEME_KEY = 'baton-admin-theme-' + (window.ADMIN_USER_IDX || 'default');
     const sidebarToggle = document.getElementById('sidebarToggle');
     const mainSidebar = document.querySelector('.agency-sidebar');
     if (sidebarToggle && mainSidebar) {
@@ -10,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => { if (window.dashChart) window.dashChart.resize(); }, 400);
         });
     }
-
     document.querySelectorAll('.nav-box.has-child > .nav-btn').forEach(header => {
         header.addEventListener('click', function(e) {
             e.preventDefault();
@@ -21,18 +19,15 @@ document.addEventListener("DOMContentLoaded", () => {
             parentBox.classList.toggle('open');
         });
     });
-
     const triggerProfile = document.getElementById('profileTrigger');
     const modalProfile   = document.getElementById('profileModal');
     const triggerUtility = document.getElementById('systemUtilityTrigger');
     const modalUtility   = document.getElementById('systemUtilityModal');
     const triggerNoti    = document.getElementById('notiTrigger');
     const modalNoti      = document.getElementById('notiModal');
-
     function closeAllPopups() {
         [modalProfile, modalUtility, modalNoti].forEach(m => m && m.classList.remove('show'));
     }
-
     if (triggerProfile && modalProfile) {
         triggerProfile.addEventListener('click', e => {
             e.stopPropagation();
@@ -41,7 +36,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!wasOpen) modalProfile.classList.add('show');
         });
     }
-
     if (triggerUtility && modalUtility) {
         triggerUtility.addEventListener('click', e => {
             e.stopPropagation();
@@ -50,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!wasOpen) { modalUtility.classList.add('show'); loadCalMonth(); }
         });
     }
-
     if (triggerNoti && modalNoti) {
         triggerNoti.addEventListener('click', e => {
             e.stopPropagation();
@@ -59,19 +52,12 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!wasOpen) modalNoti.classList.add('show');
         });
     }
-
     document.addEventListener('click', e => {
         const inModal   = [modalProfile, modalUtility, modalNoti].some(m => m && m.contains(e.target));
         const inTrigger = [triggerProfile, triggerUtility, triggerNoti].some(t => t && t.contains(e.target));
         if (!inModal && !inTrigger) closeAllPopups();
     });
-
-
-    /* ─────────────────────────────────────────────
-       NOTIFICATION SYSTEM  (enhanced)
-       ───────────────────────────────────────────── */
     const NOTI_SETTINGS_KEY = 'baton_noti_settings';
-
     const NOTI_TYPE_MAP = {
         'REPORT':    { icon: 'ri-error-warning-fill',    bg: 'bg-orange', label: '신고',    lb: '#FFF7ED', lc: '#F97316' },
         'PAYMENT':   { icon: 'ri-coin-fill',             bg: 'bg-blue',   label: '결제',    lb: '#EFF6FF', lc: '#3B82F6' },
@@ -85,33 +71,26 @@ document.addEventListener("DOMContentLoaded", () => {
         'SYSTEM':    { icon: 'ri-shield-flash-fill',     bg: 'bg-orange', label: '시스템',  lb: '#FFF7ED', lc: '#F97316' },
         'default':   { icon: 'ri-notification-3-fill',   bg: 'bg-blue',   label: '알림',    lb: '#EFF6FF', lc: '#3B82F6' }
     };
-
-    // 기본 설정: 모두 ON
     const NOTI_DEFAULT_SETTINGS = {
         REPORT: true, PAYMENT: true, REFUND: true, INQUIRY: true,
         MEMBER: false, CHAT: true, CALENDAR: true, TODO: true,
         TODO_DONE: true, SYSTEM: true,
         sound: false, browser: false
     };
-
     function getNotiSettings() {
         try {
             const raw = localStorage.getItem(NOTI_SETTINGS_KEY);
             return raw ? Object.assign({}, NOTI_DEFAULT_SETTINGS, JSON.parse(raw)) : Object.assign({}, NOTI_DEFAULT_SETTINGS);
         } catch(e) { return Object.assign({}, NOTI_DEFAULT_SETTINGS); }
     }
-
     function saveNotiSettings(settings) {
         try { localStorage.setItem(NOTI_SETTINGS_KEY, JSON.stringify(settings)); } catch(e) {}
     }
-
     function isTypeEnabled(type) {
         const s = getNotiSettings();
-        return s[type] !== false; // 설정 없으면 기본 ON
+        return s[type] !== false;
     }
-
     function notiInfo(t) { return NOTI_TYPE_MAP[t] || NOTI_TYPE_MAP['default']; }
-
     function notiTimeAgo(createdAt) {
         if (!createdAt) return '';
         try {
@@ -124,8 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return Math.floor(diff / 604800) + '주 전';
         } catch(e) { return ''; }
     }
-
-    // 알림 그룹핑: 같은 타입 연속 3건 이상이면 "외 N건" 으로 축약
     function buildGroupedNotiList(list) {
         const result = [];
         const typeCount = {};
@@ -134,7 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!typeCount[n.notifType]) { typeCount[n.notifType] = 0; typeFirst[n.notifType] = n; }
             typeCount[n.notifType]++;
         });
-        // 상위 8개만 표시 (그룹별로 첫 번째 + 카운트 표시)
         const seen = new Set();
         list.slice(0, 20).forEach(n => {
             if (!seen.has(n.notifType)) {
@@ -147,18 +123,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         return result.slice(0, 8);
     }
-
     let notiList = [];
-
     function renderNotiModal() {
         const listEl = document.getElementById('notiList');
         if (!listEl) return;
-
         const settings = getNotiSettings();
-        // 설정에서 꺼진 타입 제외
         const filtered = notiList.filter(n => settings[n.notifType] !== false);
         const grouped  = buildGroupedNotiList(filtered);
-
         if (!grouped.length) {
             listEl.innerHTML =
                 '<div style="padding:32px 20px;text-align:center;">' +
@@ -167,7 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 '</div>';
             return;
         }
-
         listEl.innerHTML = grouped.map(n => {
             const info   = notiInfo(n.notifType);
             const unread = n.isRead === 0;
@@ -189,8 +159,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 '</div>' +
                 '</div>';
         }).join('');
-
-        // 호버 시 삭제버튼 보이기
         listEl.querySelectorAll('.noti-item').forEach(el => {
             const delBtn = el.querySelector('.noti-item-del');
             if (delBtn) {
@@ -198,8 +166,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 el.addEventListener('mouseleave', () => delBtn.style.opacity = '0');
             }
         });
-
-        // 클릭: 읽음 처리 + URL 이동
         listEl.querySelectorAll('.noti-item[data-nid]').forEach(el => {
             el.addEventListener('click', e => {
                 if (e.target.closest('.noti-item-del')) return;
@@ -221,8 +187,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         });
-
-        // 개별 삭제
         listEl.querySelectorAll('.noti-item-del[data-did]').forEach(btn => {
             btn.addEventListener('click', e => {
                 e.stopPropagation();
@@ -241,7 +205,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }
-
     function updateNotiBadge() {
         const settings = getNotiSettings();
         const count = notiList.filter(n => n.isRead === 0 && settings[n.notifType] !== false).length;
@@ -252,7 +215,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (ring)  { ring.style.display = count > 0 ? '' : 'none'; }
         if (mc)    { mc.textContent = count > 0 ? count : ''; mc.style.display = count > 0 ? '' : 'none'; }
     }
-
     function loadNotiList() {
         apiGet(BASE + '/admin/util/noti/list')
             .then(data => {
@@ -261,8 +223,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 updateNotiBadge();
             }).catch(() => {});
     }
-
-    // 알림음 재생
     function playNotiSound() {
         try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -278,8 +238,6 @@ document.addEventListener("DOMContentLoaded", () => {
             osc.stop(ctx.currentTime + 0.35);
         } catch(e) {}
     }
-
-    // 브라우저 Push Notification
     function sendBrowserNotif(n) {
         if (!('Notification' in window) || Notification.permission !== 'granted') return;
         const info = notiInfo(n.notifType);
@@ -289,8 +247,6 @@ document.addEventListener("DOMContentLoaded", () => {
             tag: 'baton-noti-' + n.notifIdx
         });
     }
-
-    // 헤더 토스트 배너 (새 알림 도착 시)
     function showNotiBanner(n) {
         const info = notiInfo(n.notifType);
         const banner = document.createElement('div');
@@ -309,19 +265,16 @@ document.addEventListener("DOMContentLoaded", () => {
             '<div style="font-size:13px;font-weight:600;color:#1E293B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(n.content) + '</div>' +
             '</div>' +
             '<button onclick="this.parentElement.remove()" style="border:none;background:none;color:#CBD5E1;cursor:pointer;font-size:16px;padding:0;flex-shrink:0;">×</button>';
-
         if (!document.getElementById('notiBannerStyle')) {
             const s = document.createElement('style');
             s.id = 'notiBannerStyle';
             s.textContent = '@keyframes fadeSlideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}';
             document.head.appendChild(s);
         }
-
         if (n.url) banner.addEventListener('click', e => { if (e.target.tagName !== 'BUTTON') window.location.href = n.url; });
         document.body.appendChild(banner);
         setTimeout(() => { banner.style.transition = 'opacity 0.4s'; banner.style.opacity = '0'; setTimeout(() => banner.remove(), 400); }, 5000);
     }
-
     function injectRealtimeNoti(n) {
         if (!notiList.find(x => x.notifIdx === n.notifIdx)) {
             notiList.unshift(n);
@@ -335,7 +288,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     }
-
     const notiReadAllBtn = document.getElementById('notiReadAll');
     if (notiReadAllBtn) {
         notiReadAllBtn.addEventListener('click', e => {
@@ -344,25 +296,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(() => { notiList.forEach(n => n.isRead = 1); renderNotiModal(); updateNotiBadge(); });
         });
     }
-
     loadNotiList();
     setInterval(loadNotiList, 60000);
-
-    // ── 알림 설정 저장/불러오기 ────────────────────────
     function initNotiSettings() {
         const settings = getNotiSettings();
-        // 토글 상태 반영
         document.querySelectorAll('.fm-noti-toggle[data-ntype]').forEach(cb => {
             const type = cb.dataset.ntype;
             cb.checked = settings[type] !== false;
         });
-        // 브라우저 알림 권한 상태 표시
         const browserToggle = document.querySelector('.fm-noti-toggle[data-ntype="browser"]');
         if (browserToggle && 'Notification' in window) {
             browserToggle.checked = settings.browser && Notification.permission === 'granted';
         }
     }
-
     const notiSaveBtn = document.getElementById('notiSettingsSaveBtn');
     if (notiSaveBtn) {
         notiSaveBtn.addEventListener('click', () => {
@@ -388,22 +334,16 @@ document.addEventListener("DOMContentLoaded", () => {
             if (typeof showToast === 'function') showToast('알림 설정이 저장되었습니다.', 'success');
         });
     }
-
-    // 설정 탭이 열릴 때마다 최신 상태 반영
     document.querySelectorAll('.fm-nav-item[data-tab="notifications"]').forEach(btn => {
         btn.addEventListener('click', initNotiSettings);
     });
-
     initNotiSettings();
-
-
     const setupOverlay     = document.getElementById('setupOverlay');
     const profileOverlay   = document.getElementById('profileOverlay');
     const setupTrigger     = document.getElementById('setupTrigger');
     const myProfileTrigger = document.getElementById('myProfileTrigger');
     const setupClose       = document.getElementById('setupClose');
     const profileFullClose = document.getElementById('profileFullClose');
-
     if (setupTrigger && setupOverlay) {
         setupTrigger.addEventListener('click', () => { closeAllPopups(); setupOverlay.classList.add('show'); });
     }
@@ -412,12 +352,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (setupClose)       setupClose.addEventListener('click', () => setupOverlay.classList.remove('show'));
     if (profileFullClose) profileFullClose.addEventListener('click', () => profileOverlay.classList.remove('show'));
-
     [setupOverlay, profileOverlay].forEach(overlay => {
         if (!overlay) return;
         overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });
     });
-
     document.querySelectorAll('.fm-nav-item[data-tab]').forEach(btn => {
         btn.addEventListener('click', function() {
             const tab = this.dataset.tab;
@@ -428,7 +366,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (target) target.classList.add('active');
         });
     });
-
     document.querySelectorAll('.fm-nav-item[data-ptab]').forEach(btn => {
         btn.addEventListener('click', function() {
             const tab = this.dataset.ptab;
@@ -439,8 +376,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (target) target.classList.add('active');
         });
     });
-
-
     function runClock() {
         const d = new Date();
         const headClock = document.getElementById('systemClock');
@@ -452,16 +387,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     setInterval(runClock, 1000);
     runClock();
-
-
     let calYear  = new Date().getFullYear();
     let calMonth = new Date().getMonth();
     const today  = new Date();
     const calMemos       = {};
     let   selectedCalKey = null;
-
     function calPad(n) { return String(n).padStart(2, '0'); }
-
     function loadCalMonth() {
         const ym = calYear + '-' + calPad(calMonth + 1);
         apiGet(BASE + '/admin/util/memo/month?yearMonth=' + ym)
@@ -476,7 +407,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }).catch(() => { renderCal(); });
     }
-
     function renderCal() {
         const cGrid = document.getElementById('miniCalGrid');
         if (!cGrid) return;
@@ -500,7 +430,6 @@ document.addEventListener("DOMContentLoaded", () => {
             cell.addEventListener('click', e => { e.stopPropagation(); selectCalDate(cell.dataset.key); });
         });
     }
-
     function selectCalDate(key) {
         selectedCalKey = key;
         const panel = document.getElementById('calMemoPanel');
@@ -515,7 +444,6 @@ document.addEventListener("DOMContentLoaded", () => {
         renderCal();
         setTimeout(() => input.focus(), 60);
     }
-
     function updateCalMemoPreview(key, val) {
         const preview = document.getElementById('calMemoPreview');
         if (!preview) return;
@@ -533,18 +461,15 @@ document.addEventListener("DOMContentLoaded", () => {
             preview.style.display = 'none';
         }
     }
-
     const calPrevBtn  = document.getElementById('calPrev');
     const calNextBtn  = document.getElementById('calNext');
     const calTodayBtn = document.getElementById('calToday');
     if (calPrevBtn)  calPrevBtn.addEventListener('click',  e => { e.stopPropagation(); calMonth--; if (calMonth < 0)  { calMonth = 11; calYear--; } loadCalMonth(); });
     if (calNextBtn)  calNextBtn.addEventListener('click',  e => { e.stopPropagation(); calMonth++; if (calMonth > 11) { calMonth = 0;  calYear++; } loadCalMonth(); });
     if (calTodayBtn) calTodayBtn.addEventListener('click', e => { e.stopPropagation(); calYear = today.getFullYear(); calMonth = today.getMonth(); loadCalMonth(); });
-
     const calMemoSaveBtn  = document.getElementById('calMemoSave');
     const calMemoClearBtn = document.getElementById('calMemoClear');
     const calMemoInputEl  = document.getElementById('calMemoInput');
-
     if (calMemoSaveBtn) {
         calMemoSaveBtn.addEventListener('click', e => {
             e.preventDefault();
@@ -590,7 +515,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
     if (calMemoClearBtn) {
         calMemoClearBtn.addEventListener('click', e => {
             e.preventDefault();
@@ -598,7 +522,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (calMemoInputEl) calMemoInputEl.value = '';
         });
     }
-
     if (calMemoInputEl) {
         calMemoInputEl.addEventListener('click', e => e.stopPropagation());
         calMemoInputEl.addEventListener('keydown', e => {
@@ -610,11 +533,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
-
     function todoEsc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     let todos = [];
-
     function loadTodoList() {
         apiGet(BASE + '/admin/util/todo/list')
             .then(data => {
@@ -622,7 +542,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 renderTodo();
             }).catch(() => { renderTodo(); });
     }
-
     function renderTodo() {
         const listEl  = document.getElementById('todoList');
         const countEl = document.getElementById('todoCount');
@@ -657,10 +576,8 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }
-
     const todoAddBtnEl = document.getElementById('todoAddBtn');
     const todoInputEl  = document.getElementById('todoInput');
-
     function addTodo() {
         if (!todoInputEl) return;
         const text = todoInputEl.value.trim();
@@ -674,30 +591,27 @@ document.addEventListener("DOMContentLoaded", () => {
         todoInputEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.stopPropagation(); addTodo(); } });
         todoInputEl.addEventListener('click', e => e.stopPropagation());
     }
-
     loadTodoList();
     loadCalMonth();
-
-
     if (typeof SockJS !== 'undefined' && typeof Stomp !== 'undefined') {
         try {
             const sock   = new SockJS(BASE + '/ws/chat');
             const stompC = Stomp.over(sock);
             stompC.debug = null;
             stompC.connect({}, () => {
-                apiGet(BASE + '/admin/util/noti/list').then(list => {
-                    const adminIdx = Array.isArray(list) && list.length > 0 ? list[0].userIdx : null;
-                    if (!adminIdx) return;
-                    stompC.subscribe('/topic/alarms/' + adminIdx, msg => {
-                        try { const n = JSON.parse(msg.body); if (n && n.notifIdx) injectRealtimeNoti(n); }
-                        catch(e) {}
-                    });
-                }).catch(() => {});
+                const adminIdx = window.ADMIN_USER_IDX || null;
+                if (!adminIdx) return;
+                stompC.subscribe('/topic/alarms/' + adminIdx, msg => {
+                    try {
+                        const raw = msg.body;
+                        if (!raw || raw === 'read_chat' || raw.startsWith('room_deleted:')) return;
+                        const n = JSON.parse(raw);
+                        if (n && n.notifIdx) injectRealtimeNoti(n);
+                    } catch(e) {}
+                });
             }, () => {});
         } catch(e) {}
     }
-
-
     function buildChartGradients(ctx2d) {
         const style = getComputedStyle(document.documentElement);
         const c1  = style.getPropertyValue('--chart-c1').trim()  || '#7C3AED';
@@ -711,7 +625,6 @@ document.addEventListener("DOMContentLoaded", () => {
         fill.addColorStop(1, 'rgba(0,0,0,0)');
         return { stroke, fill, c1 };
     }
-
     const ctx = document.getElementById('gradientChart');
     if (ctx) {
         const ctx2d = ctx.getContext('2d');
@@ -746,17 +659,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
     document.querySelectorAll('.pill-tab').forEach(btn => {
         btn.addEventListener('click', function() {
             this.closest('.pill-tabs').querySelectorAll('.pill-tab').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
         });
     });
-
-
     (function() {
-        var saved = localStorage.getItem('baton-admin-theme') || 'purple';
+        var saved = localStorage.getItem(THEME_KEY) || 'purple';
         applyTheme(saved);
         var activeCard = document.querySelector('.theme-card[data-theme="' + saved + '"]');
         if (activeCard) {
@@ -764,28 +674,25 @@ document.addEventListener("DOMContentLoaded", () => {
             activeCard.classList.add('active');
         }
     })();
-
     document.querySelectorAll('.theme-card[data-theme]').forEach(function(card) {
         card.addEventListener('click', function() {
             document.querySelectorAll('.theme-card').forEach(function(c) { c.classList.remove('active'); });
             card.classList.add('active');
         });
     });
-
     var THEME_NAMES = {
         purple: '퍼플 (기본)', blue: '오션 블루', emerald: '에메랄드',
         sunset: '선셋', rose: '로즈', slate: '슬레이트'
     };
-
     var saveThemeBtn = document.getElementById('saveThemeBtn');
     if (saveThemeBtn) {
         saveThemeBtn.addEventListener('click', function() {
             var active = document.querySelector('.theme-card.active');
             if (!active) return;
             var theme = active.dataset.theme;
-            var prevTheme = localStorage.getItem('baton-admin-theme') || 'purple';
+            var prevTheme = localStorage.getItem(THEME_KEY) || 'purple';
             applyTheme(theme);
-            localStorage.setItem('baton-admin-theme', theme);
+            localStorage.setItem(THEME_KEY, theme);
             var name = THEME_NAMES[theme] || theme;
             if (typeof showToast === 'function') {
                 if (theme === prevTheme) {
@@ -802,7 +709,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }, 2000);
         });
     }
-
     function applyTheme(theme) {
         if (theme === 'purple') {
             document.documentElement.removeAttribute('data-theme');
@@ -820,11 +726,60 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     }
+    (function () {
+        var AWAY_MS      = 10 * 60 * 1000;
+        var HEARTBEAT_MS = 60 * 1000;
+        var lastActivity = Date.now();
+        var isNavigating = false;
 
+        ['mousemove', 'keydown', 'mousedown', 'touchstart', 'scroll'].forEach(function (evt) {
+            document.addEventListener(evt, function () { lastActivity = Date.now(); }, { passive: true });
+        });
+
+        // 페이지 이동(링크 클릭, 폼 submit)은 오프라인 처리 제외
+        document.addEventListener('click', function (e) {
+            var a = e.target.closest('a[href]');
+            if (a && !a.target && a.href && a.href.indexOf(location.origin) === 0) {
+                isNavigating = true;
+            }
+        });
+        document.addEventListener('submit', function () { isNavigating = true; });
+
+        function getBase() {
+            return (typeof window.CTX !== 'undefined') ? window.CTX : null;
+        }
+        function getStatus() {
+            return (Date.now() - lastActivity < AWAY_MS) ? 1 : 2;
+        }
+        function sendHeartbeat() {
+            var base = getBase();
+            if (base === null) return; // CTX 자체가 없으면 skip (로그인 전 등)
+            fetch(base + '/api/presence/heartbeat', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'status=' + getStatus()
+            }).catch(function () {});
+        }
+        function sendOffline() {
+            if (isNavigating) return; // 페이지 이동 시엔 오프라인 처리 안 함
+            var base = getBase();
+            if (base === null) return;
+            navigator.sendBeacon(base + '/api/presence/offline');
+        }
+        sendHeartbeat();
+        setInterval(sendHeartbeat, HEARTBEAT_MS);
+        window.addEventListener('beforeunload', sendOffline);
+        document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') {
+                lastActivity = Date.now();
+                sendHeartbeat();
+            }
+        });
+    })();
     function escHtml(s) {
         return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
-
     function apiGet(url) {
         return fetch(url, { credentials: 'same-origin' })
             .then(r => {
@@ -832,7 +787,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 return r.json();
             });
     }
-
     function apiPost(url, body) {
         return fetch(url, {
             method: 'POST',

@@ -290,7 +290,7 @@
 
 .chat-date-divider {
     display: flex; align-items: center; gap: 12px;
-    margin: 20px 0; color: var(--text-light); font-size: 12px; font-weight: 700;
+    margin: 10px 0; color: var(--text-light); font-size: 12px; font-weight: 700;
 }
 .chat-date-divider::before,
 .chat-date-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-color); }
@@ -301,7 +301,7 @@
 
 .chat-msg-group {
     display: flex; align-items: flex-start; gap: 12px;
-    padding: 4px 0; animation: msgPop 0.3s var(--spring);
+    padding: 2px 0;
 }
 .chat-msg-group.mine { flex-direction: row-reverse; }
 
@@ -468,7 +468,10 @@
     width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--card-bg);
 }
 .chat-dm-avt.online::after { background: var(--color-green); box-shadow: 0 0 0 2px var(--color-green-light); }
-.chat-dm-avt.away::after   { background: var(--border-color); }
+.chat-dm-avt.away::after   { background: var(--color-orange); }  /* 자리비움 */
+
+/* ★ 오프라인: 상태 점 안 보이게 (기본 border-color) */
+.chat-dm-avt::after        { background: var(--border-color); }
 
 .chat-member-info { display: flex; flex-direction: column; overflow: hidden; flex: 1; }
 .chat-member-name { font-size: 13px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
