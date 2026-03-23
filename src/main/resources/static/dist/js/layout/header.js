@@ -130,11 +130,35 @@ document.addEventListener("DOMContentLoaded", () => {
     const adminIcon = document.querySelector('.admin-icon');
     const adminOverlay = document.getElementById('adminTransitionOverlay');
 
+    // 테마별 색상 매핑
+    const ADMIN_THEME_COLORS = {
+        purple:  { c1: '#7C3AED', c2: '#EC4899' },
+        blue:    { c1: '#1D4ED8', c2: '#06B6D4' },
+        emerald: { c1: '#059669', c2: '#3B82F6' },
+        sunset:  { c1: '#EA580C', c2: '#EF4444' },
+        rose:    { c1: '#BE185D', c2: '#F43F5E' },
+        slate:   { c1: '#334155', c2: '#64748B' }
+    };
+
+    function applyThemeToOverlay() {
+        var theme = localStorage.getItem('baton-admin-theme') || 'purple';
+        var colors = ADMIN_THEME_COLORS[theme] || ADMIN_THEME_COLORS.purple;
+        var spinner = adminOverlay ? adminOverlay.querySelector('.admin-loader-spinner') : null;
+        var dot     = adminOverlay ? adminOverlay.querySelector('.admin-loader-text .dot') : null;
+        if (spinner) {
+            spinner.style.background = 'conic-gradient(from 0deg, ' + colors.c1 + ', ' + colors.c2 + ', transparent 60%)';
+        }
+        if (dot) {
+            dot.style.color = colors.c1;
+        }
+    }
+
     if (adminIcon && adminOverlay) {
         adminIcon.addEventListener('click', function(e) {
             e.preventDefault();
             const targetUrl = this.getAttribute('href');
-            
+
+            applyThemeToOverlay();
             adminOverlay.style.display = 'flex';
             
             setTimeout(() => {

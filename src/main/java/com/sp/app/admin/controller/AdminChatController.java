@@ -93,7 +93,7 @@ public class AdminChatController {
     }
 
     
-    @PostMapping("/chat/dm")
+    @PostMapping(value = "/chat/dm", produces = "application/json")
     @ResponseBody
     public Map<String, Object> getOrCreateDM(
             @RequestParam("targetUserIdx") Long targetUserIdx,
@@ -110,7 +110,7 @@ public class AdminChatController {
     }
 
     
-    @PostMapping("/chat/channel")
+    @PostMapping(value = "/chat/channel", produces = "application/json")
     @ResponseBody
     public Map<String, Object> createChannel(
             @RequestParam("roomName") String roomName,
@@ -146,7 +146,7 @@ public class AdminChatController {
     
 
     
-    @GetMapping("/chat/channel/{roomIdx}/members")
+    @GetMapping(value = "/chat/channel/{roomIdx}/members", produces = "application/json")
     @ResponseBody
     public Map<String, Object> getChannelMembers(
             @PathVariable Long roomIdx,
@@ -160,7 +160,7 @@ public class AdminChatController {
     }
 
     
-    @PostMapping("/chat/channel/{roomIdx}/member/add")
+    @PostMapping(value = "/chat/channel/{roomIdx}/member/add", produces = "application/json")
     @ResponseBody
     public Map<String, Object> addMember(
             @PathVariable Long roomIdx,
@@ -174,7 +174,7 @@ public class AdminChatController {
     }
 
     
-    @PostMapping("/chat/channel/{roomIdx}/member/remove")
+    @PostMapping(value = "/chat/channel/{roomIdx}/member/remove", produces = "application/json")
     @ResponseBody
     public Map<String, Object> removeMember(
             @PathVariable Long roomIdx,
@@ -188,7 +188,7 @@ public class AdminChatController {
     }
 
     
-    @PostMapping("/chat/channel/{roomIdx}/rename")
+    @PostMapping(value = "/chat/channel/{roomIdx}/rename", produces = "application/json")
     @ResponseBody
     public Map<String, Object> renameChannel(
             @PathVariable Long roomIdx,
@@ -205,7 +205,7 @@ public class AdminChatController {
     }
 
     
-    @PostMapping("/chat/channel/{roomIdx}/delete")
+    @PostMapping(value = "/chat/channel/{roomIdx}/delete", produces = "application/json")
     @ResponseBody
     public Map<String, Object> deleteChannel(
             @PathVariable Long roomIdx,

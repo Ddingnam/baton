@@ -2,12 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.NotificationMapper">
 
+    <resultMap id="notificationMap" type="com.sp.app.model.Notification">
+        <result property="notifIdx"  column="NOTIFIDX"/>
+        <result property="userIdx"   column="USERIDX"/>
+        <result property="notifType" column="NOTIFTYPE"/>
+        <result property="content"   column="CONTENT"/>
+        <result property="url"       column="URL"/>
+        <result property="isRead"    column="ISREAD"/>
+        <result property="createdAt" column="CREATEDAT"/>
+    </resultMap>
+
     <insert id="insertNotification" parameterType="com.sp.app.model.Notification">
         INSERT INTO NOTIFICATION (notifIdx, userIdx, notifType, content, url, isRead, createdAt)
         VALUES (notifSeq.NEXTVAL, #{userIdx}, #{notifType}, #{content}, #{url}, 0, SYSTIMESTAMP)
     </insert>
 
-    <select id="listNotification" parameterType="Long" resultType="com.sp.app.model.Notification">
+    <select id="listNotification" parameterType="Long" resultMap="notificationMap">
         SELECT notifIdx, userIdx, notifType, content, url, isRead,
                TO_CHAR(createdAt, 'YYYY-MM-DD HH24:MI') AS createdAt
         FROM NOTIFICATION

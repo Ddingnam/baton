@@ -103,7 +103,15 @@
     
 
     
-    <select id="listChannelMembers" resultType="com.sp.app.domain.dto.UserDto">
+    <resultMap id="channelMemberMap" type="com.sp.app.domain.dto.UserDto">
+        <result property="userIdx"      column="USERIDX"/>
+        <result property="nickname"     column="NICKNAME"/>
+        <result property="profile_photo" column="PROFILE_PHOTO"/>
+        <result property="userLevel"    column="USERLEVEL"/>
+        <result property="authority"    column="AUTHORITY"/>
+    </resultMap>
+
+    <select id="listChannelMembers" resultMap="channelMemberMap">
         SELECT u.userIdx, u.nickname, u.profile_photo, u.userLevel,
                NVL(a.authority, '') AS authority
         FROM chatMember cm
@@ -113,8 +121,7 @@
         ORDER BY u.userLevel DESC, u.userIdx ASC
     </select>
 
-    
-    <select id="listNonMembers" resultType="com.sp.app.domain.dto.UserDto">
+    <select id="listNonMembers" resultMap="channelMemberMap">
         SELECT u.userIdx, u.nickname, u.profile_photo, u.userLevel,
                NVL(a.authority, '') AS authority
         FROM users u

@@ -135,6 +135,12 @@
             var dash = document.getElementById('nav-dashboard');
             if (dash) dash.classList.add('active');
         }
+
+        // 팀채팅 버튼: /admin/chat 경로일 때 활성화
+        if (path.startsWith(adminRoot + '/chat')) {
+            var chatBtn = document.querySelector('.chat-entry-btn');
+            if (chatBtn) chatBtn.classList.add('active');
+        }
     })();
     </script>
     <div class="sidebar-foot">

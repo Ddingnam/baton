@@ -212,7 +212,7 @@
     function startDM(targetUserIdx) {
         fetch(CHAT_CTX + '/admin/chat/dm', {
             method: 'POST', credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
             body: 'targetUserIdx=' + targetUserIdx
         }).then(function (r) { return r.json(); })
           .then(function (d) {
@@ -267,7 +267,7 @@
         if (!name) return;
         fetch(CHAT_CTX + '/admin/chat/channel', {
             method: 'POST', credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
             body: 'roomName=' + encodeURIComponent(name) + '&inviteIdxs=' + selectedInviteIdxs.join(',')
         }).then(function(r) { return r.json(); })
           .then(function(d) {
@@ -572,15 +572,38 @@
         });
         document.getElementById('manageTabMembers').style.display  = tab === 'members'  ? '' : 'none';
         document.getElementById('manageTabSettings').style.display = tab === 'settings' ? '' : 'none';
+        // 멤버 탭으로 전환 시 최신 목록 재로드
+        if (tab === 'members' && manageRoomIdx) {
+            loadChannelMembers(manageRoomIdx);
+        }
     }
 
     function loadChannelMembers(roomIdx) {
-        fetch(CHAT_CTX + '/admin/chat/channel/' + roomIdx + '/members', { credentials: 'same-origin' })
-            .then(function(r) { return r.json(); })
+        var url = CHAT_CTX + '/admin/chat/channel/' + roomIdx + '/members';
+        var currentEl = document.getElementById('currentMemberList');
+        var nonEl     = document.getElementById('nonMemberList');
+        var loadingHtml = '<p style="font-size:12px;color:var(--text-light);padding:8px 0;"><i class="ri-loader-4-line" style="display:inline-block;margin-right:4px;"></i>불러오는 중...</p>';
+        if (currentEl) currentEl.innerHTML = loadingHtml;
+        if (nonEl)     nonEl.innerHTML     = loadingHtml;
+
+        fetch(url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+            .then(function(r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
             .then(function(d) {
-                if (!d.success) return;
+                if (!d.success) {
+                    if (currentEl) currentEl.innerHTML = '<p style="font-size:12px;color:var(--color-red);padding:8px 0;">권한이 없거나 오류가 발생했습니다.</p>';
+                    if (nonEl)     nonEl.innerHTML     = '';
+                    return;
+                }
                 renderCurrentMembers(d.members, roomIdx);
                 renderNonMembers(d.nonMembers, roomIdx);
+            })
+            .catch(function(err) {
+                console.error('[채널멤버] 로드 실패:', err);
+                if (currentEl) currentEl.innerHTML = '<p style="font-size:12px;color:var(--color-red);padding:8px 0;">멤버 목록을 불러오지 못했습니다.</p>';
+                if (nonEl)     nonEl.innerHTML     = '';
             });
     }
 
@@ -626,10 +649,35 @@
 
     function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+    function customConfirm(opts, onOk) {
+        var overlay = document.getElementById('customConfirmOverlay');
+        var icon    = document.getElementById('confirmIcon');
+        var title   = document.getElementById('confirmTitle');
+        var desc    = document.getElementById('confirmDesc');
+        var okBtn   = document.getElementById('confirmOkBtn');
+        var cancel  = document.getElementById('confirmCancelBtn');
+        if (!overlay) { if (onOk) onOk(); return; }
+
+        icon.style.background  = opts.iconBg  || 'linear-gradient(135deg,#EF4444,#F97316)';
+        icon.innerHTML         = opts.icon     || '<i class="ri-error-warning-fill" style="color:#fff;"></i>';
+        title.textContent      = opts.title    || '확인';
+        desc.textContent       = opts.desc     || '';
+        okBtn.textContent      = opts.okLabel  || '확인';
+        okBtn.style.background = opts.okBg     || '#EF4444';
+        okBtn.style.color      = '#fff';
+
+        overlay.style.display = 'flex';
+
+        function close() { overlay.style.display = 'none'; }
+        okBtn.onclick = function() { close(); if (onOk) onOk(); };
+        cancel.onclick = close;
+        overlay.onclick = function(e) { if (e.target === overlay) close(); };
+    }
+
     window.addMember = function(roomIdx, userIdx) {
         fetch(CHAT_CTX + '/admin/chat/channel/' + roomIdx + '/member/add', {
             method: 'POST', credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
             body: 'userIdx=' + userIdx
         }).then(function(r) { return r.json(); }).then(function(d) {
             if (d.success) loadChannelMembers(roomIdx);
@@ -637,13 +685,21 @@
     };
 
     window.removeMember = function(roomIdx, userIdx) {
-        if (!confirm('이 멤버를 채널에서 제거하시겠습니까?')) return;
-        fetch(CHAT_CTX + '/admin/chat/channel/' + roomIdx + '/member/remove', {
-            method: 'POST', credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'userIdx=' + userIdx
-        }).then(function(r) { return r.json(); }).then(function(d) {
-            if (d.success) loadChannelMembers(roomIdx);
+        customConfirm({
+            icon: '<i class="ri-user-unfollow-fill" style="color:#fff;"></i>',
+            iconBg: 'linear-gradient(135deg,#F97316,#EF4444)',
+            title: '멤버 제거',
+            desc: '이 멤버를 채널에서 제거하시겠습니까?',
+            okLabel: '제거',
+            okBg: '#EF4444'
+        }, function() {
+            fetch(CHAT_CTX + '/admin/chat/channel/' + roomIdx + '/member/remove', {
+                method: 'POST', credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'userIdx=' + userIdx
+            }).then(function(r) { return r.json(); }).then(function(d) {
+                if (d.success) loadChannelMembers(roomIdx);
+            });
         });
     };
 
@@ -653,7 +709,7 @@
         if (!newName) return;
         fetch(CHAT_CTX + '/admin/chat/channel/' + manageRoomIdx + '/rename', {
             method: 'POST', credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
             body: 'roomName=' + encodeURIComponent(newName)
         }).then(function(r) { return r.json(); }).then(function(d) {
             if (d.success) {
@@ -673,19 +729,26 @@
 
     window.doDeleteChannel = function() {
         if (!manageRoomIdx) return;
-        if (!confirm('채널 "' + manageRoomName + '"을 삭제하시겠습니까?\n모든 메시지가 영구 삭제됩니다.')) return;
-        fetch(CHAT_CTX + '/admin/chat/channel/' + manageRoomIdx + '/delete', {
-            method: 'POST', credentials: 'same-origin'
-        }).then(function(r) { return r.json(); }).then(function(d) {
-            if (d.success) {
-                var item = document.querySelector('.channel-item[data-roomidx="' + manageRoomIdx + '"]');
-                if (item) item.remove();
-                closeManageModal();
-                
-                if (manageRoomIdx === CHAT_ROOM_IDX) {
-                    window.location.href = CHAT_CTX + '/admin/chat';
+        customConfirm({
+            icon: '<i class="ri-delete-bin-fill" style="color:#fff;"></i>',
+            iconBg: 'linear-gradient(135deg,#EF4444,#DC2626)',
+            title: '채널 삭제',
+            desc: '"' + manageRoomName + '" 채널을 삭제하면 모든 메시지가 영구 삭제됩니다.',
+            okLabel: '삭제',
+            okBg: '#EF4444'
+        }, function() {
+            fetch(CHAT_CTX + '/admin/chat/channel/' + manageRoomIdx + '/delete', {
+                method: 'POST', credentials: 'same-origin'
+            }).then(function(r) { return r.json(); }).then(function(d) {
+                if (d.success) {
+                    var item = document.querySelector('.channel-item[data-roomidx="' + manageRoomIdx + '"]');
+                    if (item) item.remove();
+                    closeManageModal();
+                    if (manageRoomIdx === CHAT_ROOM_IDX) {
+                        window.location.href = CHAT_CTX + '/admin/chat';
+                    }
                 }
-            }
+            });
         });
     };
 

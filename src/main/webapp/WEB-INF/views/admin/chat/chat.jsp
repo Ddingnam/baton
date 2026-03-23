@@ -374,6 +374,7 @@
                 </div>
                 <div class="ch-member-pick-list" id="channelMemberPickList">
                     <c:forEach var="member" items="${memberList}">
+                        <c:if test="${member.userIdx != myUserIdx}">
                         <div class="ch-member-pick-row" data-useridx="${member.userIdx}" data-nickname="${member.nickname}">
                             <div class="ch-pick-avt">${fn:substring(member.nickname, 0, 2)}</div>
                             <div class="ch-pick-info">
@@ -382,6 +383,7 @@
                             </div>
                             <div class="ch-pick-check"><i class="ri-check-line"></i></div>
                         </div>
+                        </c:if>
                     </c:forEach>
                 </div>
             </div>
@@ -415,6 +417,20 @@
                     </c:if>
                 </c:forEach>
             </div>
+        </div>
+    </div>
+</div>
+
+<div id="customConfirmOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:99999;align-items:center;justify-content:center;">
+    <div style="background:var(--card-bg);border-radius:20px;padding:28px 28px 22px;width:340px;box-shadow:0 24px 60px rgba(0,0,0,0.18);border:1.5px solid var(--border-color);">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+            <div id="confirmIcon" style="width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;"></div>
+            <p id="confirmTitle" style="font-size:15px;font-weight:800;color:var(--text-main);margin:0;"></p>
+        </div>
+        <p id="confirmDesc" style="font-size:13px;color:var(--text-light);font-weight:500;line-height:1.6;margin:0 0 22px;padding-left:54px;"></p>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <button id="confirmCancelBtn" style="padding:9px 20px;border-radius:10px;border:1.5px solid var(--border-color);background:none;color:var(--text-sub);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">취소</button>
+            <button id="confirmOkBtn" style="padding:9px 20px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;"></button>
         </div>
     </div>
 </div>
