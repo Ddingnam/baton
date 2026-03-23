@@ -63,6 +63,15 @@ public class JobPostingController {
 
 		int dataCount = postingService.dataCount(map);
 		List<JobPosting> list = postingService.listPosting(map);
+		
+		java.util.List<Long> userScrapList = new java.util.ArrayList<>();
+		if (userDetails != null) {
+		    List<JobPosting> scraps = postingService.listJobScrap(userDetails.getUserIdx());
+		    for(JobPosting p : scraps) {
+		        userScrapList.add(p.getPostingIdx());
+		    }
+		}
+		model.addAttribute("userScrapList", userScrapList);
 
 		model.addAttribute("list", list);
 		model.addAttribute("dataCount", dataCount);
@@ -96,36 +105,48 @@ public class JobPostingController {
 		return "redirect:/alba/list";
 	}
 
-	@GetMapping("article/{num}")
-	public String article(@PathVariable("num") long num, 
-	                      @RequestParam(value = "page", defaultValue = "1") String page,
-	                      Model model) {
-	    try {
-	        postingService.updateHitCount(num); 
-	        JobPosting dto = postingService.findById(num);
-	        
-	        if (dto == null) return "redirect:/alba/list?page=" + page;
+	// 1. article 메서드를 통째로 아래 코드로 변경하세요. (스크랩 여부 확인 로직 추가)
+		@GetMapping("article/{num}")
+		public String article(@PathVariable("num") long num, 
+		                      @RequestParam(value = "page", defaultValue = "1") String page,
+		                      @AuthenticationPrincipal CustomUserDetails userDetails, // 🔥 로그인 정보 추가
+		                      Model model) {
+		    try {
+		        postingService.updateHitCount(num); 
+		        JobPosting dto = postingService.findById(num);
+		        
+		        if (dto == null) return "redirect:/alba/list?page=" + page;
 
-	        // 1. 요일 변환 (데이터가 없으면 그냥 빈값으로 둡니다)
-	        String koreanDays = convertToKoreanDays(dto.getWorkDays());
-	        model.addAttribute("koreanDays", koreanDays);
+		        String koreanDays = convertToKoreanDays(dto.getWorkDays());
+		        model.addAttribute("koreanDays", koreanDays);
 
-	        // 2. 근무시간 (시작/종료 시간이 둘 다 있을 때만 합치고, 없으면 시간협의)
-	        String computedWorkTime = (dto.getStartTime() != null && !dto.getStartTime().isEmpty() && 
-	                                   dto.getEndTime() != null && !dto.getEndTime().isEmpty()) 
-	                                   ? dto.getStartTime() + " ~ " + dto.getEndTime() 
-	                                   : "시간협의";
-	        model.addAttribute("computedWorkTime", computedWorkTime);
+		        String computedWorkTime = (dto.getStartTime() != null && !dto.getStartTime().isEmpty() && 
+		                                   dto.getEndTime() != null && !dto.getEndTime().isEmpty()) 
+		                                   ? dto.getStartTime() + " ~ " + dto.getEndTime() 
+		                                   : "시간협의";
+		        model.addAttribute("computedWorkTime", computedWorkTime);
 
-	        model.addAttribute("dto", dto);
-	        model.addAttribute("page", page);
-	        
-	        return "alba/article"; 
-	    } catch (Exception e) {
-	        log.error("상세보기 에러: ", e);
-	        return "redirect:/alba/list?page=" + page;
-	    }
-	}
+		        boolean isUserScrap = false;
+		        if (userDetails != null) {
+		            Map<String, Object> map = new HashMap<>();
+		            map.put("memberId", userDetails.getUserIdx());
+		            map.put("postingIdx", num);
+		            int scrapCount = postingService.checkJobScrap(map);
+		            if (scrapCount > 0) {
+		                isUserScrap = true;
+		            }
+		        }
+		        model.addAttribute("userScrap", isUserScrap); // JSP에서 이 값을 받아 하트 색칠 여부 결정
+
+		        model.addAttribute("dto", dto);
+		        model.addAttribute("page", page);
+		        
+		        return "alba/article"; 
+		    } catch (Exception e) {
+		        log.error("상세보기 에러: ", e);
+		        return "redirect:/alba/list?page=" + page;
+		    }
+		}
 
 	@GetMapping("update")
 	public String updateForm(@RequestParam(value = "postingIdx") long postingIdx,
@@ -248,39 +269,41 @@ public class JobPostingController {
 	    }
 	}
 	
-	@PostMapping("/scrap")
-	@ResponseBody
-	public Map<String, Object> toggleScrap(
-	        @RequestParam("postingIdx") long postingIdx,
-	        @RequestParam("isScrap") boolean isScrap,
-	        HttpSession session) {
+	// 2. toggleScrap 메서드를 통째로 아래 코드로 변경하세요. (Security 인증 객체 사용으로 변경)
+		@PostMapping("/scrap")
+		@ResponseBody
+		public Map<String, Object> toggleScrap(
+		        @RequestParam("postingIdx") long postingIdx,
+		        @RequestParam("isScrap") boolean isScrap,
+		        @AuthenticationPrincipal CustomUserDetails userDetails) { // 🔥 HttpSession 대신 Security 객체 사용
 
-	    Map<String, Object> result = new HashMap<>();
-	    SessionInfo info = (SessionInfo) session.getAttribute("member");
+		    Map<String, Object> result = new HashMap<>();
 
-	    if (info == null) {
-	        result.put("status", "login_required");
-	        return result;
-	    }
+		    // 로그인하지 않은 경우
+		    if (userDetails == null) {
+		        result.put("status", "login_required");
+		        return result;
+		    }
 
-	    try {
-	        Map<String, Object> map = new HashMap<>();
-	        map.put("memberId", info.getUserIdx());
-	        map.put("postingIdx", postingIdx);
+		    try {
+		        Map<String, Object> map = new HashMap<>();
+		        map.put("memberId", userDetails.getUserIdx()); // 🔥 확실하게 Security에서 UserIdx를 꺼내옴
+		        map.put("postingIdx", postingIdx);
 
-	        if (isScrap) {
-	            postingService.insertJobScrap(map);
-	        } else {
-	            postingService.deleteJobScrap(map);
-	        }
+		        if (isScrap) {
+		            postingService.insertJobScrap(map);
+		        } else {
+		            postingService.deleteJobScrap(map);
+		        }
 
-	        result.put("status", "success");
+		        result.put("status", "success");
 
-	    } catch (Exception e) {
-	        result.put("status", "error");
-	    }
+		    } catch (Exception e) {
+		    	log.error("스크랩 에러", e);
+		        result.put("status", "error");
+		    }
 
-	    return result;
-	}
+		    return result;
+		}
 	
 }

@@ -33,4 +33,7 @@ public interface JobPostingMapper {
     public void insertJobScrap(Map<String, Object> map) throws SQLException;
     public void deleteJobScrap(Map<String, Object> map) throws SQLException;
     public int checkJobScrap(Map<String, Object> map);
+    
+    public List<JobPosting> listJobScrap(long memberId);
+    
 }

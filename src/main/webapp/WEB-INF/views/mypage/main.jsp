@@ -391,7 +391,7 @@
 						<div class="list-card">
 							<div class="lc-header">
 								<h3>알바 활동 내역</h3>
-								<a href="${pageContext.request.contextPath}/mypage/alba/apply" class="theme-link">이력서 관리 <i class="ri-arrow-right-s-line"></i></a>
+								<a href="${pageContext.request.contextPath}/resume/myList" class="theme-link">이력서 관리 <i class="ri-arrow-right-s-line"></i></a>
 							</div>
 
 							<div class="inner-tabs">
@@ -469,7 +469,41 @@
 							        </c:choose>
 								</div>
 							</div>
-						</div>
+							
+							<div class="inner-section" id="alba-wish">
+								<div class="lc-list">
+									<c:choose>
+										<c:when test="${empty albaScrapList}">
+											<div class="lc-empty">
+												<i class="ri-heart-line"></i>
+												<p>스크랩한 관심 공고가 없습니다.</p>
+											</div>
+										</c:when>
+										<c:otherwise>
+											<c:forEach var="alba" items="${albaScrapList}">
+												<div class="lc-item" style="cursor:pointer;" onclick="location.href='${pageContext.request.contextPath}/alba/article/${alba.postingIdx}'">
+													<div class="item-info">
+														<c:if test="${not empty alba.employer}">
+															<span class="corp-name theme-text">${alba.employer}</span>
+														</c:if>
+														<h4>${alba.title}</h4>
+														<p class="info-metrics">
+															${alba.payType} <fmt:formatNumber value="${alba.pay}" pattern="#,###"/>원 · 
+															${alba.location}
+														</p>
+													</div>
+													<div class="item-right">
+														<span class="${alba.recruitStatus == '모집중' ? 'theme-badge' : 'theme-badge-done'}">
+															${alba.recruitStatus}
+														</span>
+													</div>
+												</div>
+											</c:forEach>
+										</c:otherwise>
+									</c:choose>
+								</div>
+							</div>
+							</div>
 					</section>
 
 					<section id="sec-community" class="mp-section">

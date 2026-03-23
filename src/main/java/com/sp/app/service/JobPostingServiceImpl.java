@@ -156,5 +156,27 @@ public class JobPostingServiceImpl implements JobPostingService {
 	        log.warn("스크랩 삭제 실패", e);
 	    }
 	}
+	
+	@Override
+	public List<JobPosting> listJobScrap(long userIdx) {
+	    List<JobPosting> list = null;
+	    try {
+	        list = mapper.listJobScrap(userIdx);
+	    } catch (Exception e) {
+	        log.info("listJobScrap error : ", e);
+	    }
+	    return list;
+	}
+	
+	@Override
+	public int checkJobScrap(Map<String, Object> map) {
+	    int result = 0;
+	    try {
+	        result = mapper.checkJobScrap(map);
+	    } catch (Exception e) {
+	        log.info("checkJobScrap error", e);
+	    }
+	    return result;
+	}
     
 }

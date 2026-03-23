@@ -226,4 +226,22 @@
 		    WHERE MEMBER_ID = #{memberId} AND POSTING_IDX = #{postingIdx}
 		</select>
 
+		<select id="listJobScrap" parameterType="long" resultType="com.sp.app.model.JobPosting">
+		    SELECT 
+		        jp.posting_idx AS postingIdx,
+		        jp.title, jp.employer, jp.pay,
+		        jp.pay_type AS payType,
+		        jp.location, jp.created_date AS createdDate,
+		        jp.category, jp.work_period AS workPeriod,
+		        jp.recruit_status AS recruitStatus,
+		        jp.work_days AS workDays,
+		        jp.start_time AS startTime,
+		        jp.end_time AS endTime,
+		        jp.deadline
+		    FROM job_posting jp
+		    JOIN JOB_SCRAP js ON jp.posting_idx = js.POSTING_IDX
+		    WHERE js.MEMBER_ID = #{memberId}
+		    ORDER BY jp.posting_idx DESC
+		</select>
+
 </mapper>

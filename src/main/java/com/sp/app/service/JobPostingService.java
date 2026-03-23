@@ -29,4 +29,8 @@ public interface JobPostingService {
 	void insertJobScrap(Map<String, Object> map) throws Exception;
 
 	void deleteJobScrap(Map<String, Object> map) throws Exception;
+	
+	List<JobPosting> listJobScrap(long userIdx);
+	
+	public int checkJobScrap(Map<String, Object> map) throws Exception;
 }

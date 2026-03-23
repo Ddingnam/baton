@@ -161,14 +161,11 @@
         </div>
       </div>
 
-      <%-- ===== LAYOUT ===== --%>
       <div id="alba-layout-container">
         <div class="baton-page">
 
-          <%-- 사이드바 --%>
           <aside class="baton-sidebar">
 
-            <%-- 현재 지역 --%>
             <div class="sidebar-header">
               <div class="location-label">
                 <i class="ri-map-pin-2-fill"></i> 현재 지역
@@ -196,7 +193,6 @@
               </div>
             </div>
 
-            <%-- 동네 범위 슬라이더 --%>
             <div class="range-section">
               <div class="range-label-row">
                 <span class="range-title">동네 범위</span>
@@ -206,7 +202,6 @@
                      min="0" max="4" value="0" step="1" />
             </div>
 
-            <%-- 근무 기간 --%>
             <div class="filter-section" data-filter-type="period">
               <div class="filter-title">근무 기간</div>
               <div class="filter-chips">
@@ -222,7 +217,6 @@
               </div>
             </div>
 
-            <%-- 현황 통계 --%>
             <div class="sidebar-stat-box">
               <div class="stat-row">
                 <span>모집 중</span>
@@ -232,7 +226,6 @@
 
           </aside>
 
-          <%-- 콘텐츠 영역 --%>
           <div class="content">
             <div class="content-header">
               <div class="result-count">
@@ -240,7 +233,6 @@
               </div>
             </div>
 
-            <%-- 카드 그리드가 renderList()로 여기에 삽입됨 --%>
             <div id="listView"></div>
             <div class="pagination" id="pagination"></div>
           </div>
@@ -277,7 +269,11 @@
         category:    `${dto.category}`,
         startTime:   `${dto.startTime}`,
         endTime:     `${dto.endTime}`,
-        recruitStatus: `${dto.recruitStatus}`
+        
+        recruitStatus: `${dto.recruitStatus}`, 
+        
+        isScrapped:  ${userScrapList != null && userScrapList.contains(dto.postingIdx) ? 'true' : 'false'}
+        
       }${!status.last ? ',' : ''}
       </c:forEach>
     ];

@@ -79,6 +79,8 @@ public class MyPageController {
             model.addAttribute("buyList", tradeService.findBuyList(userIdx));
             model.addAttribute("wishList", wishListService.findWishList(userIdx));
             model.addAttribute("albaPostList", jobPostingService.postListByUserId(userIdx));
+            
+            model.addAttribute("albaScrapList", jobPostingService.listJobScrap(userIdx));
         }
 
         return "mypage/main";
