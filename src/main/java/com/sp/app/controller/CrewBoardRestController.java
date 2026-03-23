@@ -53,6 +53,23 @@ public class CrewBoardRestController {
         }
     }
 	
+	@PostMapping("update")
+    public ResponseEntity<?> updatePost(
+    		@RequestBody CrewBoardDto dto) {
+        Map<String, Object> model = new HashMap<>();
+        
+        try {
+        	service.updatePost(dto);
+            model.put("status", "success");
+            return ResponseEntity.ok(model);
+            
+        } catch (Exception e) {
+            log.error("updatePost error : ", e);
+            model.put("status", "error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
+        }
+    }
+	
 	@GetMapping("list/{crewIdx}")
     public ResponseEntity<?> boardList(
     		@PathVariable("crewIdx") Long crewIdx,
@@ -60,7 +77,7 @@ public class CrewBoardRestController {
             @RequestParam(value = "size", defaultValue = "5") int size) {
 		Map<String, Object> model = new HashMap<>();
 		try {
-            model = service.getPostListCustom(crewIdx, page, size);
+            model = service.getPostList(crewIdx, page, size);
             model.put("status", "success");
             return ResponseEntity.ok(model);
         } catch (Exception e) {
@@ -72,9 +89,13 @@ public class CrewBoardRestController {
 
     @GetMapping("detail/{boardIdx}")
     public ResponseEntity<CrewBoardDto> getPostDetail(@PathVariable("boardIdx") Long boardIdx) {
-        CrewBoardDto dto = service.findPostById(boardIdx);
-        service.updateViewCount(boardIdx);
-        return ResponseEntity.ok(dto);
+    	try {
+            CrewBoardDto dto = service.getPostDetail(boardIdx);
+            return ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            log.error("getPostDetail error : ", e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 	
 	

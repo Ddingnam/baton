@@ -16,11 +16,13 @@
 	                    <strong v-if="viewMode === 'list'">List</strong>
 	                    <strong v-else-if="viewMode === 'detail'">Detail</strong>
 	                    <strong v-else-if="viewMode === 'write'">New Post</strong>
+						<strong v-else-if="viewMode === 'edit'">Update Post</strong>
 	                </div>
 	                <h2 class="cdb-header-title">
 	                    <template v-if="viewMode === 'list'">크루 게시판</template>
 	                    <template v-else-if="viewMode === 'detail'">게시글 상세보기</template>
 	                    <template v-else-if="viewMode === 'write'">새 글 작성하기</template>
+	                    <template v-else-if="viewMode === 'edit'">글 수정하기</template>
 	                </h2>
 	            </div>
 	
@@ -33,7 +35,7 @@
 	                <button v-if="viewMode === 'list'" class="cdb-btn-primary" @click="viewMode = 'write'">
 	                    <i class="ri-add-line"></i> <span>글쓰기</span>
 	                </button>
-	                <button v-else class="cdb-btn-outline" @click="viewMode = 'list'">
+	                <button v-else class="cdb-btn-outline" @click="backToList">
 	                    <i class="ri-list-check"></i> <span>목록으로</span>
 	                </button>
 	            </div>
@@ -49,18 +51,20 @@
 			            <span class="col-date">등록일</span>
 			            <span class="col-view">조회</span>
 			        </div>
-			        
-			        <div v-for="(post, index) in posts" :key="post.crewBoardIdx" class="cdb-list-item" @click="goToDetail(post)">
-			            <span class="col-id">{{ totalElements - ((currentPage - 1) * pageSize) - index }}</span>
-			            <span class="col-title">
-			                <span v-if="post.isNotice === 'Y'" class="cdb-badge-notice">공지</span>
-			                {{ post.title }}
-			                </span>
-			            <span class="col-author">{{ post.authorNickname || '익명' }}</span>
-			            <span class="col-date">{{ post.createdDate }}</span>
-			            <span class="col-view">{{ post.viewCount }}</span>
+					
+					<div v-else class="cdb-list-container fade-in-list" :key="currentPage">
+				        <div v-for="(post, index) in posts" :key="post.crewBoardIdx" class="cdb-list-item" @click="goToDetail(post)">
+				            <span class="col-id">{{ totalElements - ((currentPage - 1) * pageSize) - index }}</span>
+				            <span class="col-title">
+				                <span v-if="post.isNotice === 'Y'" class="cdb-badge-notice">공지</span>
+				                {{ post.title }}
+				                </span>
+				            <span class="col-author">{{ post.authorNickname || '익명' }}</span>
+				            <span class="col-date">{{ post.formattedDate }}</span>
+				            <span class="col-view">{{ post.viewCount }}</span>
+				        </div>
 			        </div>
-			        
+					
 			        <div v-if="posts.length === 0" class="cd-no-data">
 			            등록된 게시글이 없습니다. 첫 글을 남겨보세요!
 			        </div>
@@ -80,25 +84,31 @@
 			</div>
 
             <div v-else-if="viewMode === 'detail' && currentPost" key="detail" class="cdb-detail-view">
-                <div class="cdb-detail-nav">
-                    <div class="cdb-detail-actions" style="margin-left: auto;">
-                        <button class="cdb-text-btn">수정</button>
-                        <button class="cdb-text-btn danger">삭제</button>
-                    </div>
-                </div>
+				<header class="cdb-post-header">
+			        <div class="cdb-post-info">
+			            <h2 class="cdb-post-title">{{ currentPost.title }}</h2>
+			            <div class="cdb-post-meta">
+			                <span class="meta-item"><i class="ri-user-smile-line"></i> {{ currentPost.authorNickname || '익명' }}</span>
+			                <span class="meta-divider"></span>
+			                <span class="meta-item"><i class="ri-time-line"></i> {{ currentPost.formattedDate }}</span>
+			                <span class="meta-divider"></span>
+			                <span class="meta-item"><i class="ri-eye-line"></i> {{ currentPost.viewCount }}</span>
+			            </div>
+			        </div>
+			        
+			        <div class="cdb-post-side">
+			            <div class="cdb-detail-actions">
+			                <button class="cdb-action-btn edit" @click="goToEdit">
+			                    <i class="ri-edit-line"></i> 수정
+			                </button>
+			                <button class="cdb-action-btn delete" @click="deletePost">
+			                    <i class="ri-delete-bin-line"></i> 삭제
+			                </button>
+			            </div>
+			        </div>
+			    </header>
                 
-                <div class="cdb-post-head">
-                    <h2>{{ currentPost.title }}</h2>
-                    <div class="cdb-post-meta">
-                        <span><i class="ri-user-smile-line"></i> {{ currentPost.author }}</span>
-                        <span><i class="ri-time-line"></i> {{ currentPost.date }}</span>
-                        <span><i class="ri-eye-line"></i> {{ currentPost.views }}</span>
-                    </div>
-                </div>
-                
-                <div class="cdb-post-body">
-                    {{ currentPost.content }}
-                </div>
+                <div class="cdb-post-body ql-editor" v-html="currentPost.content"></div>
                 
                 <div class="cdb-comment-area">
                     <h4>댓글 <span>{{ currentPost.commentCount || 0 }}</span></h4>
@@ -118,26 +128,27 @@
                 </div>
             </div>
 
-            <div v-else-if="viewMode === 'write'" key="write" class="cdb-write-view">
+			<div v-else-if="viewMode === 'write' || viewMode === 'edit'" :key="viewMode" class="cdb-write-view">
 			    <div class="cdb-form">
 			        <div class="cdb-form-item">
 			            <input type="text" v-model="writeForm.title" placeholder="제목을 입력하세요" class="cdb-input">
 			        </div>
-			
+
 			        <div class="cdb-form-item">
-					    <div id="quill-editor" ref="quillEditor" class="cdb-quill-container"></div>
-					</div>
-			
+			            <div id="quill-editor" ref="quillEditor" class="cdb-quill-container"></div>
+			        </div>
+
 			        <div class="cdb-form-btns">
 			            <label class="cdb-checkbox-label" style="margin-right: auto;">
 			                <input type="checkbox" v-model="writeForm.isNotice" true-value="Y" false-value="N">
 			                <span class="cdb-check-custom"></span>
 			                <span class="label-text">공지사항으로 등록</span>
 			            </label>
-			
-			            <button class="cdb-btn-outline" @click="viewMode = 'list'" style="width: auto;">취소</button>
+
+			            <button class="cdb-btn-outline" @click="cancelWrite" style="width: auto;">취소</button>
+			            
 			            <button class="cdb-btn-primary" @click="submitPost" style="width: auto;">
-			                <i class="ri-check-line"></i> 등록하기
+			                <i class="ri-check-line"></i> {{ viewMode === 'edit' ? '수정하기' : '등록하기' }}
 			            </button>
 			        </div>
 			    </div>

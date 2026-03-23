@@ -4,6 +4,7 @@ const CrewBoard = {
     data() {
         return {
             viewMode: 'list',
+			isBoardListLoading: false,
             currentPost: null,
             newComment: '',
 			quill: null,
@@ -42,7 +43,7 @@ const CrewBoard = {
     },
 	watch: {
 		viewMode(newMode) {
-	        if (newMode === 'write') {
+	        if (newMode === 'write' || newMode === 'edit') {
 	            this.$nextTick(() => {
 	                const el = this.$refs.quillEditor;
 	                if (!el) {
@@ -51,6 +52,13 @@ const CrewBoard = {
 	                
 	                if (!this.quill) {
 	                    this.initQuill();
+	                }
+					
+					if (newMode === 'edit') {
+	                    this.quill.root.innerHTML = this.writeForm.content;
+	                } else if (newMode === 'write') {
+	                    this.quill.root.innerHTML = '';
+	                    this.writeForm = { title: '', content: '', isNotice: 'N', status: 'ACTIVE' };
 	                }
 	            });
 	        } else {
@@ -86,13 +94,52 @@ const CrewBoard = {
                 this.writeForm.content = this.quill.root.innerHTML;
             });
         },
-        goToDetail(post) {
-            this.currentPost = post;
-            this.viewMode = 'detail';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        },
+		async goToDetail(post) {
+		    try {
+		        const response = await fetch(`${contextPath}/api/crew/board/detail/${post.crewBoardIdx}`);
+		        
+		        if (!response.ok) throw new Error('상세보기 서버 응답 오류');
+
+		        const updatedPost = await response.json();
+
+		        this.currentPost = updatedPost;
+
+		        const index = this.posts.findIndex(p => p.crewBoardIdx === updatedPost.crewBoardIdx);
+		        if (index !== -1) {
+		            this.posts.splice(index, 1, updatedPost);
+		        }
+
+		        this.viewMode = 'detail';
+		        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+		    } catch (error) {
+		        console.error('상세 조회 중 에러 발생:', error);
+		        alert('게시글 정보를 가져오지 못했습니다.');
+		    }
+		},
+		goToEdit() {
+	        this.writeForm = {
+	            crewBoardIdx: this.currentPost.crewBoardIdx,
+	            title: this.currentPost.title,
+	            content: this.currentPost.content,
+	            isNotice: this.currentPost.isNotice,
+	            status: this.currentPost.status
+	        };
+	        this.viewMode = 'edit';
+	    },
+	    cancelWrite() {
+	        if (this.viewMode === 'edit') {
+	            this.viewMode = 'detail';
+	        } else {
+	            this.writeForm = { title: '', content: '', isNotice: 'N', status: 'ACTIVE' }; // 폼 초기화
+	            this.viewMode = 'list';
+	        }
+	    },
 		async fetchPosts(page = 1) {
             if (!this.crew || !this.crew.crewIdx) return;
+			
+			const startTime = Date.now();
+		    this.isBoardListLoading = true;
 
             try {
                 const response = await fetch(`${contextPath}/api/crew/board/list/${this.crew.crewIdx}?page=${page}`);
@@ -109,8 +156,21 @@ const CrewBoard = {
             } catch (error) {
                 console.error('목록 조회 에러:', error);
                 alert('게시글 목록을 불러오는 중 오류가 발생했습니다.');
-            }
+            } finally {
+		        const elapsedTime = Date.now() - startTime;
+		        const delay = Math.max(0, 300 - elapsedTime);
+		        
+		        setTimeout(() => {
+		            this.isBoardListLoading = false;
+		        }, delay);
+		    }
         },
+		
+		backToList() {
+		    this.viewMode = 'list';
+		    this.fetchPosts(this.currentPage); 
+		    this.currentPost = null;
+		},
 
         changePage(page) {
             if (page < 1 || page > this.totalPages || page === this.currentPage) return;
@@ -127,39 +187,46 @@ const CrewBoard = {
 		        alert('제목과 내용을 모두 입력해주세요.');
 		        return;
 		    }
+			
+			const isEdit = this.viewMode === 'edit';
 
-		    const postData = {
+			const postData = {
 		        crewIdx: this.crew.crewIdx,
+		        crewBoardIdx: isEdit ? this.writeForm.crewBoardIdx : null,
 		        title: this.writeForm.title,
 		        content: this.writeForm.content,
 		        isNotice: this.writeForm.isNotice,
 		        status: this.writeForm.status
 		    };
+			
+			const url = isEdit ? `${contextPath}/api/crew/board/update` : `${contextPath}/api/crew/board/write`;
 
 		    try {
-		        const response = await fetch(`${contextPath}/api/crew/board/write`, {
-		            method: 'POST',
-		            headers: {
-		                'Content-Type': 'application/json'
-		            },
-		            body: JSON.stringify(postData)
-		        });
+				const response = await fetch(url, {
+			        method: 'POST',
+			        headers: { 'Content-Type': 'application/json' },
+			        body: JSON.stringify(postData)
+			    });
 
 		        if (!response.ok) throw new Error('서버 응답 오류');
 
 		        const result = await response.json();
 
 		        if (result.status === 'success') {
-		            alert('게시글이 성공적으로 등록되었습니다.');
+		            alert(isEdit ? '게시글이 수정되었습니다.' : '게시글이 등록되었습니다.');
 		            
 		            this.writeForm = { title: '', content: '', isNotice: 'N', status: 'ACTIVE' };
 		            if (this.quill) this.quill.setContents([]);
 		            
-		            this.viewMode = 'list';
-					this.fetchPosts(1); 
-					window.scrollTo(0, 0);
+					if (isEdit) {
+		                this.goToDetail(this.currentPost); 
+		            } else {
+		                this.viewMode = 'list';
+		                this.fetchPosts(1); 
+		                window.scrollTo(0, 0);
+		            }
 		        } else {
-		            alert('등록 실패: ' + result.message);
+		            alert((isEdit ? '수정' : '등록') + ' 실패: ' + result.message);
 		        }
 		    } catch (error) {
 		        console.error('Error:', error);

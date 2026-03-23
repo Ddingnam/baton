@@ -2,6 +2,7 @@ package com.sp.app.domain.dto;
 
 import java.time.format.DateTimeFormatter;
 
+import com.sp.app.common.MyUtil;
 import com.sp.app.domain.entity.CrewBoard;
 import com.sp.app.service.MemberService;
 
@@ -21,7 +22,6 @@ public class CrewBoardDto {
     private Long crewBoardIdx;
     private Long crewIdx;
     private Long userIdx;
-    private String authorNickname;
     private String title;
     private String content;
     private String isNotice;
@@ -29,6 +29,11 @@ public class CrewBoardDto {
     private Integer viewCount;
     private String createdDate;
     private String updatedDate;
+    
+    private String authorNickname;
+    private String authorProfilePhoto;
+    
+    private String formattedDate;
     
     public static CrewBoardDto fromEntity(CrewBoard entity) {
         if (entity == null) return null;
@@ -46,6 +51,7 @@ public class CrewBoardDto {
                 entity.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : null)
             .updatedDate(entity.getUpdatedDate() != null ? 
                 entity.getUpdatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : null)
+            .formattedDate(MyUtil.formatRelativeDate(entity.getCreatedDate()))
             .build();
     }
 }

@@ -4,6 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -264,5 +267,33 @@ public class MyUtil {
         String cleanUuid = uuid.replace("-", "");
         
         return cleanUuid;
+    }
+	
+	/**
+	 * 시간 출력용 변환 함수
+	 * @param targetDate
+	 * @return 출력 문자열
+	 */
+	public static String formatRelativeDate(LocalDateTime targetDate) {
+        if (targetDate == null) return "";
+
+        LocalDateTime now = LocalDateTime.now();
+        
+        long seconds = ChronoUnit.SECONDS.between(targetDate, now);
+        long minutes = ChronoUnit.MINUTES.between(targetDate, now);
+        long hours = ChronoUnit.HOURS.between(targetDate, now);
+        long days = ChronoUnit.DAYS.between(targetDate, now);
+
+        if (seconds < 60) {
+            return "방금 전";
+        } else if (minutes < 60) {
+            return minutes + "분 전";
+        } else if (hours < 24) {
+            return hours + "시간 전";
+        } else if (days <= 7) {
+            return days + "일 전";
+        } else {
+            return targetDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        }
     }
 }
