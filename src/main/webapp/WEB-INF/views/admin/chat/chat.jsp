@@ -208,7 +208,7 @@
                             </c:when>
                             <c:otherwise>
                                 <div class="chat-msg-group">
-                                    <div class="chat-avt">${fn:substring(chat.nickname, 0, 2)}</div>
+                                    <div class="chat-avt" data-uid="${chat.userIdx}">${fn:substring(chat.nickname, 0, 2)}</div>
                                     <div class="chat-msg-body">
                                         <div class="chat-msg-meta">
                                             <span class="chat-msg-name">${chat.nickname}</span>
@@ -497,6 +497,8 @@ var CHAT_MY_LEVEL  = Number('${myUserLevel}');
 
 window.CTX = CHAT_CTX;
 window.ADMIN_USER_IDX = CHAT_MY_IDX;
+
+var CHAT_MEMBER_ORDER = [<c:forEach var="member" items="${memberList}" varStatus="s">${member.userIdx}<c:if test="${!s.last}">,</c:if></c:forEach>];
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_chat.js"></script>

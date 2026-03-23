@@ -23,7 +23,7 @@ public class PresenceController {
 	}
 
 	@PostMapping("/heartbeat")
-	public Map<String, Object> heartbeat(@RequestParam int status,
+	public Map<String, Object> heartbeat(@RequestParam("status") int status,
 			@AuthenticationPrincipal CustomUserDetails userDetails) {
 		if (userDetails == null)
 			return Map.of("success", false);

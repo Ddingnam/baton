@@ -192,6 +192,15 @@
     const avatarClasses = ['jy','hn','mn','hs','op','cs'];
     const avatarMap     = {};
     let   avatarIdx     = 0;
+    // 서버에서 넘어온 멤버 순서로 avatarMap 미리 초기화
+    // → 페이지 로드 시와 실시간 메시지 시 색상이 항상 동일하게 유지됨
+    if (typeof CHAT_MEMBER_ORDER !== 'undefined') {
+        CHAT_MEMBER_ORDER.forEach(function(uid) {
+            if (Number(uid) !== CHAT_MY_IDX) {
+                avatarMap[Number(uid)] = avatarClasses[avatarIdx++ % avatarClasses.length];
+            }
+        });
+    }
     function getAvatarClass(userIdx) {
         if (userIdx === CHAT_MY_IDX) return 'me';
         if (!avatarMap[userIdx]) {
@@ -367,8 +376,12 @@
     document.getElementById('chatSend').addEventListener('click', sendMessage);
     chatInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            // 한글 IME 조합 중일 때는 전송하지 않음 (뒤에 띄어쓰기 붙는 버그 방지)
+            e.preventDefault(); // 줄바꿈 방지는 keydown에서
+        }
+    });
+    chatInput.addEventListener('keyup', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            // 한글 IME 조합 중이면 전송 안 함
             if (e.isComposing || e.keyCode === 229) return;
             sendMessage();
         }
@@ -897,5 +910,12 @@
     document.getElementById('channelManageClose').addEventListener('click', closeManageModal);
     document.getElementById('channelManageOverlay').addEventListener('click', function(e) {
         if (e.target === this) closeManageModal();
+    });
+	
+    document.querySelectorAll('.chat-avt[data-uid]').forEach(function(el) {
+        var uid = Number(el.dataset.uid);
+        if (uid && uid !== CHAT_MY_IDX) {
+            el.classList.add(getAvatarClass(uid));
+        }
     });
 })();

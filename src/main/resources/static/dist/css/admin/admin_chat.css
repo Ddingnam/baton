@@ -320,7 +320,7 @@
 .chat-avt.op { background: linear-gradient(135deg, #A855F7, #6366F1); box-shadow: 0 4px 10px rgba(168,85,247,0.25); }
 .chat-avt.cs { background: linear-gradient(135deg, var(--color-pink), var(--color-orange)); box-shadow: 0 4px 10px rgba(236,72,153,0.25); }
 
-.chat-msg-body { display: flex; flex-direction: column; gap: 5px; max-width: 58%; }
+.chat-msg-body { display: flex; flex-direction: column; gap: 5px; max-width: 58%; align-items: flex-start; }
 .chat-msg-group.mine .chat-msg-body { align-items: flex-end; }
 .chat-msg-meta { display: flex; align-items: center; gap: 6px; }
 .chat-msg-meta.right { flex-direction: row-reverse; }
