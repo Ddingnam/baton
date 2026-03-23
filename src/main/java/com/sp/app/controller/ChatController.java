@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,20 +20,22 @@ import com.sp.app.model.ChatMessage;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.ChatService;
 
-import jakarta.servlet.http.HttpSession;
-
 @Controller
 public class ChatController {
+    
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatService chatService;
     private final StorageService storageService;
+
+    @Value("${file.upload-root}")
+    private String uploadRoot; 
 
     public ChatController(SimpMessagingTemplate messagingTemplate, ChatService chatService, StorageService storageService) {
         this.messagingTemplate = messagingTemplate;
         this.chatService = chatService;
         this.storageService = storageService;
     }
-    
+
     @MessageMapping("/chat/send")
     public void sendMessage(ChatMessage message) {
         String dbNickname = chatService.getSenderNickname(message.getUserIdx());
@@ -46,7 +49,7 @@ public class ChatController {
         alarmData.put("type", "CHAT");
         alarmData.put("roomIdx", message.getRoomIdx());
         alarmData.put("sender", senderName);
- 
+        
         if (message.getMsgType() != null && message.getMsgType() == 5) {
             alarmData.put("content", "(사진)");
         } else {
@@ -60,7 +63,7 @@ public class ChatController {
             }
         }
     }
-    
+
     @MessageMapping("/chat/read")
     public void readMessage(ChatMessage message) {
         chatService.updateLastReadDate(message.getRoomIdx(), message.getUserIdx());
@@ -68,7 +71,7 @@ public class ChatController {
         messagingTemplate.convertAndSend("/topic/room/" + message.getRoomIdx(), message);
         messagingTemplate.convertAndSend("/topic/alarms/" + message.getUserIdx(), "read_chat");
     }
-    
+
     @PostMapping("/chat/delete")
     @ResponseBody
     public Map<String, Object> deleteChatRoom(@RequestParam("roomIdx") Long roomIdx,
@@ -83,21 +86,18 @@ public class ChatController {
         }
         return model;
     }
-    
+
     @MessageMapping("/chat/typing")
     public void typingSignal(ChatMessage message) {
-        messagingTemplate.convertAndSend(
-            "/topic/typing/" + message.getRoomIdx(), message
-        );
+        messagingTemplate.convertAndSend("/topic/typing/" + message.getRoomIdx(), message);
     }
     
     @PostMapping("/chat/imageUpload")
     @ResponseBody
-    public Map<String, Object> imageUpload(@RequestParam("file") MultipartFile file, HttpSession session) {
+    public Map<String, Object> imageUpload(@RequestParam("file") MultipartFile file) {
         Map<String, Object> model = new HashMap<>();
         try {
-            String root = session.getServletContext().getRealPath("/");
-            String pathname = root + "uploads" + File.separator + "chat";
+            String pathname = uploadRoot + File.separator + "chat";
             String saveFilename = storageService.uploadFileToServer(file, pathname);
             
             model.put("state", "true");

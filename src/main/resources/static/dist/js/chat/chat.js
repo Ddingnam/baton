@@ -1,5 +1,5 @@
 let stompClient = null;
-let currentRoomIdx = 123;
+let selectedImageFile = null; 
 
 function connect() {
     let socket = new SockJS(window.contextPath + '/ws/chat');
@@ -24,36 +24,63 @@ function connect() {
 function handleEnter(e) {
     if(e.keyCode === 13 && !e.shiftKey) {
         e.preventDefault();
-        sendMessage();
+        handleSendButtonClick();
     }
 }
 
-function sendMessage() {
+function handleImageSelect(event) {
+    let fileInput = event.target;
+    if(fileInput.files.length === 0) return;
+    
+    selectedImageFile = fileInput.files[0];
+    
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('imagePreview').src = e.target.result;
+        document.getElementById('imagePreviewContainer').style.display = 'block';
+    };
+    reader.readAsDataURL(selectedImageFile);
+}
+
+function clearSelectedImage() {
+    selectedImageFile = null;
+    document.getElementById('chatImageFile').value = '';
+    document.getElementById('imagePreviewContainer').style.display = 'none';
+}
+
+function handleSendButtonClick() {
     let input = document.getElementById("chatInput");
     let content = input.value.trim();
-    if(!content) return;
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const tradeIdx = urlParams.get('tradeIdx');
-
-    let messageModel = { 
-        roomIdx: currentRoomIdx, 
-        userIdx: myUserIdx, 
-        content: content, 
-        msgType: 1, 
-        tradeIdx: tradeIdx
-    };
     
-    stompClient.send("/app/chat/send", {}, JSON.stringify(messageModel));
-    input.value = '';
+    if(selectedImageFile) {
+        uploadChatImageAndSend(selectedImageFile);
+        if(!content) {
+            input.style.height = '46px'; 
+            return;
+        }
+    }
+    
+    if(content) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tradeIdx = urlParams.get('tradeIdx');
+
+        let messageModel = { 
+            roomIdx: currentRoomIdx, 
+            userIdx: myUserIdx, 
+            content: content, 
+            msgType: 1, 
+            tradeIdx: tradeIdx
+        };
+        
+        stompClient.send("/app/chat/send", {}, JSON.stringify(messageModel));
+
+        input.value = '';
+        input.style.height = '46px';
+    }
     input.focus();
 }
 
-function uploadChatImage() {
-    let fileInput = document.getElementById("chatImageFile");
-    if(fileInput.files.length === 0) return;
-    
-    let file = fileInput.files[0];
+function uploadChatImageAndSend(file) {
     let formData = new FormData();
     formData.append("file", file);
     
@@ -74,12 +101,12 @@ function uploadChatImage() {
         } else {
             alert('이미지 업로드에 실패했습니다.');
         }
-        fileInput.value = ''; 
+        clearSelectedImage(); 
     })
     .catch(err => {
         console.error(err);
-        alert('업로드 중 오류가 발생했습니다.');
-        fileInput.value = '';
+        alert('업로드 중 통신 오류가 발생했습니다.');
+        clearSelectedImage();
     });
 }
 
@@ -129,9 +156,9 @@ function appendMessage(message) {
     
     html += '<div style="display: flex; align-items: flex-end;">';
     if(isMe) html += '<div class="msg-info"><span class="unread-count">1</span><span class="msg-time">' + timeStr + '</span></div>';
-
+    
     if(message.msgType === 5) {
-        html += '<div class="msg-bubble" style="background:transparent; padding:0;">';
+        html += '<div class="msg-bubble" style="background: transparent; padding: 0;">';
         html += '<img src="' + window.contextPath + '/uploads/chat/' + message.content + '" style="max-width: 200px; border-radius: 14px; border: 1px solid #eee;">';
         html += '</div>';
     } else {

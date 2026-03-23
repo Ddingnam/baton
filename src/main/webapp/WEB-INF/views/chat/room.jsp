@@ -21,7 +21,7 @@
     .header-left i { font-size: 24px; cursor: pointer; color: #333; }
     .header-center { flex: 1; text-align: center; font-weight: 700; color: #333; }
     .header-right { width: 24px; } 
-
+    
     .trade-banner { display: flex; flex-direction: column; padding: 14px 20px; background: #fafafa; border-bottom: 1px solid #eee; }
     .trade-banner-info-wrap { display: flex; align-items: center; width: 100%; }
     .trade-thumb { width: 45px; height: 45px; border-radius: 8px; background: #ddd; margin-right: 12px; object-fit: cover; border: 1px solid #eee;}
@@ -50,10 +50,21 @@
     .profile-img { width: 36px; height: 36px; border-radius: 50%; margin-right: 10px; object-fit: cover; border: 1px solid #eaeaea; }
     .nickname { font-size: 12px; margin-bottom: 4px; color: #555; }
     
-    .chat-input-box { display: flex; padding: 15px; background: #fff; border-top: 1px solid #eee; align-items: center; }
-    .chat-input-box textarea { flex: 1; padding: 12px 15px; border: 1px solid #f0f0f0; background: #f8f9fa; border-radius: 20px; outline: none; resize: none; overflow: hidden; height: 44px; line-height: 20px; font-family: inherit; font-size: 14px;}
+    .image-preview-container { display: none; padding: 10px 20px; background: #f8f9fa; border-top: 1px solid #eee; position: relative; }
+    .preview-box { position: relative; display: inline-block; }
+    .preview-box img { height: 60px; border-radius: 8px; border: 1px solid #ddd; object-fit: cover; }
+    .preview-delete-btn { position: absolute; top: -6px; right: -6px; background: rgba(0,0,0,0.6); color: #fff; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; z-index: 10; }
+
+    .chat-input-box { display: flex; padding: 15px; background: #fff; border-top: 1px solid #eee; align-items: flex-end; }
+
+    .chat-input-box textarea { 
+        flex: 1; padding: 12px 15px; border: 1px solid #f0f0f0; background: #f8f9fa; 
+        border-radius: 20px; outline: none; resize: none; 
+        overflow-y: auto; height: 46px; max-height: 120px;
+        line-height: 20px; font-family: inherit; font-size: 14px; box-sizing: border-box;
+    }
     .chat-input-box textarea:focus { border-color: #00B050; background: #fff; }
-    .chat-input-box button { width: 44px; height: 44px; margin-left: 10px; border: none; background: #00B050; color: white; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
+    .chat-input-box button { width: 44px; height: 44px; margin-left: 10px; border: none; background: #00B050; color: white; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -64,7 +75,6 @@
             </div>
             <div class="header-center">${counterpartName}</div>
             <div class="header-right" style="position:relative;">
-                
                 <i class="ri-more-2-fill" style="font-size: 24px; cursor: pointer; color: #333;" onclick="toggleMenu()"></i>
                 <div id="roomMenu" style="display:none; position:absolute; right:0; top:35px; background:#fff; border:1px solid #eee; box-shadow:0 4px 16px rgba(0,0,0,0.10); border-radius:12px; z-index:100; width:130px; overflow:hidden;">
                     <div onclick="leaveRoom()" style="padding:13px 16px; color:#555; cursor:pointer; font-size:14px; font-weight:600; text-align:center; transition:background 0.15s;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='transparent'">삭제하기</div>
@@ -96,7 +106,7 @@
                 <c:if test="${tradeInfo.TRADESTATUS == '판매완료'}">
                     <div class="review-btn-wrap">
                         <c:set var="myRole" value="${userIdx == tradeInfo.SELLERIDX ? 'SELLER' : 'BUYER'}" />
-                        <button type="button" class="review-btn" onclick="location.href='${pageContext.request.contextPath}/review/write?productIdx=${tradeInfo.PRODUCTIDX}&role=${myRole}'">
+                        <button type="button" class="review-btn" onclick="location.href='${pageContext.request.contextPath}/review/write?productIdx=${tradeInfo.PRODUCTIDX}&role=${myRole}&mode=popup'">
                             <i class="ri-edit-2-line"></i> 거래 후기 남기기
                         </button>
                     </div>
@@ -155,12 +165,20 @@
             </c:forEach>
         </div>
 
+        <div id="imagePreviewContainer" class="image-preview-container">
+            <div class="preview-box">
+                <div class="preview-delete-btn" onclick="clearSelectedImage()"><i class="ri-close-line"></i></div>
+                <img id="imagePreview" src="">
+            </div>
+        </div>
+
         <div class="chat-input-box">
-            <i class="ri-attachment-line" style="font-size: 24px; color: #888; cursor: pointer; margin-right: 12px; transition: color 0.2s;" onmouseover="this.style.color='#00B98D'" onmouseout="this.style.color='#888'" onclick="document.getElementById('chatImageFile').click()"></i>
-            <input type="file" id="chatImageFile" style="display:none;" accept="image/*" onchange="uploadChatImage()">
+            <i class="ri-attachment-line" style="font-size: 24px; color: #888; cursor: pointer; margin-right: 12px; margin-bottom: 10px; transition: color 0.2s;" onmouseover="this.style.color='#00B98D'" onmouseout="this.style.color='#888'" onclick="document.getElementById('chatImageFile').click()"></i>
+            <input type="file" id="chatImageFile" style="display:none;" accept="image/*" onchange="handleImageSelect(event)">
             
-            <textarea id="chatInput" placeholder="메시지 보내기..." onkeydown="handleEnter(event)"></textarea>
-            <button onclick="sendMessage()"><i class="ri-send-plane-fill" style="font-size:18px;"></i></button>
+            <textarea id="chatInput" placeholder="메시지 보내기..." onkeydown="handleEnter(event)" oninput="autoResize(this)"></textarea>
+            
+            <button onclick="handleSendButtonClick()" style="margin-bottom: 2px;"><i class="ri-send-plane-fill" style="font-size:18px;"></i></button>
         </div>
     </div>
 
@@ -170,6 +188,11 @@
     const myUserIdx = ${userIdx};
     const counterpartName = "${counterpartName}";
     let currentDisplayDate = "${lastDate}";
+
+    function autoResize(textarea) {
+        textarea.style.height = '46px'; 
+        textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    }
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/chat/chat.js"></script>
 
