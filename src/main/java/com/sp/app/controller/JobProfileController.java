@@ -5,6 +5,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.sp.app.domain.dto.SessionInfo;
+import com.sp.app.mail.Mail;
+import com.sp.app.mail.MailSender;
 import com.sp.app.model.JobProfile;
 import com.sp.app.service.JobProfileService;
 import jakarta.servlet.http.HttpSession;
@@ -18,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JobProfileController {
 
     private final JobProfileService jobProfileService;
+    private final MailSender mailSender;
 
     @GetMapping("/write")
     public String writeForm(HttpSession session, Model model) {
@@ -161,7 +164,7 @@ public class JobProfileController {
         return "resume/emailPopup";
     }
 
-    /* ───────────── ★ 이메일 발송 처리 (추가됨) ───────────── */
+    /* ───────────── ★ 이메일 발송 처리 (수정본) ───────────── */
     @PostMapping("/email")
     public String sendEmailSubmit(@RequestParam("profileIdx") long profileIdx,
                                   @RequestParam("receiverName") String receiverName,
@@ -172,20 +175,44 @@ public class JobProfileController {
         SessionInfo info = (SessionInfo) session.getAttribute("member");
         if (info == null) return "resume/close";
 
-        String targetEmail = emailId + "@" + emailDomain;
-
         try {
-            // [참고] 여기서 실제로 JavaMailSender 등을 사용하여 targetEmail로 이력서 내용을 쏘면 됩니다.
-            // 지금은 로직이 성공했다고 가정하고 결과창으로 보냅니다.
-            log.info("이력서 발송: 대상={}, 수신자={}, 이력서번호={}", targetEmail, receiverName, profileIdx);
+            JobProfile dto = jobProfileService.findById(profileIdx);
+            if (dto == null) return "resume/close";
+
+            Mail mail = new Mail();
+            mail.setSenderName(info.getName()); // SessionInfo의 name 사용
+            mail.setSenderEmail("jmn5316@gmail.com"); 
+            mail.setReceiverEmail(emailId + "@" + emailDomain);
+            mail.setSubject("[BATON] " + info.getName() + "님의 이력서입니다.");
             
-            model.addAttribute("msg", receiverName + "님께 이력서가 성공적으로 발송되었습니다.");
+            // ★ 핵심 수정: getContent() 대신 getIntroduce() 사용!
+            String intro = dto.getIntroduce() != null ? dto.getIntroduce() : "내용이 없습니다.";
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("<div style='padding:20px; border:1px solid #ddd; max-width:600px;'>");
+            sb.append("<h2 style='color:#002C5F;'>").append(dto.getTitle()).append("</h2>");
+            sb.append("<hr>");
+            sb.append("<p><strong>수신:</strong> ").append(receiverName).append("님</p>");
+            sb.append("<p><strong>지원자:</strong> ").append(dto.getUserName()).append("</p>");
+            sb.append("<div style='background:#f9f9f9; padding:15px; margin-top:10px;'>");
+            
+            // 엔터(\n)를 HTML 줄바꿈(<br>)으로 변환
+            sb.append(intro.replace("\n", "<br>")); 
+            
+            sb.append("</div>");
+            sb.append("</div>");
+            
+            mail.setContent(sb.toString());
+
+            boolean result = mailSender.mailSend(mail);
+            model.addAttribute("msg", result ? receiverName + "님께 이력서를 발송했습니다." : "발송에 실패했습니다.");
+            
         } catch (Exception e) {
-            log.error("sendEmailSubmit error", e);
-            model.addAttribute("msg", "이메일 발송 중 오류가 발생했습니다.");
+            log.error("메일 발송 오류", e);
+            model.addAttribute("msg", "시스템 오류가 발생했습니다.");
         }
         
-        // 결과 확인 후 팝업창을 닫게 만드는 JSP 리턴
         return "resume/emailResult"; 
     }
+    
 }
