@@ -19,7 +19,6 @@
 
   <main class="alba-main-container">
 
-    <%-- ===== HERO (기존 그대로 유지) ===== --%>
     <section class="alba-hero-section">
       <div class="container hero-inner">
         <div class="hero-text-box">
@@ -40,7 +39,6 @@
 
     <div class="content-wrapper">
 
-      <%-- ===== TOOLBAR ===== --%>
       <div class="alba-toolbar">
         <div class="toolbar-top">
           <div class="filter-group alba-filter-list filter-section" data-filter-type="category">
@@ -82,7 +80,6 @@
 			</div>
         </div>
 
-        <%-- 지역 필터 패널 --%>
         <div class="advanced-filter-wrap">
           <div class="filter-tab-group">
             <label class="filter-tab active">

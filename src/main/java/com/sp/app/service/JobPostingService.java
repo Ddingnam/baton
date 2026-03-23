@@ -3,7 +3,6 @@ package com.sp.app.service;
 import com.sp.app.model.JobPosting;
 import java.util.List;
 import java.util.Map;
-import org.apache.ibatis.annotations.Param;
 
 public interface JobPostingService {
 
@@ -26,4 +25,8 @@ public interface JobPostingService {
     List<String> listDong(Map<String,Object> map);
     
     public List<JobPosting> postListByUserId(long userIdx);
+
+	void insertJobScrap(Map<String, Object> map) throws Exception;
+
+	void deleteJobScrap(Map<String, Object> map) throws Exception;
 }

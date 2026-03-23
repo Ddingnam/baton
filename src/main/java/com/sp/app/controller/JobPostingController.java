@@ -1,11 +1,13 @@
 package com.sp.app.controller;
 
+import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.model.JobPosting;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.JobPostingService;
 
 import com.sp.app.service.JobProfileService; // 이력서
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -231,7 +233,6 @@ public class JobPostingController {
 	    try {
 	        JobPosting dto = postingService.findById(postingIdx);
 
-	        // ✅ 작성자 검증 (이거 핵심)
 	        if (dto == null || userDetails == null || dto.getUserIdx() != userDetails.getUserIdx()) {
 	            return "fail";
 	        }
@@ -245,6 +246,41 @@ public class JobPostingController {
 	        log.error("상태 변경 실패", e);
 	        return "fail";
 	    }
+	}
+	
+	@PostMapping("/scrap")
+	@ResponseBody
+	public Map<String, Object> toggleScrap(
+	        @RequestParam("postingIdx") long postingIdx,
+	        @RequestParam("isScrap") boolean isScrap,
+	        HttpSession session) {
+
+	    Map<String, Object> result = new HashMap<>();
+	    SessionInfo info = (SessionInfo) session.getAttribute("member");
+
+	    if (info == null) {
+	        result.put("status", "login_required");
+	        return result;
+	    }
+
+	    try {
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("memberId", info.getUserIdx());
+	        map.put("postingIdx", postingIdx);
+
+	        if (isScrap) {
+	            postingService.insertJobScrap(map);
+	        } else {
+	            postingService.deleteJobScrap(map);
+	        }
+
+	        result.put("status", "success");
+
+	    } catch (Exception e) {
+	        result.put("status", "error");
+	    }
+
+	    return result;
 	}
 	
 }

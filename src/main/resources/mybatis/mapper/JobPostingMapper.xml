@@ -215,5 +215,20 @@
         WHERE user_idx = #{userIdx}
         ORDER BY created_date DESC
     </select>
+    
+		 <insert id="insertJobScrap" parameterType="map">
+		    INSERT INTO JOB_SCRAP(MEMBER_ID, POSTING_IDX) 
+		    VALUES (#{memberId}, #{postingIdx})
+		</insert>
+		
+		<delete id="deleteJobScrap" parameterType="map">
+		    DELETE FROM JOB_SCRAP 
+		    WHERE MEMBER_ID = #{memberId} AND POSTING_IDX = #{postingIdx}
+		</delete>
+		
+		<select id="checkJobScrap" parameterType="map" resultType="int">
+		    SELECT COUNT(*) FROM JOB_SCRAP 
+		    WHERE MEMBER_ID = #{memberId} AND POSTING_IDX = #{postingIdx}
+		</select>
 
 </mapper>

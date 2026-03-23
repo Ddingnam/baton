@@ -3,7 +3,6 @@ package com.sp.app.service;
 import com.sp.app.common.StorageService;
 import com.sp.app.mapper.JobPostingMapper;
 import com.sp.app.model.JobPosting;
-import com.sp.app.model.JobPostingImage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -137,6 +136,25 @@ public class JobPostingServiceImpl implements JobPostingService {
 			log.info("postListByUserId : ", e);
 		}
 		return list;
+	}
+	
+	@Override
+	public void insertJobScrap(Map<String, Object> map) throws Exception {
+	    try {
+	        mapper.insertJobScrap(map);
+	    } catch (Exception e) {
+	        log.warn("이미 스크랩된 데이터", e);
+	        // 그냥 무시 (중복 클릭 방지)
+	    }
+	}
+
+	@Override
+	public void deleteJobScrap(Map<String, Object> map) throws Exception {
+	    try {
+	        mapper.deleteJobScrap(map);
+	    } catch (Exception e) {
+	        log.warn("스크랩 삭제 실패", e);
+	    }
 	}
     
 }

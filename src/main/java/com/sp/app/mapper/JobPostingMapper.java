@@ -2,6 +2,8 @@ package com.sp.app.mapper;
 
 import com.sp.app.model.JobPosting;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -27,4 +29,8 @@ public interface JobPostingMapper {
     List<String> listDong(Map<String, Object> map);
     
     public List<JobPosting> postListByUserIdx(long userIdx);
+    
+    public void insertJobScrap(Map<String, Object> map) throws SQLException;
+    public void deleteJobScrap(Map<String, Object> map) throws SQLException;
+    public int checkJobScrap(Map<String, Object> map);
 }

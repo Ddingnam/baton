@@ -1,4 +1,3 @@
-
 const API_BASE_URL = "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes";
 const CAT_MAP = {
 	'서빙': '서빙',
@@ -6,6 +5,14 @@ const CAT_MAP = {
 	'매장관리': '매장관리',
 	'음료제조': '음료제조',
 	'기타': '기타'
+};
+
+const CAT_INFO = {
+	'서빙':    { emoji: '🍽️', cls: 'cat-serving' },
+	'주방보조': { emoji: '👨‍🍳', cls: 'cat-kitchen' },
+	'매장관리': { emoji: '🏪',  cls: 'cat-store'   },
+	'음료제조': { emoji: '☕',  cls: 'cat-beverage' },
+	'기타':    { emoji: '💼',  cls: 'cat-other'    },
 };
 
 let currentPage = 1;
@@ -17,37 +24,35 @@ function getRelativeTime(dateStr) {
 	const now = new Date();
 	const d = new Date(dateStr);
 	const diff = Math.floor((now - d) / 60000);
-	if (diff < 1) return '방금전';
-	if (diff < 60) return diff + '분전';
+	if (diff < 1)    return '방금전';
+	if (diff < 60)   return diff + '분전';
 	if (diff < 1440) return Math.floor(diff / 60) + '시간전';
 	return Math.floor(diff / 1440) + '일전';
 }
 
+function isFresh(dateStr) {
+	if (!dateStr) return false;
+	const diff = Math.floor((new Date() - new Date(dateStr)) / 60000);
+	return diff < 60;
+}
+
 function applyFilters() {
-	
-	const rc2 = document.getElementById('sidebarResultCount');
-	if (rc2) rc2.textContent = jobs.length
-	
-	const keywordEl = document.getElementById('searchInput');
-	const keyword = keywordEl ? keywordEl.value.trim().toLowerCase() : '';
-
-	const periodEl = document.querySelector('.filter-section[data-filter-type="period"] .chip.active');
-	const period = periodEl ? periodEl.textContent.trim() : '전체';
-
-	const catEl = document.querySelector('.filter-section[data-filter-type="category"] .chip.active');
-	const cat = catEl ? catEl.textContent.trim() : '전체';
-
+	const keywordEl  = document.getElementById('searchInput');
+	const keyword    = keywordEl ? keywordEl.value.trim().toLowerCase() : '';
+	const periodEl   = document.querySelector('.filter-section[data-filter-type="period"] .chip.active');
+	const period     = periodEl ? periodEl.textContent.trim() : '전체';
+	const catEl      = document.querySelector('.filter-section[data-filter-type="category"] .chip.active');
+	const cat        = catEl ? catEl.textContent.trim() : '전체';
 	const minPayInput = document.getElementById('minPayInput');
-	const minPay = minPayInput ? (parseInt(minPayInput.value) || 0) : 0;
-
-	const sortEl = document.getElementById('sortSelect');
-	const sort = sortEl ? sortEl.value : 'latest';
+	const minPay     = minPayInput ? (parseInt(minPayInput.value) || 0) : 0;
+	const sortEl     = document.getElementById('sortSelect');
+	const sort       = sortEl ? sortEl.value : 'latest';
 
 	let jobs = [...serverData];
 
 	if (keyword) {
 		jobs = jobs.filter(j =>
-			(j.title || '').toLowerCase().includes(keyword) ||
+			(j.title    || '').toLowerCase().includes(keyword) ||
 			(j.employer || '').toLowerCase().includes(keyword) ||
 			(j.location || '').toLowerCase().includes(keyword)
 		);
@@ -56,13 +61,13 @@ function applyFilters() {
 	if (period !== '전체') {
 		jobs = jobs.filter(j =>
 			(period === '1개월 이상' && j.workPeriod === 'MORE_THAN_A_MONTH') ||
-			(period === '단기' && j.workPeriod === 'LESS_THAN_A_MONTH')
+			(period === '단기'       && j.workPeriod === 'LESS_THAN_A_MONTH')
 		);
 	}
 
 	if (cat !== '전체') {
-	    const mappedCat = CAT_MAP[cat] || cat; 
-	    jobs = jobs.filter(j => j.category === mappedCat);
+		const mappedCat = CAT_MAP[cat] || cat;
+		jobs = jobs.filter(j => j.category === mappedCat);
 	}
 
 	if (minPay > 0) {
@@ -76,8 +81,10 @@ function applyFilters() {
 	}
 
 	filteredJobs = jobs;
-	currentPage = 1;
+	currentPage  = 1;
 
+	const rc2 = document.getElementById('sidebarResultCount');
+	if (rc2) rc2.textContent = jobs.length;
 	const rc = document.getElementById('resultCount');
 	if (rc) rc.textContent = jobs.length;
 
@@ -93,34 +100,66 @@ function renderCurrentPage() {
 function renderList(jobs) {
 	const container = document.getElementById('listView');
 	if (!container) return;
-	
-	
+
 	if (!jobs || !jobs.length) {
-		container.innerHTML = `<div class="no-result"><strong>검색 결과가 없어요</strong></div>`;
+		container.innerHTML = `
+			<div class="no-result">
+				<i class="ri-search-line"></i>
+				<strong>조건에 맞는 공고가 없습니다.</strong>
+				<span>다른 필터를 선택하거나 검색어를 변경해보세요.</span>
+			</div>`;
 		return;
 	}
-	
 
 	container.innerHTML = jobs.map(job => {
-		const relTime = getRelativeTime(job.createdDate);
-		const workTime = (job.startTime && job.endTime) ? `${job.startTime}~${job.endTime}` : '-';
+		const relTime   = getRelativeTime(job.createdDate);
+		const fresh     = isFresh(job.createdDate);
+		const workTime  = (job.startTime && job.endTime)
+			? `${job.startTime}~${job.endTime}` : '시간협의';
+		const scrapCls  = job.isScrapped ? 'active' : '';
+		const catInfo   = CAT_INFO[job.category] || { emoji: '💼', cls: 'cat-other' };
+
+		const isShort = job.workPeriod === 'LESS_THAN_A_MONTH';
+		const isLong  = job.workPeriod === 'MORE_THAN_A_MONTH';
+
+		const periodTag = isShort
+			? `<span class="job-tag period-short">⚡ 단기</span>`
+			: isLong
+			? `<span class="job-tag period-long">📅 장기</span>`
+			: '';
 
 		return `
-      <div class="job-list-item" onclick="location.href='${CONTEXT_PATH}/alba/article/${job.postingIdx}'">
-        <div class="job-area-col">
-          <span class="job-area-text">${job.location || '지역미정'}</span>
-        </div>
-        <div class="job-article-col">
-          <div class="job-employer">${job.employer}</div>
-          <div class="job-title">${job.title}</div>
-        </div>
-        <div class="job-salary-col">
-          <span class="pay-badge">${job.payType}</span>
-          <div class="pay-amount">${Number(job.pay).toLocaleString()}원</div>
-        </div>
-        <div class="job-time-col">${workTime}</div>
-        <div class="job-date-col">${relTime}</div>
-      </div>`;
+		<div class="job-list-item" onclick="location.href='${CONTEXT_PATH}/alba/article/${job.postingIdx}'">
+
+			<div class="job-cat-bar ${catInfo.cls}"></div>
+			<div class="job-cat-icon">${catInfo.emoji}</div>
+
+			<div class="job-item-body">
+				<div class="job-article-col">
+					<div class="job-employer">${job.employer}</div>
+					<div class="job-title">${job.title}</div>
+					<div class="job-tags">
+						<span class="job-tag loc"><i class="ri-map-pin-line"></i>${job.location || '지역미정'}</span>
+						${periodTag}
+						<span class="job-tag"><i class="ri-time-line"></i>${workTime}</span>
+					</div>
+				</div>
+
+				<div class="job-salary-col">
+					<span class="pay-badge">${job.payType}</span>
+					<span class="pay-amount">${Number(job.pay).toLocaleString()}원</span>
+				</div>
+
+				<div class="job-meta-info">
+					<span class="job-date-text ${fresh ? 'fresh' : ''}">${relTime}</span>
+				</div>
+			</div>
+
+			<button class="scrap-btn ${scrapCls}"
+			        onclick="toggleScrap(event, ${job.postingIdx}, this)">
+				<i class="ri-star-fill"></i>
+			</button>
+		</div>`;
 	}).join('');
 }
 
@@ -131,19 +170,19 @@ function renderPagination() {
 	if (total <= 1) { pg.innerHTML = ''; return; }
 
 	let html = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
-                <i class="ri-arrow-left-s-line"></i>
-              </button>`;
+	              <i class="ri-arrow-left-s-line"></i>
+	            </button>`;
 
 	const start = Math.max(1, currentPage - 4);
-	const end = Math.min(total, start + 9);
+	const end   = Math.min(total, start + 9);
 
 	for (let i = start; i <= end; i++) {
 		html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
 	}
 
 	html += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === total ? 'disabled' : ''}>
-             <i class="ri-arrow-right-s-line"></i>
-           </button>`;
+	           <i class="ri-arrow-right-s-line"></i>
+	         </button>`;
 
 	pg.innerHTML = html;
 }
@@ -157,106 +196,68 @@ function goPage(p) {
 	window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-const areaData = {
-	"서울": ["서울 전체", "강남구", "강동구", "강북구", "강서구", "관악구", "광진구", "구로구", "금천구", "노원구", "도봉구", "동대문구", "동작구", "마포구", "서대문구", "서초구", "성동구", "성북구", "송파구", "양천구", "영등포구", "용산구", "은평구", "종로구", "중구", "중랑구"],
-	"경기": ["경기 전체", "가평군", "고양시", "과천시", "광명시", "광주시", "구리시", "군포시", "김포시", "남양주시", "동두천시", "부천시", "성남시", "수원시", "시흥시", "안산시", "안성시", "안양시", "양주시", "양평군", "여주시", "연천군", "오산시", "용인시", "의왕시", "의정부시", "이천시", "파주시", "평택시", "포천시", "하남시", "화성시"],
-	"인천": ["인천 전체", "강화군", "계양구", "남동구", "동구", "미추홀구", "부평구", "서구", "연수구", "옹진군", "중구"],
-	"강원": ["강원 전체", "강릉시", "고성군", "동해시", "삼척시", "속초시", "양구군", "양양군", "영월군", "원주시", "인제군", "정선군", "철원군", "춘천시", "태백시", "평창군", "홍천군", "화천군", "횡성군"]
-};
-
+/* ===== 지역 데이터 ===== */
 function loadGugunData(sidoName) {
+	const gugunList = document.getElementById('col-gugun');
+	const dongList  = document.getElementById('col-dong');
+	gugunList.innerHTML = '';
+	dongList.innerHTML  = '';
 
-    const gugunList = document.getElementById('col-gugun');
-    const dongList = document.getElementById('col-dong');
-
-    gugunList.innerHTML = '';
-    dongList.innerHTML = '';
-
-    // 👉 시도 코드 찾기 (regionAuth처럼)
-    fetch(API_BASE_URL + "?regcode_pattern=*00000000")
-        .then(res => res.json())
-        .then(data => {
-
-            const sidoObj = data.regcodes.find(r => r.name.startsWith(sidoName));
-            if (!sidoObj) return;
-
-            const pattern = sidoObj.code.substring(0, 2) + "*00000";
-
-            return fetch(API_BASE_URL + "?regcode_pattern=" + pattern + "&is_ignore_zero=true");
-        })
-        .then(res => res.json())
-        .then(data => {
-
-            data.regcodes.forEach(item => {
-
-                const nameParts = item.name.split(" ");
-                const gugunName = nameParts.slice(1).join(" ");
-
-                const li = document.createElement('li');
-                li.textContent = gugunName;
-
-                // ⭐ 핵심
-                li.dataset.code = item.code;
-
-                gugunList.appendChild(li);
-            });
-
-        })
-        .catch(err => console.error(err));
+	fetch(API_BASE_URL + "?regcode_pattern=*00000000")
+		.then(res => res.json())
+		.then(data => {
+			const sidoObj = data.regcodes.find(r => r.name.startsWith(sidoName));
+			if (!sidoObj) return;
+			const pattern = sidoObj.code.substring(0, 2) + "*00000";
+			return fetch(API_BASE_URL + "?regcode_pattern=" + pattern + "&is_ignore_zero=true");
+		})
+		.then(res => res.json())
+		.then(data => {
+			data.regcodes.forEach(item => {
+				const nameParts = item.name.split(" ");
+				const gugunName = nameParts.slice(1).join(" ");
+				const li = document.createElement('li');
+				li.textContent = gugunName;
+				li.dataset.code = item.code;
+				gugunList.appendChild(li);
+			});
+		})
+		.catch(err => console.error(err));
 }
 
 function loadDongData(gugunName) {
-    const dongList = document.getElementById('col-dong');
-    if (!dongList) return;
+	const dongList  = document.getElementById('col-dong');
+	if (!dongList) return;
+	const gugunCode = window.selectedGugunCode;
+	if (!gugunCode) return;
 
-    const sido = document.querySelector('#col-sido li.active')?.textContent || '';
+	const pattern = gugunCode.substring(0, 4) + "*&is_ignore_zero=true";
 
-    // 👉 행정안전부 API용 코드 찾기
-    const gugunCode = window.selectedGugunCode;
-	if (!gugunCode) {
-	    console.log("❌ 구군 코드 없음");
-	    return;
-	}
-
-    const pattern = gugunCode.substring(0, 4) + "*&is_ignore_zero=true";
-
-    fetch(API_BASE_URL + "?regcode_pattern=" + pattern)
-        .then(res => res.json())
-        .then(data => {
-            dongList.innerHTML = '';
-
-            const filtered = data.regcodes.filter(item => item.code !== gugunCode);
-
-            if (!filtered.length) {
-                dongList.innerHTML = '<li>검색 결과 없음</li>';
-                return;
-            }
-
-            filtered.forEach(item => {
-                const nameParts = item.name.split(" ");
-                const dongName = nameParts[nameParts.length - 1];
-
-                const li = document.createElement('li');
-                li.textContent = dongName;
-
-                li.onclick = function() {
-                    document.querySelectorAll('#col-dong li').forEach(el => el.classList.remove('active'));
-                    this.classList.add('active');
-                    applyAreaFilter();
-                };
-
-                dongList.appendChild(li);
-            });
-        })
-        .catch(err => {
-            console.error(err);
-            dongList.innerHTML = '<li>로드 실패</li>';
-        });
+	fetch(API_BASE_URL + "?regcode_pattern=" + pattern)
+		.then(res => res.json())
+		.then(data => {
+			dongList.innerHTML = '';
+			const filtered = data.regcodes.filter(item => item.code !== gugunCode);
+			if (!filtered.length) { dongList.innerHTML = '<li>검색 결과 없음</li>'; return; }
+			filtered.forEach(item => {
+				const nameParts = item.name.split(" ");
+				const dongName  = nameParts[nameParts.length - 1];
+				const li = document.createElement('li');
+				li.textContent = dongName;
+				li.onclick = function() {
+					document.querySelectorAll('#col-dong li').forEach(el => el.classList.remove('active'));
+					this.classList.add('active');
+					applyAreaFilter();
+				};
+				dongList.appendChild(li);
+			});
+		})
+		.catch(err => { console.error(err); dongList.innerHTML = '<li>로드 실패</li>'; });
 }
 
 function resetFilters() {
 	document.querySelectorAll('.col-list li').forEach(li => li.classList.remove('active'));
-	document.getElementById('col-dong').innerHTML = '';
+	document.getElementById('col-dong').innerHTML  = '';
 	document.getElementById('col-gugun').innerHTML = '<li>먼저 시/도를 선택해주세요</li>';
 	document.getElementById('filterCount').textContent = '0';
 	document.querySelector('.filter-search-box input').value = '';
@@ -265,42 +266,24 @@ function resetFilters() {
 function setupColumnSelection(colId) {
 	const list = document.getElementById(colId);
 	if (!list) return;
-
 	list.addEventListener('click', function(e) {
 		if (e.target.tagName === 'LI') {
-
-			const items = list.querySelectorAll('li');
-			items.forEach(item => item.classList.remove('active'));
+			list.querySelectorAll('li').forEach(item => item.classList.remove('active'));
 			e.target.classList.add('active');
-
 			const selectedText = e.target.textContent;
-
-			if (colId === 'col-sido') {
-				loadGugunData(selectedText);
-			}
-			else if (colId === 'col-gugun') {
-			    window.selectedGugunCode = e.target.dataset.code; // 👈 이거 추가
-			    loadDongData(selectedText);
-			}
-			else if (colId === 'col-dong') {
-				applyAreaFilter();
-			}
+			if      (colId === 'col-sido')  loadGugunData(selectedText);
+			else if (colId === 'col-gugun') { window.selectedGugunCode = e.target.dataset.code; loadDongData(selectedText); }
+			else if (colId === 'col-dong')  applyAreaFilter();
 		}
 	});
 }
 
-// 아까아까
 document.addEventListener('DOMContentLoaded', function() {
-	
 	if (myRegion && myRegion.sido) {
-	    applyAreaFilterAuto(myRegion.sido, myRegion.gugun, myRegion.dong)
-	        .then(() => {
-	            if (filteredJobs.length === 0) {
-	                applyFilters();
-	            }
-	        });
+		applyAreaFilterAuto(myRegion.sido, myRegion.gugun, myRegion.dong)
+			.then(() => { if (filteredJobs.length === 0) applyFilters(); });
 	} else {
-	    setTimeout(applyFilters, 100);
+		setTimeout(applyFilters, 100);
 	}
 
 	document.querySelectorAll('.filter-section .filter-chips, .filter-section[data-filter-type="category"]').forEach(group => {
@@ -313,22 +296,15 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	});
 
-
-	const tabs = document.querySelectorAll('.filter-tab');
-	const areaPanel = document.getElementById('filterAreaPanel');
+	const tabs       = document.querySelectorAll('.filter-tab');
+	const areaPanel  = document.getElementById('filterAreaPanel');
 	const filterWrap = document.querySelector('.advanced-filter-wrap');
 
 	tabs.forEach(tab => {
-
 		tab.addEventListener('click', function(e) {
-
 			e.preventDefault();
-
 			const value = this.querySelector('input')?.value;
-
-			// 지역 탭
 			if (value === 'area') {
-
 				if (areaPanel.classList.contains('active')) {
 					areaPanel.classList.remove('active');
 					this.classList.remove('active');
@@ -337,67 +313,52 @@ document.addEventListener('DOMContentLoaded', function() {
 					this.classList.add('active');
 					areaPanel.classList.add('active');
 				}
-
 			} else {
 				tabs.forEach(t => t.classList.remove('active'));
 				this.classList.add('active');
 				areaPanel.classList.remove('active');
 			}
-
 		});
-
 	});
 
 	document.addEventListener('click', function(e) {
-
 		if (!filterWrap.contains(e.target)) {
-
 			tabs.forEach(t => t.classList.remove('active'));
 			areaPanel.classList.remove('active');
-
 		}
-
 	});
 
 	setupColumnSelection('col-sido');
 	setupColumnSelection('col-gugun');
 	setupColumnSelection('col-dong');
-
 });
 
 function applyAreaFilter() {
-	
-		let jobs = [...serverData];
-		const rc2 = document.getElementById('sidebarResultCount');
-		if (rc2) rc2.textContent = filteredJobs.length;	
-		
-		const sido = normalizeSido(
-			document.querySelector('#col-sido li.active')?.textContent || ''
-		);
-		const gugun = document.querySelector('#col-gugun li.active')?.textContent || '';
-		const dong = document.querySelector('#col-dong li.active')?.textContent || '';
+	const sido  = normalizeSido(document.querySelector('#col-sido li.active')?.textContent || '');
+	const gugun = document.querySelector('#col-gugun li.active')?.textContent || '';
+	const dong  = document.querySelector('#col-dong li.active')?.textContent  || '';
 
-		fetch(`${CONTEXT_PATH}/alba/filter?sido=${sido}&gugun=${gugun}&dong=${dong}`)
+	fetch(`${CONTEXT_PATH}/alba/filter?sido=${sido}&gugun=${gugun}&dong=${dong}`)
 		.then(res => res.json())
 		.then(data => {
 			filteredJobs = data.map(job => ({
-				postingIdx: job.postingIdx,
-				title: job.title,
-				employer: job.employer || '업체명',
-				payType: job.payType,
-				pay: job.pay || 0,
-				location: job.location,
+				postingIdx:  job.postingIdx,
+				title:       job.title,
+				employer:    job.employer || '업체명',
+				payType:     job.payType,
+				pay:         job.pay || 0,
+				location:    job.location,
 				createdDate: job.createdDate,
-				workPeriod: job.workPeriod,
-				category: job.category,
-				startTime: job.startTime,
-				endTime: job.endTime
+				workPeriod:  job.workPeriod,
+				category:    job.category,
+				startTime:   job.startTime,
+				endTime:     job.endTime
 			}));
-
 			currentPage = 1;
+			const rc2 = document.getElementById('sidebarResultCount');
+			if (rc2) rc2.textContent = filteredJobs.length;
 			const rc = document.getElementById('resultCount');
 			if (rc) rc.textContent = filteredJobs.length;
-
 			renderCurrentPage();
 			renderPagination();
 		})
@@ -405,59 +366,60 @@ function applyAreaFilter() {
 }
 
 async function applyAreaFilterAuto(sido, gugun, dong) {
+	sido = normalizeSido(sido);
+	const res  = await fetch(`${CONTEXT_PATH}/alba/filter?sido=${sido}&gugun=${gugun}&dong=${dong}`);
+	const data = await res.json();
+	filteredJobs = data;
+	renderCurrentPage();
+	renderPagination();
 
-    sido = normalizeSido(sido);
+	const sidoEl = [...document.querySelectorAll('#col-sido li')].find(li => li.textContent.includes(sido));
+	if (!sidoEl) return;
+	sidoEl.click();
 
-    // 1. 서버 필터
-    const res = await fetch(`${CONTEXT_PATH}/alba/filter?sido=${sido}&gugun=${gugun}&dong=${dong}`);
-    const data = await res.json();
+	await waitForElement('#col-gugun li');
+	const gugunEl = [...document.querySelectorAll('#col-gugun li')].find(li => li.textContent.includes(gugun));
+	if (!gugunEl) return;
+	gugunEl.click();
 
-    filteredJobs = data;
-    renderCurrentPage();
-    renderPagination();
-
-    // 2. 시도 클릭
-    const sidoEl = [...document.querySelectorAll('#col-sido li')]
-        .find(li => li.textContent.includes(sido));
-
-    if (!sidoEl) return;
-    sidoEl.click();
-
-    // 👉 구군 로딩 기다림
-    await waitForElement('#col-gugun li');
-
-    const gugunEl = [...document.querySelectorAll('#col-gugun li')]
-        .find(li => li.textContent.includes(gugun));
-
-    if (!gugunEl) return;
-    gugunEl.click();
-
-    // 👉 동 로딩 기다림
-    await waitForElement('#col-dong li');
-
-    const dongEl = [...document.querySelectorAll('#col-dong li')]
-        .find(li => li.textContent.includes(dong));
-
-    if (dongEl) dongEl.click();
+	await waitForElement('#col-dong li');
+	const dongEl = [...document.querySelectorAll('#col-dong li')].find(li => li.textContent.includes(dong));
+	if (dongEl) dongEl.click();
 }
 
 function waitForElement(selector) {
-    return new Promise(resolve => {
-        const interval = setInterval(() => {
-            if (document.querySelector(selector)) {
-                clearInterval(interval);
-                resolve();
-            }
-        }, 50);
-    });
+	return new Promise(resolve => {
+		const interval = setInterval(() => {
+			if (document.querySelector(selector)) { clearInterval(interval); resolve(); }
+		}, 50);
+	});
 }
 
 function normalizeSido(sido) {
-    if (!sido) return '';
-    return sido
-        .replace('특별시', '')
-        .replace('광역시', '')
-        .replace('특별자치시', '')
-        .replace('도', '');
+	if (!sido) return '';
+	return sido
+		.replace('특별시', '').replace('광역시', '')
+		.replace('특별자치시', '').replace('도', '');
 }
 
+function toggleScrap(event, postingIdx) {
+	event.stopPropagation();
+	const btn      = event.currentTarget;
+	const isAdding = !btn.classList.contains('active');
+
+	fetch(`${CONTEXT_PATH}/alba/scrap`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+		body: `postingIdx=${postingIdx}&isScrap=${isAdding}`
+	})
+	.then(res => res.json())
+	.then(data => {
+		if (data.status === "login_required") {
+			alert("로그인이 필요한 기능입니다.");
+			location.href = CONTEXT_PATH + "/member/login";
+		} else if (data.status === "success") {
+			btn.classList.toggle('active');
+		}
+	})
+	.catch(err => console.error(err));
+}
