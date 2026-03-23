@@ -111,16 +111,14 @@
                     deadline 
                 FROM job_posting
                 <where>
-                    <if test="sido != null and sido != ''">
-                        sido = #{sido}
-                    </if>
-                    <if test="gugun != null and gugun != '' and !gugun.contains('전체')">
-                        gugun = #{gugun}
-                    </if>
-                    <if test="dong != null and dong != '' and !dong.contains('전체')">
-                        dong = #{dong}
-                    </if>
-                </where>
+				    <if test="sido != null and sido != ''">
+				        sido = #{sido}
+				    </if>
+				    <if test="gugun != null and gugun != '' and !gugun.contains('전체')">
+				        AND gugun = #{gugun} </if>
+				    <if test="dong != null and dong != '' and !dong.contains('전체')">
+				        AND dong = #{dong} </if>
+				</where>
                 ORDER BY posting_idx DESC
             ) a WHERE ROWNUM &lt;= #{offset} + #{size}
         ) WHERE rnum &gt; #{offset}
@@ -174,17 +172,15 @@
             end_time AS endTime,
             deadline
         FROM job_posting
-        <where>
-            <if test="sido != null and sido != ''">
-                sido = #{sido}
-            </if>
-            <if test="gugun != null and gugun != '' and !gugun.contains('전체')">
-                gugun = #{gugun}
-            </if>
-            <if test="dong != null and dong != '' and !dong.contains('전체')">
-                dong = #{dong}
-            </if>
-        </where>
+			<where>
+			    <if test="sido != null and sido != ''">
+			        sido = #{sido}
+			    </if>
+			    <if test="gugun != null and gugun != '' and !gugun.contains('전체')">
+			        AND gugun = #{gugun} </if>
+			    <if test="dong != null and dong != '' and !dong.contains('전체')">
+			        AND dong = #{dong} </if>
+			</where>
         ORDER BY created_date DESC
     </select>
 
