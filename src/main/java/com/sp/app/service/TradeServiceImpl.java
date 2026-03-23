@@ -341,6 +341,11 @@ public class TradeServiceImpl implements TradeService {
 	        this.insertTradePost(dto, uploadPath);
 	    } else {
 	        this.updateTradePost(dto, uploadPath);
+	        if (temp != null && temp.getProductIdx() == dto.getProductIdx()
+	        		&& !"임시저장".equals(dto.getTradeStatus())) {
+	        	
+	            mapper.updateLastUpDate(dto.getProductIdx());
+	        }
 	    }
 		
 	}

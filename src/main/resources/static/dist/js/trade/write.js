@@ -203,6 +203,9 @@ function useTradeWrite(shared) {
 	    if (!productIdx && tempProductIdx.value) {
 	        nextTick(() => {
 	            if (confirm('작성 중인 임시저장 글이 있습니다. 불러오시겠습니까?')) {
+	                writeMode.value = 'write';
+	                currentProductIdx.value = tempProductIdx.value;
+
 	                fetch('/api/trade/updateData?productIdx=' + tempProductIdx.value)
 	                    .then(r => r.json())
 	                    .then(data => fillWForm(data));
@@ -241,7 +244,7 @@ function useTradeWrite(shared) {
 	    e.target.value = formattedValue;
 	}
 
-	function submitForm(status) {
+	async function submitForm(status) {
 	    const f = document.getElementById('tradeForm');
 	    if (!f) return;
 
@@ -320,9 +323,26 @@ function useTradeWrite(shared) {
 
 	    const finalTags = document.getElementById('finalTags');
 	    if (finalTags) finalTags.value = tags.value.join(',');
+		
+		const url = currentProductIdx.value ? '/api/trade/update' : '/api/trade/write';
+		const formData = new FormData(f);
+		
+		try {
+			const response = await fetch(url, {
+				method: 'POST',
+				body: formData
+			});
+			const result = await response.json();
 
-	    f.action = writeMode.value === 'update' ? '/trade/update' : '/trade/write';
-	    f.submit();
+			if (result.status === 'success') {
+				location.href = '/trade/main';
+			} else {
+				showBatonToast('저장에 실패했습니다: ' + (result.message || '알 수 없는 오류'));
+			}
+		} catch (error) {
+			console.error('Submit Error:', error);
+			showBatonToast('서버 전송 중 오류가 발생했습니다.');
+		}
 	}
 
     return {

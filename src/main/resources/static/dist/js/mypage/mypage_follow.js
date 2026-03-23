@@ -11,7 +11,7 @@ window.FollowModule = {
 
 		this.isProcessing = true;
 
-		fetch('/trade/toggleFollow', {
+		fetch('/api/trade/toggleFollow', {
 			method: 'POST',
 			headers: headers,
 			body: new URLSearchParams({ followingIdx: followingIdx })

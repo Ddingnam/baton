@@ -35,20 +35,6 @@ public class TradeViewController {
     public String tradeMain() {
         return "trade/main";
     }
-    
-    @PostMapping("write")
-	public String writeSubmit(Trade dto, 
-			@AuthenticationPrincipal CustomUserDetails userDetails) throws Exception{
-		try {
-			dto.setUserIdx(userDetails.getUserIdx());
-			dto.setRegionCode(userDetails.getMember().getUserRegionInfo().getActiveRegion().getRegionCode());
-			service.saveTradePost(dto, uploadPath);
-		} catch (Exception e) {
-			log.info("writeSubmit : ", e);
-		}
-		return "redirect:/trade/main";
-	}
-	
 	
 	@GetMapping("update")
 	public String updateForm(@RequestParam("productIdx") long productIdx, 

@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <form id="tradeForm" name="tradeForm" method="post" enctype="multipart/form-data">
+        <form id="tradeForm" name="tradeForm" enctype="multipart/form-data">
             <div class="grid-layout">
                 <div class="main-side">
                     <div class="card">
@@ -166,12 +166,12 @@
 
                         <input type="hidden" name="mode" :value="writeMode">
                         <input type="hidden" name="tradeStatus" id="tradeStatus" :value="wForm.tradeStatus || '판매중'">
-                        <input type="hidden" name="productIdx" v-if="writeMode === 'update'" :value="currentProductIdx">
+                        <input type="hidden" name="productIdx" v-if="currentProductIdx" :value="currentProductIdx">
                         <input type="hidden" id="tempProductIdx" :value="tempProductIdx">
 
                         <button v-if="writeMode !== 'update'" type="button" class="temp-submit-btn" @click="submitForm('임시저장')">임시저장</button>
-                        <button type="button" class="submit-btn" @click="submitForm(wForm.tradeStatus || '판매중')">
-                            {{ writeMode === 'update' ? '수정 완료하기' : '게시글 등록하기' }}
+                        <button type="button" class="submit-btn" @click="submitForm(wForm.tradeStatus === '임시저장' ? '판매중' : (wForm.tradeStatus || '판매중'))">
+                            {{ (writeMode === 'update' && wForm.tradeStatus !== '임시저장') ? '수정 완료하기' : '게시글 등록하기' }}
                         </button>
                         <button type="button" class="cancel-btn" @click="goList()">취소</button>
                     </div>

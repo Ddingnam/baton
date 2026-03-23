@@ -152,6 +152,26 @@ public class TradeRestController {
         return ResponseEntity.ok(result);
     }
     
+    @PostMapping("/write")
+	public ResponseEntity<?> writeSubmit(Trade dto, 
+			@AuthenticationPrincipal CustomUserDetails userDetails) throws Exception{
+    	
+    	Map<String, Object> result = new HashMap<>();
+    	
+    	try {
+			dto.setUserIdx(userDetails.getUserIdx());
+			dto.setRegionCode(userDetails.getMember().getUserRegionInfo().getActiveRegion().getRegionCode());
+			tradeService.saveTradePost(dto, uploadPath);
+			
+			result.put("status", "success");
+	        return ResponseEntity.ok(result);
+		} catch (Exception e) {
+			log.info("writeSubmit : ", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("status", "fail", "message", e.getMessage()));
+		}
+		
+	}
 
     @PostMapping("/update")
 	public ResponseEntity<?> updateSubmit(Trade dto, 
