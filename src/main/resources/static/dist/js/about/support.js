@@ -105,11 +105,25 @@ createApp({
             return text.replace(regex, '<mark>$1</mark>');
         }
 
-        function clickSearchResult(item) {
-            selectedFaq.value = item;
-            searchQuery.value = '';
-            searchResults.value = [];
-        }
+		function clickSearchResult(item) {
+			searchFocused.value = false;
+		    selectedCat.value = item.category;
+
+		    const targetIdx = faqs.value
+		        .filter(f => f.category === item.category)
+		        .findIndex(f => f.q === item.q);
+		    
+		    openIdx.value = targetIdx;
+		    searchQuery.value = '';
+		    searchResults.value = [];
+
+		    setTimeout(() => {
+		        const faqItems = document.querySelectorAll('.faq-item');
+		        if (faqItems[targetIdx]) {
+		            faqItems[targetIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+		        }
+		    }, 100);
+		}
 
         function setQuickTag(tag) {
             searchQuery.value = tag;

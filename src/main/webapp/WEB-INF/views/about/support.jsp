@@ -40,7 +40,7 @@
                         placeholder="궁금한 내용을 검색해보세요 (예: 환불, 안전결제, 배송)"
                         autocomplete="off"
                         @focus="searchFocused = true"
-                        @blur="searchFocused = false; setTimeout(() => searchResults = [], 200)"
+                        @blur="searchFocused = false"
                         @input="onSearch"/>
                     <button class="search-clear" v-if="searchQuery" @click="clearSearch">
                         <i class="ri-close-line"></i>
@@ -51,7 +51,7 @@
                         class="search-result-item"
                         v-for="(item, idx) in searchResults"
                         :key="idx"
-                        @mousedown="clickSearchResult(item)">
+                        @mousedown.prevent="clickSearchResult(item)">
                         
                         <i class="ri-question-line"></i>
                         <span v-html="highlightText(item.q)"></span>
