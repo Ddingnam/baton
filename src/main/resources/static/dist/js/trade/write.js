@@ -186,58 +186,126 @@ function useTradeWrite(shared) {
         if (data.tagList) tags.value = [...data.tagList];
     }
 
+	
+	async function initWrite(productIdx = null) {
+	    resetWForm();
+	    writeMode.value = productIdx ? 'update' : 'write';
+	    currentProductIdx.value = productIdx || '';
 
-    async function initWrite(productIdx = null) {
-        resetWForm();
-        writeMode.value = productIdx ? 'update' : 'write';
-        currentProductIdx.value = productIdx || '';
+	    const res = await fetch('/api/trade/write-init');
+	    const data = await res.json();
 
-        if (categories.value.length === 0) {
-            const res = await fetch('/api/trade/write-init');
-            const data = await res.json();
-            categories.value = data.categoryList || [];
-            tempProductIdx.value = data.tempProductIdx || '';
-        }
+	    if (categories.value.length === 0) {
+	        categories.value = data.categoryList || [];
+	    }
+	    tempProductIdx.value = data.tempProductIdx || '';
 
-        if (productIdx) {
-            const res = await fetch('/api/trade/updateData?productIdx=' + productIdx);
-            fillWForm(await res.json());
-        } else if (tempProductIdx.value) {
-            if (confirm('작성 중인 임시저장 글이 있습니다. 불러오시겠습니까?')) {
-                const res = await fetch('/api/trade/updateData?productIdx=' + tempProductIdx.value);
-                fillWForm(await res.json());
-            }
-        }
+	    if (!productIdx && tempProductIdx.value) {
+	        nextTick(() => {
+	            if (confirm('작성 중인 임시저장 글이 있습니다. 불러오시겠습니까?')) {
+	                fetch('/api/trade/updateData?productIdx=' + tempProductIdx.value)
+	                    .then(r => r.json())
+	                    .then(data => fillWForm(data));
+	            }
+	        });
+	    } else if (productIdx) {
+	        const res = await fetch('/api/trade/updateData?productIdx=' + productIdx);
+	        fillWForm(await res.json());
+	    }
 
-        nextTick(() => setTimeout(initMapWrite, 50));
-    }
+	    nextTick(() => setTimeout(initMapWrite, 50));
+	}
+	
+	function onlyNumberKey(e) {
+	    const allowedKeys = ['Backspace', 'Tab', 'Enter', 'Escape', 'ArrowLeft', 'ArrowRight', 'Delete'];
+	    if (allowedKeys.includes(e.key)) return;
+	    
+	    if (!/^[0-9]$/.test(e.key)) {
+	        e.preventDefault();
+	    }
+	}
+
+	function validateNumber(e) {
+		const rawValue = e.target.value.replace(/[^0-9]/g, '');
+		const formattedValue = rawValue ? Number(rawValue).toLocaleString('ko-KR') : '';
+		    
+		wForm.shippingFee = rawValue;
+		e.target.value = formattedValue;
+	}
+	
+	function validatePrice(e) {
+	    const rawValue = e.target.value.replace(/[^0-9]/g, '');
+	    const formattedValue = rawValue ? Number(rawValue).toLocaleString('ko-KR') : '';
+	    
+	    wForm.price = rawValue;
+	    e.target.value = formattedValue;
+	}
 
 	function submitForm(status) {
+	    const f = document.getElementById('tradeForm');
+	    if (!f) return;
+
 	    const rawPrice = String(wForm.price || '0').replace(/[^0-9]/g, '');
 	    const rawShipping = String(wForm.shippingFee || '0').replace(/[^0-9]/g, '');
 
-	    if (!wForm.title.trim()) { alert('제목을 입력하세요.'); return; }
-	    if (!wForm.categoryIdx) { alert('카테고리를 선택해주세요.'); return; }
-	    
-	    if (!isFree.value && (rawPrice === '0' || rawPrice === '')) {
-	        alert('판매 가격을 입력하거나 무료나눔을 선택해주세요.');
+	    if (existingFiles.value.length === 0 && newFiles.value.length === 0) {
+	        showBatonToast('상품 사진을 최소 1장 이상 등록해주세요.');
 	        return;
 	    }
 
-	    const f = document.getElementById('tradeForm');
+	    if (!wForm.title.trim()) {
+	        showBatonToast('제목을 입력하세요.');
+	        document.getElementById('titleInput')?.focus();
+	        return;
+	    }
+
+	    if (!wForm.categoryIdx) {
+	        showBatonToast('카테고리를 선택해주세요.');
+	        return;
+	    }
+
+	    if (!wForm.content.trim()) {
+	        showBatonToast('상품 소개 내용을 입력해주세요.');
+	        document.getElementById('contentInput')?.focus();
+	        return;
+	    }
+
+	    if (!isFree.value && (rawPrice === '0' || rawPrice === '')) {
+	        showBatonToast('판매 가격을 입력하거나 무료나눔을 선택해주세요.');
+	        document.getElementById('priceInput')?.focus();
+	        return;
+	    }
+	    
+	    const type = wForm.tradeType;
+
+	    if (type === '직거래' || type === '둘다가능') {
+	        if (!wForm.tradePlace.trim()) {
+	            showBatonToast('직거래 희망 장소를 입력해주세요.');
+	            document.getElementById('locationInput')?.focus();
+	            return;
+	        }
+	        if (!wForm.latitude || !wForm.longitude) {
+	            showBatonToast('지도에서 정확한 거래 위치를 선택해주세요.');
+	            return;
+	        }
+	    }
+
+	    if (type === '택배' || type === '둘다가능') {
+	        if (!rawShipping || rawShipping === '') {
+	            showBatonToast('택배 거래 시 배송비를 입력해주세요.');
+	            document.getElementById('shippingFeeInput')?.focus();
+	            return;
+	        }
+	    }
 
 	    f.querySelector('[name="price"]').value = isFree.value ? '0' : rawPrice;
+	    f.querySelector('[name="shippingFee"]').value = (type === '직거래') ? '0' : rawShipping;
 	    f.querySelector('[name="tradeStatus"]').value = status;
-	    
-	    const shippingInput = f.querySelector('[name="shippingFee"]');
-	    if (shippingInput) {
-	        shippingInput.value = rawShipping || '0';
-	    }
 
 	    const latInput = f.querySelector('[name="latitude"]');
 	    const lngInput = f.querySelector('[name="longitude"]');
 
-	    if (!wForm.latitude || String(wForm.latitude).trim() === '') {
+	    if (type === '택배' || !wForm.latitude) {
 	        latInput.disabled = true;
 	        lngInput.disabled = true;
 	    } else {
@@ -245,16 +313,14 @@ function useTradeWrite(shared) {
 	        latInput.value = wForm.latitude;
 	        lngInput.value = wForm.longitude;
 	    }
-	    
+
 	    const dt = new DataTransfer();
 	    newFiles.value.forEach(file => dt.items.add(file));
 	    f.querySelector('input[name="newFiles"]').files = dt.files;
-	    
+
 	    const finalTags = document.getElementById('finalTags');
-	    if (finalTags) {
-	        finalTags.value = tags.value.join(',');
-	    }
-	    
+	    if (finalTags) finalTags.value = tags.value.join(',');
+
 	    f.action = writeMode.value === 'update' ? '/trade/update' : '/trade/write';
 	    f.submit();
 	}
@@ -263,7 +329,7 @@ function useTradeWrite(shared) {
         writeMode, currentProductIdx, tempProductIdx,
         catOpen, aiLoading, existingFiles, newFiles, newFilePreviews, deletedImgOrders,
         tags, tagInput, wForm, isFree, priceDisplay, totalImgCount, selectedCatName,
-        initWrite, selectCat, onFileChange, removeExisting, removeNew,
+        initWrite, onlyNumberKey, validateNumber, validatePrice, selectCat, onFileChange, removeExisting, removeNew, 
         addTag, removeTag, onTagBackspace, aiGenerate, submitForm
     };
 }

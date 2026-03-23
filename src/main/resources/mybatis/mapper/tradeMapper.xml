@@ -63,7 +63,7 @@
 		INSERT INTO product(productIdx, title, content, price, shippingFee, userIdx, tradeStatus, tradeType, 
 			tradePlace, latitude, longitude, regionCode, productStatus, categoryIdx)
 		VALUES(#{productIdx}, #{title, jdbcType=VARCHAR}, #{content, jdbcType=VARCHAR}, #{price}, #{shippingFee}, #{userIdx}, #{tradeStatus, jdbcType=VARCHAR}, #{tradeType, jdbcType=VARCHAR},
-			#{tradePlace, jdbcType=VARCHAR}, #{latitude}, #{longitude}, 
+			#{tradePlace, jdbcType=VARCHAR}, #{latitude, jdbcType=VARCHAR}, #{longitude, jdbcType=VARCHAR}, 
 			#{regionCode}, #{productStatus, jdbcType=VARCHAR}, #{categoryIdx, jdbcType=VARCHAR})
 	</insert>
 	

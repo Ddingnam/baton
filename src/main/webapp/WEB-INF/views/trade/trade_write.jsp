@@ -78,7 +78,7 @@
                                 <div class="price-wrap">
                                     <span class="won-sign">₩</span>
                                     <input type="text" name="price" id="priceInput" placeholder="0"
-                                           v-model="priceDisplay" :readonly="isFree">
+                                           v-model="priceDisplay" :readonly="isFree" @keydown="onlyNumberKey" @input="validatePrice">
                                 </div>
                                 <div class="free-check-wrapper">
                                     <input type="checkbox" id="freeCheck" v-model="isFree">
@@ -145,7 +145,9 @@
                                 <label>배송비</label>
                                 <div class="price-wrap">
                                     <span class="won-sign">₩</span>
-                                    <input type="text" name="shippingFee" id="shippingFeeInput" placeholder="0" v-model="wForm.shippingFee">
+                                    <input type="text" name="shippingFee" id="shippingFeeInput" placeholder="0" 
+                                    	:value="wForm.shippingFee ? Number(wForm.shippingFee).toLocaleString('ko-KR') : ''"
+                                    	@keydown="onlyNumberKey" @input="validateNumber">
                                 </div>
                             </div>
                             <div class="field" id="locationField" v-show="wForm.tradeType === '직거래' || wForm.tradeType === '둘다가능'">

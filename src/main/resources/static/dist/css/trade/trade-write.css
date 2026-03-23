@@ -183,10 +183,22 @@
 
 .price-wrap { position: relative; }
 
-.price-wrap .won-sign { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-weight: 600; color: var(--text-sub); }
+.price-wrap .won-sign { 
+    position: absolute; 
+    left: 14px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    font-weight: 600; 
+    color: var(--text-sub); 
+    z-index: 5;
+}
 
-.price-wrap input { padding-left: 32px; font-size: 18px; font-weight: 700; color: var(--primary); }
-
+.price-wrap input { 
+    padding-left: 35px !important; 
+    font-size: 18px; 
+    font-weight: 700; 
+    color: var(--primary); 
+}
 .pill-group, .trade-type-group { display: flex; gap: 8px; flex-wrap: wrap; }
 
 .pill-group input, .trade-type-group input { display: none; }
@@ -475,30 +487,4 @@
     padding: 5px;
     flex: 1;
     min-width: 120px;
-}
-
-
-.price-input-wrapper {
-    display: flex;
-    align-items: center;
-    position: relative;
-    width: 100%;
-}
-
-.price-input-wrapper input {
-    width: 100%;
-    padding-right: 40px !important;
-    height: 48px;
-    text-align: left;
-}
-
-.price-unit {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-main);
-    font-weight: bold;
-    pointer-events: none; 
-    z-index: 10;
 }
