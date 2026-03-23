@@ -47,7 +47,6 @@ body{background:var(--bg);}
 
 <main class="wrap">
 
-  <!-- 프로필 헤더 -->
   <div class="resume-header">
     <div class="avatar-circle">
       <c:choose>
@@ -89,7 +88,6 @@ body{background:var(--bg);}
     </div>
   </div>
 
-  <!-- 자기소개 -->
   <div class="info-card">
     <p class="card-label"><i class="ri-file-text-line"></i> 자기소개</p>
     <c:choose>
@@ -102,7 +100,6 @@ body{background:var(--bg);}
     </c:choose>
   </div>
 
-  <!-- 나의 장점 -->
   <c:if test="${not empty dto.strengths}">
     <div class="info-card">
       <p class="card-label"><i class="ri-star-line"></i> 나의 장점</p>
@@ -110,7 +107,6 @@ body{background:var(--bg);}
     </div>
   </c:if>
 
-  <!-- 추가 정보 -->
   <c:if test="${not empty dto.additionalInfo}">
     <div class="info-card">
       <p class="card-label"><i class="ri-information-line"></i> 추가 정보</p>
@@ -121,7 +117,6 @@ body{background:var(--bg);}
   <div style="height:80px;"></div>
 </main>
 
-<!-- 하단 버튼 -->
 <div class="bottom-bar">
   <div class="bar-inner">
     <a href="${pageContext.request.contextPath}/resume/myList" class="btn-back">
