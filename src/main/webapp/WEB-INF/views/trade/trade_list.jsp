@@ -12,7 +12,9 @@
             </div>
             <div class="hero-search-box">
                 <input type="text" placeholder="관심있는 상품과 태그를 검색해보세요"
-                       v-model="keyword" @keydown.enter="applyFilter">
+				       :value="keyword"
+				       @input="e => { keyword = e.target.value; debounce(); }"
+				       @keydown.enter="applyFilter">
                 <button class="search-btn" @click="applyFilter">검색</button>
             </div>
         </div>

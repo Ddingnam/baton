@@ -210,11 +210,14 @@ createApp({
         }
 
         let debounceTimer = null;
-        function debounce() { 
-			clearTimeout(debounceTimer); 
-			debounceTimer = setTimeout(navigate, 400); 
-		}
-		
+        let isComposing = false;
+
+        function debounce() {
+            if (isComposing) return;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(navigate, 400);
+        }
+
         watch(keyword, () => debounce());
         watch(priceMin, () => debounce());
         watch(priceMax, () => debounce());
@@ -232,7 +235,10 @@ createApp({
 			if (pIdx) {
 				goArticle(pIdx);
 			}
-			
+
+            document.addEventListener('compositionstart', () => { isComposing = true; });
+            document.addEventListener('compositionend',   () => { isComposing = false; debounce(); });
+
             document.addEventListener('click', () => { 
 				sortDropdownOpen.value = false; 
 				write.catOpen.value = false; 

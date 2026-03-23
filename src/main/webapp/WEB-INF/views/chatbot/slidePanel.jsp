@@ -17,9 +17,6 @@
             </div>
         </div>
         <div class="csp-header-actions">
-            <button class="csp-header-btn" id="csp-fullpage-btn" title="전체화면으로 보기">
-                <i class="ri-external-link-line"></i>
-            </button>
             <button class="csp-header-btn" id="csp-close-btn" title="닫기">
                 <i class="ri-close-line"></i>
             </button>
@@ -61,7 +58,7 @@
         </div>
         <div class="csp-input-footer">
             AI 답변은 참고용입니다. 복잡한 문제는
-            <a href="${pageContext.request.contextPath}/support">고객센터</a>를 이용해주세요.
+            <a href="${pageContext.request.contextPath}/about/support">고객센터</a>를 이용해주세요.
         </div>
     </div>
 

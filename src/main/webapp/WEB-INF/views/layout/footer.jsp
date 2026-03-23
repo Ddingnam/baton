@@ -35,8 +35,8 @@
                 <div class="link-group">
                     <h3>고객지원</h3>
                     <ul>
-                        <li><a href="#">공지사항</a></li>
-                        <li><a href="#">자주 묻는 질문</a></li>
+                        <li><a href="${pageContext.request.contextPath}/about/support">고객센터</a></li>
+                        <li><a href="${pageContext.request.contextPath}/about/support">자주 묻는 질문</a></li>
                         <li><a href="#">1:1 문의하기</a></li>
                         <li><a href="#">운영정책</a></li>
                     </ul>
