@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.JobPostingMapper">
 
-    <insert id="insertPosting" parameterType="com.sp.app.model.JobPosting">
+   <insert id="insertPosting" parameterType="com.sp.app.model.JobPosting">
         <selectKey keyProperty="postingIdx" resultType="long" order="BEFORE">
             SELECT seq_job_posting.NEXTVAL FROM dual
         </selectKey>
@@ -18,25 +18,20 @@
         )
         VALUES (
             #{postingIdx}, #{title},
-            #{employer},
+            #{employer, jdbcType=VARCHAR},
             #{description, jdbcType=CLOB},
             #{pay},
             #{payType},
             #{workPeriod},
             #{workDays},
-            #{startTime},
-            #{endTime},
-            #{timeNegotiable},
+            #{startTime, jdbcType=VARCHAR},
+            #{endTime, jdbcType=VARCHAR},
+            #{timeNegotiable, jdbcType=VARCHAR},
             #{location},
-            #{locationDetail},
-            #{latitude},
-            #{longitude},
-            #{sido},
-            #{gugun},
-            #{dong},
-            #{subwayInfo},
-            #{contact},
-            #{benefits},
+            #{locationDetail, jdbcType=VARCHAR},
+            #{latitude, jdbcType=DOUBLE},  #{longitude, jdbcType=DOUBLE}, #{sido, jdbcType=VARCHAR},     #{gugun, jdbcType=VARCHAR},    #{dong, jdbcType=VARCHAR},     #{subwayInfo, jdbcType=VARCHAR},
+            #{contact, jdbcType=VARCHAR},
+            #{benefits, jdbcType=VARCHAR},
             #{userIdx},
             #{regionIdx},
             #{category},
