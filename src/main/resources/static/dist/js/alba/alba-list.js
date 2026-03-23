@@ -116,7 +116,7 @@ function renderList(jobs) {
 		const fresh     = isFresh(job.createdDate);
 		const workTime  = (job.startTime && job.endTime)
 			? `${job.startTime}~${job.endTime}` : '시간협의';
-		const scrapCls  = job.isScrapped ? 'active' : '';
+		const scrapCls = job.isScrapped == 1 ? 'active' : '';
 		const catInfo   = CAT_INFO[job.category] || { emoji: '💼', cls: 'cat-other' };
 
 		const isShort = job.workPeriod === 'LESS_THAN_A_MONTH';
@@ -352,7 +352,8 @@ function applyAreaFilter() {
 				workPeriod:  job.workPeriod,
 				category:    job.category,
 				startTime:   job.startTime,
-				endTime:     job.endTime
+				endTime:     job.endTime,
+				isScrapped:  job.isScrapped
 			}));
 			currentPage = 1;
 			const rc2 = document.getElementById('sidebarResultCount');
@@ -419,6 +420,12 @@ function toggleScrap(event, postingIdx) {
 			location.href = CONTEXT_PATH + "/member/login";
 		} else if (data.status === "success") {
 			btn.classList.toggle('active');
+            
+			if (isAdding) {
+				myScrapIds.push(Number(postingIdx));
+			} else {
+				myScrapIds = myScrapIds.filter(id => id !== Number(postingIdx));
+			}
 		}
 	})
 	.catch(err => console.error(err));

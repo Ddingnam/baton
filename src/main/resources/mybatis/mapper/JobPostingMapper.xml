@@ -155,29 +155,45 @@
     </select>
 
     <select id="listPostingByArea" parameterType="map" resultType="com.sp.app.model.JobPosting">
-        SELECT
-            posting_idx AS postingIdx,
-            title, employer, pay,
-            pay_type AS payType,
-            location, created_date AS createdDate,
-            category, work_period AS workPeriod,
-            recruit_status AS recruitStatus,
-            work_days AS workDays,
-            start_time AS startTime,
-            end_time AS endTime,
-            deadline
-        FROM job_posting
-			<where>
-			    <if test="sido != null and sido != ''">
-			        sido = #{sido}
-			    </if>
-			    <if test="gugun != null and gugun != '' and !gugun.contains('전체')">
-			        AND gugun = #{gugun} </if>
-			    <if test="dong != null and dong != '' and !dong.contains('전체')">
-			        AND dong = #{dong} </if>
-			</where>
-        ORDER BY created_date DESC
-    </select>
+    SELECT
+        jp.posting_idx AS postingIdx,
+        jp.title, jp.employer, jp.pay,
+        jp.pay_type AS payType,
+        jp.location, jp.created_date AS createdDate,
+        jp.category, jp.work_period AS workPeriod,
+        jp.recruit_status AS recruitStatus,
+        jp.work_days AS workDays,
+        jp.start_time AS startTime,
+        jp.end_time AS endTime,
+        jp.deadline,
+
+        CASE 
+            WHEN js.posting_idx IS NOT NULL THEN 1
+            ELSE 0
+        END AS isScrapped
+
+    FROM job_posting jp
+
+    LEFT JOIN job_scrap js
+    ON jp.posting_idx = js.posting_idx
+    <if test="memberId != null">
+        AND js.member_id = #{memberId}
+    </if>
+
+    <where>
+        <if test="sido != null and sido != ''">
+            jp.sido = #{sido}
+        </if>
+        <if test="gugun != null and gugun != ''">
+            AND jp.gugun = #{gugun}
+        </if>
+        <if test="dong != null and dong != ''">
+            AND jp.dong = #{dong}
+        </if>
+    </where>
+
+    ORDER BY jp.created_date DESC
+</select>
 
     <select id="listDong" parameterType="map" resultType="String">
         SELECT DISTINCT

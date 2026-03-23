@@ -255,6 +255,13 @@
 
   <script>
     const CONTEXT_PATH = "${pageContext.request.contextPath}";
+    
+    let myScrapIds = [
+        <c:forEach var="scrapId" items="${userScrapList}" varStatus="st">
+          ${scrapId}${!st.last ? ',' : ''}
+        </c:forEach>
+      ];
+    
     const serverData = [
       <c:forEach var="dto" items="${list}" varStatus="status">
       {
@@ -272,8 +279,7 @@
         
         recruitStatus: `${dto.recruitStatus}`, 
         
-        isScrapped:  ${userScrapList != null && userScrapList.contains(dto.postingIdx) ? 'true' : 'false'}
-        
+        isScrapped:  ${userScrapList != null && userScrapList.contains(dto.postingIdx) ? 1 : 0}        
       }${!status.last ? ',' : ''}
       </c:forEach>
     ];

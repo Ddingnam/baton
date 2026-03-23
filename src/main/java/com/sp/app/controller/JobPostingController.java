@@ -67,6 +67,7 @@ public class JobPostingController {
 		java.util.List<Long> userScrapList = new java.util.ArrayList<>();
 		if (userDetails != null) {
 		    List<JobPosting> scraps = postingService.listJobScrap(userDetails.getUserIdx());
+		    System.out.println("scraps size = " + scraps.size());
 		    for(JobPosting p : scraps) {
 		        userScrapList.add(p.getPostingIdx());
 		    }
@@ -190,16 +191,26 @@ public class JobPostingController {
 
 	@GetMapping("filter")
 	@ResponseBody
-	public List<JobPosting> filter(@RequestParam("sido") String sido, @RequestParam("gugun") String gugun,
-			@RequestParam("dong") String dong) {
+	public List<JobPosting> filter(
+	        @RequestParam("sido") String sido,
+	        @RequestParam("gugun") String gugun,
+	        @RequestParam("dong") String dong,
+	        @AuthenticationPrincipal CustomUserDetails userDetails) { // 🔥 추가
 
-		Map<String, Object> map = new HashMap<>();
+	    Map<String, Object> map = new HashMap<>();
 
-		map.put("sido", (sido != null && !sido.contains("전체")) ? sido : null);
-		map.put("gugun", (gugun != null && !gugun.contains("전체")) ? gugun : null);
-		map.put("dong", (dong != null && !dong.contains("전체")) ? dong : null);
+	    map.put("sido", (sido != null && !sido.contains("전체")) ? sido : null);
+	    map.put("gugun", (gugun != null && !gugun.contains("전체")) ? gugun : null);
+	    map.put("dong", (dong != null && !dong.contains("전체")) ? dong : null);
 
-		return postingService.listPostingByArea(map);
+	    // 🔥 이거 핵심
+	    if (userDetails != null) {
+	        map.put("userIdx", userDetails.getUserIdx());
+	    } else {
+	        map.put("memberId", -1); 
+	    }
+
+	    return postingService.listPostingByArea(map);
 	}
 
 	private String convertToKoreanDays(String days) {
