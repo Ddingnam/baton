@@ -12,7 +12,6 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_login.css">
 
-    <%-- 테마 색상 먼저 적용 --%>
     <script>
     (function() {
         var THEME_COLORS = {
@@ -36,7 +35,6 @@
     })();
     </script>
 
-    <%-- CSS 인라인 내장 (외부 파일 fallback 보장) --%>
     <style>
     :root {
         --bg-main: #F4F5F8; --card-bg: #FFFFFF;

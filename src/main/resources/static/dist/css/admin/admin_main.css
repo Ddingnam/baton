@@ -256,6 +256,22 @@ ul, li { list-style: none; }
 .u-name { font-size: 13px; font-weight: 700; color: var(--text-main); }
 .u-role { font-size: 11px; font-weight: 500; color: var(--text-sub); }
 
+.user-badge { position: relative; }
+.user-texts { flex: 1; }
+.sidebar-noti-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-sub);
+    font-size: 17px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.sidebar-noti-btn:hover { background: var(--color-purple-light); color: var(--color-purple); }
+
 .agency-header {
     height: var(--header-h);
     display: flex;
@@ -618,6 +634,8 @@ ul, li { list-style: none; }
 }
 .chat-entry-btn i { font-size: 18px; }
 .chat-entry-btn:hover { background: var(--grad-primary); color: white; transform: translateY(-1px); box-shadow: var(--shadow-glow); }
+.chat-entry-btn.active { background: var(--grad-primary); color: white; box-shadow: var(--shadow-glow); }
+.chat-entry-btn.active .chat-unread-badge { background: rgba(255,255,255,0.3); color: white; }
 .chat-unread-badge {
     position: absolute;
     right: 12px;

@@ -149,7 +149,7 @@ public class AdminChatController {
     @GetMapping(value = "/chat/channel/{roomIdx}/members", produces = "application/json")
     @ResponseBody
     public Map<String, Object> getChannelMembers(
-            @PathVariable Long roomIdx,
+            @PathVariable("roomIdx") Long roomIdx,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Map<String, Object> result = new HashMap<>();
         if (userDetails.getUserLevel() < 99) { result.put("success", false); return result; }
@@ -163,8 +163,8 @@ public class AdminChatController {
     @PostMapping(value = "/chat/channel/{roomIdx}/member/add", produces = "application/json")
     @ResponseBody
     public Map<String, Object> addMember(
-            @PathVariable Long roomIdx,
-            @RequestParam Long userIdx,
+            @PathVariable("roomIdx") Long roomIdx,
+            @RequestParam("userIdx") Long userIdx,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Map<String, Object> result = new HashMap<>();
         if (userDetails.getUserLevel() < 99) { result.put("success", false); return result; }
@@ -177,8 +177,8 @@ public class AdminChatController {
     @PostMapping(value = "/chat/channel/{roomIdx}/member/remove", produces = "application/json")
     @ResponseBody
     public Map<String, Object> removeMember(
-            @PathVariable Long roomIdx,
-            @RequestParam Long userIdx,
+            @PathVariable("roomIdx") Long roomIdx,
+            @RequestParam("userIdx") Long userIdx,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Map<String, Object> result = new HashMap<>();
         if (userDetails.getUserLevel() < 99) { result.put("success", false); return result; }
@@ -191,8 +191,8 @@ public class AdminChatController {
     @PostMapping(value = "/chat/channel/{roomIdx}/rename", produces = "application/json")
     @ResponseBody
     public Map<String, Object> renameChannel(
-            @PathVariable Long roomIdx,
-            @RequestParam String roomName,
+            @PathVariable("roomIdx") Long roomIdx,
+            @RequestParam("roomName") String roomName,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Map<String, Object> result = new HashMap<>();
         if (userDetails.getUserLevel() < 99) { result.put("success", false); return result; }
@@ -208,7 +208,7 @@ public class AdminChatController {
     @PostMapping(value = "/chat/channel/{roomIdx}/delete", produces = "application/json")
     @ResponseBody
     public Map<String, Object> deleteChannel(
-            @PathVariable Long roomIdx,
+            @PathVariable("roomIdx") Long roomIdx,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Map<String, Object> result = new HashMap<>();
         if (userDetails.getUserLevel() < 99) { result.put("success", false); return result; }
