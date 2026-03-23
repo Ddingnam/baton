@@ -199,11 +199,13 @@
 					                                </div>
 					                                
 					                                <div class="item-right">
-													    <span class="${item.tradeStatus == '판매완료' ? 'theme-badge-done' : 'theme-badge'}">${item.tradeStatus}</span>
-													    
-													    <c:if test="${item.tradeStatus == '판매완료'}">
-													        <button class="btn-sm" style="margin-top: 6px;" onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/review/write?productIdx=${item.productIdx}&role=SELLER'">후기 쓰기</button>
-													    </c:if>
+					                                	<div class="item-status-row">
+														    <span class="${item.tradeStatus == '판매완료' ? 'theme-badge-done' : 'theme-badge'}">${item.tradeStatus}</span>
+														    
+														    <c:if test="${item.tradeStatus == '판매완료'}">
+														        <button class="btn-sm" onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/review/write?productIdx=${item.productIdx}&role=SELLER'">후기 쓰기</button>
+														    </c:if>
+													    </div>
 													    
 													    <strong class="price">
 													        <c:choose>
@@ -231,7 +233,7 @@
 							            </c:when>
 							            <c:otherwise>
 							                <c:forEach var="item" items="${buyList}">
-							                    <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/article?productIdx=${item.productIdx}'">
+							                    <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/main?productIdx=${item.productIdx}'">
 							                        <div class="item-thumb">
 							                            <c:if test="${not empty item.imageList}">
 							                                <img src="${pageContext.request.contextPath}/uploads/trade/${item.imageList[0].saveName}" alt="상품이미지">
@@ -242,14 +244,18 @@
 							                            <p class="info-metrics"><span class="time-ago" data-time="${item.tradeDate}">${item.tradeDate} </span> 구매 · 조회 ${item.hitCount} · 찜 ${item.likeCount} </p>
 							                        </div>							                        
 							                        <div class="item-right">
-													    <span class="${item.tradeStatus == 'CANCELED' ? 'theme-badge-done' : 'theme-badge'}">${item.tradeStatus == 'CANCELED' ? '결제취소' : item.tradeStatus == 'PAY_COMPLETED' ? '결제완료' : item.tradeStatus == 'SHIPPING' ? '배송중' : '거래완료'}</span>
-													    
-													    <c:if test="${item.tradeStatus == 'CONFIRMED' or item.tradeStatus == '거래완료'}">
-													        <button class="btn-sm" style="margin-top: 6px;" onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/review/write?productIdx=${item.productIdx}&role=BUYER'">후기 쓰기</button>
-													    </c:if>
-													    
+							                        	<div class="item-status-row">
+														    <span class="${item.tradeStatus == 'CANCELED' ? 'theme-badge-done' : 'theme-badge'}">${item.tradeStatus == 'CANCELED' ? '결제취소' : item.tradeStatus == 'PAY_COMPLETED' ? '결제완료' : item.tradeStatus == 'SHIPPING' ? '배송중' : '거래완료'}</span>
+														    
+														    <c:if test="${item.tradeStatus == 'CONFIRMED' or item.tradeStatus == '거래완료'}">
+														        <button class="btn-sm" onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/review/write?productIdx=${item.productIdx}&role=BUYER'">후기 쓰기</button>
+														    </c:if>
+													    </div>
 													    <strong class="price">
-													        <fmt:formatNumber value="${item.price}" pattern="#,###"/>원
+													        <c:choose>
+													            <c:when test="${item.price == 0}">나눔</c:when>
+													            <c:otherwise><fmt:formatNumber value="${item.price}" pattern="#,###"/>원</c:otherwise>
+													        </c:choose>
 													    </strong>
 													</div>							                        
 							                    </div>
@@ -270,7 +276,7 @@
 							            </c:when>
 							            <c:otherwise>
 							                <c:forEach var="item" items="${wishList}">
-							                    <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/article?productIdx=${item.productIdx}'">
+							                    <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/main?productIdx=${item.productIdx}'">
 							                        <div class="item-thumb">
 							                            <c:choose>
 							                                <c:when test="${not empty item.imageList}">
@@ -295,8 +301,11 @@
 							                        <div class="item-right">
 							                        	<span class="${item.tradeStatus == '판매완료' ? 'theme-badge-done' : 'theme-badge'}">${item.tradeStatus}</span>
 							                            <strong class="price">
-							                                <fmt:formatNumber value="${item.price}" pattern="#,###"/>원
-							                            </strong>
+													        <c:choose>
+													            <c:when test="${item.price == 0}">나눔</c:when>
+													            <c:otherwise><fmt:formatNumber value="${item.price}" pattern="#,###"/>원</c:otherwise>
+													        </c:choose>
+													    </strong>
 							                        </div>
 							                    </div>
 							                </c:forEach>

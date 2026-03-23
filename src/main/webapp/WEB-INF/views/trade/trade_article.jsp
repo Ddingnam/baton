@@ -115,51 +115,53 @@
                     </div>
 
                     <template v-if="!articleIsLoggedIn">
-                        <button v-if="article.tradeStatus === '판매완료'" class="chat-btn" disabled>판매 완료된 상품입니다</button>
-                        <button v-else class="chat-btn" @click="location.href = ContextPath + '/member/login'"><i class="ri-chat-3-line"></i> 로그인하고 채팅하기</button>
-                        <div class="secondary-actions">
-                            <button class="wish-btn-large" @click="location.href = ContextPath + '/member/login'"><i class="ri-heart-3-line"></i> 찜하기</button>
-                            <button class="share-btn" @click="shareArticle"><i class="ri-share-line"></i> 공유</button>
-                        </div>
-                    </template>
-
-                    <template v-else-if="articleIsOwner">
-                        <button class="chat-btn" @click="openChatList"><i class="ri-chat-3-line"></i> 채팅 내역 확인하기</button>
-                        <template v-if="escrowInfo">
-                            <template v-if="escrowInfo.TRADESTATUS === 'PAY_COMPLETED'">
-                                <button class="pay-btn" @click="shippingOpen = true"><i class="ri-truck-line"></i> 운송장 입력하기</button>
-                                <button class="pay-btn danger" @click="cancelTrade">주문 취소 (구매자에게 환불)</button>
-                            </template>
-                            <button v-else-if="escrowInfo.TRADESTATUS === 'SHIPPING'"  class="pay-btn" disabled>배송 중 (구매자 확정 대기)</button>
-                            <button v-else-if="escrowInfo.TRADESTATUS === 'CONFIRMED'" class="chat-btn" disabled>판매 완료된 상품입니다</button>
-                        </template>
-                    </template>
-
-                    <template v-else>
-                        <button v-if="article.tradeStatus === '판매완료'" class="chat-btn" disabled>판매 완료된 상품입니다</button>
-                        <button v-else class="chat-btn" @click="openChatRoom"><i class="ri-chat-3-line"></i> 채팅으로 거래하기</button>
-                        <template v-if="article.price > 0">
-                            <template v-if="!escrowInfo || escrowInfo.TRADESTATUS === 'CANCELED'">
-                                <button type="button" class="pay-btn" @click="goToCheckout(article.productIdx)">
-                                    <i class="ri-shield-check-line"></i> 안전 결제하기
-                                </button>
-                            </template>
-                            <template v-else-if="escrowInfo && escrowInfo.BUYERIDX == articleCurrentUserIdx">
-                                <template v-if="escrowInfo.TRADESTATUS === 'PAY_COMPLETED'">
-                                    <button class="pay-btn" disabled>판매자의 발송을 대기 중입니다</button>
-                                    <button class="pay-btn danger" @click="cancelTrade">결제 취소 (포인트 환불)</button>
-                                </template>
-                                <template v-else-if="escrowInfo.TRADESTATUS === 'SHIPPING'">
-                                    <button class="chat-btn" @click="confirmPurchase">구매 확정하기</button>
-                                    <button class="pay-btn danger" @click="requestRefund">반품 / 환불 요청하기</button>
-                                </template>
-                                <button v-else-if="escrowInfo.TRADESTATUS === 'CONFIRMED'" class="pay-btn success" disabled>구매 확정 완료</button>
-                            </template>
-                            <template v-else>
-                                <button class="pay-btn" style="background:#999;" disabled>다른 사용자가 안전결제를 진행 중입니다</button>
-                            </template>
-                        </template>
-                    </template>
+				        <button v-if="article.tradeStatus === '판매완료'" class="chat-btn" disabled>판매 완료된 상품입니다</button>
+				        <button v-else class="chat-btn" @click="location.href = ContextPath + '/member/login'">
+				            <i class="ri-chat-3-line"></i> 로그인하고 채팅하기
+				        </button>
+				    </template>
+				
+				    <template v-else-if="articleIsOwner">
+				        <button class="chat-btn" @click="openChatList"><i class="ri-chat-3-line"></i> 채팅 내역 확인하기</button>
+				        <template v-if="escrowInfo">
+				            <template v-if="escrowInfo.TRADESTATUS === 'PAY_COMPLETED'">
+				                <button class="pay-btn" @click="shippingOpen = true"><i class="ri-truck-line"></i> 운송장 입력하기</button>
+				                <button class="pay-btn danger" @click="cancelTrade">주문 취소 (구매자에게 환불)</button>
+				            </template>
+				            <button v-else-if="escrowInfo.TRADESTATUS === 'SHIPPING'" class="pay-btn" disabled>배송 중 (구매자 확정 대기)</button>
+				            <button v-else-if="escrowInfo.TRADESTATUS === 'CONFIRMED'" class="chat-btn" disabled>판매 완료된 상품입니다</button>
+				        </template>
+				    </template>
+				
+				    <template v-else>
+				        <button v-if="article.tradeStatus === '판매완료'" class="chat-btn" disabled>판매 완료된 상품입니다</button>
+				        
+				        <template v-else>
+				            <button class="chat-btn" @click="openChatRoom"><i class="ri-chat-3-line"></i> 채팅으로 거래하기</button>
+				            
+				            <template v-if="article.price > 0">
+				                <template v-if="!escrowInfo || escrowInfo.TRADESTATUS === 'CANCELED'">
+				                    <button type="button" class="pay-btn" @click="goToCheckout(article.productIdx)">
+				                        <i class="ri-shield-check-line"></i> 안전 결제하기
+				                    </button>
+				                </template>
+				                <template v-else-if="escrowInfo.BUYERIDX == articleCurrentUserIdx">
+				                    <template v-if="escrowInfo.TRADESTATUS === 'PAY_COMPLETED'">
+				                        <button class="pay-btn" disabled>판매자의 발송을 대기 중입니다</button>
+				                        <button class="pay-btn danger" @click="cancelTrade">결제 취소 (포인트 환불)</button>
+				                    </template>
+				                    <template v-else-if="escrowInfo.TRADESTATUS === 'SHIPPING'">
+				                        <button class="chat-btn" @click="confirmPurchase">구매 확정하기</button>
+				                        <button class="pay-btn danger" @click="requestRefund">반품 / 환불 요청하기</button>
+				                    </template>
+				                    <button v-else-if="escrowInfo.TRADESTATUS === 'CONFIRMED'" class="pay-btn success" disabled>구매 확정 완료</button>
+				                </template>
+				                <template v-else>
+				                    <button class="pay-btn" style="background:#999;" disabled>다른 사용자가 안전결제를 진행 중입니다</button>
+				                </template>
+				            </template>
+				        </template>
+				    </template>
 
                     <div v-if="articleIsLoggedIn" class="secondary-actions">
                         <button class="wish-btn-large" :class="{ active: articleIsLiked }" @click="toggleWishArticle">

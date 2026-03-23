@@ -761,7 +761,7 @@ a {
     color: var(--text-sub);
 }
 
-.more-btn-wrap { text-align: center; margin-top: 30px; }
+.more-btn-wrap { text-align: center; margin-top: 30px; margin-bottom: 40px;}
 
 .btn-more {
     width: 200px;

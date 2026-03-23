@@ -89,7 +89,8 @@
                  class="trade-card tl-product-card"
                  @click="goArticle(item.productIdx)">
                 <div class="card-image-box tl-card-img" :class="{ 'no-image': !item.imgUrl }">
-                    <img v-if="item.imgUrl" :src="item.imgUrl" :alt="item.title" loading="lazy">
+                    <img v-if="item.imgUrl" :src="item.imgUrl" :alt="item.title" 
+						loading="lazy" @error="item.imgUrl = null">
                     <i v-else class="ri-camera-off-line placeholder-icon"></i>
                     <div class="badge-group">
                         <span v-if="item.productStatus === '새상품'" class="badge badge-new">새상품</span>

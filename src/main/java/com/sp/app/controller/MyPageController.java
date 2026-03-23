@@ -55,10 +55,10 @@ public class MyPageController {
             int currentPoint = paymentMapper.getCurrentPoint(userIdx);
             model.addAttribute("userPoint", currentPoint);
 
-            model.addAttribute("myPosts",   mypageService.getMyPosts(userIdx));
+            model.addAttribute("myPosts", mypageService.getMyPosts(userIdx));
             model.addAttribute("myReplies", mypageService.getMyReplies(userIdx));
-            model.addAttribute("myScraps",  mypageService.getMyScraps(userIdx));
-            model.addAttribute("myVotes",   mypageService.getMyVotes(userIdx));
+            model.addAttribute("myScraps", mypageService.getMyScraps(userIdx));
+            model.addAttribute("myVotes", mypageService.getMyVotes(userIdx));
 
             Map<String, Object> map = new HashMap<>();
             map.put("userIdx", userIdx);
@@ -73,11 +73,11 @@ public class MyPageController {
             rMap.put("userIdx", userIdx);
             rMap.put("regionType", 1);
 
-            model.addAttribute("userDto",      memberService.findById(userIdx));
-            model.addAttribute("region",       memberService.findUserRegionbyType(rMap));
-            model.addAttribute("tradeList",    tradeList);
-            model.addAttribute("buyList",      tradeService.findBuyList(userIdx));
-            model.addAttribute("wishList",     wishListService.findWishList(userIdx));
+            model.addAttribute("userDto", memberService.findById(userIdx));
+            model.addAttribute("region", memberService.findUserRegionbyType(rMap));
+            model.addAttribute("tradeList", tradeList);
+            model.addAttribute("buyList", tradeService.findBuyList(userIdx));
+            model.addAttribute("wishList", wishListService.findWishList(userIdx));
             model.addAttribute("albaPostList", jobPostingService.postListByUserId(userIdx));
         }
 
@@ -102,11 +102,23 @@ public class MyPageController {
                 List<TradeImg> images = tradeService.findImgsByIdx(trade.getProductIdx());
                 trade.setImageList(images);
             }
-
+            
             UserDto userDto = memberService.findById(userIdx);
             model.addAttribute("dto", userDto);
             model.addAttribute("tradeList", tradeList);
-
+            
+            Map<String, Object> rMap = new HashMap<>();
+            rMap.put("userIdx", userIdx);
+            rMap.put("regionType", 1);
+            model.addAttribute("region", memberService.findUserRegionbyType(rMap));
+            model.addAttribute("followerCount", followService.countByFollowing(userIdx));
+            model.addAttribute("followingCount", followService.countByFollower(userIdx));
+            
+            if (userDetails != null) {
+                boolean isFollowing = followService.isFollowing(userDetails.getUserIdx(), userIdx);
+                model.addAttribute("isFollowing", isFollowing);
+            }
+            
         } catch (Exception e) {
             log.info("tradeUserMain", e);
         }
@@ -115,8 +127,8 @@ public class MyPageController {
 
     @GetMapping("/followList")
     @ResponseBody
-    public Map<String, Object> followList(@RequestParam("userIdx") long userIdx,
-                                          @RequestParam("type") String type) {
+    public Map<String, Object> followList(@RequestParam("userIdx") long userIdx, 
+    		@RequestParam("type") String type) {
         Map<String, Object> model = new HashMap<>();
         try {
             List<User> list;

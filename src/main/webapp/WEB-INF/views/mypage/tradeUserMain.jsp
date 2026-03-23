@@ -32,10 +32,10 @@
 					<div class="pb-avatar"><i class="ri-user-smile-fill"></i></div>
 					<div class="pb-info">
 						<h2 class="pb-name">${dto.nickname} 님</h2>
-						<span class="pb-desc">서초4동 · 매너온도 <strong class="theme-text">36.5℃</strong></span>
+						<span class="pb-desc">${region.dong} · 매너온도 <strong class="theme-text">${dto.score}℃</strong></span>
 						<div class="manner-bar-wrap">
 							<div class="manner-bar-bg">
-								<div class="manner-bar-fill theme-bg" style="width: 36.5%"></div>
+								<div class="manner-bar-fill theme-bg" style="width: ${dto.score}%"></div>
 							</div>
 						</div>
 					</div>
