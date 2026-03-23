@@ -54,6 +54,7 @@ body { background: var(--bg); font-family: 'Pretendard', sans-serif; }
   font-weight: 700;
   color: var(--sub);
   border-bottom: 1px solid var(--border);
+  white-space: nowrap; /* 헤더 글자 줄바꿈 방지 */
 }
 .resume-table td {
   padding: 18px 12px;
@@ -77,6 +78,7 @@ body { background: var(--bg); font-family: 'Pretendard', sans-serif; }
   padding: 6px 10px; border-radius: 6px; font-size: 13px; font-weight: 500;
   background: var(--bg); color: var(--sub); border: 1px solid var(--border);
   cursor: pointer; text-decoration: none; transition: 0.2s;
+  white-space: nowrap; /* ★핵심: 아이콘과 글자가 무조건 가로로 유지되게 함★ */
 }
 .btn-icon:hover { background: #E2E8F0; color: var(--text); }
 
@@ -86,6 +88,7 @@ body { background: var(--bg); font-family: 'Pretendard', sans-serif; }
   padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600;
   background: var(--primary-light); color: var(--primary); border: none;
   text-decoration: none; transition: 0.2s;
+  white-space: nowrap; /* 줄바꿈 방지 */
 }
 .btn-edit:hover { background: #d4e3f5; }
 
@@ -95,6 +98,7 @@ body { background: var(--bg); font-family: 'Pretendard', sans-serif; }
   padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600;
   background: var(--surface); color: var(--primary); border: 1px solid var(--primary);
   cursor: pointer; transition: 0.2s;
+  white-space: nowrap; /* 줄바꿈 방지 */
 }
 .btn-outline:hover { background: var(--primary-light); }
 
@@ -138,12 +142,7 @@ body { background: var(--bg); font-family: 'Pretendard', sans-serif; }
             <colgroup>
               <col style="width:50px">
               <col style="width:auto">
-              <col style="width:110px">
-              <col style="width:80px">
-              <col style="width:100px">
-              <col style="width:90px">
-              <col style="width:100px">
-            </colgroup>
+              <col style="width:100px"> <col style="width:90px">  <col style="width:110px"> <col style="width:90px">  <col style="width:100px"> </colgroup>
             <thead>
               <tr>
                 <th scope="col"><input type="checkbox" id="chkAll" class="custom-chk" onclick="toggleAll(this)"></th>
