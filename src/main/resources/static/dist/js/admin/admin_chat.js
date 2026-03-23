@@ -39,9 +39,28 @@
             const data = JSON.parse(frame.body);
             if (Number(data.userIdx) !== CHAT_MY_IDX) showTyping(data.nickname, data.typing);
         });
+        // 온/오프라인 실시간 추적
+        stompClient.subscribe('/topic/presence', function (frame) {
+            var data = JSON.parse(frame.body);
+            updatePresence(Number(data.userIdx), data.online);
+        });
         clearUnreadBadges();
         sendReadEvent();
         scrollToBottom();
+    }
+
+    function updatePresence(userIdx, online) {
+        // 멤버 패널 아바타 상태 업데이트
+        var avt = document.getElementById('avt-' + userIdx);
+        if (avt) {
+            avt.classList.toggle('online', online);
+            avt.classList.toggle('away',   !online);
+        }
+        // DM 목록 상태 점 업데이트
+        var dot = document.getElementById('status-' + userIdx);
+        if (dot) {
+            dot.classList.toggle('online', online);
+        }
     }
 
     function onDisconnected() {

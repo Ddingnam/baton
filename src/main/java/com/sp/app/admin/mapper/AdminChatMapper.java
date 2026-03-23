@@ -36,4 +36,7 @@ public interface AdminChatMapper {
 	public void setMuted(@Param("roomIdx") Long roomIdx, @Param("userIdx") Long userIdx, @Param("isMuted") int isMuted);
 	public int getMuted(@Param("roomIdx") Long roomIdx, @Param("userIdx") Long userIdx);
 	public void transferOwnership(@Param("roomIdx") Long roomIdx, @Param("newOwnerIdx") Long newOwnerIdx);
+	
+	public void setOnlineStatus(@Param("userIdx") Long userIdx, @Param("isOnline") int isOnline);
+	public int  getOnlineStatus(@Param("userIdx") Long userIdx);
 }

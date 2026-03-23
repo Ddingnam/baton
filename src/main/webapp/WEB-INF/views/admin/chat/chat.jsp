@@ -90,7 +90,7 @@
                              data-roomidx="${dm.roomIdx}" data-roomname="${dm.nickname}" data-type="dm">
                             <div class="chat-dm-avt-wrap">
                                 <div class="chat-dm-avt-sm" id="avt-dm-${dm.userIdx}">${fn:substring(dm.nickname, 0, 2)}</div>
-                                <span class="chat-dm-status-dot" id="status-${dm.userIdx}"></span>
+                                <span class="chat-dm-status-dot ${dm.isOnline == 1 ? 'online' : ''}" id="status-${dm.userIdx}"></span>
                             </div>
                             <div class="chat-room-info">
                                 <span class="chat-room-name">${dm.nickname}</span>
@@ -269,7 +269,7 @@
                 <c:forEach var="member" items="${memberList}">
                     <div class="chat-member-item" id="member-${member.userIdx}"
                          data-useridx="${member.userIdx}" data-nickname="${member.nickname}">
-                        <div class="chat-dm-avt ${member.userIdx == myUserIdx ? 'online' : 'away'}"
+                        <div class="chat-dm-avt ${member.isOnline == 1 ? 'online' : 'away'}"
                              id="avt-${member.userIdx}">
                             ${fn:substring(member.nickname, 0, 2)}
                         </div>

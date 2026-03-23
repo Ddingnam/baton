@@ -15,4 +15,5 @@ public class ChatRoom {
     private String tradeSaveName;
     private String roomName;
     private int roomType;
+    private int isOnline;
 }

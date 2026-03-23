@@ -46,4 +46,14 @@ public class UserDto {
     private String coreAddress;
     private Double lat;
     private Double lng;
+    
+    private int isOnline;
+
+	public int getIsOnline() {
+		return isOnline;
+	}
+
+	public void setIsOnline(int isOnline) {
+		this.isOnline = isOnline;
+	}
 }

@@ -23,4 +23,7 @@ public interface AdminChatService {
 	public void leaveChannel(Long roomIdx, Long userIdx);
 	public int  toggleMute(Long roomIdx, Long userIdx);
 	public void transferOwnership(Long roomIdx, Long newOwnerIdx);
+	
+	public void setOnlineStatus(Long userIdx, int isOnline);
+	public int  getOnlineStatus(Long userIdx);
 }
