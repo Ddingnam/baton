@@ -156,8 +156,6 @@
 						<div class="list-card">
 							<div class="lc-header">
 								<h3>나의 거래 내역</h3>
-								
-								<a href="${pageContext.request.contextPath}/mypage/trade/sell" class="theme-link">전체보기 <i class="ri-arrow-right-s-line"></i></a>
 							</div>
 
 							<div class="inner-tabs">
@@ -181,7 +179,7 @@
 					                    </c:when>
 					                    <c:otherwise>
 					                        <c:forEach var="item" items="${tradeList}">
-					                            <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/article?productIdx=${item.productIdx}'">
+					                            <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/main?productIdx=${item.productIdx}'">
 					                                <div class="item-thumb">
 					                                    <c:choose>
 													        <c:when test="${not empty item.imageList}">

@@ -100,7 +100,7 @@
 					            <c:when test="${not empty tradeList}">
 					                <c:forEach var="item" items="${tradeList}">
 					                    <div class="lc-item" style="cursor:pointer" 
-					                         onclick="location.href='${pageContext.request.contextPath}/trade/article?productIdx=${item.productIdx}'">
+					                         onclick="location.href='${pageContext.request.contextPath}/trade/main?productIdx=${item.productIdx}'">
 					                        
 					                        <div class="item-icon theme-icon-bg">
 					                            <i class="ri-shopping-bag-3-fill"></i>

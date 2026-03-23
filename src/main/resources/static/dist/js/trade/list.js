@@ -225,6 +225,14 @@ createApp({
 
         onMounted(() => {
             fetchList(1);
+			
+			const urlParams = new URLSearchParams(window.location.search);
+			const pIdx = urlParams.get('productIdx');
+
+			if (pIdx) {
+				goArticle(pIdx);
+			}
+			
             document.addEventListener('click', () => { 
 				sortDropdownOpen.value = false; 
 				write.catOpen.value = false; 
