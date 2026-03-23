@@ -8,6 +8,9 @@
 <title>바톤 채팅방</title>
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/report/report-modal.css">
+<meta name="_csrf" content="${_csrf.token}"/>
+<meta name="_csrf_header" content="${_csrf.headerName}"/>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
@@ -18,15 +21,23 @@
     .header-left i { font-size: 24px; cursor: pointer; color: #333; }
     .header-center { flex: 1; text-align: center; font-weight: 700; color: #333; }
     .header-right { width: 24px; } 
-    .trade-banner { display: flex; padding: 12px 20px; background: #fafafa; border-bottom: 1px solid #eee; align-items: center; }
+
+    .trade-banner { display: flex; flex-direction: column; padding: 14px 20px; background: #fafafa; border-bottom: 1px solid #eee; }
+    .trade-banner-info-wrap { display: flex; align-items: center; width: 100%; }
     .trade-thumb { width: 45px; height: 45px; border-radius: 8px; background: #ddd; margin-right: 12px; object-fit: cover; border: 1px solid #eee;}
     .trade-info { flex: 1; display: flex; flex-direction: column; }
     .trade-title { font-size: 14px; font-weight: bold; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;}
     .trade-date { font-size: 12px; color: #888; margin-top: 3px; }
+    
+    .review-btn-wrap { margin-top: 12px; width: 100%; }
+    .review-btn { width: 100%; padding: 10px; background: #fff; border: 1px solid #00B98D; color: #00B98D; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
+    .review-btn:hover { background: #E6F8F3; }
+
     .chat-messages { flex: 1; overflow-y: auto; padding: 20px; background: #fff; } 
     .date-divider { text-align: center; margin: 20px 0; }
     .date-divider span { background: #f0f0f0; color: #666; font-size: 12px; padding: 5px 15px; border-radius: 15px; }
     .system-msg { text-align: center; margin-bottom: 20px; color: #888; font-size: 13px; }
+    
     .msg-row { margin-bottom: 15px; display: flex; align-items: flex-end; }
     .msg-me { justify-content: flex-end; }
     .msg-other { justify-content: flex-start; }
@@ -38,6 +49,7 @@
     .unread-count { color: #00B050; font-weight: bold; font-size: 11px; text-align: right; margin-bottom: 2px; }
     .profile-img { width: 36px; height: 36px; border-radius: 50%; margin-right: 10px; object-fit: cover; border: 1px solid #eaeaea; }
     .nickname { font-size: 12px; margin-bottom: 4px; color: #555; }
+    
     .chat-input-box { display: flex; padding: 15px; background: #fff; border-top: 1px solid #eee; align-items: center; }
     .chat-input-box textarea { flex: 1; padding: 12px 15px; border: 1px solid #f0f0f0; background: #f8f9fa; border-radius: 20px; outline: none; resize: none; overflow: hidden; height: 44px; line-height: 20px; font-family: inherit; font-size: 14px;}
     .chat-input-box textarea:focus { border-color: #00B050; background: #fff; }
@@ -52,6 +64,7 @@
             </div>
             <div class="header-center">${counterpartName}</div>
             <div class="header-right" style="position:relative;">
+                
                 <i class="ri-more-2-fill" style="font-size: 24px; cursor: pointer; color: #333;" onclick="toggleMenu()"></i>
                 <div id="roomMenu" style="display:none; position:absolute; right:0; top:35px; background:#fff; border:1px solid #eee; box-shadow:0 4px 16px rgba(0,0,0,0.10); border-radius:12px; z-index:100; width:130px; overflow:hidden;">
                     <div onclick="leaveRoom()" style="padding:13px 16px; color:#555; cursor:pointer; font-size:14px; font-weight:600; text-align:center; transition:background 0.15s;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='transparent'">삭제하기</div>
@@ -65,18 +78,29 @@
         
         <c:if test="${not empty tradeInfo}">
             <div class="trade-banner">
-                <c:choose>
-                    <c:when test="${not empty tradeInfo.SAVENAME}">
-                        <img src="${pageContext.request.contextPath}/uploads/trade/${tradeInfo.SAVENAME}" class="trade-thumb" onerror="this.src='${pageContext.request.contextPath}/dist/images/noimage.png'">
-                    </c:when>
-                    <c:otherwise>
-                        <img src="${pageContext.request.contextPath}/dist/images/noimage.png" class="trade-thumb">
-                    </c:otherwise>
-                </c:choose>
-                <div class="trade-info">
-                    <span class="trade-title">${tradeInfo.TITLE}</span>
-                    <span class="trade-date">작성일: ${tradeInfo.CREATEDDATE}</span>
+                <div class="trade-banner-info-wrap">
+                    <c:choose>
+                        <c:when test="${not empty tradeInfo.SAVENAME}">
+                            <img src="${pageContext.request.contextPath}/uploads/trade/${tradeInfo.SAVENAME}" class="trade-thumb" onerror="this.src='${pageContext.request.contextPath}/dist/images/noimage.png'">
+                        </c:when>
+                        <c:otherwise>
+                            <img src="${pageContext.request.contextPath}/dist/images/noimage.png" class="trade-thumb">
+                        </c:otherwise>
+                    </c:choose>
+                    <div class="trade-info">
+                        <span class="trade-title">${tradeInfo.TITLE}</span>
+                        <span class="trade-date">작성일: ${tradeInfo.CREATEDDATE}</span>
+                    </div>
                 </div>
+                
+                <c:if test="${tradeInfo.TRADESTATUS == '판매완료'}">
+                    <div class="review-btn-wrap">
+                        <c:set var="myRole" value="${userIdx == tradeInfo.SELLERIDX ? 'SELLER' : 'BUYER'}" />
+                        <button type="button" class="review-btn" onclick="location.href='${pageContext.request.contextPath}/review/write?productIdx=${tradeInfo.PRODUCTIDX}&role=${myRole}'">
+                            <i class="ri-edit-2-line"></i> 거래 후기 남기기
+                        </button>
+                    </div>
+                </c:if>
             </div>
         </c:if>
 
@@ -108,7 +132,18 @@
                                     <span class="msg-time">${msgTime}</span>
                                 </div>
                             </c:if>
-                            <div class="msg-bubble">${chat.content}</div>
+                            
+                            <c:choose>
+                                <c:when test="${chat.msgType == 5}">
+                                    <div class="msg-bubble" style="background: transparent; padding: 0;">
+                                        <img src="${pageContext.request.contextPath}/uploads/chat/${chat.content}" style="max-width: 200px; border-radius: 14px; border: 1px solid #eee;">
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="msg-bubble">${fn:replace(chat.content, '\\n', '<br>')}</div>
+                                </c:otherwise>
+                            </c:choose>
+                            
                             <c:if test="${chat.userIdx != userIdx}">
                                 <div class="msg-info">
                                     <span class="msg-time">${msgTime}</span>
@@ -121,191 +156,30 @@
         </div>
 
         <div class="chat-input-box">
+            <i class="ri-attachment-line" style="font-size: 24px; color: #888; cursor: pointer; margin-right: 12px; transition: color 0.2s;" onmouseover="this.style.color='#00B98D'" onmouseout="this.style.color='#888'" onclick="document.getElementById('chatImageFile').click()"></i>
+            <input type="file" id="chatImageFile" style="display:none;" accept="image/*" onchange="uploadChatImage()">
+            
             <textarea id="chatInput" placeholder="메시지 보내기..." onkeydown="handleEnter(event)"></textarea>
             <button onclick="sendMessage()"><i class="ri-send-plane-fill" style="font-size:18px;"></i></button>
         </div>
     </div>
 
 <script>
+    window.contextPath = "${pageContext.request.contextPath}";
     const currentRoomIdx = ${roomIdx};
     const myUserIdx = ${userIdx};
-    let stompClient = null;
+    const counterpartName = "${counterpartName}";
     let currentDisplayDate = "${lastDate}";
-
-    function connect() {
-        let socket = new SockJS('${pageContext.request.contextPath}/ws/chat');
-        stompClient = Stomp.over(socket);
-        stompClient.debug = null; 
-        
-        stompClient.connect({}, function (frame) {
-            stompClient.subscribe('/topic/room/' + currentRoomIdx, function (chat) {
-                let message = JSON.parse(chat.body);
-                if(message.msgType === 4) {
-                    if(message.userIdx !== myUserIdx) removeUnreadCounts();
-                } else {
-                    appendMessage(message);
-                    sendReadEvent();
-                }
-            });
-            sendReadEvent();
-            scrollToBottom();
-        });
-    }
-
-    function handleEnter(e) {
-        if(e.keyCode === 13 && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    }
-
-    function sendMessage() {
-        let input = document.getElementById("chatInput");
-        let content = input.value.trim();
-        if(!content) return;
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const tradeIdx = urlParams.get('tradeIdx');
-
-        let messageModel = { 
-            roomIdx: currentRoomIdx, 
-            userIdx: myUserIdx, 
-            content: content, 
-            msgType: 1,
-            tradeIdx: tradeIdx
-        };
-        
-        stompClient.send("/app/chat/send", {}, JSON.stringify(messageModel));
-        input.value = '';
-        input.focus();
-    }
-
-    function sendReadEvent() {
-        let readEvent = { roomIdx: currentRoomIdx, userIdx: myUserIdx, msgType: 4 };
-        stompClient.send("/app/chat/read", {}, JSON.stringify(readEvent));
-    }
-
-    function appendMessage(message) {
-        let chatArea = document.getElementById("chatArea");
-        let isMe = (message.userIdx === myUserIdx);
-        
-        let now = new Date();
-        let dateStr = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,'0') + "-" + String(now.getDate()).padStart(2,'0');
-        let timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-
-        if(currentDisplayDate !== dateStr) {
-            let dateHtml = '<div class="date-divider"><span>' + dateStr + '</span></div>';
-            chatArea.insertAdjacentHTML('beforeend', dateHtml);
-            currentDisplayDate = dateStr;
-        }
-
-        let html = '<div class="msg-row ' + (isMe ? 'msg-me' : 'msg-other') + '">';
-        if(!isMe) {
-            let photoPath = message.profilePhoto ? '${pageContext.request.contextPath}/uploads/profile/' + message.profilePhoto : '${pageContext.request.contextPath}/dist/images/person.png';
-            html += '<img src="' + photoPath + '" class="profile-img" onerror="this.src=\'${pageContext.request.contextPath}/dist/images/person.png\'">';
-            html += '<div><div class="nickname">${counterpartName}</div>';
-        } else {
-            html += '<div>';
-        }
-        
-        html += '<div style="display: flex; align-items: flex-end;">';
-        if(isMe) html += '<div class="msg-info"><span class="unread-count">1</span><span class="msg-time">' + timeStr + '</span></div>';
-        html += '<div class="msg-bubble">' + message.content.replace(/\n/g, '<br>') + '</div>';
-        if(!isMe) html += '<div class="msg-info"><span class="msg-time">' + timeStr + '</span></div>';
-        html += '</div></div></div>';
-        
-        chatArea.insertAdjacentHTML('beforeend', html);
-        scrollToBottom();
-    }
-
-    function removeUnreadCounts() {
-        let unreadElements = document.querySelectorAll('.unread-count');
-        unreadElements.forEach(el => el.innerText = '');
-    }
-
-    function scrollToBottom() {
-        let chatArea = document.getElementById("chatArea");
-        chatArea.scrollTop = chatArea.scrollHeight;
-    }
-    
-    function goBack() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const tradeIdx = urlParams.get('tradeIdx');
-        let ref = document.referrer;
-        
-        if (ref.indexOf('/chat/tradeList') !== -1) {
-            location.href = '${pageContext.request.contextPath}/chat/tradeList?tradeIdx=' + tradeIdx;
-        } else {
-            location.href = '${pageContext.request.contextPath}/chat/list?mode=popup';
-        }
-    }
-    
-    function toggleMenu() {
-        let menu = document.getElementById('roomMenu');
-        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function leaveRoom() {
-        document.getElementById('chatDeleteModal').style.display = 'flex';
-    }
-
-    function confirmLeaveRoom() {
-        document.getElementById('chatDeleteModal').style.display = 'none';
-        const params = new URLSearchParams();
-        params.append('roomIdx', currentRoomIdx);
-        fetch('${pageContext.request.contextPath}/chat/delete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: params
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data.state === 'true') { goBack(); }
-        });
-    }
-
-    function cancelLeaveRoom() {
-        document.getElementById('chatDeleteModal').style.display = 'none';
-    }
-
-    window.onload = function() { connect(); };
 </script>
+<script src="${pageContext.request.contextPath}/dist/js/chat/chat.js"></script>
+
 <script>
-    window.contextPath = "${pageContext.request.contextPath}";
     if (typeof showBatonToast === 'undefined') {
         (function() {
             const style = document.createElement('style');
             style.textContent = `
-                #chat-toast-container {
-                    position: fixed;
-                    top: 24px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    z-index: 9999999;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 10px;
-                    pointer-events: none;
-                }
-                .chat-toast-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    padding: 14px 28px;
-                    background: rgba(25, 31, 40, 0.95);
-                    backdrop-filter: blur(10px);
-                    color: #fff;
-                    border-radius: 100px;
-                    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-                    border: 1px solid rgba(255,255,255,0.1);
-                    min-width: 200px;
-                    justify-content: center;
-                    font-size: 15px;
-                    font-weight: 600;
-                    letter-spacing: -0.3px;
-                    animation: chatToastIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
-                }
+                #chat-toast-container { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 9999999; display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; }
+                .chat-toast-item { display: flex; align-items: center; gap: 10px; padding: 14px 28px; background: rgba(25, 31, 40, 0.95); backdrop-filter: blur(10px); color: #fff; border-radius: 100px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); min-width: 200px; justify-content: center; font-size: 15px; font-weight: 600; letter-spacing: -0.3px; animation: chatToastIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
                 .chat-toast-item .ct-icon { font-size: 18px; color: #3182F6; }
                 .chat-toast-item.hide { animation: chatToastOut 0.4s cubic-bezier(0.16,1,0.3,1) forwards !important; }
                 @keyframes chatToastIn  { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
@@ -332,6 +206,41 @@
             };
         })();
     }
+    
+    function goBack() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tradeIdx = urlParams.get('tradeIdx');
+        let ref = document.referrer;
+        
+        if (ref.indexOf('/chat/tradeList') !== -1) {
+            location.href = '${pageContext.request.contextPath}/chat/tradeList?tradeIdx=' + tradeIdx;
+        } else {
+            location.href = '${pageContext.request.contextPath}/chat/list?mode=popup';
+        }
+    }
+    
+    function toggleMenu() {
+        let menu = document.getElementById('roomMenu');
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function leaveRoom() { document.getElementById('chatDeleteModal').style.display = 'flex'; }
+
+    function confirmLeaveRoom() {
+        document.getElementById('chatDeleteModal').style.display = 'none';
+        const params = new URLSearchParams();
+        params.append('roomIdx', currentRoomIdx);
+        fetch('${pageContext.request.contextPath}/chat/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params
+        })
+        .then(response => response.json())
+        .then(data => { if(data.state === 'true') { goBack(); } });
+    }
+
+    function cancelLeaveRoom() { document.getElementById('chatDeleteModal').style.display = 'none'; }
+    window.onload = function() { connect(); };
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/report/report-modal.js"></script>
 
@@ -366,78 +275,18 @@
     </div>
 </div>
 
-
-
 <style>
-#chatDeleteModal {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.45);
-    backdrop-filter: blur(6px);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    animation: fadeInModal 0.18s ease;
-}
-@keyframes fadeInModal {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-}
-.chat-delete-dialog {
-    background: #fff;
-    border-radius: 20px;
-    padding: 28px 24px 20px;
-    width: 300px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-    animation: slideUpDialog 0.22s cubic-bezier(0.16,1,0.3,1);
-}
-@keyframes slideUpDialog {
-    from { transform: translateY(16px) scale(0.97); opacity: 0; }
-    to   { transform: translateY(0) scale(1); opacity: 1; }
-}
-.chat-delete-dialog .dialog-icon {
-    width: 52px; height: 52px;
-    border-radius: 50%;
-    background: #FFF1F0;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 16px;
-    font-size: 24px;
-    color: #FF4D4F;
-}
-.chat-delete-dialog .dialog-title {
-    font-size: 16px; font-weight: 800;
-    color: #111827; margin-bottom: 8px;
-    letter-spacing: -0.3px;
-}
-.chat-delete-dialog .dialog-desc {
-    font-size: 13px; color: #6B7280;
-    line-height: 1.6; margin-bottom: 22px;
-}
-.chat-delete-dialog .dialog-btns {
-    display: flex; gap: 8px;
-}
-.chat-delete-dialog .btn-cancel-dialog {
-    flex: 1; padding: 12px;
-    border-radius: 12px;
-    border: 1.5px solid #E5E7EB;
-    background: #F9FAFB;
-    font-size: 14px; font-weight: 600;
-    color: #6B7280; cursor: pointer;
-    font-family: inherit;
-    transition: all 0.15s;
-}
+#chatDeleteModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(6px); z-index: 9999; align-items: center; justify-content: center; animation: fadeInModal 0.18s ease; }
+@keyframes fadeInModal { from { opacity: 0; } to   { opacity: 1; } }
+.chat-delete-dialog { background: #fff; border-radius: 20px; padding: 28px 24px 20px; width: 300px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.18); animation: slideUpDialog 0.22s cubic-bezier(0.16,1,0.3,1); }
+@keyframes slideUpDialog { from { transform: translateY(16px) scale(0.97); opacity: 0; } to   { transform: translateY(0) scale(1); opacity: 1; } }
+.chat-delete-dialog .dialog-icon { width: 52px; height: 52px; border-radius: 50%; background: #FFF1F0; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 24px; color: #FF4D4F; }
+.chat-delete-dialog .dialog-title { font-size: 16px; font-weight: 800; color: #111827; margin-bottom: 8px; letter-spacing: -0.3px; }
+.chat-delete-dialog .dialog-desc { font-size: 13px; color: #6B7280; line-height: 1.6; margin-bottom: 22px; }
+.chat-delete-dialog .dialog-btns { display: flex; gap: 8px; }
+.chat-delete-dialog .btn-cancel-dialog { flex: 1; padding: 12px; border-radius: 12px; border: 1.5px solid #E5E7EB; background: #F9FAFB; font-size: 14px; font-weight: 600; color: #6B7280; cursor: pointer; font-family: inherit; transition: all 0.15s; }
 .chat-delete-dialog .btn-cancel-dialog:hover { background: #F3F4F6; }
-.chat-delete-dialog .btn-confirm-dialog {
-    flex: 1; padding: 12px;
-    border-radius: 12px;
-    border: none;
-    background: #FF4D4F;
-    font-size: 14px; font-weight: 700;
-    color: #fff; cursor: pointer;
-    font-family: inherit;
-    transition: all 0.15s;
-}
+.chat-delete-dialog .btn-confirm-dialog { flex: 1; padding: 12px; border-radius: 12px; border: none; background: #FF4D4F; font-size: 14px; font-weight: 700; color: #fff; cursor: pointer; font-family: inherit; transition: all 0.15s; }
 .chat-delete-dialog .btn-confirm-dialog:hover { background: #E53935; transform: translateY(-1px); }
 </style>
 

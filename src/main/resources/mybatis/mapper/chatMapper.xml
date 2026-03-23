@@ -76,7 +76,7 @@
             p.productIdx, 
             p.title, 
             p.price,
-            TO_CHAR(p.createdDate, 'YYYY-MM-DD') AS createdDate,
+            p.tradeStatus, p.userIdx as sellerIdx, TO_CHAR(p.createdDate, 'YYYY-MM-DD') AS createdDate,
             (SELECT saveName FROM productImages WHERE productIdx = p.productIdx AND imgOrder = 1) AS saveName
         FROM product p
         WHERE p.productIdx = #{tradeIdx}
