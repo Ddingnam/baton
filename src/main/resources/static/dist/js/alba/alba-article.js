@@ -415,13 +415,30 @@ document.addEventListener("DOMContentLoaded", function() {
   }
  */
   function openApplySuccess() {
-      document.getElementById("applySuccessModal").style.display = "flex";
+      const modal = document.getElementById("applySuccessModal");
+      if (!modal) return;
+
+      modal.style.display = "flex";
+
+      const icon = modal.querySelector(".icon-wrap");
+      if (icon) {
+          icon.classList.remove("pop");
+          void icon.offsetWidth;
+          icon.classList.add("pop");
+      }
+
+      setTimeout(() => {
+          closeApplySuccess();
+      }, 4000);
   }
 
   function closeApplySuccess() {
-      document.getElementById("applySuccessModal").style.display = "none";
-  }
+      const modal = document.getElementById("applySuccessModal");
+      if (!modal) return;
 
+      modal.style.display = "none";
+  }
+  
   function goMyPage() {
       location.href = CONTEXT_PATH + "/mypage"; // 필요하면 경로 수정
   }
