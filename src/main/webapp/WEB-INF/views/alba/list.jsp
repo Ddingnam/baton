@@ -199,7 +199,12 @@
                 <span class="range-value" id="rangeValueLabel">내 동네</span>
               </div>
               <input type="range" class="range-slider" id="rangeSlider"
-                     min="0" max="4" value="0" step="1" />
+                     min="0" max="2" value="0" step="1" />
+              <div class="range-steps">
+                <span class="range-step active" data-step="0">내 동네</span>
+                <span class="range-step" data-step="1">가까운 동네</span>
+                <span class="range-step" data-step="2">먼 동네</span>
+              </div>
             </div>
 
             <div class="filter-section" data-filter-type="period">
@@ -278,6 +283,7 @@
         endTime:     `${dto.endTime}`,
         
         recruitStatus: `${dto.recruitStatus}`, 
+        recruitStatusKor: `${dto.recruitStatusKor}`,
         
         isScrapped:  ${userScrapList != null && userScrapList.contains(dto.postingIdx) ? 1 : 0}        
       }${!status.last ? ',' : ''}

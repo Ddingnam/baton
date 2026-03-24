@@ -31,7 +31,13 @@
     <header class="detail-recruit-header">
         <h1 class="recruit-title">
             ${dto.title}
-		<span class="status-text open">모집중</span>       
+		<span class="status-text ${dto.recruitStatus == 'RECRUITING' || dto.recruitStatus == '모집중' ? 'open' : 'closed'}">
+            <c:choose>
+                <c:when test="${dto.recruitStatus == 'RECRUITING' || dto.recruitStatus == '모집중'}">모집중</c:when>
+                <c:when test="${dto.recruitStatus == 'CLOSED' || dto.recruitStatus == '모집완료'}">모집완료</c:when>
+                <c:otherwise>${dto.recruitStatus}</c:otherwise>
+            </c:choose>
+        </span>       
 		</h1>
         <div class="recruit-company">
             <span>${dto.employer}</span>
@@ -229,6 +235,7 @@
             </sec:authorize>
 
             <sec:authorize access="isAuthenticated()">
+                <sec:authentication property="principal.member.userIdx" var="loggedInUserId" />
                 <c:choose>
                     <c:when test="${loggedInUserId == dto.userIdx}">
                         <button class="btn-action btn-apply full-width" onclick="window.open('${pageContext.request.contextPath}/chat/albaList?albaIdx=${dto.postingIdx}', 'chatList', 'width=450,height=850')">
@@ -236,7 +243,7 @@
                             <span>지원 내역 보기 (${dto.chatCount})</span>
                         </button>
                     </c:when>
-                    <c:when test="${dto.recruitStatus == '모집완료'}">
+                    <c:when test="${dto.recruitStatus == 'CLOSED'}">
                         <button class="btn-action btn-apply disabled full-width" disabled>
                             <span class="chip-dday">마감</span>
                             <span>모집이 완료되었습니다</span>
@@ -345,8 +352,8 @@
     <div class="modal-content" onclick="event.stopPropagation()">
         <div class="modal-header"><h3>모집 상태 변경</h3><button type="button" class="close-modal" onclick="StatusModule.close()"><i class="ri-close-line"></i></button></div>
         <div class="status-options">
-            <button type="button" class="status-opt ${dto.recruitStatus == '모집중' ? 'active' : ''}" onclick="StatusModule.update(${dto.postingIdx}, '모집중')">모집중</button>
-            <button type="button" class="status-opt ${dto.recruitStatus == '모집완료' ? 'active' : ''}" onclick="StatusModule.update('${dto.postingIdx}', '모집완료')">모집완료</button>
+            <button type="button" class="status-opt ${dto.recruitStatus == 'RECRUITING' ? 'active' : ''}" onclick="StatusModule.update(${dto.postingIdx}, 'RECRUITING')">모집중</button>
+            <button type="button" class="status-opt ${dto.recruitStatus == 'CLOSED' ? 'active' : ''}" onclick="StatusModule.update('${dto.postingIdx}', 'CLOSED')">모집완료</button>
         </div>
     </div>
 </div>

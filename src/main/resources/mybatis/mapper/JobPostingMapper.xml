@@ -176,9 +176,7 @@
 
     LEFT JOIN job_scrap js
     ON jp.posting_idx = js.posting_idx
-    <if test="memberId != null">
-        AND js.member_id = #{memberId}
-    </if>
+    AND js.member_id = #{userIdx}
 
     <where>
         <if test="sido != null and sido != ''">

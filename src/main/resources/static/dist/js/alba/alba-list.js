@@ -116,7 +116,7 @@ function renderList(jobs) {
 		const fresh     = isFresh(job.createdDate);
 		const workTime  = (job.startTime && job.endTime)
 			? `${job.startTime}~${job.endTime}` : '시간협의';
-		const scrapCls = job.isScrapped == 1 ? 'active' : '';
+		const scrapCls = myScrapIds.includes(Number(job.postingIdx)) ? 'active' : '';
 		const catInfo   = CAT_INFO[job.category] || { emoji: '💼', cls: 'cat-other' };
 
 		const isShort = job.workPeriod === 'LESS_THAN_A_MONTH';
@@ -128,8 +128,11 @@ function renderList(jobs) {
 			? `<span class="job-tag period-long">📅 장기</span>`
 			: '';
 
+		const isRecruiting = job.recruitStatus === 'RECRUITING';
+
 		return `
-		<div class="job-list-item" onclick="location.href='${CONTEXT_PATH}/alba/article/${job.postingIdx}'">
+		<div class="job-list-item ${!isRecruiting ? 'job-disabled' : ''}" 
+		     onclick="${isRecruiting ? `location.href='${CONTEXT_PATH}/alba/article/${job.postingIdx}'` : ''}">
 
 			<div class="job-cat-bar ${catInfo.cls}"></div>
 			<div class="job-cat-icon">${catInfo.emoji}</div>
@@ -152,6 +155,10 @@ function renderList(jobs) {
 
 				<div class="job-meta-info">
 					<span class="job-date-text ${fresh ? 'fresh' : ''}">${relTime}</span>
+
+					<span class="${isRecruiting ? 'theme-badge' : 'theme-badge-done'}">
+						${isRecruiting ? '모집중' : '모집완료'}
+					</span>
 				</div>
 			</div>
 
@@ -159,6 +166,7 @@ function renderList(jobs) {
 			        onclick="toggleScrap(event, ${job.postingIdx}, this)">
 				<i class="ri-star-fill"></i>
 			</button>
+
 		</div>`;
 	}).join('');
 }
@@ -353,7 +361,8 @@ function applyAreaFilter() {
 				category:    job.category,
 				startTime:   job.startTime,
 				endTime:     job.endTime,
-				isScrapped:  job.isScrapped
+				recruitStatus: job.recruitStatus,
+				isScrapped:  myScrapIds.includes(Number(job.postingIdx)) ? 1 : 0
 			}));
 			currentPage = 1;
 			const rc2 = document.getElementById('sidebarResultCount');
@@ -430,3 +439,94 @@ function toggleScrap(event, postingIdx) {
 	})
 	.catch(err => console.error(err));
 }
+/* ===== 동네 범위 슬라이더 ===== */
+const RANGE_LABELS = ['내 동네', '가까운 동네', '먼 동네'];
+
+// 슬라이더 단계별 필터 조건
+// 0: 내 동네  → sido + gugun + dong 모두 일치
+// 1: 가까운 동네 → sido + gugun 일치 (dong 무관)
+// 2: 먼 동네  → sido 일치 (gugun, dong 무관)
+function getRangeFilter(step) {
+	if (!myRegion || !myRegion.sido) return null; // 동네 인증 안 된 경우 필터 없음
+	if (step === 0) return { sido: myRegion.sido, gugun: myRegion.gugun, dong: myRegion.dong };
+	if (step === 1) return { sido: myRegion.sido, gugun: myRegion.gugun, dong: '' };
+	if (step === 2) return { sido: myRegion.sido, gugun: '', dong: '' };
+	return null;
+}
+
+function applyRangeFilter(step) {
+	const filter = getRangeFilter(step);
+
+	// 라벨 + step 점 업데이트
+	const label = document.getElementById('rangeValueLabel');
+	if (label) label.textContent = RANGE_LABELS[step];
+
+	document.querySelectorAll('.range-step').forEach(el => {
+		el.classList.toggle('active', Number(el.dataset.step) === step);
+	});
+
+	// 슬라이더 배경 진행도 업데이트
+	const slider = document.getElementById('rangeSlider');
+	if (slider) {
+		const pct = (step / (slider.max - slider.min)) * 100;
+		slider.style.background =
+			`linear-gradient(to right, var(--primary) ${pct}%, var(--border-color) ${pct}%)`;
+	}
+
+	if (!filter) {
+		// 동네 인증 없으면 전체 목록 표시
+		applyFilters();
+		return;
+	}
+
+	const { sido, gugun, dong } = filter;
+	fetch(`${CONTEXT_PATH}/alba/filter?sido=${encodeURIComponent(sido)}&gugun=${encodeURIComponent(gugun)}&dong=${encodeURIComponent(dong)}`)
+		.then(res => res.json())
+		.then(data => {
+			filteredJobs = data.map(job => ({
+				postingIdx:    job.postingIdx,
+				title:         job.title,
+				employer:      job.employer || '업체명',
+				payType:       job.payType,
+				pay:           job.pay || 0,
+				location:      job.location,
+				createdDate:   job.createdDate,
+				workPeriod:    job.workPeriod,
+				category:      job.category,
+				startTime:     job.startTime,
+				endTime:       job.endTime,
+				recruitStatus: job.recruitStatus,
+				isScrapped:    myScrapIds.includes(Number(job.postingIdx)) ? 1 : 0
+			}));
+			currentPage = 1;
+			const rc  = document.getElementById('resultCount');
+			const rc2 = document.getElementById('sidebarResultCount');
+			if (rc)  rc.textContent  = filteredJobs.length;
+			if (rc2) rc2.textContent = filteredJobs.length;
+			renderCurrentPage();
+			renderPagination();
+		})
+		.catch(err => console.error(err));
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+	const slider = document.getElementById('rangeSlider');
+	if (!slider) return;
+
+	// 초기 배경 세팅 (step=0 → 0%)
+	slider.style.background =
+		`linear-gradient(to right, var(--primary) 0%, var(--border-color) 0%)`;
+
+	slider.addEventListener('input', function () {
+		applyRangeFilter(Number(this.value));
+	});
+
+	// step 텍스트 클릭으로도 조작 가능
+	document.querySelectorAll('.range-step').forEach(el => {
+		el.addEventListener('click', function () {
+			const step = Number(this.dataset.step);
+			slider.value = step;
+			applyRangeFilter(step);
+		});
+	});
+});

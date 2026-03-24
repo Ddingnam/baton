@@ -1015,3 +1015,35 @@ body {
   border-color: var(--primary);
   transform: translateY(-1px);
 }
+
+/* ===== 동네 범위 슬라이더 단계 레이블 ===== */
+.range-steps {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.range-step {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-sub, #888);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+  user-select: none;
+}
+
+.range-step.active {
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.range-step:hover:not(.active) {
+  color: var(--text-main);
+}
+
+.job-disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}

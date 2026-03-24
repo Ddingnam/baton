@@ -203,11 +203,10 @@ public class JobPostingController {
 	    map.put("gugun", (gugun != null && !gugun.contains("전체")) ? gugun : null);
 	    map.put("dong", (dong != null && !dong.contains("전체")) ? dong : null);
 
-	    // 🔥 이거 핵심
 	    if (userDetails != null) {
 	        map.put("userIdx", userDetails.getUserIdx());
 	    } else {
-	        map.put("memberId", -1); 
+	        map.put("userIdx", -1L); 
 	    }
 
 	    return postingService.listPostingByArea(map);
