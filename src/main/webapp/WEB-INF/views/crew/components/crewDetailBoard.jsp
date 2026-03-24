@@ -110,22 +110,49 @@
                 
                 <div class="cdb-post-body ql-editor" v-html="currentPost.content"></div>
                 
-                <div class="cdb-comment-area">
-                    <h4>댓글 <span>{{ currentPost.commentCount || 0 }}</span></h4>
-                    <ul class="cdb-comment-list">
-                        <li v-for="reply in currentPost.comments" :key="reply.id" class="cdb-comment-item">
-                            <div class="cdb-comment-info">
-                                <strong>{{ reply.author }}</strong>
-                                <span>{{ reply.date }}</span>
-                            </div>
-                            <p>{{ reply.text }}</p>
-                        </li>
-                    </ul>
-                    <div class="cdb-comment-form">
-                        <input type="text" v-model="newComment" placeholder="따뜻한 댓글을 남겨주세요." @keyup.enter="submitComment">
-                        <button @click="submitComment"><i class="ri-send-plane-fill"></i></button>
-                    </div>
-                </div>
+                <div class="cdb-comment-card">
+				    <h4 class="cdb-comment-title">댓글 <span class="cdb-comment-count">3</span></h4>
+				    
+				    <ul class="cdb-comment-list">
+				        <li class="cdb-comment-item">
+				            <div class="cdb-comment-info">
+				                <div class="cdb-author-meta">
+				                    <img src="https://via.placeholder.com/32" alt="프로필" class="cdb-profile-img">
+				                    <strong class="cdb-author-name">김철수</strong>
+				                </div>
+				                <span class="cdb-comment-date">2026.03.24</span>
+				            </div>
+				            <p class="cdb-comment-text">정말 유익한 포스팅이네요! 디자인이 깔끔해서 보기 좋습니다.</p>
+				        </li>
+				
+				        <li class="cdb-comment-item cdb-reply-item">
+				            <div class="cdb-comment-info">
+				                <div class="cdb-author-meta">
+				                    <img src="https://via.placeholder.com/32/ffcccc" alt="프로필" class="cdb-profile-img">
+				                    <strong class="cdb-author-name">작성자</strong>
+				                </div>
+				                <span class="cdb-comment-date">2026.03.24</span>
+				            </div>
+				            <p class="cdb-comment-text">철수님, 좋게 봐주셔서 감사합니다! 😊</p>
+				        </li>
+				
+				        <li class="cdb-comment-item">
+				            <div class="cdb-comment-info">
+				                <div class="cdb-author-meta">
+				                    <img src="https://via.placeholder.com/32/ccccff" alt="프로필" class="cdb-profile-img">
+				                    <strong class="cdb-author-name">이영희</strong>
+				                </div>
+				                <span class="cdb-comment-date">2026.03.23</span>
+				            </div>
+				            <p class="cdb-comment-text">혹시 사용하신 폰트 정보 좀 알 수 있을까요? 가독성이 너무 좋네요.</p>
+				        </li>
+				    </ul>
+				
+				    <div class="cdb-comment-form">
+				        <input type="text" class="cdb-comment-input" placeholder="따뜻한 댓글을 남겨주세요.">
+				        <button class="cdb-comment-submit"><i class="ri-send-plane-fill"></i></button>
+				    </div>
+				</div>
             </div>
 
 			<div v-else-if="viewMode === 'write' || viewMode === 'edit'" :key="viewMode" class="cdb-write-view">

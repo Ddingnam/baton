@@ -177,20 +177,132 @@
 .cdb-post-body { font-size: 16px; line-height: 1.8; color: #191F28; min-height: 300px; margin-bottom: 40px; }
 
 /* 댓글 영역 */
-.cdb-comment-area h4 { font-size: 17px; font-weight: 800; margin-bottom: 20px; }
-.cdb-comment-area h4 span { color: var(--crew-pink); }
-.cdb-comment-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
-.cdb-comment-item { padding: 16px 20px; background: rgba(255,255,255,0.4); border-radius: 16px; border: 1px solid rgba(255,255,255,0.7); }
-.cdb-comment-info { display: flex; justify-content: space-between; margin-bottom: 8px; }
-.cdb-comment-info strong { font-size: 14px; font-weight: 700; color: #191F28; }
-.cdb-comment-info span { font-size: 12px; color: var(--text-sub); font-weight: 600; }
-.cdb-comment-item p { font-size: 14px; color: #4E5968; margin: 0; line-height: 1.5; }
+/* 1. 전체 카드 영역 */
+.cdb-comment-card {
+    background: #F2F4F6; 
+    border-radius: 20px;
+    padding: 20px;
+    margin-top: 30px;
+}
 
-.cdb-comment-form { display: flex; gap: 10px; background: #fff; padding: 10px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.05); }
-.cdb-comment-form input { flex: 1; border: none; outline: none; padding: 0 10px; font-size: 14px; font-weight: 500; }
-.cdb-comment-form button { width: 44px; height: 44px; background: #191F28; color: #fff; border: none; border-radius: 12px; cursor: pointer; transition: 0.3s; }
-.cdb-comment-form button:hover { background: var(--crew-pink); transform: scale(1.05); }
+.cdb-comment-title { 
+    font-size: 16px; 
+    font-weight: 800; 
+    margin-bottom: 16px; 
+    padding-left: 4px;
+    color: #191F28;
+}
 
+.cdb-comment-count { color: var(--crew-pink); }
+
+/* 2. 댓글 리스트 및 아이템 */
+.cdb-comment-list { 
+    list-style: none; 
+    padding: 0; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 8px; 
+    margin-bottom: 20px; 
+}
+
+.cdb-comment-item { 
+    padding: 14px 16px; 
+    background: #ffffff; 
+    border-radius: 14px; 
+    border: 1px solid rgba(0, 0, 0, 0.02);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); 
+}
+
+/* 대댓글 구분 */
+.cdb-comment-item.cdb-reply-item {
+    margin-left: 32px; 
+    background: rgba(255, 255, 255, 0.5); 
+    box-shadow: none;
+    border: 1px dashed #D1D6DB;
+}
+
+/* 3. 프로필 및 메타 정보 */
+.cdb-comment-info { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 6px; 
+}
+
+.cdb-author-meta { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+}
+
+.cdb-profile-img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.cdb-author-name { 
+    font-size: 13.5px; 
+    font-weight: 700; 
+    color: #191F28; 
+}
+
+.cdb-comment-date { 
+    font-size: 11px; 
+    color: #8B95A1; 
+    font-weight: 500; 
+}
+
+/* 4. 본문 가독성 설정 */
+.cdb-comment-text { 
+    font-size: 14.5px; 
+    color: #333D4B; 
+    margin: 0 0 0 36px; /* 프로필 이미지(28px) + 간격(8px) 만큼 내어쓰기 */
+    line-height: 1.5; 
+    letter-spacing: -0.01em;
+    word-break: break-all;
+}
+
+/* 5. 입력 폼 */
+.cdb-comment-form { 
+    display: flex; 
+    gap: 8px; 
+    background: #fff; 
+    padding: 6px 6px 6px 14px; 
+    border-radius: 12px; 
+    border: 1px solid #E5E8EB; 
+}
+
+.cdb-comment-input { 
+    flex: 1; 
+    border: none; 
+    outline: none; 
+    font-size: 14px; 
+    background: transparent; 
+    color: #191F28;
+}
+
+.cdb-comment-input::placeholder { color: #ADB5BD; }
+
+.cdb-comment-submit { 
+    width: 36px; 
+    height: 36px; 
+    background: #191F28; 
+    color: #fff; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cdb-comment-submit:hover { 
+    background: var(--crew-pink); 
+}
 /* --- 4. 작성 뷰 --- */
 .cdb-form { display: flex; flex-direction: column; gap: 20px; }
 

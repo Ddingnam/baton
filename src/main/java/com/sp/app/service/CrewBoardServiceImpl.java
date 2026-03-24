@@ -12,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sp.app.domain.dto.CrewBoardDto;
 import com.sp.app.domain.entity.CrewBoard;
-import com.sp.app.domain.entity.User;
-import com.sp.app.mapper.MemberMapper;
 import com.sp.app.repository.CrewBoardRepository;
 import com.sp.app.repository.UserRepository;
 
