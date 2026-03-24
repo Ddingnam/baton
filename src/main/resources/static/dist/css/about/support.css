@@ -28,9 +28,14 @@
     position: relative;
     background: linear-gradient(135deg, #0d0f1a 0%, #1a1d3a 60%, #0d1525 100%);
     padding: 120px 24px 80px;
-    overflow: hidden;
+    overflow: visible;
 }
-.hero-bg { position: absolute; inset: 0; pointer-events: none; }
+.hero-bg { 
+	position: absolute;
+	inset: 0; 
+	pointer-events: none;
+	overflow: hidden;
+}
 .hero-orb {
     position: absolute;
     border-radius: 50%;
