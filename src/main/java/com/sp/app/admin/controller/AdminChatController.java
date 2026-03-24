@@ -114,7 +114,6 @@ public class AdminChatController {
         return result;
     }
 
-    /** 채널 멤버 목록 — creatorIdx는 DB 컬럼 추가 전까지 null 반환 가능 */
     @GetMapping(value = "/chat/channel/{roomIdx}/members", produces = "application/json")
     @ResponseBody
     public Map<String, Object> getChannelMembers(
@@ -125,7 +124,6 @@ public class AdminChatController {
         result.put("success",    true);
         result.put("members",    adminChatService.listChannelMembers(roomIdx));
         result.put("nonMembers", adminChatService.listNonMembers(roomIdx));
-        // creatorIdx: DB 컬럼 없으면 null → JS에서 SUPER 유저가 방장 역할
         try {
             result.put("creatorIdx", adminChatService.getChannelCreator(roomIdx));
         } catch (Exception e) {
@@ -147,7 +145,6 @@ public class AdminChatController {
         return result;
     }
 
-    /** 강퇴 — creatorIdx 없으면 SUPER(level 99)가 방장 역할 */
     @PostMapping(value = "/chat/channel/{roomIdx}/member/remove", produces = "application/json")
     @ResponseBody
     public Map<String, Object> removeMember(
@@ -159,7 +156,6 @@ public class AdminChatController {
         if (userIdx.equals(userDetails.getUserIdx())) {
             result.put("success", false); result.put("msg", "본인은 강퇴할 수 없습니다."); return result;
         }
-        // creatorIdx 컬럼 있으면 방장만, 없으면 SUPER(99)만 가능
         try {
             Long creatorIdx = adminChatService.getChannelCreator(roomIdx);
             if (creatorIdx != null && !creatorIdx.equals(userDetails.getUserIdx())) {
@@ -192,7 +188,6 @@ public class AdminChatController {
         return result;
     }
 
-    /** 알람 끄기/켜기 토글 */
     @PostMapping(value = "/chat/channel/{roomIdx}/mute", produces = "application/json")
     @ResponseBody
     public Map<String, Object> toggleMute(
