@@ -320,5 +320,7 @@ public class JobPostingController {
 
 		    return result;
 		}
+		
+		
 	
 }

@@ -385,7 +385,7 @@ document.addEventListener("DOMContentLoaded", function() {
       const countSpan = document.getElementById('applyMessageCount');
       if(countSpan) countSpan.innerText = currentLength;
   });
-
+/*
   function submitResume() {
       const resumeIdx = document.getElementById('resumeSelect').value;
       const message = document.getElementById('applyMessage').value;
@@ -413,3 +413,29 @@ document.addEventListener("DOMContentLoaded", function() {
       })
       .catch(() => alert('네트워크 오류'));
   }
+ */
+  function openApplySuccess() {
+      document.getElementById("applySuccessModal").style.display = "flex";
+  }
+
+  function closeApplySuccess() {
+      document.getElementById("applySuccessModal").style.display = "none";
+  }
+
+  function goMyPage() {
+      location.href = CONTEXT_PATH + "/mypage"; // 필요하면 경로 수정
+  }
+  
+  function submitResume() {
+      const resumeIdx = document.getElementById("resumeSelect").value;
+
+      if (!resumeIdx) {
+          alert("이력서를 선택해주세요!");
+          return;
+      }
+
+      closeResumeModal();
+      openApplySuccess(); 
+  }
+  
+  

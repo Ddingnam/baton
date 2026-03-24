@@ -417,5 +417,16 @@
     </div>
 </div>
 
+<div id="applySuccessModal" class="success-overlay">
+    <div class="success-box">
+        <div class="icon-wrap">
+            <i class="ri-checkbox-circle-fill"></i>
+        </div>
+        <h3>지원 완료되었습니다!</h3>
+        <p>마이페이지에서 지원내역을 확인해주세요.</p>
+        <button onclick="closeApplySuccess()">확인</button>
+    </div>
+</div>
+
 </body>
 </html>
