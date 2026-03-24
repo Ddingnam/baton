@@ -456,9 +456,13 @@
 							                            </p>
 							                        </div>
 							                        <div class="item-right">
-							                            <span class="${alba.recruitStatus == '모집중' ? 'theme-badge' : 'theme-badge-done'}">
-							                                ${alba.recruitStatus}
-							                            </span>
+														<span class="theme-badge-done">
+														    <c:choose>
+														        <c:when test="${alba.recruitStatus == 'RECRUITING'}">모집중</c:when>
+														        <c:when test="${alba.recruitStatus == 'CLOSED'}">마감</c:when>
+														        <c:when test="${alba.recruitStatus == 'PRIVATE'}">비공개</c:when>
+														    </c:choose>
+														</span>
 							                            <button class="btn-sm" onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/alba/manage?postingIdx=${alba.postingIdx}'">
 							                                지원자 보기
 							                            </button>
@@ -493,8 +497,12 @@
 														</p>
 													</div>
 													<div class="item-right">
-														<span class="${alba.recruitStatus == '모집중' ? 'theme-badge' : 'theme-badge-done'}">
-															${alba.recruitStatus}
+														<span class="theme-badge-done">
+														    <c:choose>
+														        <c:when test="${alba.recruitStatus == 'RECRUITING' ? 'theme-badge' : 'theme-badge-done'}'}">모집중</c:when>
+														        <c:when test="${alba.recruitStatus == 'CLOSED'}">마감</c:when>
+														        <c:when test="${alba.recruitStatus == 'PRIVATE'}">비공개</c:when>
+														    </c:choose>
 														</span>
 													</div>
 												</div>

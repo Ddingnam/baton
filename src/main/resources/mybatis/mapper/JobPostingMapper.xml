@@ -219,7 +219,7 @@
             subway_info AS subwayInfo,
             contact, benefits,
             category, deadline, created_date AS createdDate,
-            hit_count AS hitCount
+            hit_count AS hitCount, recruit_status AS recruitStatus
         FROM job_posting
         WHERE user_idx = #{userIdx}
         ORDER BY created_date DESC
