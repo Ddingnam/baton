@@ -2,6 +2,7 @@ package com.sp.app.controller;
 
 import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.model.JobPosting;
+import com.sp.app.model.JobProfile;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.JobPostingService;
 
@@ -136,10 +137,15 @@ public class JobPostingController {
 		                isUserScrap = true;
 		            }
 		        }
-		        model.addAttribute("userScrap", isUserScrap); // JSP에서 이 값을 받아 하트 색칠 여부 결정
+		        model.addAttribute("userScrap", isUserScrap); 
 
 		        model.addAttribute("dto", dto);
 		        model.addAttribute("page", page);
+		        
+		        if (userDetails != null) {
+		        	List<JobProfile> resumeList = jobProfileService.listJobProfile(userDetails.getUserIdx());
+		        	model.addAttribute("resumeList", resumeList);
+		        }
 		        
 		        return "alba/article"; 
 		    } catch (Exception e) {

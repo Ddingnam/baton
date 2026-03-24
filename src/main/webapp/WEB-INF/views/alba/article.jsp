@@ -284,9 +284,11 @@
                     <option value="">선택해주세요</option>
                     <c:choose>
                         <c:when test="${not empty resumeList}">
-                            <c:forEach var="resume" items="${resumeList}">
-                                <option value="${resume.resumeIdx}">${resume.title}</option>
-                            </c:forEach>
+							<c:forEach var="resume" items="${resumeList}">
+							    <option value="${resume.profileIdx}">
+							        ${resume.title}
+							    </option>
+							</c:forEach>
                         </c:when>
                         <c:otherwise>
                             <option value="" disabled>등록된 이력서가 없습니다. 마이페이지에서 작성해주세요.</option>
