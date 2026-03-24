@@ -95,8 +95,8 @@ public class JobPostingController {
 				dto.setUserIdx(userDetails.getUserIdx());
 			}
 			
-			dto.setRecruitStatus("모집중");
-	        
+			dto.setRecruitStatus("RECRUITING");
+			
 			postingService.insertPosting(dto);
 
 		} catch (Exception e) {
@@ -106,7 +106,6 @@ public class JobPostingController {
 		return "redirect:/alba/list";
 	}
 
-	// 1. article 메서드를 통째로 아래 코드로 변경하세요. (스크랩 여부 확인 로직 추가)
 		@GetMapping("article/{num}")
 		public String article(@PathVariable("num") long num, 
 		                      @RequestParam(value = "page", defaultValue = "1") String page,

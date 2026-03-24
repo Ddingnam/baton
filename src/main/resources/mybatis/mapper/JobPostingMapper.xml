@@ -36,7 +36,7 @@
             #{regionIdx},
             #{category},
             #{deadline, jdbcType=DATE},
-            #{recruitStatus},
+            'RECRUITING',
             SYSDATE
         )
     </insert>
