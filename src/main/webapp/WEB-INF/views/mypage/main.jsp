@@ -401,39 +401,44 @@
 							</div>
 
 							<div class="inner-section active" id="alba-apply">
-								<div class="lc-list">
-									<div class="lc-item">
-										<div class="item-info">
-											<span class="corp-name theme-text">스타벅스 강남역점</span>
-											<h4>주말 마감 파트타이머 구합니다</h4>
-											<p class="info-metrics">시급 11,000원 · 2월 24일 지원</p>
-										</div>
-										<div class="item-right">
-											<span class="theme-badge-outline">열람대기</span>
-										</div>
-									</div>
-									<div class="lc-item">
-										<div class="item-info">
-											<span class="corp-name theme-text">버터앤빈 카페</span>
-											<h4>바리스타 모집 (주 3회)</h4>
-											<p class="info-metrics">시급 13,000원 · 2월 18일 지원</p>
-										</div>
-										<div class="item-right">
-											<span class="theme-badge">서류통과</span>
-										</div>
-									</div>
-									<div class="lc-item">
-										<div class="item-info">
-											<span class="corp-name" style="color:#8B95A1;font-size:12px;font-weight:700;margin-bottom:4px;display:block;">컴포즈 두타몰점</span>
-											<h4>오전 파트타임 (월~수)</h4>
-											<p class="info-metrics">시급 10,400원 · 2월 10일 지원</p>
-										</div>
-										<div class="item-right">
-											<span style="background:#F2F4F6;color:#8B95A1;padding:6px 12px;border-radius:8px;font-size:13px;font-weight:700;">불합격</span>
-										</div>
-									</div>
-								</div>
-							</div>
+						    <div class="lc-list">
+						        <c:choose>
+						            <c:when test="${empty albaApplyList}">
+						                <div class="lc-empty">
+						                    <i class="ri-briefcase-line"></i>
+						                    <p>지원한 공고가 없습니다.</p>
+						                </div>
+						            </c:when>
+						            <c:otherwise>
+						                <c:forEach var="apply" items="${albaApplyList}">
+						                    <div class="lc-item">
+						                        <div class="item-info">
+						                            <span class="corp-name theme-text">${apply.employer}</span>
+						                            <h4>${apply.title}</h4>
+						                            <p class="info-metrics">
+						                                ${apply.payType} <fmt:formatNumber value="${apply.pay}" pattern="#,###"/>원 · 
+						                                <fmt:formatDate value="${apply.applyDate}" pattern="M월 d일"/> 지원
+						                            </p>
+						                        </div>
+						                        <div class="item-right">
+						                            <c:choose>
+						                                <c:when test="${apply.status == '열람대기'}">
+						                                    <span class="theme-badge-outline">열람대기</span>
+						                                </c:when>
+						                                <c:when test="${apply.status == '서류통과'}">
+						                                    <span class="theme-badge">서류통과</span>
+						                                </c:when>
+						                                <c:when test="${apply.status == '불합격'}">
+						                                    <span style="background:#F2F4F6;color:#8B95A1;padding:6px 12px;border-radius:8px;font-size:13px;font-weight:700;">불합격</span>
+						                                </c:when>
+						                            </c:choose>
+						                        </div>
+						                    </div>
+						                </c:forEach>
+						            </c:otherwise>
+						        </c:choose>
+						    </div>
+						</div>
 
 							<div class="inner-section" id="alba-post">
 								<div class="lc-list">

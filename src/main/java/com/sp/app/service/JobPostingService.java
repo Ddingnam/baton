@@ -33,4 +33,6 @@ public interface JobPostingService {
 	List<JobPosting> listJobScrap(long userIdx);
 	
 	public int checkJobScrap(Map<String, Object> map) throws Exception;
+	
+	void applyToAlba(long userIdx, long postingIdx, long profileIdx, String message) throws Exception;
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -177,6 +178,23 @@ public class JobPostingServiceImpl implements JobPostingService {
 	        log.info("checkJobScrap error", e);
 	    }
 	    return result;
+	}
+	
+	@Override
+	@Transactional
+	public void applyToAlba(long userIdx, long postingIdx, long profileIdx, String message) throws Exception {
+	    try {
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("userIdx", userIdx);
+	        map.put("postingIdx", postingIdx);
+	        map.put("profileIdx", profileIdx);
+	        map.put("message", message);
+
+	        mapper.insertAlbaApply(map); 
+	    } catch (Exception e) {
+	        log.error("지원 실패", e);
+	        throw e;
+	    }
 	}
     
 }

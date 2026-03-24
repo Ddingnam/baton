@@ -321,6 +321,30 @@ public class JobPostingController {
 		    return result;
 		}
 		
-		
+		@PostMapping("/apply-posting")
+		@ResponseBody
+		public Map<String, Object> applyAlba(
+		        @RequestParam("postingIdx") long postingIdx,
+		        @RequestParam("profileIdx") long profileIdx,
+		        @RequestParam(value="message", required=false) String message,
+		        @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+		    Map<String, Object> result = new HashMap<>();
+
+		    if (userDetails == null) {
+		        result.put("status", "login_required");
+		        return result;
+		    }
+
+		    try {
+		        postingService.applyToAlba(userDetails.getUserIdx(), postingIdx, profileIdx, message);
+		        result.put("status", "success");
+		    } catch (Exception e) {
+		        log.error("지원 실패", e);
+		        result.put("status", "error");
+		    }
+
+		    return result;
+		}
 	
 }

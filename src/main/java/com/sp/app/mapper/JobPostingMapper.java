@@ -36,4 +36,6 @@ public interface JobPostingMapper {
     
     public List<JobPosting> listJobScrap(long memberId);
     
+    void insertAlbaApply(Map<String, Object> map);
+    
 }

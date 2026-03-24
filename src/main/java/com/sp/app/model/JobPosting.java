@@ -67,10 +67,9 @@ public class JobPosting {
     public String getRecruitStatusKor() {
         if ("RECRUITING".equals(recruitStatus)) return "모집중";
         if ("CLOSED".equals(recruitStatus))     return "모집완료";
-        return recruitStatus; // 혹시 다른 값 있으면 그대로
+        return recruitStatus; 
     }
 
-    // 필요하면 뱃지 CSS까지 같이
     public String getRecruitStatusClass() {
         if ("RECRUITING".equals(recruitStatus)) return "theme-badge";
         if ("CLOSED".equals(recruitStatus))     return "theme-badge-done";

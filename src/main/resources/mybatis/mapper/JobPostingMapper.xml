@@ -257,5 +257,16 @@
 		    WHERE js.MEMBER_ID = #{memberId}
 		    ORDER BY jp.posting_idx DESC
 		</select>
+		
+		<insert id="insertAlbaApply" parameterType="map">
+		    INSERT INTO JOB_APPLY (  apply_idx, posting_idx, user_idx, resume_idx, status, apply_date
+		    )
+		    VALUES (
+		        seq_job_apply.NEXTVAL, #{postingIdx},
+		        #{userIdx},
+		        #{profileIdx},         '열람대기',
+		        SYSDATE
+		    )
+		</insert>
 
 </mapper>

@@ -445,14 +445,47 @@ document.addEventListener("DOMContentLoaded", function() {
   
   function submitResume() {
       const resumeIdx = document.getElementById("resumeSelect").value;
+      const message = document.getElementById("applyMessage").value;
+      const postingIdx = document.getElementById("articleData").dataset.albaIdx;
 
       if (!resumeIdx) {
-          alert("이력서를 선택해주세요!");
+          alert("지원할 이력서를 선택해주세요!");
           return;
       }
 
-      closeResumeModal();
-      openApplySuccess(); 
-  }
-  
-  
+	  fetch(CONTEXT_PATH + '/alba/apply-posting', {
+	      method: 'POST',
+	      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+	      body: new URLSearchParams({ 
+	          postingIdx: postingIdx, 
+	          profileIdx: resumeIdx, 
+	          message: message 
+	      })
+	  })
+	  .then(res => {
+	      console.log('HTTP status:', res.status);
+	      return res.text();  // 먼저 text로 받아서 내용 확인
+	  })
+	  .then(text => {
+	      console.log('Response text:', text);
+	      try {
+	          const data = JSON.parse(text);
+	          if (data.status === "success") {
+	              closeResumeModal();
+	              openApplySuccess();
+	          } else if (data.status === "login_required") {
+	              alert("로그인이 필요합니다.");
+	              location.href = CONTEXT_PATH + "/login";
+	          } else {
+	              alert("지원 중 오류가 발생했습니다.");
+	          }
+	      } catch(e) {
+	          console.error('JSON parse error', e);
+	          alert("지원 중 오류가 발생했습니다. (서버 응답 확인 필요)");
+	      }
+	  })
+	  .catch(err => {
+	      console.error(err);
+	      alert("네트워크 오류가 발생했습니다.");
+	  });
+ }

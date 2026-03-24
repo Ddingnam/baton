@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sp.app.mapper.JobApplyMapper">
+
+	 <insert id="insertApply" parameterType="com.sp.app.domain.dto.JobApplyDto">
+	  <selectKey keyProperty="applyIdx" resultType="long" order="BEFORE">
+	    SELECT seq_job_apply.NEXTVAL FROM dual
+	  </selectKey>
+	  INSERT INTO JOB_APPLY (apply_idx, posting_idx, user_idx, resume_idx, status, apply_date)
+	  VALUES (#{applyIdx}, #{postingIdx}, #{userIdx}, #{resumeIdx}, '열람대기', SYSDATE)
+	</insert>
+	
+	<select id="listApplyByUser" parameterType="long" resultType="com.sp.app.domain.dto.JobApplyDto">
+    SELECT 
+        a.apply_idx, a.posting_idx, a.status, a.apply_date,
+        p.title, p.employer, p.pay, p.pay_type AS payType
+    FROM JOB_APPLY a
+    JOIN job_posting p ON a.posting_idx = p.posting_idx
+    WHERE a.user_idx = #{userIdx}
+    ORDER BY a.apply_date DESC
+</select>
+
+  <update id="updateStatus" parameterType="map">
+    UPDATE JOB_APPLY
+    SET status = #{status}
+    WHERE apply_idx = #{applyIdx} AND user_idx = #{userIdx}
+  </update>
+
+  <select id="checkDuplicate" parameterType="map" resultType="int">
+    SELECT COUNT(*) FROM JOB_APPLY
+    WHERE posting_idx = #{postingIdx} AND user_idx = #{userIdx}
+  </select>
+  
+  
+
+</mapper>
