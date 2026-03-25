@@ -15,7 +15,7 @@
 
 <jsp:include page="/WEB-INF/views/layout/header.jsp"/>
 
-<main id="support-app">
+<main id="support-app" data-user-id="${userId}" data-user-name="${userName}" data-user-email="${userMail}">
 
     <section class="support-hero">
         <div class="hero-bg">
@@ -166,13 +166,51 @@
                     <p class="contact-desc">24시간 언제든지 바톤 AI 가이드에게 질문하세요. 결제, 배송, 거래 분쟁 모두 빠르게 안내해드려요.</p>
                     <div class="contact-cta"><span>채팅 시작하기</span><i class="ri-arrow-right-line"></i></div>
                 </div>
-                <div class="contact-card email-card">
+                <div class="contact-card email-card" @click="openEmailInquiry">
                     <div class="contact-icon email-icon"><i class="ri-mail-line"></i></div>
                     <h3 class="contact-title">이메일 문의</h3>
                     <p class="contact-desc">복잡한 분쟁이나 정산 문제는 이메일로 문의주세요. 영업일 기준 1~2일 내에 답변드려요.</p>
                     <div class="contact-info">support@baton.com</div>
                     <div class="contact-cta"><span>이메일 보내기</span><i class="ri-arrow-right-line"></i></div>
                 </div>
+                
+                <teleport to="body">
+				    <transition name="modal-fade">
+				        <div class="email-drawer-overlay" v-if="showEmailDrawer" @click="showEmailDrawer = false"></div>
+				    </transition>
+				
+				    <transition name="drawer-slide">
+				        <div class="email-drawer" v-if="showEmailDrawer">
+				            <button class="drawer-close-btn" @click="showEmailDrawer = false">
+				                <i class="ri-close-line"></i>
+				            </button>
+				            
+				            <div class="drawer-header">
+				                <h2 class="drawer-title">이메일 문의하기</h2>
+				                <p class="drawer-sub">궁금하신 내용을 남겨주시면 빠르게 답변드릴게요.</p>
+				            </div>
+				
+				            <form class="email-form" @submit.prevent="sendInquiry">
+				                <div class="form-group">
+				                    <label>이름</label>
+				                    <input type="text" 
+				                    	v-model="inquiry.name" readonly class="readonly-input">
+				                </div>
+				                <div class="form-group">
+				                    <label>회신 받을 이메일</label>
+				                    <input type="email" 
+				                    	v-model="inquiry.email" readonly class="readonly-input">
+				                </div>
+				                <div class="form-group">
+				                    <label>문의 내용</label>
+				                    <textarea v-model="inquiry.content" placeholder="문의하실 내용을 상세히 적어주세요." required></textarea>
+				                </div>
+				                <button type="submit" class="submit-btn">보내기</button>
+				            </form>
+				        </div>
+				    </transition>
+				</teleport>
+                
             </div>
         </div>
     </section>

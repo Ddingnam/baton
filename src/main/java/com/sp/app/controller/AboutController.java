@@ -1,10 +1,16 @@
 package com.sp.app.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.sp.app.security.CustomUserDetails;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Controller
 @RequestMapping("/about/*")
 public class AboutController {
@@ -36,8 +42,23 @@ public class AboutController {
     }
     
     @GetMapping("support")
-    public String support() {
-        
+    public String support(Model model, 
+    		@AuthenticationPrincipal CustomUserDetails userDetails) {
+    	
+    	model.addAttribute("userId", "");
+        model.addAttribute("userName", "");
+        model.addAttribute("userMail", "");
+    	
+        if (userDetails != null) {
+            try {
+                model.addAttribute("userId", userDetails.getMember().getUserId());
+                model.addAttribute("userName", userDetails.getMember().getName());
+                model.addAttribute("userMail", userDetails.getMember().getEmail());
+            } catch (Exception e) {
+            	log.info("support : ", e);
+            }
+        }
+    	
         return "about/support";
     }
 }

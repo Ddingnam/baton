@@ -1,10 +1,14 @@
 package com.sp.app.mail;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.sp.app.common.MyUtil;
@@ -108,4 +112,37 @@ public class MailController {
 		
 		return "mail/complete";
 	}
+	
+	@PostMapping("sendInquiry")
+    @ResponseBody
+    public Map<String, Object> sendInquiry(Mail dto) {
+        Map<String, Object> model = new HashMap<>();
+        boolean b = false;
+        
+        try {
+            dto.setReceiverEmail("hil03020@gmail.com"); 
+            
+            dto.setSubject("[고객문의] " + dto.getSenderName() + "님의 문의사항입니다.");
+            
+            String htmlContent = "<div style='font-family: sans-serif; padding: 20px; border: 1px solid #eee;'>"
+                + "<h2>고객센터 문의 접수</h2>"
+                + "<p><b>발신자:</b> " + dto.getSenderName() + " (" + dto.getSenderEmail() + ")</p>"
+                + "<hr>"
+                + "<p style='white-space: pre-wrap;'>" + dto.getContent().replaceAll("\n", "<br>") + "</p>"
+                + "</div>";
+            dto.setContent(htmlContent);
+
+            b = mailSender.mailSend(dto);
+            
+            if(b) {
+                model.put("status", "success");
+            } else {
+                model.put("status", "fail");
+            }
+        } catch (Exception e) {
+            model.put("status", "error");
+        }
+        
+        return model;
+    }
 }

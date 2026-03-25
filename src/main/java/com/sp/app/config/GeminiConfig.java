@@ -28,7 +28,7 @@ public class GeminiConfig {
     @Bean
     public WebClient chatBotWebClient() {
         return WebClient.builder()
-            .baseUrl("http://localhost:9091")
+            .baseUrl("http://192.168.0.86:9091")
             .build();
     }
 }

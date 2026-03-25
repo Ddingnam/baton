@@ -1,9 +1,8 @@
-const { createApp, ref, computed } = Vue;
+const { createApp, ref, computed, reactive } = Vue;
 
 createApp({
     setup() {
         const faqs = ref([
-			// 임시
             { category: 'payment', q: '바톤 포인트가 무엇인가요?', a: '구매자가 결제한 금액을 Baton이 안전하게 보관하다가, 물품 수령 확인 후 판매자에게 정산하는 에스크로 서비스입니다.' },
             { category: 'payment', q: '판매 대금은 언제 정산되나요?', a: '구매자가 구매확정을 누르는 즉시 판매자의 바통 포인트로 합산됩니다. 구매확정이 없더라도 배송 완료 3일 후 자동 정산됩니다.' },
             { category: 'payment', q: '어떤 결제 수단을 지원하나요?', a: '바통 포인트는 카카오페이 간편결제로 지원합니다.' },
@@ -146,11 +145,72 @@ createApp({
             if (window.openBatonChatbot) window.openBatonChatbot();
             else window.location.href = '/chatbot/slidePanel';
         }
+		
+		
+		const appEl = document.getElementById('support-app');
+		const userData = appEl.dataset;
+		
+		const showEmailDrawer = ref(false);
+		const inquiry = reactive({
+			name: userData.userName || '',
+			email: userData.userEmail || '',
+			content: ''
+		});
+
+		const openEmailInquiry = () => {
+			const userId = appEl.dataset.userId;
+
+			if (!userId || userId === "") {
+				setTimeout(() => {
+					showBatonToast('이메일 문의는 로그인이 필요합니다.');
+				}, 800);
+
+				setTimeout(() => {
+					location.href = '/member/login';
+				}, 3700);
+			}
+
+			inquiry.name = appEl.dataset.userName;
+			inquiry.email = appEl.dataset.userEmail;
+			showEmailDrawer.value = true;
+		};
+		
+		const sendInquiry = () => {
+			const formData = new URLSearchParams();
+			    formData.append('senderName', inquiry.name);
+			    formData.append('senderEmail', inquiry.email);
+			    formData.append('content', inquiry.content);
+
+			    fetch('/mail/sendInquiry', {
+			        method: 'POST',
+			        headers: {
+			            'Content-Type': 'application/x-www-form-urlencoded',
+			        },
+			        body: formData
+			    })
+			    .then(response => response.json())
+			    .then(data => {
+			        if(data.status === 'success') {
+			            showBatonToast(`${inquiry.name}님의 문의가 성공적으로 접수되었습니다.`);
+			            
+			            inquiry.content = '';
+			            showEmailDrawer.value = false;
+			        } else {
+			            showBatonToast('메일 전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+			        }
+			    })
+			    .catch(error => {
+			        console.error('Error:', error);
+			        showBatonToast('서버 오류가 발생했습니다.');
+			    });
+		};
+		
 
         return {
             faqs, categories, badgeMap, quickTags, searchQuery, searchFocused, selectedCat, openIdx,
             searchResults, selectedFaq, filteredFaqs, catTitle, getFaqCount, onSearch, clearSearch,
-            highlightText, clickSearchResult, setQuickTag, selectCat, toggleFaq, openChatbot
+            highlightText, clickSearchResult, setQuickTag, selectCat, toggleFaq, openChatbot,
+			showEmailDrawer, inquiry, sendInquiry, openEmailInquiry
         };
     }
 }).mount('#support-app');
