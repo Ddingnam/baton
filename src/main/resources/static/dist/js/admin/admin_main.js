@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
     const BASE      = (typeof window.CTX !== 'undefined' ? window.CTX : '');
     const THEME_KEY = 'baton-admin-theme-' + (window.ADMIN_USER_IDX || 'default');
+    if (window.ADMIN_USER_IDX) {
+        try { localStorage.setItem('baton-admin-last-user', window.ADMIN_USER_IDX); } catch(e) {}
+    }
     const sidebarToggle = document.getElementById('sidebarToggle');
     const mainSidebar = document.querySelector('.agency-sidebar');
     if (sidebarToggle && mainSidebar) {
@@ -376,6 +379,153 @@ document.addEventListener("DOMContentLoaded", () => {
             if (target) target.classList.add('active');
         });
     });
+
+    function getAvatarText(name) {
+        const text = String(name || '').trim();
+        return text ? text.substring(0, 2) : 'AD';
+    }
+
+    function syncProfileUi(profile) {
+        if (!profile) return;
+        const avatar = getAvatarText(profile.nickname || profile.name);
+        const setText = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value || '';
+        };
+        const setValue = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.value = value || '';
+        };
+        setText('profileTrigger', avatar);
+        setText('profileQuickAvatar', avatar);
+        setText('profileQuickName', profile.nickname || profile.name || '');
+        setText('profileQuickRole', profile.roleCode || 'emp');
+        setText('sidebarAvatarText', avatar);
+        setText('sidebarUserName', profile.nickname || profile.name || '');
+        setText('sidebarUserRole', profile.roleCode || 'emp');
+        setText('profileAvatarCircle', avatar);
+        setValue('profileNameInput', profile.name || '');
+        setValue('profileNicknameInput', profile.nickname || '');
+        setValue('profileEmailInput', profile.email || '');
+        window.ADMIN_PROFILE = Object.assign({}, window.ADMIN_PROFILE || {}, profile);
+    }
+
+    syncProfileUi(window.ADMIN_PROFILE || {});
+
+    const profilePhotoBtn = document.getElementById('profilePhotoBtn');
+    const profilePhotoInput = document.getElementById('profilePhotoInput');
+    const profilePhotoClearBtn = document.getElementById('profilePhotoClearBtn');
+    if (profilePhotoBtn && profilePhotoInput) {
+        profilePhotoBtn.addEventListener('click', function() {
+            profilePhotoInput.click();
+        });
+        profilePhotoInput.addEventListener('change', function() {
+            const file = this.files && this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const circle = document.getElementById('profileAvatarCircle');
+                if (!circle) return;
+                circle.textContent = '';
+                circle.style.backgroundImage = 'url(' + e.target.result + ')';
+                circle.style.backgroundSize = 'cover';
+                circle.style.backgroundPosition = 'center';
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    if (profilePhotoClearBtn) {
+        profilePhotoClearBtn.addEventListener('click', function() {
+            const circle = document.getElementById('profileAvatarCircle');
+            if (circle) {
+                circle.style.backgroundImage = '';
+                circle.style.backgroundSize = '';
+                circle.style.backgroundPosition = '';
+                circle.textContent = getAvatarText((document.getElementById('profileNicknameInput') || {}).value || (document.getElementById('profileNameInput') || {}).value);
+            }
+            if (profilePhotoInput) profilePhotoInput.value = '';
+        });
+    }
+
+    const profileNicknameInput = document.getElementById('profileNicknameInput');
+    const profileNameInput = document.getElementById('profileNameInput');
+    [profileNicknameInput, profileNameInput].forEach(function(input) {
+        if (!input) return;
+        input.addEventListener('input', function() {
+            const circle = document.getElementById('profileAvatarCircle');
+            if (!circle || circle.style.backgroundImage) return;
+            circle.textContent = getAvatarText((profileNicknameInput && profileNicknameInput.value) || (profileNameInput && profileNameInput.value));
+        });
+    });
+
+    const profileSaveBtn = document.getElementById('profileSaveBtn');
+    if (profileSaveBtn) {
+        profileSaveBtn.addEventListener('click', function() {
+            const payload = {
+                name: (document.getElementById('profileNameInput') || {}).value || '',
+                nickname: (document.getElementById('profileNicknameInput') || {}).value || '',
+                email: (document.getElementById('profileEmailInput') || {}).value || ''
+            };
+            profileSaveBtn.disabled = true;
+            profileSaveBtn.textContent = '저장 중...';
+            apiPost(BASE + '/admin/util/profile/save', payload)
+                .then(function(data) {
+                    if (data && data.success) {
+                        syncProfileUi({ name: data.name, nickname: data.nickname, email: data.email, roleCode: data.roleCode || ((window.ADMIN_PROFILE || {}).roleCode) });
+                        if (typeof showToast === 'function') showToast('정보 변경이 완료되었습니다.', 'success');
+                    } else if (typeof showToast === 'function') {
+                        showToast((data && data.msg) || '프로필 저장에 실패했습니다.', 'error');
+                    }
+                })
+                .catch(function() {
+                    if (typeof showToast === 'function') showToast('프로필 저장 중 오류가 발생했습니다.', 'error');
+                })
+                .finally(function() {
+                    profileSaveBtn.disabled = false;
+                    profileSaveBtn.textContent = '저장하기';
+                });
+        });
+    }
+
+    const passwordSaveBtn = document.getElementById('passwordSaveBtn');
+    if (passwordSaveBtn) {
+        passwordSaveBtn.addEventListener('click', function() {
+            const payload = {
+                currentPassword: (document.getElementById('currentPasswordInput') || {}).value || '',
+                newPassword: (document.getElementById('newPasswordInput') || {}).value || '',
+                confirmPassword: (document.getElementById('confirmPasswordInput') || {}).value || ''
+            };
+            if (!payload.currentPassword || !payload.newPassword || !payload.confirmPassword) {
+                if (typeof showToast === 'function') showToast('비밀번호를 모두 입력해 주세요.', 'warning');
+                return;
+            }
+            if (payload.newPassword !== payload.confirmPassword) {
+                if (typeof showToast === 'function') showToast('새 비밀번호가 일치하지 않습니다.', 'warning');
+                return;
+            }
+            passwordSaveBtn.disabled = true;
+            passwordSaveBtn.textContent = '변경 중...';
+            apiPost(BASE + '/admin/util/profile/password', payload)
+                .then(function(data) {
+                    if (data && data.success) {
+                        ['currentPasswordInput','newPasswordInput','confirmPasswordInput'].forEach(function(id) {
+                            const el = document.getElementById(id);
+                            if (el) el.value = '';
+                        });
+                        if (typeof showToast === 'function') showToast('정보 변경이 완료되었습니다.', 'success');
+                    } else if (typeof showToast === 'function') {
+                        showToast((data && data.msg) || '비밀번호 변경에 실패했습니다.', 'error');
+                    }
+                })
+                .catch(function() {
+                    if (typeof showToast === 'function') showToast('비밀번호 변경 중 오류가 발생했습니다.', 'error');
+                })
+                .finally(function() {
+                    passwordSaveBtn.disabled = false;
+                    passwordSaveBtn.textContent = '변경하기';
+                });
+        });
+    }
     function runClock() {
         const d = new Date();
         const headClock = document.getElementById('systemClock');
@@ -693,7 +843,7 @@ document.addEventListener("DOMContentLoaded", () => {
             var prevTheme = localStorage.getItem(THEME_KEY) || 'purple';
             applyTheme(theme);
             localStorage.setItem(THEME_KEY, theme);
-            // 세션에도 저장 (채팅 페이지에서 JSP 렌더링 시 사용)
+            localStorage.setItem('baton-admin-theme', theme);
             fetch((window.CTX || '') + '/admin/theme/save', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
@@ -743,7 +893,6 @@ document.addEventListener("DOMContentLoaded", () => {
             document.addEventListener(evt, function () { lastActivity = Date.now(); }, { passive: true });
         });
 
-        // 페이지 이동(링크 클릭, 폼 submit)은 오프라인 처리 제외
         document.addEventListener('click', function (e) {
             var a = e.target.closest('a[href]');
             if (a && !a.target && a.href && a.href.indexOf(location.origin) === 0) {
@@ -760,7 +909,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         function sendHeartbeat() {
             var base = getBase();
-            if (base === null) return; // CTX 자체가 없으면 skip (로그인 전 등)
+            if (base === null) return;
             fetch(base + '/api/presence/heartbeat', {
                 method: 'POST',
                 credentials: 'same-origin',
@@ -769,7 +918,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }).catch(function () {});
         }
         function sendOffline() {
-            if (isNavigating) return; // 페이지 이동 시엔 오프라인 처리 안 함
+            if (isNavigating) return; 
             var base = getBase();
             if (base === null) return;
             navigator.sendBeacon(base + '/api/presence/offline');

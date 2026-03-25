@@ -2,8 +2,8 @@
 
 #adminToastContainer {
     position: fixed;
-    top: 28px;
-    right: 28px;
+    top: 24px;
+    right: 24px;
     z-index: 99999;
     display: flex;
     flex-direction: column; 
@@ -15,40 +15,91 @@
     pointer-events: all;
     display: flex;
     align-items: center;
-    gap: 12px;
-    min-width: 280px;
-    max-width: 400px;
-    padding: 14px 16px;
-    border-radius: 14px;
-    background: var(--card-bg, #fff);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
+    gap: 14px;
+    min-width: 300px;
+    max-width: 420px;
+    padding: 16px 18px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.06);
     border-left: 4px solid transparent;
     opacity: 0;
-    transform: translateX(24px) scale(0.97);
-    transition: opacity 0.32s cubic-bezier(0.16,1,0.3,1),
-                transform 0.32s cubic-bezier(0.16,1,0.3,1);
+    transform: translateX(32px) scale(0.95);
+    transition: opacity 0.36s cubic-bezier(0.16,1,0.3,1),
+                transform 0.36s cubic-bezier(0.16,1,0.3,1);
     will-change: transform, opacity;
+    position: relative;
+    overflow: hidden;
 }
 .admin-toast--show {
     opacity: 1;
     transform: translateX(0) scale(1);
 }
 
-.admin-toast--success { border-left-color: var(--color-green, #10B981); }
-.admin-toast--success .admin-toast__icon { color: var(--color-green, #10B981); }
-
-.admin-toast--error   { border-left-color: var(--color-red, #EF4444); }
-.admin-toast--error   .admin-toast__icon { color: var(--color-red, #EF4444); }
-
-.admin-toast--warning { border-left-color: #F59E0B; }
-.admin-toast--warning .admin-toast__icon { color: #F59E0B; }
-
-.admin-toast--info    { border-left-color: var(--color-purple, #7C3AED); }
-.admin-toast--info    .admin-toast__icon { color: var(--color-purple, #7C3AED); }
-
-.admin-toast__icon {
-    font-size: 20px;
+/* success — 녹색 왼쪽 바 + 아이콘 배경 */
+.admin-toast--success {
+    border-left-color: #10B981;
+    background: linear-gradient(135deg, #F0FDF9 0%, #ffffff 100%);
+}
+.admin-toast--success .admin-toast__icon-wrap {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: #D1FAE5;
+    display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
+}
+.admin-toast--success .admin-toast__icon { color: #059669; font-size: 20px; }
+
+/* error */
+.admin-toast--error {
+    border-left-color: #EF4444;
+    background: linear-gradient(135deg, #FFF5F5 0%, #ffffff 100%);
+}
+.admin-toast--error .admin-toast__icon-wrap {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: #FEE2E2;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.admin-toast--error .admin-toast__icon { color: #DC2626; font-size: 20px; }
+
+/* warning */
+.admin-toast--warning {
+    border-left-color: #F59E0B;
+    background: linear-gradient(135deg, #FFFBEB 0%, #ffffff 100%);
+}
+.admin-toast--warning .admin-toast__icon-wrap {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: #FEF3C7;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.admin-toast--warning .admin-toast__icon { color: #D97706; font-size: 20px; }
+
+/* info */
+.admin-toast--info {
+    border-left-color: var(--color-purple, #7C3AED);
+    background: linear-gradient(135deg, #F5F3FF 0%, #ffffff 100%);
+}
+.admin-toast--info .admin-toast__icon-wrap {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: #EDE9FE;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.admin-toast--info .admin-toast__icon { color: var(--color-purple, #7C3AED); font-size: 20px; }
+
+.admin-toast__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+.admin-toast__title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1E293B;
+    line-height: 1.3;
 }
 .admin-toast__msg {
     flex: 1;
@@ -59,21 +110,27 @@
 }
 .admin-toast__close {
     flex-shrink: 0;
-    width: 22px;
-    height: 22px;
-    border-radius: 6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-light, #94A3B8);
-    font-size: 14px;
+    color: #94A3B8;
+    font-size: 15px;
     transition: background 0.15s, color 0.15s;
     cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin-left: 4px;
 }
 .admin-toast__close:hover {
-    background: var(--base-bg, #F8FAFC);
-    color: var(--text-main, #1E293B);
+    background: #F1F5F9;
+    color: #1E293B;
 }
+
+
 
 .admin-confirm-overlay {
     position: fixed;

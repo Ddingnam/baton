@@ -1,5 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="adminMember" value="${sessionScope.member}"/>
+<c:set var="adminName" value="${empty adminMember.name ? '관리자' : adminMember.name}"/>
+<c:set var="adminNickname" value="${empty adminMember.nickname ? adminName : adminMember.nickname}"/>
+<c:set var="adminEmail" value="${empty adminMember.email ? '' : adminMember.email}"/>
+<c:set var="adminAvatarText" value="${fn:length(adminNickname) >= 2 ? fn:substring(adminNickname, 0, 2) : adminNickname}"/>
+<c:set var="adminRoleCode" value="${adminMember.userLevel >= 99 ? 'admin' : 'emp'}"/>
+<c:set var="adminRoleLabel" value="${adminMember.userLevel >= 99 ? 'ADMIN' : 'EMP'}"/>
 
 <header class="agency-header">
     <div class="head-left">
@@ -17,14 +26,14 @@
             <span class="noti-count-badge" id="notiCountBadge" style="display:none;"></span>
         </div>
 
-        <div class="user-avt-btn" id="profileTrigger">A</div>
+        <div class="user-avt-btn" id="profileTrigger">${adminAvatarText}</div>
 
         <div class="pop-modal" id="profileModal">
             <div class="sq-user">
-                <div class="sq-avt">AD</div>
+                <div class="sq-avt" id="profileQuickAvatar">${adminAvatarText}</div>
                 <div class="sq-info">
-                    <span class="sq-name">Admin User</span>
-                    <span class="sq-role">Super Admin</span>
+                    <span class="sq-name" id="profileQuickName">${adminNickname}</span>
+                    <span class="sq-role" id="profileQuickRole">${adminRoleCode}</span>
                 </div>
             </div>
             <div class="sq-grid">
@@ -473,27 +482,28 @@
                 <p class="fm-tab-desc">프로필 사진과 이름, 닉네임을 변경합니다.</p>
                 <div class="fm-section">
                     <div class="profile-avatar-edit">
-                        <div class="profile-av-circle">AD</div>
+                        <div class="profile-av-circle" id="profileAvatarCircle">${adminAvatarText}</div>
                         <div class="profile-av-actions">
-                            <button class="btn-pill btn-light" style="font-size:13px;padding:8px 16px;">사진 변경</button>
-                            <button class="btn-text" style="font-size:13px;">삭제</button>
+                            <button class="btn-pill btn-light" type="button" id="profilePhotoBtn" style="font-size:13px;padding:8px 16px;">사진 변경</button>
+                            <button class="btn-text" type="button" id="profilePhotoClearBtn" style="font-size:13px;">삭제</button>
+                            <input type="file" id="profilePhotoInput" accept="image/*" style="display:none;">
                         </div>
                     </div>
                     <div class="fm-field">
                         <label class="fm-label">이름</label>
-                        <input type="text" class="fm-input" value="관리자" placeholder="이름 입력">
+                        <input type="text" class="fm-input" id="profileNameInput" value="${adminName}" placeholder="이름 입력">
                     </div>
                     <div class="fm-field">
                         <label class="fm-label">닉네임</label>
-                        <input type="text" class="fm-input" value="Admin" placeholder="닉네임 입력">
+                        <input type="text" class="fm-input" id="profileNicknameInput" value="${adminNickname}" placeholder="닉네임 입력">
                     </div>
                     <div class="fm-field">
                         <label class="fm-label">이메일</label>
-                        <input type="email" class="fm-input" value="admin@baton.kr" placeholder="이메일">
+                        <input type="email" class="fm-input" id="profileEmailInput" value="${adminEmail}" placeholder="이메일">
                     </div>
                 </div>
                 <div class="fm-actions">
-                    <button class="btn-pill btn-gradient">저장하기</button>
+                    <button class="btn-pill btn-gradient" type="button" id="profileSaveBtn">저장하기</button>
                 </div>
             </div>
 
@@ -503,19 +513,19 @@
                 <div class="fm-section">
                     <div class="fm-field">
                         <label class="fm-label">현재 비밀번호</label>
-                        <input type="password" class="fm-input" placeholder="현재 비밀번호 입력">
+                        <input type="password" class="fm-input" id="currentPasswordInput" placeholder="현재 비밀번호 입력">
                     </div>
                     <div class="fm-field">
                         <label class="fm-label">새 비밀번호</label>
-                        <input type="password" class="fm-input" placeholder="8자 이상, 영문+숫자+특수문자">
+                        <input type="password" class="fm-input" id="newPasswordInput" placeholder="새 비밀번호 입력">
                     </div>
                     <div class="fm-field">
                         <label class="fm-label">비밀번호 확인</label>
-                        <input type="password" class="fm-input" placeholder="새 비밀번호 재입력">
+                        <input type="password" class="fm-input" id="confirmPasswordInput" placeholder="새 비밀번호 재입력">
                     </div>
                 </div>
                 <div class="fm-actions">
-                    <button class="btn-pill btn-gradient">변경하기</button>
+                    <button class="btn-pill btn-gradient" type="button" id="passwordSaveBtn">변경하기</button>
                 </div>
             </div>
 
@@ -526,8 +536,8 @@
                     <div class="grade-card">
                         <div class="grade-icon"><i class="ri-shield-star-fill"></i></div>
                         <div class="grade-info">
-                            <span class="grade-title">Super Admin</span>
-                            <span class="grade-desc">모든 메뉴 접근 및 설정 변경 가능</span>
+                            <span class="grade-title">${adminRoleLabel}</span>
+                            <span class="grade-desc">${adminMember.userLevel >= 99 ? '모든 메뉴 접근 및 설정 변경 가능' : '업무 채널과 운영 메뉴에 접근 가능'}</span>
                         </div>
                     </div>
                     <div class="perm-list">
@@ -542,3 +552,13 @@
         </div>
     </div>
 </div>
+
+<script>
+    window.ADMIN_PROFILE = {
+        name: '${fn:escapeXml(adminName)}',
+        nickname: '${fn:escapeXml(adminNickname)}',
+        email: '${fn:escapeXml(adminEmail)}',
+        roleCode: '${adminRoleCode}',
+        roleLabel: '${adminRoleLabel}'
+    };
+</script>

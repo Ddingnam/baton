@@ -268,4 +268,37 @@ public class AdminChatController {
         catch (Exception e) { result.put("success", false); }
         return result;
     }
+
+    /** DM 나가기 */
+    @PostMapping(value = "/chat/dm/{roomIdx}/leave", produces = "application/json")
+    @ResponseBody
+    public Map<String, Object> leaveDM(
+            @PathVariable("roomIdx") Long roomIdx,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            Long myIdx = userDetails.getUserIdx();
+            adminChatService.leaveChannel(roomIdx, myIdx);
+            result.put("success", true);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "DM 나가기에 실패했습니다.");
+        }
+        return result;
+    }
+
+    /** 관리자 채팅 전체 미읽음 카운트 */
+    @GetMapping(value = "/chat/unread", produces = "application/json")
+    @ResponseBody
+    public Map<String, Object> getChatUnread(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Map<String, Object> result = new HashMap<>();
+        Long myIdx = userDetails != null ? userDetails.getUserIdx() : null;
+        int count = 0;
+        if (myIdx != null) {
+            try { count = chatService.getUnreadTotalCount(myIdx); } catch (Exception ignored) {}
+        }
+        result.put("count", count);
+        return result;
+    }
 }

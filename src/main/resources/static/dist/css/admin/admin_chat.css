@@ -320,6 +320,24 @@
 .chat-avt.op { background: linear-gradient(135deg, #A855F7, #6366F1); box-shadow: 0 4px 10px rgba(168,85,247,0.25); }
 .chat-avt.cs { background: linear-gradient(135deg, var(--color-pink), var(--color-orange)); box-shadow: 0 4px 10px rgba(236,72,153,0.25); }
 
+/* DM 나가기 버튼 */
+.dm-leave-btn {
+    display: none; width: 20px; height: 20px; border: none;
+    background: none; color: var(--text-light); cursor: pointer;
+    border-radius: 4px; flex-shrink: 0; font-size: 13px;
+    align-items: center; justify-content: center; transition: all 0.15s;
+}
+.chat-room-item:hover .dm-leave-btn { display: flex; }
+.dm-leave-btn:hover { background: #FEF2F2; color: #EF4444; }
+
+/* 받는 메시지 아바타 테마별 색상 */
+.chat-avt.theme-recv-purple  { background: linear-gradient(135deg,#7C3AED,#A855F7); box-shadow: 0 4px 10px rgba(124,58,237,0.25); }
+.chat-avt.theme-recv-blue    { background: linear-gradient(135deg,#2563EB,#06B6D4); box-shadow: 0 4px 10px rgba(37,99,235,0.25); }
+.chat-avt.theme-recv-emerald { background: linear-gradient(135deg,#059669,#3B82F6); box-shadow: 0 4px 10px rgba(5,150,105,0.25); }
+.chat-avt.theme-recv-sunset  { background: linear-gradient(135deg,#EA580C,#EF4444); box-shadow: 0 4px 10px rgba(234,88,12,0.25); }
+.chat-avt.theme-recv-rose    { background: linear-gradient(135deg,#BE185D,#F43F5E); box-shadow: 0 4px 10px rgba(190,24,93,0.25); }
+.chat-avt.theme-recv-slate   { background: linear-gradient(135deg,#334155,#64748B); box-shadow: 0 4px 10px rgba(71,85,105,0.25); }
+
 .chat-msg-body { display: flex; flex-direction: column; gap: 5px; max-width: 58%; align-items: flex-start; }
 .chat-msg-group.mine .chat-msg-body { align-items: flex-end; }
 .chat-msg-meta { display: flex; align-items: center; gap: 6px; }
@@ -372,8 +390,9 @@
 }
 .chat-attach-btn {
     color: var(--text-light); font-size: 20px; cursor: pointer;
-    flex-shrink: 0; display: flex; align-items: center;
+    flex-shrink: 0; display: flex; align-items: center; justify-content:center;
     transition: color 0.2s, transform 0.2s var(--spring);
+    background:none; border:none; padding:0; position:relative;
 }
 .chat-attach-btn:hover { color: var(--color-purple); transform: rotate(15deg); }
 .chat-input {
@@ -382,6 +401,41 @@
     color: var(--text-main); outline: none;
 }
 .chat-input::placeholder { color: var(--text-light); }
+
+.chat-attach-menu {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 10px);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    background: rgba(255,255,255,0.98);
+    border: 1px solid rgba(var(--color-purple-rgb,124,58,237),0.12);
+    border-radius: 14px;
+    box-shadow: 0 18px 40px rgba(15,23,42,0.14);
+    z-index: 30;
+}
+.chat-attach-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 128px;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text-main);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+}
+.chat-attach-menu-item:hover {
+    background: rgba(var(--color-purple-rgb,124,58,237),0.08);
+    color: var(--color-purple);
+}
+.chat-attach-menu-item i { font-size: 16px; }
 .chat-input-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
 .char-counter { font-size: 11px; font-weight: 700; color: var(--text-light); min-width: 40px; text-align: right; }
 .char-counter.warn { color: var(--color-red); }

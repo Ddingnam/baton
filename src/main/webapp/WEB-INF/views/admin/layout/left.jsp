@@ -1,6 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c"   uri="jakarta.tags.core"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<c:set var="adminMember" value="${sessionScope.member}"/>
+<c:set var="adminName" value="${empty adminMember.name ? '관리자' : adminMember.name}"/>
+<c:set var="adminNickname" value="${empty adminMember.nickname ? adminName : adminMember.nickname}"/>
+<c:set var="adminAvatarText" value="${fn:length(adminNickname) >= 2 ? fn:substring(adminNickname, 0, 2) : adminNickname}"/>
+<c:set var="adminRoleCode" value="${adminMember.userLevel >= 99 ? 'admin' : 'emp'}"/>
 
 <aside class="agency-sidebar">
     <div class="brand-logo" onclick="location.href='${pageContext.request.contextPath}/admin'" style="cursor:pointer;">
@@ -77,13 +84,13 @@
         <button class="chat-entry-btn" id="studioChatBtn" onclick="location.href='${pageContext.request.contextPath}/admin/chat'">
             <i class="ri-message-3-fill"></i>
             <span>스튜디오 채팅</span>
-            <div class="chat-unread-badge">3</div>
+            <div class="chat-unread-badge" id="studioChatBadge" style="display:none;"></div>
         </button>
         <div class="user-badge">
-            <div class="avt-circle">AD</div>
+            <div class="avt-circle" id="sidebarAvatarText">${adminAvatarText}</div>
             <div class="user-texts">
-                <span class="u-name">관리자</span>
-                <span class="u-role">최고 관리자</span>
+                <span class="u-name" id="sidebarUserName">${adminNickname}</span>
+                <span class="u-role" id="sidebarUserRole">${adminRoleCode}</span>
             </div>
             <button class="sidebar-noti-btn" onclick="location.href='${pageContext.request.contextPath}/admin/notifications'" title="알림">
                 <i class="ri-notification-3-line"></i>
@@ -139,5 +146,21 @@
         <sec:authorize access="isAuthenticated()">
         window.ADMIN_USER_IDX = '<sec:authentication property="principal.userIdx"/>';
         </sec:authorize>
+
+        (function loadChatUnread() {
+            fetch(window.CTX + '/admin/chat/unread', { credentials: 'same-origin' })
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    var badge = document.getElementById('studioChatBadge');
+                    if (!badge) return;
+                    if (d.count > 0) {
+                        badge.textContent = d.count > 99 ? '99+' : d.count;
+                        badge.style.display = '';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }).catch(function() {});
+            setTimeout(loadChatUnread, 30000);
+        })();
     </script>
 </aside>

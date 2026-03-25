@@ -23,7 +23,8 @@
             slate:   { c1: '#475569', c2: '#64748B', glow: 'rgba(71,85,105,0.4)'   }
         };
         try {
-            var theme  = localStorage.getItem('baton-admin-theme') || 'purple';
+            var savedKey = 'baton-admin-theme-' + (localStorage.getItem('baton-admin-last-user') || '');
+            var theme  = localStorage.getItem(savedKey) || localStorage.getItem('baton-admin-theme') || 'purple';
             var colors = THEME_COLORS[theme] || THEME_COLORS.purple;
             var grad   = 'linear-gradient(135deg, ' + colors.c1 + ' 0%, ' + colors.c2 + ' 100%)';
             var root   = document.documentElement;

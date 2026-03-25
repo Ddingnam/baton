@@ -31,7 +31,15 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 			AuthenticationException exception) throws IOException, ServletException {
 
 		String login_id = request.getParameter("login_id");
+		String loginType = request.getParameter("loginType");
+		
 		String redirectUrl = defaultFailureUrl;
+		
+		if ("ADMIN".equals(loginType)) {
+			redirectUrl = request.getContextPath() + "/admin/login?error";
+		} else {
+			redirectUrl = request.getContextPath() + defaultFailureUrl;
+		}
 
 		// Spring Security 6에서 DisabledException이 InternalAuthenticationServiceException으로
 		// 래핑될 수 있으므로 getCause()까지 함께 확인

@@ -101,6 +101,7 @@
                             <c:if test="${dm.unreadCount > 0}">
                                 <span class="chat-room-badge" id="badge-${dm.roomIdx}">${dm.unreadCount}</span>
                             </c:if>
+                            <button class="dm-leave-btn" onclick="event.stopPropagation(); leaveDM(${dm.roomIdx})" title="나가기">×</button>
                         </div>
                     </c:forEach>
                     <c:if test="${empty dmList}">
@@ -229,10 +230,15 @@
 
                 <div class="chat-input-area">
                     <div class="chat-input-wrap">
-                        <label class="chat-attach-btn" title="파일 첨부">
+                        <button type="button" class="chat-attach-btn" id="attachToggleBtn" title="파일 첨부">
                             <i class="ri-attachment-2"></i>
-                            <input type="file" id="fileInput" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx">
-                        </label>
+                        </button>
+                        <div class="chat-attach-menu" id="attachMenu" style="display:none;">
+                            <button type="button" class="chat-attach-menu-item" id="attachImageBtn"><i class="ri-image-add-line"></i><span>사진 보내기</span></button>
+                            <button type="button" class="chat-attach-menu-item" id="attachFileBtn"><i class="ri-folder-upload-line"></i><span>파일 보내기</span></button>
+                        </div>
+                        <input type="file" id="imageInput" style="display:none;" accept="image/*">
+                        <input type="file" id="fileInput" style="display:none;">
                         <input type="text" class="chat-input" id="chatInput"
                                placeholder="<c:choose><c:when test='${currentRoomType == &quot;dm&quot;}'>${currentRoomName}에게 메시지 보내기</c:when><c:otherwise>#${currentRoomName}에 메시지 보내기</c:otherwise></c:choose>"
                                autocomplete="off" autofocus maxlength="500">

@@ -14,9 +14,28 @@
     const typingIndicator = document.getElementById('typingIndicator');
     const typingLabel     = document.getElementById('typingLabel');
     const fileInput       = document.getElementById('fileInput');
+    const imageInput      = document.getElementById('imageInput');
+    const attachToggleBtn = document.getElementById('attachToggleBtn');
+    const attachMenu      = document.getElementById('attachMenu');
     const filePreviewBar  = document.getElementById('filePreviewBar');
     const filePreviewName = document.getElementById('filePreviewName');
     const emojiPicker     = document.getElementById('emojiPicker');
+    function formatBadgeCount(count) { return count > 99 ? '99+' : String(count); }
+    function updateStudioUnreadBadge() {
+        var badge = document.getElementById('studioChatBadge');
+        if (!badge) return;
+        fetch(CHAT_CTX + '/admin/chat/unread', { credentials: 'same-origin' })
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                var count = Number(d.count || 0);
+                if (count > 0) {
+                    badge.textContent = formatBadgeCount(count);
+                    badge.style.display = '';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }).catch(function() {});
+    }
     function connect() {
         if (CHAT_ROOM_IDX < 0) return;
         const socket = new SockJS(CHAT_CTX + '/ws/chat');
@@ -49,18 +68,17 @@
                     if (roomIdx === CHAT_ROOM_IDX) return;
                     var item = document.querySelector('.chat-room-item[data-roomidx="' + roomIdx + '"]');
                     if (!item) return;
-                    // 뱃지 업데이트
                     var badge = document.getElementById('badge-' + roomIdx);
                     if (!badge) {
                         badge = document.createElement('span');
                         badge.className = 'chat-room-badge';
                         badge.id = 'badge-' + roomIdx;
-                        badge.textContent = '1';
+                        badge.textContent = formatBadgeCount(1);
                         item.appendChild(badge);
                     } else {
-                        badge.textContent = (parseInt(badge.textContent) || 0) + 1;
+                        var nextCount = Math.min((parseInt(badge.textContent) || 0) + 1, 9999);
+                        badge.textContent = formatBadgeCount(nextCount);
                     }
-                    // 미리보기 텍스트 실시간 업데이트
                     var preview = document.getElementById('preview-' + roomIdx);
                     if (data.content) {
                         var previewText = (data.sender ? data.sender + ': ' : '') + data.content;
@@ -68,7 +86,6 @@
                         if (preview) {
                             preview.textContent = previewText;
                         } else {
-                            // preview 요소가 없으면 생성
                             var infoDiv = item.querySelector('.chat-room-info');
                             if (infoDiv) {
                                 var newPreview = document.createElement('span');
@@ -79,6 +96,7 @@
                             }
                         }
                     }
+                    updateStudioUnreadBadge();
                 } catch(e) {}
             });
         }
@@ -97,19 +115,18 @@
     }
     function updatePresence(userIdx, status) {
         var cls = status === 1 ? 'online' : status === 2 ? 'away' : '';
-        // 멤버 패널 아바타
         var avt = document.getElementById('avt-' + userIdx);
         if (avt) {
             avt.classList.remove('online', 'away');
             if (cls) avt.classList.add(cls);
         }
-        // DM 목록 아바타 (id가 avt-dm-{userIdx})
+		
         var avtDm = document.getElementById('avt-dm-' + userIdx);
         if (avtDm) {
             avtDm.classList.remove('online', 'away');
             if (cls) avtDm.classList.add(cls);
         }
-        // DM 상태 점
+
         var dot = document.getElementById('status-' + userIdx);
         if (dot) {
             dot.classList.remove('online', 'away');
@@ -135,8 +152,9 @@
         const text = chatInput.value.trim();
         if ((!text && !pendingFile) || !stompClient || !stompClient.connected) return;
         if (pendingFile) {
-            uploadFile(pendingFile, function (url) {
-                doSend('[파일] ' + pendingFile.name + ' | ' + url);
+            var _file = pendingFile;
+            uploadFile(_file, function (url) {
+                doSend(url);
                 clearFilePreview();
             });
             return;
@@ -197,12 +215,12 @@
     function clearUnreadBadges() {
         const badge = document.getElementById('badge-' + CHAT_ROOM_IDX);
         if (badge) badge.remove();
+        updateStudioUnreadBadge();
     }
     const avatarClasses = ['jy','hn','mn','hs','op','cs'];
     const avatarMap     = {};
     let   avatarIdx     = 0;
-    // 서버에서 넘어온 멤버 순서로 avatarMap 미리 초기화
-    // → 페이지 로드 시와 실시간 메시지 시 색상이 항상 동일하게 유지됨
+	
     if (typeof CHAT_MEMBER_ORDER !== 'undefined') {
         CHAT_MEMBER_ORDER.forEach(function(uid) {
             if (Number(uid) !== CHAT_MY_IDX) {
@@ -231,7 +249,19 @@
         const isMe    = (Number(msg.userIdx) === Number(CHAT_MY_IDX));
         const name    = msg.nickname || (isMe ? CHAT_MY_NAME : '?');
         const initial = name.substring(0, 2);
-        const safe    = escHtml(String(msg.content)).replace(/\n/g, '<br>');
+        var rawContent = String(msg.content || '');
+        var safe;
+        if (rawContent.indexOf('__IMG__') === 0) {
+            var imgUrl = escHtml(rawContent.slice(7));
+            safe = '<img src="' + imgUrl + '" style="max-width:220px;max-height:200px;border-radius:8px;cursor:pointer;display:block;" onclick="window.open(this.src)" onerror="this.style.display=\'none\'">';
+        } else if (rawContent.indexOf('__FILE__') === 0) {
+            var fileUrl  = escHtml(rawContent.slice(8));
+            var fileName = fileUrl.split('/').pop().split('?')[0];
+            try { fileName = decodeURIComponent(fileName); } catch(e) {}
+            safe = '<a href="' + fileUrl + '" target="_blank" download="' + escHtml(fileName) + '" style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.25);border-radius:10px;color:inherit;text-decoration:none;font-size:13px;font-weight:600;max-width:220px;"><i class="ri-file-download-line" style="font-size:18px;flex-shrink:0;"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escHtml(fileName) + '</span><i class="ri-download-2-line" style="font-size:14px;flex-shrink:0;opacity:0.7;"></i></a>';
+        } else {
+            safe = escHtml(rawContent).replace(/\n/g, '<br>');
+        }
         const avatarCls = getAvatarClass(Number(msg.userIdx));
         const wrapper = document.createElement('div');
         wrapper.className = 'chat-msg-group' + (isMe ? ' mine' : '');
@@ -260,7 +290,10 @@
         scrollToBottom();
         const preview = document.getElementById('preview-' + CHAT_ROOM_IDX);
         if (preview) {
-            const t = (isMe ? '나: ' : name + ': ') + msg.content;
+            var previewContent = msg.content;
+            if (String(previewContent || '').indexOf('__IMG__') === 0) previewContent = '사진';
+            else if (String(previewContent || '').indexOf('__FILE__') === 0) previewContent = '파일';
+            const t = (isMe ? '나: ' : name + ': ') + previewContent;
             preview.textContent = t.length > 20 ? t.substring(0, 20) + '…' : t;
         }
     }
@@ -385,12 +418,11 @@
     document.getElementById('chatSend').addEventListener('click', sendMessage);
     chatInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault(); // 줄바꿈 방지는 keydown에서
+            e.preventDefault();
         }
     });
     chatInput.addEventListener('keyup', function (e) {
         if (e.key === 'Enter' && !e.shiftKey) {
-            // 한글 IME 조합 중이면 전송 안 함
             if (e.isComposing || e.keyCode === 229) return;
             sendMessage();
         }
@@ -416,6 +448,16 @@
             pendingFile = this.files[0];
             filePreviewName.textContent = pendingFile.name;
             filePreviewBar.style.display = 'flex';
+            if (attachMenu) attachMenu.style.display = 'none';
+        });
+    }
+    if (imageInput) {
+        imageInput.addEventListener('change', function () {
+            if (!this.files || !this.files[0]) return;
+            pendingFile = this.files[0];
+            filePreviewName.textContent = pendingFile.name;
+            filePreviewBar.style.display = 'flex';
+            if (attachMenu) attachMenu.style.display = 'none';
         });
     }
     const filePreviewRemove = document.getElementById('filePreviewRemove');
@@ -531,6 +573,23 @@
             window.switchRoom(Number(this.dataset.roomidx), this.dataset.roomname, this.dataset.type);
         });
     });
+    if (attachToggleBtn && attachMenu) {
+        attachToggleBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            attachMenu.style.display = attachMenu.style.display === 'none' || !attachMenu.style.display ? 'flex' : 'none';
+        });
+    }
+    var attachImageBtn = document.getElementById('attachImageBtn');
+    var attachFileBtn = document.getElementById('attachFileBtn');
+    if (attachImageBtn && imageInput) attachImageBtn.addEventListener('click', function() { imageInput.click(); });
+    if (attachFileBtn && fileInput) attachFileBtn.addEventListener('click', function() { fileInput.click(); });
+    document.addEventListener('click', function(e) {
+        if (!attachMenu) return;
+        if (attachToggleBtn && attachToggleBtn.contains(e.target)) return;
+        if (attachMenu.contains(e.target)) return;
+        attachMenu.style.display = 'none';
+    });
+
     window.addEventListener('beforeunload', function () {
         isLeaving = true; stopTypingSignal();
     });
@@ -538,9 +597,16 @@
         const formData = new FormData();
         formData.append('file', file);
         formData.append('roomIdx', CHAT_ROOM_IDX);
-        fetch(CHAT_CTX + '/chat/upload', { method: 'POST', body: formData })
+        fetch(CHAT_CTX + '/chat/imageUpload', { method: 'POST', body: formData })
             .then(function (r) { return r.json(); })
-            .then(function (data) { callback(data.url || '(파일 업로드 완료)'); })
+            .then(function (data) {
+                if (!data || data.state !== 'true' || !data.saveFilename) { callback('(파일 업로드 실패)'); return; }
+                var url = CHAT_CTX + '/uploads/chat/' + encodeURIComponent(data.saveFilename);
+                var ext = data.saveFilename.split('.').pop().toLowerCase();
+                var imgExts = ['jpg','jpeg','png','gif','webp','bmp','svg'];
+                if (imgExts.indexOf(ext) !== -1) callback('__IMG__' + url);
+                else callback('__FILE__' + url);
+            })
             .catch(function () { callback('(파일 업로드 실패)'); });
     }
     function clearFilePreview() {
@@ -548,6 +614,7 @@
         if (filePreviewBar)  filePreviewBar.style.display = 'none';
         if (filePreviewName) filePreviewName.textContent  = '';
         if (fileInput)       fileInput.value = '';
+        if (imageInput)      imageInput.value = '';
     }
     function setConnStatus(ok) {
         const dot   = document.getElementById('connDot');
@@ -568,6 +635,7 @@
         }
         connect();
         scrollToBottom();
+        updateStudioUnreadBadge();
     });
 })();
 (function() {
@@ -694,6 +762,7 @@
         cancel.onclick = close;
         overlay.onclick = function(e) { if (e.target === overlay) close(); };
     }
+    window._batonConfirm = customConfirm; // leaveDM 전역 함수에서 사용
     window.addMember = function(roomIdx, userIdx) {
         fetch(CHAT_CTX + '/admin/chat/channel/' + roomIdx + '/member/add', {
             method: 'POST', credentials: 'same-origin',
@@ -928,3 +997,41 @@
         }
     });
 })();
+
+function leaveDM(roomIdx) {
+    function doLeave() {
+        fetch((window.CHAT_CTX || window.CTX || '') + '/admin/chat/dm/' + roomIdx + '/leave', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.success) {
+                var item = document.querySelector('.chat-room-item[data-roomidx="' + roomIdx + '"]');
+                if (item) item.remove();
+                if (typeof CHAT_ROOM_IDX !== 'undefined' && Number(CHAT_ROOM_IDX) === Number(roomIdx)) {
+                    window.location.href = (window.CHAT_CTX || window.CTX || '') + '/admin/chat';
+                }
+            } else {
+                if (typeof showToast === 'function') showToast(d.msg || 'DM 나가기에 실패했습니다.', 'error');
+            }
+        })
+        .catch(function() {
+            if (typeof showToast === 'function') showToast('오류가 발생했습니다.', 'error');
+        });
+    }
+
+    if (typeof window._batonConfirm === 'function') {
+        window._batonConfirm({
+            icon:    '<i class="ri-door-open-line" style="color:#fff;"></i>',
+            iconBg:  'linear-gradient(135deg,#F97316,#EF4444)',
+            title:   '대화방 나가기',
+            desc:    '이 대화를 나가시겠어요? 대화 내용은 삭제되지 않습니다.',
+            okLabel: '나가기',
+            okBg:    '#EF4444'
+        }, doLeave);
+    } else {
+        if (confirm('이 대화를 나가시겠어요?')) doLeave();
+    }
+}
