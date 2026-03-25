@@ -201,7 +201,7 @@
                                             <span class="chat-msg-time">${msgTime}</span>
                                             <span class="chat-msg-name">${myNickname}</span>
                                         </div>
-                                        <div class="chat-bubble mine">${chat.content}</div>
+                                        <div class="chat-bubble mine theme-${myTheme}">${chat.content}</div>
                                     </div>
                                     <div class="chat-avt me">${fn:substring(myNickname, 0, 2)}</div>
                                 </div>
@@ -494,6 +494,7 @@ var CHAT_MY_NAME  = '${myNickname}';
 var CHAT_ROOM_IDX = Number('${currentRoomIdx}');
 var CHAT_ROOM_TYPE  = '${currentRoomType}';
 var CHAT_MY_LEVEL  = Number('${myUserLevel}');
+var CHAT_MY_THEME = '${myTheme}';
 
 window.CTX = CHAT_CTX;
 window.ADMIN_USER_IDX = CHAT_MY_IDX;

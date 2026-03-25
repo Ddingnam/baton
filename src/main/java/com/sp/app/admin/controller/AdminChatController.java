@@ -6,6 +6,7 @@ import com.sp.app.model.ChatMessage;
 import com.sp.app.model.ChatRoom;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.ChatService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +32,7 @@ public class AdminChatController {
     public String adminChat(
             @RequestParam(value = "roomIdx", required = false) Long roomIdx,
             @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpSession session,
             Model model) {
 
         if (userDetails == null) return "redirect:/member/login";
@@ -64,6 +66,10 @@ public class AdminChatController {
 
         List<ChatMessage> chatList = currentRoomIdx > 0 ? chatService.listChatMessage(currentRoomIdx) : List.of();
 
+        // 세션에서 테마 읽기 (없으면 purple 기본값)
+        String myTheme = (String) session.getAttribute("adminTheme");
+        if (myTheme == null) myTheme = "purple";
+
         model.addAttribute("roomList",        roomList);
         model.addAttribute("dmList",          dmList);
         model.addAttribute("chatList",        chatList);
@@ -74,8 +80,27 @@ public class AdminChatController {
         model.addAttribute("currentRoomName", currentRoomName);
         model.addAttribute("currentRoomType", currentRoomType);
         model.addAttribute("memberList",      memberList);
+        model.addAttribute("myTheme",         myTheme);
 
         return "admin/chat/chat";
+    }
+
+    /** 테마를 세션에 저장 (DB 없이 세션으로 관리) */
+    @PostMapping(value = "/theme/save", produces = "application/json")
+    @ResponseBody
+    public Map<String, Object> saveTheme(
+            @RequestParam String theme,
+            HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        // 허용된 테마값만 저장 (보안)
+        List<String> allowed = List.of("purple", "blue", "emerald", "sunset", "rose", "slate");
+        if (allowed.contains(theme)) {
+            session.setAttribute("adminTheme", theme);
+            result.put("success", true);
+        } else {
+            result.put("success", false);
+        }
+        return result;
     }
 
     @PostMapping(value = "/chat/dm", produces = "application/json")
@@ -214,7 +239,6 @@ public class AdminChatController {
         return result;
     }
 
-    /** 방장 위임 */
     @PostMapping(value = "/chat/channel/{roomIdx}/transfer", produces = "application/json")
     @ResponseBody
     public Map<String, Object> transferOwnership(

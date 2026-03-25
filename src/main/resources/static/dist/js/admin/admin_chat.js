@@ -143,21 +143,30 @@
         }
         doSend(text);
     }
-    function doSend(content) {
-        content = content.trim(); // IME 잔여 공백 제거
-        if (!content) return;
-        stompClient.send('/app/chat/send', {}, JSON.stringify({
-            roomIdx: CHAT_ROOM_IDX,
-            userIdx: CHAT_MY_IDX,
-            nickname: CHAT_MY_NAME,
-            content: content,
-            msgType: 1
-        }));
-        chatInput.value = '';
-        charCounter.style.display = 'none';
-        chatInput.focus();
-        stopTypingSignal();
-    }
+	
+	function getCurrentTheme() {
+	    return document.documentElement.getAttribute('data-theme') || 'purple';
+	}
+
+	function doSend(content) {
+	    content = content.trim();
+	    if (!content) return;
+
+	    stompClient.send('/app/chat/send', {}, JSON.stringify({
+	        roomIdx: CHAT_ROOM_IDX,
+	        userIdx: CHAT_MY_IDX,
+	        nickname: CHAT_MY_NAME,
+	        content: content,
+	        msgType: 1,
+	        theme: getCurrentTheme()
+	    }));
+
+	    chatInput.value = '';
+	    charCounter.style.display = 'none';
+	    chatInput.focus();
+	    stopTypingSignal();
+	}
+	
     function sendReadEvent() {
         if (!stompClient || !stompClient.connected) return;
         stompClient.send('/app/chat/read', {}, JSON.stringify({
@@ -233,18 +242,18 @@
               +     '<span class="chat-msg-time">' + timeStr + '</span>'
               +     '<span class="chat-msg-name">' + escHtml(name) + '</span>'
               +   '</div>'
-              +   '<div class="chat-bubble mine">' + safe + '</div>'
+              +   '<div class="chat-bubble mine theme-' + (msg.theme || 'purple') + '">' + safe + '</div>'
               + '</div>'
               + '<div class="chat-avt me ' + avatarCls + '">' + initial + '</div>';
         } else {
             wrapper.innerHTML =
-                '<div class="chat-avt ' + avatarCls + '">' + initial + '</div>'
+                '<div class="chat-avt theme-recv-' + (msg.theme || 'purple') + '">' + initial + '</div>'
               + '<div class="chat-msg-body">'
               +   '<div class="chat-msg-meta">'
               +     '<span class="chat-msg-name">' + escHtml(name) + '</span>'
               +     '<span class="chat-msg-time">' + timeStr + '</span>'
               +   '</div>'
-              +   '<div class="chat-bubble">' + safe + '</div>'
+              +   '<div class="chat-bubble theme-' + (msg.theme || 'purple') + '">' + safe + '</div>'
               + '</div>';
         }
         chatArea.insertBefore(wrapper, typingIndicator);

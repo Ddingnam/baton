@@ -1,8 +1,12 @@
 package com.sp.app.model;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
+@Getter
+@Setter
 public class ChatMessage {
     private Long msgIdx;
     private Long roomIdx;
@@ -14,5 +18,5 @@ public class ChatMessage {
     private String profilePhoto;
     private Integer unreadCount;
     private Long tradeIdx;
-    private String userTheme;
+    private String theme;
 }

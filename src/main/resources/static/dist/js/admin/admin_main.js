@@ -693,6 +693,13 @@ document.addEventListener("DOMContentLoaded", () => {
             var prevTheme = localStorage.getItem(THEME_KEY) || 'purple';
             applyTheme(theme);
             localStorage.setItem(THEME_KEY, theme);
+            // 세션에도 저장 (채팅 페이지에서 JSP 렌더링 시 사용)
+            fetch((window.CTX || '') + '/admin/theme/save', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'theme=' + encodeURIComponent(theme),
+                credentials: 'same-origin'
+            }).catch(function() {});
             var name = THEME_NAMES[theme] || theme;
             if (typeof showToast === 'function') {
                 if (theme === prevTheme) {
