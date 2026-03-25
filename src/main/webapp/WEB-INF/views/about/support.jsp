@@ -193,8 +193,10 @@
 				            <form class="email-form" @submit.prevent="sendInquiry">
 				                <div class="form-group">
 				                    <label>이름</label>
-				                    <input type="text" 
-				                    	v-model="inquiry.name" readonly class="readonly-input">
+				                    <input type="text" v-model="inquiry.name" 
+							           :readonly="inquiry.isLoggedIn" 
+							           :class="{ 'readonly-input': inquiry.isLoggedIn }" 
+							           placeholder="이름을 입력해주세요">
 				                </div>
 				                <div class="form-group">
 				                    <label>회신 받을 이메일</label>
