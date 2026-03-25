@@ -103,6 +103,12 @@
             location.reload();
         });
     }
+	
+	function formatDate(dateString) {
+	    if (!dateString) return '';
+	    const date = new Date(dateString);
+	    return `${date.getMonth() + 1}월 ${date.getDate()}일`;
+	}
 
 	function loadAlbaApply() {
 	    const container = document.querySelector("#alba-apply .lc-list");

@@ -23,6 +23,7 @@ import com.sp.app.model.TradeImg;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.FollowService;
 import com.sp.app.service.JobPostingService;
+import com.sp.app.service.JobApplyService;
 import com.sp.app.service.MemberService;
 import com.sp.app.service.MypageService;
 import com.sp.app.service.TradeService;
@@ -44,6 +45,7 @@ public class MyPageController {
     private final FollowService followService;
     private final WishListService wishListService;
     private final JobPostingService jobPostingService;
+    private final JobApplyService jobApplyService;
 
     @GetMapping({"", "/", "/main"})
     public String main(Model model, Authentication auth) {
@@ -79,8 +81,8 @@ public class MyPageController {
             model.addAttribute("buyList", tradeService.findBuyList(userIdx));
             model.addAttribute("wishList", wishListService.findWishList(userIdx));
             model.addAttribute("albaPostList", jobPostingService.postListByUserId(userIdx));
-            
             model.addAttribute("albaScrapList", jobPostingService.listJobScrap(userIdx));
+            model.addAttribute("albaApplyList", jobApplyService.listApplyByUser(userIdx)); 
         }
 
         return "mypage/main";
