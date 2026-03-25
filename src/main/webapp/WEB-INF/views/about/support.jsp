@@ -173,12 +173,6 @@
                     <div class="contact-info">support@baton.com</div>
                     <div class="contact-cta"><span>이메일 보내기</span><i class="ri-arrow-right-line"></i></div>
                 </div>
-                <div class="contact-card notice-card">
-                    <div class="contact-icon notice-icon"><i class="ri-megaphone-line"></i></div>
-                    <h3 class="contact-title">공지사항</h3>
-                    <p class="contact-desc">서비스 업데이트, 정책 변경, 점검 일정 등 바톤의 최신 소식을 확인하세요.</p>
-                    <div class="contact-cta"><span>공지 보러가기</span><i class="ri-arrow-right-line"></i></div>
-                </div>
             </div>
         </div>
     </section>
