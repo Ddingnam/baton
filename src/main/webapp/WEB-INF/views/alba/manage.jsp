@@ -12,37 +12,67 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 
 <style>
+* { box-sizing:border-box; }
+
 body {
   margin:0;
-  font-family: -apple-system, BlinkMacSystemFont;
-  background:#f9fafb;
+  font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
+  background: linear-gradient(135deg, #eef2ff, #fdf2f8);
 }
 
+/* 헤더 */
 .header {
   position:sticky;
   top:0;
-  background:#fff;
-  padding:14px;
-  border-bottom:1px solid #eee;
-  font-weight:700;
+  backdrop-filter: blur(14px);
+  background: rgba(255,255,255,0.7);
+  padding:18px;
+  font-weight:800;
+  font-size:20px;
+  border-bottom:1px solid rgba(255,255,255,0.4);
 }
 
+/* 리스트 */
 .list {
-  padding:6px 0;
+  padding:16px;
 }
 
+/* 카드 */
 .item {
   display:flex;
-  align-items:center;
-  gap:12px;
-  padding:14px;
-  border-bottom:1px solid #eee;
-  background:#fff;
+  gap:14px;
+  padding:16px;
+  margin-bottom:14px;
+  border-radius:20px;
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  transition: all 0.25s ease;
+  position:relative;
+  overflow:hidden;
 }
 
+.item::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.6), transparent);
+  opacity:0;
+  transition:0.4s;
+}
+
+.item:hover::before {
+  opacity:1;
+}
+
+.item:hover {
+  transform: translateY(-6px) scale(1.01);
+}
+
+/* 프로필 */
 .profile img, .no-img {
-  width:44px;
-  height:44px;
+  width:52px;
+  height:52px;
   border-radius:50%;
 }
 
@@ -50,9 +80,12 @@ body {
   display:flex;
   align-items:center;
   justify-content:center;
-  background:#eee;
+  background: linear-gradient(135deg, #c7d2fe, #a5b4fc);
+  color:#fff;
+  font-size:22px;
 }
 
+/* 정보 */
 .info {
   flex:1;
 }
@@ -60,58 +93,79 @@ body {
 .top {
   display:flex;
   justify-content:space-between;
-  font-size:14px;
+  align-items:center;
 }
 
 .name {
-  font-weight:700;
+  font-weight:800;
+  font-size:16px;
+  letter-spacing:-0.3px;
 }
 
 .time {
   font-size:12px;
-  color:#999;
+  color:#9ca3af;
 }
 
-.message {
+/* 서브 */
+.sub {
   font-size:13px;
-  color:#555;
-  margin-top:4px;
-}
-
-.actions {
+  color:#6b7280;
+  margin-top:6px;
   display:flex;
+  align-items:center;
   gap:6px;
 }
 
+/* 메시지 */
+.message {
+  margin-top:8px;
+  font-size:13px;
+  color:#374151;
+  background: rgba(255,255,255,0.7);
+  padding:8px 10px;
+  border-radius:10px;
+}
+
+/* 버튼 영역 */
+.actions {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+/* 버튼 */
 .actions button {
-  width:32px;
-  height:32px;
+  width:40px;
+  height:40px;
   border:none;
-  border-radius:50%;
+  border-radius:14px;
   cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.actions button:hover {
+  transform: scale(1.15) rotate(3deg);
+}
+
+/* 버튼 색 */
+.call {
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
+  color:#fff;
 }
 
 .pass {
-  background:#10B981;
+  background: linear-gradient(135deg, #34d399, #059669);
   color:#fff;
 }
 
 .fail {
-  background:#EF4444;
+  background: linear-gradient(135deg, #f87171, #dc2626);
   color:#fff;
-}
-
-.call {
-  background:#3B82F6;
-  color:#fff;
-}
-
-.item.pass-bg {
-  background:#ECFDF5;
-}
-
-.item.fail-bg {
-  opacity:0.5;
 }
 </style>
 </head>
@@ -125,9 +179,8 @@ body {
 <div class="list">
 
 <c:forEach var="a" items="${applicants}">
-  <div class="item ${a.status == '합격' ? 'pass-bg' : ''} ${a.status == '불합격' ? 'fail-bg' : ''}">
+  <div class="item">
 
-    <!-- 프로필 -->
     <div class="profile">
       <c:choose>
         <c:when test="${not empty a.photoUrl}">
@@ -139,23 +192,31 @@ body {
       </c:choose>
     </div>
 
-    <!-- 정보 -->
     <div class="info">
+
       <div class="top">
         <span class="name">${a.applicantName}</span>
-
-        <!-- ✅ 날짜 수정 (에러 안남) -->
         <span class="time">
           ${a.applyDate.toString().replace('T',' ').substring(5,16)}
         </span>
       </div>
 
+      <div class="sub">
+        <i class="ri-phone-line"></i>
+        ${empty a.applicantPhone ? "전화번호 없음" : a.applicantPhone}
+      </div>
+
+      <div class="sub">
+        <i class="ri-mail-line"></i>
+        ${empty a.applicantEmail ? "이메일 없음" : a.applicantEmail}
+      </div>
+
       <div class="message">
         ${empty a.message ? "메시지 없음" : a.message}
       </div>
+
     </div>
 
-    <!-- 액션 -->
     <div class="actions">
       <button class="call"
         onclick="location.href='tel:${a.applicantPhone}'">

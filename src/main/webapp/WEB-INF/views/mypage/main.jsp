@@ -416,9 +416,10 @@
 						                            <span class="corp-name theme-text">${apply.employer}</span>
 						                            <h4>${apply.title}</h4>
 						                            <p class="info-metrics">
-						                                ${apply.payType} <fmt:formatNumber value="${apply.pay}" pattern="#,###"/>원 · 
-						                                <fmt:formatDate value="${apply.applyDate}" pattern="M월 d일"/> 지원
-						                            </p>
+													    ${apply.payType} <fmt:formatNumber value="${apply.pay}" pattern="#,###"/>원 · 
+													    <fmt:parseDate value="${apply.applyDate}" pattern="yyyy-MM-dd'T'HH:mm:ss" var="parsedDate" type="both" />
+													    <fmt:formatDate value="${parsedDate}" pattern="M월 d일"/> 지원
+													</p>
 						                        </div>
 						                        <div class="item-right">
 						                            <c:choose>
