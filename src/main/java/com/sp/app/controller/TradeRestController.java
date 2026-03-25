@@ -21,13 +21,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sp.app.model.Trade;
 import com.sp.app.model.TradeAiResponse;
-import com.sp.app.model.TradeImg;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.EscrowService;
 import com.sp.app.service.FollowService;
 import com.sp.app.service.TradeAiService;
 import com.sp.app.service.TradeService;
 import com.sp.app.service.WishListService;
+import com.sp.app.service.NotificationService;
+import com.sp.app.mapper.TradeMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,8 @@ public class TradeRestController {
     private final WishListService wishListService;
     private final FollowService followService;
     private final TradeAiService tradeAiService;
+    private final NotificationService notificationService;
+    private final TradeMapper tradeMapper;
 
     @Value("${file.upload-root}/trade")
     private String uploadPath;
@@ -214,12 +217,23 @@ public class TradeRestController {
         }
     }
 	
-	
     @PostMapping("/updateStatus")
     public ResponseEntity<?> updateTradeStatus(@RequestParam("productIdx") long productIdx, 
     		@RequestParam("tradeStatus") String tradeStatus) {
         try {
+            Trade trade = tradeService.findByIdx(productIdx);
             tradeService.updateTradeStatus(productIdx, tradeStatus);
+            
+            if("판매완료".equals(tradeStatus) || "예약중".equals(tradeStatus)) {
+                List<Long> wishUsers = tradeMapper.getWishUserList(productIdx);
+                for(Long uId : wishUsers) {
+                    notificationService.sendTradeNotification(
+                        uId, 
+                        "찜하신 [" + trade.getTitle() + "] 상품이 " + tradeStatus + "로 변경되었습니다.", 
+                        "/trade/article?productIdx=" + productIdx
+                    );
+                }
+            }
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -257,6 +271,12 @@ public class TradeRestController {
                 long count = followService.follow(followerIdx, followingIdx);
                 map.put("isFollowing", true);
                 map.put("followerCount", count);
+                
+                notificationService.sendTradeNotification(
+                    followingIdx, 
+                    userDetails.getMember().getNickname() + "님이 회원님을 팔로우하기 시작했습니다.", 
+                    "/mypage/main?tab=trade"
+                );
             }
             map.put("status", "success");
             return ResponseEntity.ok(map);
@@ -288,6 +308,17 @@ public class TradeRestController {
             }
             
             tradeService.updateLastUpDate(productIdx);
+            Trade trade = tradeService.findByIdx(productIdx);
+            
+            List<Long> wishUsers = tradeMapper.getWishUserList(productIdx);
+            for(Long uId : wishUsers) {
+                notificationService.sendTradeNotification(
+                    uId, 
+                    "찜하신 [" + trade.getTitle() + "] 상품이 끌어올림 되었습니다.", 
+                    "/trade/article?productIdx=" + productIdx
+                );
+            }
+            
             map.put("status", "success");
             return ResponseEntity.ok(map);
         } catch (Exception e) {
@@ -314,5 +345,4 @@ public class TradeRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
 }

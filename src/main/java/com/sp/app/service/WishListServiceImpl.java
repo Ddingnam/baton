@@ -27,13 +27,13 @@ public class WishListServiceImpl implements WishListService{
 	private final WishListRepository wishListRepository;
     private final ProductRepository productRepository;
     private final TradeMapper tradeMapper;
+    private final NotificationService notificationService; 
     
 	@Override
 	public Map<String, Object> toggleWishList(long productIdx, long userIdx) throws Exception {
 		Map<String, Object> result = new HashMap<>();
         
 		try {
-			
 			WishListId id = new WishListId(productIdx, userIdx);
 			
 			Product product = productRepository.findById(productIdx)
@@ -53,6 +53,15 @@ public class WishListServiceImpl implements WishListService{
 				wishListRepository.save(newWish);
 				product.updateLikeCount(1);
 				result.put("isLiked", true);
+
+				Trade tradeDto = tradeMapper.findByIdx(productIdx);
+				if(tradeDto != null && tradeDto.getUserIdx() != userIdx) {
+                    notificationService.sendTradeNotification(
+                        tradeDto.getUserIdx(), 
+                        "누군가 회원님의 [" + tradeDto.getTitle() + "] 상품을 찜했습니다.", 
+                        "/trade/article?productIdx=" + productIdx
+                    );
+                }
 			}
 			
 			result.put("likeCount", product.getLikeCount());
@@ -65,10 +74,8 @@ public class WishListServiceImpl implements WishListService{
 	@Override
 	public boolean isUserLiked(long productIdx, long userIdx) {
 		try {
-			
 			WishListId id = new WishListId(productIdx, userIdx);
 			return wishListRepository.existsById(id);
-			
 		} catch (Exception e) {
 			log.info("isUserLiked : ", e);
 			return false;
@@ -78,19 +85,14 @@ public class WishListServiceImpl implements WishListService{
 	@Override
 	public List<Trade> findWishList(long userIdx) {
 		List<Trade> list = null;
-		
 		try {
 			list = tradeMapper.findWishListByUserIdx(userIdx);
-			
 			for (Trade trade : list) {
 	            trade.setImageList(tradeMapper.findImagesByIdx(trade.getProductIdx()));
 	        }
-			
 		} catch (Exception e) {
 			log.info("findWishList : ", e);
 		}
 		return list;
 	}
-	
-	
 }

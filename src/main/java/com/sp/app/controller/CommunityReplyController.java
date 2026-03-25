@@ -11,9 +11,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import com.sp.app.domain.dto.CommunityDto;
 import com.sp.app.domain.dto.CommunityReplyDto;
 import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.service.CommunityReplyService;
+import com.sp.app.service.CommunityService;
+import com.sp.app.service.NotificationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +26,8 @@ import lombok.RequiredArgsConstructor;
 public class CommunityReplyController {
 
     private final CommunityReplyService service;
+    private final NotificationService notificationService;
+    private final CommunityService communityService;
 
     @GetMapping("/list")
     public Map<String, Object> list(@RequestParam("communityId") Long communityId) {
@@ -53,6 +58,16 @@ public class CommunityReplyController {
 
             service.insertReply(communityId, dto);
             model.put("state", "true");
+            
+            CommunityDto communityDto = communityService.getCommunity(communityId);
+            if(!communityDto.getMemberIdx().equals(info.getUserIdx())) {
+                notificationService.sendCommunityNotification(
+                    communityDto.getMemberIdx(), 
+                    "[" + communityDto.getSubject() + "] 글에 새로운 댓글이 달렸습니다.", 
+                    "/community/article?id=" + communityId
+                );
+            }
+            
         } catch (Exception e) {
             e.printStackTrace();
             model.put("state", "false");

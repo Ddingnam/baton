@@ -5,7 +5,8 @@ import com.sp.app.model.JobPosting;
 import com.sp.app.model.JobProfile;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.JobPostingService;
-import com.sp.app.service.JobProfileService; // 이력서
+import com.sp.app.service.JobProfileService;
+import com.sp.app.service.NotificationService; 
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ public class JobPostingController {
 
 	private final JobPostingService postingService;
 	private final JobProfileService jobProfileService;
+	private final NotificationService notificationService;
 
 	@GetMapping("list")
 	public String list(@RequestParam(value = "page", defaultValue = "1") int current_page,
@@ -77,7 +79,7 @@ public class JobPostingController {
 		model.addAttribute("list", list);
 		model.addAttribute("dataCount", dataCount);
 		model.addAttribute("page", current_page);
-		model.addAttribute("resumeCount", resumeCount); // 이력서
+		model.addAttribute("resumeCount", resumeCount);
 
 		return "alba/list";
 	}
@@ -106,61 +108,60 @@ public class JobPostingController {
 		return "redirect:/alba/list";
 	}
 
-		@GetMapping("article/{num}")
-		public String article(@PathVariable("num") long num, 
-		                      @RequestParam(value = "page", defaultValue = "1") String page,
-		                      @AuthenticationPrincipal CustomUserDetails userDetails, // 🔥 로그인 정보 추가
-		                      Model model) {
-		    try {
-		        postingService.updateHitCount(num); 
-		        JobPosting dto = postingService.findById(num);
-		        
-		        if (dto == null) return "redirect:/alba/list?page=" + page;
+	@GetMapping("article/{num}")
+	public String article(@PathVariable("num") long num, 
+	                      @RequestParam(value = "page", defaultValue = "1") String page,
+	                      @AuthenticationPrincipal CustomUserDetails userDetails,
+	                      Model model) {
+	    try {
+	        postingService.updateHitCount(num); 
+	        JobPosting dto = postingService.findById(num);
+	        
+	        if (dto == null) return "redirect:/alba/list?page=" + page;
 
-		        String koreanDays = convertToKoreanDays(dto.getWorkDays());
-		        model.addAttribute("koreanDays", koreanDays);
+	        String koreanDays = convertToKoreanDays(dto.getWorkDays());
+	        model.addAttribute("koreanDays", koreanDays);
 
-		        String computedWorkTime = (dto.getStartTime() != null && !dto.getStartTime().isEmpty() && 
-		                                   dto.getEndTime() != null && !dto.getEndTime().isEmpty()) 
-		                                   ? dto.getStartTime() + " ~ " + dto.getEndTime() 
-		                                   : "시간협의";
-		        model.addAttribute("computedWorkTime", computedWorkTime);
-		        
-		        int applyCount = 0;
-		        try {
-		            // 공고 번호(num)를 던져서 해당 공고의 지원자 수를 가져옵니다.
-		            applyCount = postingService.applyCount(num); 
-		        } catch (Exception e) {
-		            log.error("지원자 수 조회 실패", e);
-		        }
-		        model.addAttribute("applyCount", applyCount);
+	        String computedWorkTime = (dto.getStartTime() != null && !dto.getStartTime().isEmpty() && 
+	                                   dto.getEndTime() != null && !dto.getEndTime().isEmpty()) 
+	                                   ? dto.getStartTime() + " ~ " + dto.getEndTime() 
+	                                   : "시간협의";
+	        model.addAttribute("computedWorkTime", computedWorkTime);
+	        
+	        int applyCount = 0;
+	        try {
+	            applyCount = postingService.applyCount(num); 
+	        } catch (Exception e) {
+	            log.error("지원자 수 조회 실패", e);
+	        }
+	        model.addAttribute("applyCount", applyCount);
 
-		        boolean isUserScrap = false;
-		        if (userDetails != null) {
-		            Map<String, Object> map = new HashMap<>();
-		            map.put("memberId", userDetails.getUserIdx());
-		            map.put("postingIdx", num);
-		            int scrapCount = postingService.checkJobScrap(map);
-		            if (scrapCount > 0) {
-		                isUserScrap = true;
-		            }
-		        }
-		        model.addAttribute("userScrap", isUserScrap); 
+	        boolean isUserScrap = false;
+	        if (userDetails != null) {
+	            Map<String, Object> map = new HashMap<>();
+	            map.put("memberId", userDetails.getUserIdx());
+	            map.put("postingIdx", num);
+	            int scrapCount = postingService.checkJobScrap(map);
+	            if (scrapCount > 0) {
+	                isUserScrap = true;
+	            }
+	        }
+	        model.addAttribute("userScrap", isUserScrap); 
 
-		        model.addAttribute("dto", dto);
-		        model.addAttribute("page", page);
-		        
-		        if (userDetails != null) {
-		        	List<JobProfile> resumeList = jobProfileService.listJobProfile(userDetails.getUserIdx());
-		        	model.addAttribute("resumeList", resumeList);
-		        }
-		        
-		        return "alba/article"; 
-		    } catch (Exception e) {
-		        log.error("상세보기 에러: ", e);
-		        return "redirect:/alba/list?page=" + page;
-		    }
-		}
+	        model.addAttribute("dto", dto);
+	        model.addAttribute("page", page);
+	        
+	        if (userDetails != null) {
+	        	List<JobProfile> resumeList = jobProfileService.listJobProfile(userDetails.getUserIdx());
+	        	model.addAttribute("resumeList", resumeList);
+	        }
+	        
+	        return "alba/article"; 
+	    } catch (Exception e) {
+	        log.error("상세보기 에러: ", e);
+	        return "redirect:/alba/list?page=" + page;
+	    }
+	}
 
 	@GetMapping("update")
 	public String updateForm(@RequestParam(value = "postingIdx") long postingIdx,
@@ -208,7 +209,7 @@ public class JobPostingController {
 	        @RequestParam("sido") String sido,
 	        @RequestParam("gugun") String gugun,
 	        @RequestParam("dong") String dong,
-	        @AuthenticationPrincipal CustomUserDetails userDetails) { // 🔥 추가
+	        @AuthenticationPrincipal CustomUserDetails userDetails) { 
 
 	    Map<String, Object> map = new HashMap<>();
 
@@ -292,99 +293,115 @@ public class JobPostingController {
 	    }
 	}
 	
-	// 2. toggleScrap 메서드를 통째로 아래 코드로 변경하세요. (Security 인증 객체 사용으로 변경)
-		@PostMapping("/scrap")
-		@ResponseBody
-		public Map<String, Object> toggleScrap(
-		        @RequestParam("postingIdx") long postingIdx,
-		        @RequestParam("isScrap") boolean isScrap,
-		        @AuthenticationPrincipal CustomUserDetails userDetails) { // 🔥 HttpSession 대신 Security 객체 사용
+	@PostMapping("/scrap")
+	@ResponseBody
+	public Map<String, Object> toggleScrap(
+	        @RequestParam("postingIdx") long postingIdx,
+	        @RequestParam("isScrap") boolean isScrap,
+	        @AuthenticationPrincipal CustomUserDetails userDetails) { 
 
-		    Map<String, Object> result = new HashMap<>();
+	    Map<String, Object> result = new HashMap<>();
 
-		    // 로그인하지 않은 경우
-		    if (userDetails == null) {
-		        result.put("status", "login_required");
-		        return result;
-		    }
+	    if (userDetails == null) {
+	        result.put("status", "login_required");
+	        return result;
+	    }
 
-		    try {
-		        Map<String, Object> map = new HashMap<>();
-		        map.put("memberId", userDetails.getUserIdx()); // 🔥 확실하게 Security에서 UserIdx를 꺼내옴
-		        map.put("postingIdx", postingIdx);
+	    try {
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("memberId", userDetails.getUserIdx()); 
+	        map.put("postingIdx", postingIdx);
 
-		        if (isScrap) {
-		            postingService.insertJobScrap(map);
-		        } else {
-		            postingService.deleteJobScrap(map);
-		        }
+	        if (isScrap) {
+	            postingService.insertJobScrap(map);
 
-		        result.put("status", "success");
+	            JobPosting posting = postingService.findById(postingIdx);
+                if(posting != null && posting.getUserIdx() != userDetails.getUserIdx()) {
+                    notificationService.sendAlbaNotification(
+                        posting.getUserIdx(), 
+                        "누군가 사장님의 [" + posting.getTitle() + "] 공고를 스크랩했습니다.", 
+                        "/alba/article/" + postingIdx
+                    );
+                }
+                
+	        } else {
+	            postingService.deleteJobScrap(map);
+	        }
 
-		    } catch (Exception e) {
-		    	log.error("스크랩 에러", e);
-		        result.put("status", "error");
-		    }
+	        result.put("status", "success");
 
-		    return result;
-		}
-		
-		@PostMapping("/apply-posting")
-		@ResponseBody
-		public Map<String, Object> applyAlba(
-		        @RequestParam("postingIdx") long postingIdx,
-		        @RequestParam("profileIdx") long profileIdx,
-		        @RequestParam(value="message", required=false) String message,
-		        @AuthenticationPrincipal CustomUserDetails userDetails) {
+	    } catch (Exception e) {
+	    	log.error("스크랩 에러", e);
+	        result.put("status", "error");
+	    }
 
-		    Map<String, Object> result = new HashMap<>();
+	    return result;
+	}
+	
+	@PostMapping("/apply-posting")
+	@ResponseBody
+	public Map<String, Object> applyAlba(
+	        @RequestParam("postingIdx") long postingIdx,
+	        @RequestParam("profileIdx") long profileIdx,
+	        @RequestParam(value="message", required=false) String message,
+	        @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-		    if (userDetails == null) {
-		        result.put("status", "login_required");
-		        return result;
-		    }
+	    Map<String, Object> result = new HashMap<>();
 
-		    try {
-		        postingService.applyToAlba(userDetails.getUserIdx(), postingIdx, profileIdx, message);
-		        result.put("status", "success");
-		        
-		    } catch (DuplicateKeyException e) {
-		        log.info("중복 지원 시도 차단됨 - userIdx: {}, postingIdx: {}", userDetails.getUserIdx(), postingIdx);
-		        result.put("status", "duplicate"); 
-		        
-		    } catch (Exception e) {
-		        log.error("지원 실패", e);
-		        result.put("status", "error");
-		    }
+	    if (userDetails == null) {
+	        result.put("status", "login_required");
+	        return result;
+	    }
 
-		    return result;
-		}
-		
-		@GetMapping("manage")
-		public String manage(@RequestParam("postingIdx") long postingIdx,
-		                     @AuthenticationPrincipal CustomUserDetails userDetails,
-		                     Model model) {
+	    try {
+	        postingService.applyToAlba(userDetails.getUserIdx(), postingIdx, profileIdx, message);
+	        result.put("status", "success");
 
-		    if (userDetails == null) return "redirect:/member/login";
+	        JobPosting posting = postingService.findById(postingIdx);
+            if(posting != null) {
+                notificationService.sendAlbaNotification(
+                    posting.getUserIdx(), 
+                    "[" + posting.getTitle() + "] 공고에 새로운 지원자가 있습니다.", 
+                    "/alba/manage?postingIdx=" + postingIdx
+                );
+            }
+	        
+	    } catch (DuplicateKeyException e) {
+	        log.info("중복 지원 시도 차단됨 - userIdx: {}, postingIdx: {}", userDetails.getUserIdx(), postingIdx);
+	        result.put("status", "duplicate"); 
+	        
+	    } catch (Exception e) {
+	        log.error("지원 실패", e);
+	        result.put("status", "error");
+	    }
 
-		    JobPosting posting = postingService.findById(postingIdx);
+	    return result;
+	}
+	
+	@GetMapping("manage")
+	public String manage(@RequestParam("postingIdx") long postingIdx,
+	                     @AuthenticationPrincipal CustomUserDetails userDetails,
+	                     Model model) {
 
-		    if (posting == null || posting.getUserIdx() != userDetails.getUserIdx()) {
-		        return "redirect:/alba/list";
-		    }
+	    if (userDetails == null) return "redirect:/member/login";
 
-		    List<JobApplyDto> list = postingService.listApplicantsByPosting(postingIdx);
+	    JobPosting posting = postingService.findById(postingIdx);
 
-		    model.addAttribute("applicants", list);
-		    model.addAttribute("posting", posting);
-		    
-		    // 왕잠시 추가
-		    model.addAttribute("totalCount", list.size());
-		    model.addAttribute("waitCount", 0);
-		    model.addAttribute("reviewCount", 0);
-		    model.addAttribute("passCount", 0);
-		    model.addAttribute("failCount", 0);
+	    if (posting == null || posting.getUserIdx() != userDetails.getUserIdx()) {
+	        return "redirect:/alba/list";
+	    }
 
-		    return "alba/manage";
-		}
+	    List<JobApplyDto> list = postingService.listApplicantsByPosting(postingIdx);
+
+	    model.addAttribute("applicants", list);
+	    model.addAttribute("posting", posting);
+	    
+	    model.addAttribute("totalCount", list.size());
+	    model.addAttribute("waitCount", 0);
+	    model.addAttribute("reviewCount", 0);
+	    model.addAttribute("passCount", 0);
+	    model.addAttribute("failCount", 0);
+
+	    return "alba/manage";
+	}
 }

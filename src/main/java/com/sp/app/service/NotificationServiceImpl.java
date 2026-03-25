@@ -33,7 +33,6 @@ public class NotificationServiceImpl implements NotificationService {
         messagingTemplate.convertAndSend("/topic/alarms/" + userIdx, notif);
     }
 
-    /** 모든 관리자에게 특정 타입의 알림 발송 (내부 공통 헬퍼) */
     private void sendToAllAdmins(String notifType, String content, String url) {
         for (Long adminIdx : adminTargetMapper.findAdminUserIdxList()) {
             sendNotification(adminIdx, notifType, content, url);
@@ -63,6 +62,21 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void sendMemberJoinNotification(String content, String url) {
         sendToAllAdmins("MEMBER", content, url);
+    }
+
+    @Override
+    public void sendTradeNotification(Long userIdx, String content, String url) {
+        sendNotification(userIdx, "TRADE", content, url);
+    }
+
+    @Override
+    public void sendAlbaNotification(Long userIdx, String content, String url) {
+        sendNotification(userIdx, "ALBA", content, url);
+    }
+
+    @Override
+    public void sendCommunityNotification(Long userIdx, String content, String url) {
+        sendNotification(userIdx, "COMMUNITY", content, url);
     }
 
     @Override

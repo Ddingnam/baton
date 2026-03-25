@@ -11,6 +11,10 @@ public interface NotificationService {
 	public void sendRefundNotification(String content, String url);
 	public void sendMemberJoinNotification(String content, String url);
 	
+	public void sendTradeNotification(Long userIdx, String content, String url);
+	public void sendAlbaNotification(Long userIdx, String content, String url);
+	public void sendCommunityNotification(Long userIdx, String content, String url);
+	
 	public List<Notification> listNotification(Long userIdx);
 	public void updateNotificationRead(Long notifIdx);
 	public void updateAllNotificationRead(Long userIdx);
