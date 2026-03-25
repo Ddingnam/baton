@@ -60,38 +60,37 @@
           AND user_idx = #{userIdx}
     </select>
 
-    <!-- 🔥 지원자 목록 (핵심) -->
-    <select id="listApplicantsByPosting" resultType="com.sp.app.domain.dto.JobApplyDto">
-        SELECT 
-            ja.apply_idx AS applyIdx,
-            ja.posting_idx AS postingIdx,
-            ja.user_idx AS userIdx,
-            ja.resume_idx AS resumeIdx,
-            ja.status,
-            ja.message,
-            ja.apply_date AS applyDate,
-
-            u.name AS applicantName,
-            u.tel AS applicantPhone,
-            u.email AS applicantEmail,
-            u.birth AS applicantBirth,
-
-            jp.gender AS applicantGender,
-            jp.profileTitle,
-            jp.photoUrl
-
-        FROM job_apply ja
-
-        JOIN users u 
-            ON ja.user_idx = u.userIdx
-
-        LEFT JOIN jobprofile jp
-            ON ja.user_idx = jp.userIdx
-            AND jp.isDefault = 'Y'
-
-        WHERE ja.posting_idx = #{postingIdx}
-
-        ORDER BY ja.apply_idx DESC
-    </select>
+	    <select id="listApplicantsByPosting" resultType="com.sp.app.domain.dto.JobApplyDto">
+			SELECT 
+			    ja.apply_idx AS applyIdx,
+			    ja.posting_idx AS postingIdx,
+			    ja.user_idx AS userIdx,
+			    ja.resume_idx AS resumeIdx,
+			    ja.status,
+			    ja.message,
+			    ja.apply_date AS applyDate,
+			
+			    u.name AS applicantName,
+			    u.tel AS applicantPhone,
+			    u.email AS applicantEmail,
+			    u.birth AS applicantBirth,
+			
+			    jp.gender AS applicantGender,
+			    jp.PROFILETITLE AS profileTitle,
+			    jp.PHOTOURL AS photoUrl
+			
+			FROM job_apply ja
+			
+			JOIN users u 
+			    ON ja.user_idx = u.USERIDX
+			
+			LEFT JOIN jobprofile jp
+			    ON ja.user_idx = jp.USERIDX
+			    AND jp.ISDEFAULT = 'Y'
+			
+			WHERE ja.posting_idx = #{postingIdx}
+			
+			ORDER BY ja.apply_idx DESC
+	</select>
 
 </mapper>
