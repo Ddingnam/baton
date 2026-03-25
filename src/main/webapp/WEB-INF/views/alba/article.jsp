@@ -174,10 +174,10 @@
         <div class="article-stats">
             <span><i class="ri-eye-line"></i> 조회 ${dto.hitCount}</span>
             <span><i class="ri-heart-3-line"></i> 관심 ${dto.likeCount}</span>
-            <span><i class="ri-message-3-line"></i> 지원 ${dto.chatCount}</span>
+            <span><i class="ri-message-3-line"></i> 지원 ${dto.applyCount}</span>
         </div>
     </section>
-
+    
     <div class="divider"></div>
 
     <section id="section-company" class="scroll-section">
