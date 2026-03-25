@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -339,6 +340,11 @@ public class JobPostingController {
 		    try {
 		        postingService.applyToAlba(userDetails.getUserIdx(), postingIdx, profileIdx, message);
 		        result.put("status", "success");
+		        
+		    } catch (DuplicateKeyException e) {
+		        log.info("중복 지원 시도 차단됨 - userIdx: {}, postingIdx: {}", userDetails.getUserIdx(), postingIdx);
+		        result.put("status", "duplicate"); 
+		        
 		    } catch (Exception e) {
 		        log.error("지원 실패", e);
 		        result.put("status", "error");

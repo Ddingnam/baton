@@ -443,7 +443,11 @@ document.addEventListener("DOMContentLoaded", function() {
       location.href = CONTEXT_PATH + "/mypage"; // 필요하면 경로 수정
   }
   
+  let isApplying = false; // ✨ 다중 클릭 방지
+
   function submitResume() {
+      if (isApplying) return; // ✨ 처리 중이면 무시
+
       const resumeIdx = document.getElementById("resumeSelect").value;
       const message = document.getElementById("applyMessage").value;
       const postingIdx = document.getElementById("articleData").dataset.albaIdx;
@@ -453,39 +457,62 @@ document.addEventListener("DOMContentLoaded", function() {
           return;
       }
 
-	  fetch(CONTEXT_PATH + '/alba/apply-posting', {
-	      method: 'POST',
-	      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-	      body: new URLSearchParams({ 
-	          postingIdx: postingIdx, 
-	          profileIdx: resumeIdx, 
-	          message: message 
-	      })
-	  })
-	  .then(res => {
-	      console.log('HTTP status:', res.status);
-	      return res.text();  // 먼저 text로 받아서 내용 확인
-	  })
-	  .then(text => {
-	      console.log('Response text:', text);
-	      try {
-	          const data = JSON.parse(text);
-	          if (data.status === "success") {
-	              closeResumeModal();
-	              openApplySuccess();
-	          } else if (data.status === "login_required") {
-	              alert("로그인이 필요합니다.");
-	              location.href = CONTEXT_PATH + "/login";
-	          } else {
-	              alert("지원 중 오류가 발생했습니다.");
-	          }
-	      } catch(e) {
-	          console.error('JSON parse error', e);
-	          alert("지원 중 오류가 발생했습니다. (서버 응답 확인 필요)");
-	      }
-	  })
-	  .catch(err => {
-	      console.error(err);
-	      alert("네트워크 오류가 발생했습니다.");
-	  });
- }
+      isApplying = true; // ✨ 처리 시작
+
+      fetch(CONTEXT_PATH + '/alba/apply-posting', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ 
+              postingIdx: postingIdx, 
+              profileIdx: resumeIdx, 
+              message: message 
+          })
+      })
+      .then(res => {
+          console.log('HTTP status:', res.status);
+          return res.text();  
+      })
+      .then(text => {
+          isApplying = false; // ✨ 통신 끝났으니 초기화
+          console.log('Response text:', text);
+          
+          // 서버에서 그냥 텍스트로 "duplicate"나 "success"를 보낼 수도 있으므로 방어
+          if (text === "duplicate") {
+              alert("이미 지원한 공고입니다.");
+              return;
+          } else if (text === "success") {
+              closeResumeModal();
+              openApplySuccess();
+              return;
+          }
+
+		  try {
+		      const data = JSON.parse(text);
+		      
+		      if (data.status === "success") {
+		          closeResumeModal();
+		          openApplySuccess();
+		      } 
+		      // ✨ 여기에 중복 지원을 가로채는 조건을 추가해야 합니다!
+		      else if (data.status === "duplicate" || data.message === "duplicate") {
+		          alert("이미 지원한 공고입니다.");
+		      } 
+		      else if (data.status === "login_required") {
+		          alert("로그인이 필요합니다.");
+		          location.href = CONTEXT_PATH + "/login";
+		      } 
+		      else {
+		          // 진짜 서버 에러일 때만 이게 뜨게 됨
+		          alert("지원 중 오류가 발생했습니다.");
+		      }
+		  } catch(e) {
+		      console.error('JSON parse error', e);
+		      alert("지원 중 오류가 발생했습니다. (서버 응답 확인 필요)");
+		  }
+      })
+      .catch(err => {
+          isApplying = false; // ✨ 에러 났을 때 초기화
+          console.error(err);
+          alert("네트워크 오류가 발생했습니다.");
+      });
+  }
