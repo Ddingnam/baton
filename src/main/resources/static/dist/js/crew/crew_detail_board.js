@@ -14,12 +14,21 @@ const CrewBoard = {
                 isNotice: 'N',
                 status: 'ACTIVE'
             },
+			
 			posts: [], 
             currentPage: 1,
             totalPages: 0,
             totalElements: 0,
 			pageSize: 5,
-	        blockSize: 5
+	        blockSize: 5,
+			
+			comments: [],
+            commentTotalCount: 0,
+            newComment: '',
+            activeReplyId: null,
+            replyContent: '',
+            editingCommentId: null,
+            editCommentContent: ''
         }
     },
 	computed: {
@@ -46,13 +55,9 @@ const CrewBoard = {
 	        if (newMode === 'write' || newMode === 'edit') {
 	            this.$nextTick(() => {
 	                const el = this.$refs.quillEditor;
-	                if (!el) {
-	                    return;
-	                }
+	                if (!el) return;
 	                
-	                if (!this.quill) {
-	                    this.initQuill();
-	                }
+	                if (!this.quill) this.initQuill();
 					
 					if (newMode === 'edit') {
 	                    this.quill.root.innerHTML = this.writeForm.content;
@@ -89,7 +94,6 @@ const CrewBoard = {
             };
             
             this.quill = new Quill(this.$refs.quillEditor, options);
-
             this.quill.on('text-change', () => {
                 this.writeForm.content = this.quill.root.innerHTML;
             });
@@ -97,17 +101,15 @@ const CrewBoard = {
 		async goToDetail(post) {
 		    try {
 		        const response = await fetch(`${contextPath}/api/crew/board/detail/${post.crewBoardIdx}`);
-		        
 		        if (!response.ok) throw new Error('상세보기 서버 응답 오류');
-
 		        const updatedPost = await response.json();
 
 		        this.currentPost = updatedPost;
 
+				await this.fetchComments(updatedPost.crewBoardIdx);
+				
 		        const index = this.posts.findIndex(p => p.crewBoardIdx === updatedPost.crewBoardIdx);
-		        if (index !== -1) {
-		            this.posts.splice(index, 1, updatedPost);
-		        }
+		        if (index !== -1) this.posts.splice(index, 1, updatedPost);
 
 		        this.viewMode = 'detail';
 		        window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -128,15 +130,10 @@ const CrewBoard = {
 	        this.viewMode = 'edit';
 	    },
 		async deletePost() {
-		    if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
-		        return;
-		    }
+		    if (!confirm('정말로 이 게시글을 삭제하시겠습니까?'))  return;
 
 		    try {
-				const deleteData = {
-				    crewBoardIdx: this.currentPost.crewBoardIdx,
-				    userIdx: this.currentPost.userIdx
-				};
+				const deleteData = { crewBoardIdx: this.currentPost.crewBoardIdx };
 
 				const response = await fetch(`${contextPath}/api/crew/board/delete`, {
 				    method: 'POST',
@@ -145,7 +142,6 @@ const CrewBoard = {
 				});
 
 		        if (!response.ok) throw new Error('서버 응답 오류');
-
 		        const result = await response.json();
 
 		        if (result.status === 'success') {
@@ -214,10 +210,9 @@ const CrewBoard = {
             this.fetchPosts(page);
 			window.scrollTo({ top: 0, behavior: 'smooth' });
         },
+		
 		async submitPost() {
-		    if (this.quill) {
-		        this.writeForm.content = this.quill.root.innerHTML;
-		    }
+		    if (this.quill) this.writeForm.content = this.quill.root.innerHTML;
 		    const pureText = this.quill ? this.quill.getText().trim() : "";
 		        
 		    if(!this.writeForm.title.trim() || pureText.length === 0) {
@@ -246,7 +241,6 @@ const CrewBoard = {
 			    });
 
 		        if (!response.ok) throw new Error('서버 응답 오류');
-
 		        const result = await response.json();
 
 		        if (result.status === 'success') {
@@ -270,16 +264,140 @@ const CrewBoard = {
 		        alert('서버와 통신 중 오류가 발생했습니다.');
 		    }
 		},
+		
         submitComment() {
             if (!this.newComment.trim()) return;
             alert('댓글이 등록되었습니다: ' + this.newComment);
             this.newComment = '';
         },
+		
         onSearch(event) {
             const keyword = event.target.value.trim();
             if(keyword) {
                 alert(`'${keyword}' 검색을 실행합니다.`);
             }
+        },
+		
+		async fetchComments(boardIdx, page = 1) {
+            try {
+                const response = await fetch(`${contextPath}/api/crew/comment/list/${boardIdx}?page=${page}&size=50`);
+                if (!response.ok) throw new Error('댓글을 불러오지 못했습니다.');
+                
+                const data = await response.json();
+                if (data.status === 'success') {
+                    this.comments = data.comments;
+                    this.commentTotalCount = data.totalCount;
+                }
+            } catch (error) {
+                console.error('fetchComments Error:', error);
+            }
+        },
+		
+		async submitComment() {
+            if (!this.newComment.trim()) return;
+            try {
+                const response = await fetch(`${contextPath}/api/crew/comment/write`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        crewBoardIdx: this.currentPost.crewBoardIdx,
+                        content: this.newComment
+                    })
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    this.newComment = '';
+                    this.fetchComments(this.currentPost.crewBoardIdx);
+                } else {
+                    alert('댓글 등록 실패: ' + result.message);
+                }
+            } catch (error) {
+                console.error('submitComment Error:', error);
+                alert('통신 오류가 발생했습니다.');
+            }
+        },
+		
+		toggleReplyForm(commentId) {
+            this.activeReplyId = this.activeReplyId === commentId ? null : commentId;
+            this.replyContent = '';
+        },
+		
+		async submitReply(parentId) {
+            if (!this.replyContent.trim()) return;
+            try {
+                const response = await fetch(`${contextPath}/api/crew/comment/write`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        crewBoardIdx: this.currentPost.crewBoardIdx,
+                        content: this.replyContent,
+                        parentId: parentId
+                    })
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    this.activeReplyId = null;
+                    this.replyContent = '';
+                    this.fetchComments(this.currentPost.crewBoardIdx);
+                } else {
+                    alert('답글 등록 실패: ' + result.message);
+                }
+            } catch (error) {
+                console.error('submitReply Error:', error);
+            }
+        },
+		
+		async deleteComment(commentId) {
+            if (!confirm('이 댓글을 삭제하시겠습니까?')) return;
+            try {
+                const response = await fetch(`${contextPath}/api/crew/comment/delete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ commentId: commentId })
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    this.fetchComments(this.currentPost.crewBoardIdx); // 리스트 갱신
+                } else {
+                    alert('삭제 실패: ' + result.message);
+                }
+            } catch (error) {
+                console.error('deleteComment Error:', error);
+            }
+        },
+		
+		editComment(comment) {
+            this.editingCommentId = comment.commentId;
+            this.editCommentContent = comment.content;
+        },
+		cancelEditComment() {
+            this.editingCommentId = null;
+            this.editCommentContent = '';
+        },
+		
+		async submitEditComment(commentId) {
+            if (!this.editCommentContent.trim()) return;
+            try {
+                const response = await fetch(`${contextPath}/api/crew/comment/update`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        commentId: commentId,
+                        content: this.editCommentContent
+                    })
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    this.editingCommentId = null; // 수정 모드 종료
+                    this.fetchComments(this.currentPost.crewBoardIdx); // 리스트 갱신
+                } else {
+                    alert('수정 실패: ' + result.message);
+                }
+            } catch (error) {
+                console.error('submitEditComment Error:', error);
+            }
         }
+		
+		
     }
 };

@@ -133,15 +133,23 @@
 				                        <img :src="comment.authorProfilePhoto || '${pageContext.request.contextPath}/images/default-profile.png'" alt="프로필" class="cdb-profile-img">
 				                        <strong class="cdb-nickname">{{ comment.authorNickname || '알 수 없음' }}</strong>
 				                    </div>
-				                    <div class="cdb-action-btns" v-if="comment.userIdx === loginUserIdx">
+				                    <div class="cdb-action-btns" v-if="comment.userIdx === ${sessionScope.member.userIdx}">
 				                        <button class="cdb-btn-text" @click="editComment(comment)">수정</button>
 				                        <button class="cdb-btn-text cdb-danger" @click="deleteComment(comment.commentId)">삭제</button>
 				                    </div>
 				                </div>
 				                
-				                <div class="cdb-comment-body">
-				                    <p>{{ comment.content }}</p>
-				                </div>
+								<div class="cdb-comment-body" v-if="editingCommentId !== comment.commentId">
+								    <p>{{ comment.content }}</p>
+								</div>
+
+								<div class="cdb-comment-body" v-else>
+								    <textarea v-model="editCommentContent" class="cdb-glass-input" rows="2"></textarea>
+								    <div class="cdb-comment-actions-right">
+								        <button class="cdb-btn-outline" @click="cancelEditComment">취소</button>
+								        <button class="cdb-btn-primary" @click="submitEditComment(comment.commentId)">수정 완료</button>
+								    </div>
+								</div>
 				                
 				                <div class="cdb-comment-bottom">
 				                    <button class="cdb-btn-reply-toggle" @click="toggleReplyForm(comment.commentId)">
@@ -168,7 +176,7 @@
 				                            <img :src="child.authorProfilePhoto || '${pageContext.request.contextPath}/images/default-profile.png'" alt="프로필" class="cdb-profile-img">
 				                            <strong class="cdb-nickname">{{ child.authorNickname || '알 수 없음' }}</strong>
 				                        </div>
-				                        <div class="cdb-action-btns" v-if="child.userIdx === loginUserIdx">
+				                        <div class="cdb-action-btns" v-if="child.userIdx === ${sessionScope.member.userIdx}">
 				                            <button class="cdb-btn-text" @click="editComment(child)">수정</button>
 				                            <button class="cdb-btn-text cdb-danger" @click="deleteComment(child.commentId)">삭제</button>
 				                        </div>

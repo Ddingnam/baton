@@ -63,7 +63,7 @@ public class CrewComment {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PARENT_ID")
+    @JoinColumn(name = "parentCommentId")
     private CrewComment parent;
 
     @Builder.Default

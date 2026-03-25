@@ -37,7 +37,7 @@ html, body {
 .crew-layout-wrapper {
     display: grid;
     background-color: var(--bg-color);
-    grid-template-columns: 1fr minmax(0, 1200px) 1fr;
+    grid-template-columns: 1fr minmax(0, 1300px) 1fr;
     width: 100%;
     margin: 0 auto;
     padding-bottom: 80px; 
@@ -54,7 +54,7 @@ html, body {
 }
 
 .content-wrapper {
-	max-width: 1200px;
+	max-width: 1300px;
 	margin: auto 0;
 	padding: 0 20px;
 }
