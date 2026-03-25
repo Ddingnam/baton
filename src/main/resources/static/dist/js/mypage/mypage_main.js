@@ -87,9 +87,14 @@
             });
         });
     });
-
-    // --- 여기에 submitResume와 loadAlbaApply 추가 ---
+	
+	let isApplying = false;
     function submitResume(postingIdx, resumeIdx) {
+		if (isApplying) {
+		        return; 
+		    }
+		isApplying = true
+		
 		fetch(`${CONTEXT_PATH}/alba/apply-posting`, { 
 		        method: 'POST',
 		        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -101,7 +106,11 @@
             else if(result === 'duplicate') alert('이미 지원한 공고입니다.');
             else if(result === 'login_required') alert('로그인 후 지원 가능합니다.');
             location.reload();
-        });
+        })
+		.catch(err => {
+		        console.error(err);
+		        isApplying = false; // 에러 났을 때만 다시 누를 수 있게 풀어줌
+		});
     }
 	
 	function formatDate(dateString) {
