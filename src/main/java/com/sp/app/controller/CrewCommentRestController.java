@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sp.app.domain.dto.CrewBoardDto;
+import com.sp.app.domain.dto.CrewCommentDto;
 import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.CrewBoardService;
@@ -26,101 +26,92 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping(value = "/api/crew/board/*")
-public class CrewBoardRestController {
-	private final CrewBoardService service;
-	
+@RequestMapping(value = "/api/crew/comment/*")
+public class CrewCommentRestController {
+    private final CrewBoardService commentService;
+    
 	@Value("${file.upload-root}/crew")
     private String uploadPath;
-	
-	@PostMapping("write")
-    public ResponseEntity<?> writePost(
-    		@RequestBody CrewBoardDto dto,
-    		@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+    @PostMapping("write")
+    public ResponseEntity<?> writeComment(
+            @RequestBody CrewCommentDto dto,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         Map<String, Object> model = new HashMap<>();
-        
+
         try {
-        	SessionInfo info = userDetails.getMember();
-        	dto.setUserIdx(info.getUserIdx());
-            service.savePost(dto);
+            SessionInfo info = userDetails.getMember();
+            dto.setUserIdx(info.getUserIdx());
+            
+            commentService.saveComment(dto);
+            
             model.put("status", "success");
             return ResponseEntity.ok(model);
-            
+
         } catch (Exception e) {
-            log.error("writePost error : ", e);
-            model.put("status", "error");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
-        }
-    }
-	
-	@PostMapping("update")
-    public ResponseEntity<?> updatePost(
-    		@RequestBody CrewBoardDto dto,
-    		@AuthenticationPrincipal CustomUserDetails userDetails) {
-        Map<String, Object> model = new HashMap<>();
-        
-        try {
-        	dto.setUserIdx(userDetails.getMember().getUserIdx());
-        	service.updatePost(dto);
-            model.put("status", "success");
-            return ResponseEntity.ok(model);
-            
-        } catch (Exception e) {
-            log.error("updatePost error : ", e);
-            model.put("status", "error");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
-        }
-    }
-	
-	@PostMapping("delete")
-    public ResponseEntity<?> deletePost(
-    		@RequestBody Map<String, Long> params,
-    		@AuthenticationPrincipal CustomUserDetails userDetails) {
-        Map<String, Object> model = new HashMap<>();
-        
-        try {
-        	Long crewBoardIdx = params.get("crewBoardIdx");
-        	Long userIdx = userDetails.getMember().getUserIdx();
-            
-        	service.deletePost(crewBoardIdx, userIdx);
-        	
-            model.put("status", "success");
-            return ResponseEntity.ok(model);
-            
-        } catch (Exception e) {
-            log.error("deletePost error : ", e);
-            model.put("status", "error");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
-        }
-    }
-	
-	@GetMapping("list/{crewIdx}")
-    public ResponseEntity<?> boardList(
-    		@PathVariable("crewIdx") Long crewIdx,
-    		@RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "5") int size) {
-		Map<String, Object> model = new HashMap<>();
-		try {
-            model = service.getPostList(crewIdx, page, size);
-            model.put("status", "success");
-            return ResponseEntity.ok(model);
-        } catch (Exception e) {
-            log.error("boardList error : ", e);
+            log.error("writeComment error : ", e);
             model.put("status", "error");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
         }
     }
 
-    @GetMapping("detail/{boardIdx}")
-    public ResponseEntity<CrewBoardDto> getPostDetail(@PathVariable("boardIdx") Long boardIdx) {
-    	try {
-            CrewBoardDto dto = service.getPostDetail(boardIdx);
-            return ResponseEntity.ok(dto);
+    @PostMapping("update")
+    public ResponseEntity<?> updateComment(
+            @RequestBody CrewCommentDto dto,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Map<String, Object> model = new HashMap<>();
+
+        try {
+            dto.setUserIdx(userDetails.getMember().getUserIdx());
+            commentService.updateComment(dto);
+            model.put("status", "success");
+            return ResponseEntity.ok(model);
+
         } catch (Exception e) {
-            log.error("getPostDetail error : ", e);
-            return ResponseEntity.internalServerError().build();
+            log.error("updateComment error : ", e);
+            model.put("status", "error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
         }
     }
-	
-	
+
+    @PostMapping("delete")
+    public ResponseEntity<?> deleteComment(
+            @RequestBody Map<String, Long> params,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Map<String, Object> model = new HashMap<>();
+
+        try {
+            Long commentId = params.get("commentId");
+            Long userIdx = userDetails.getMember().getUserIdx();
+
+            commentService.deleteComment(commentId, userIdx);
+
+            model.put("status", "success");
+            return ResponseEntity.ok(model);
+
+        } catch (Exception e) {
+            log.error("deleteComment error : ", e);
+            model.put("status", "error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
+        }
+    }
+
+    @GetMapping("list/{boardIdx}")
+    public ResponseEntity<?> commentList(
+            @PathVariable("boardIdx") Long boardIdx,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        
+        Map<String, Object> model = new HashMap<>();
+        try {
+            model = commentService.getCommentList(boardIdx, page, size);
+            model.put("status", "success");
+            return ResponseEntity.ok(model);
+            
+        } catch (Exception e) {
+            log.error("commentList error : ", e);
+            model.put("status", "error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
+        }
+    }
 }

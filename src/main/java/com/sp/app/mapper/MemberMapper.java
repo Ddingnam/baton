@@ -61,7 +61,7 @@ public interface MemberMapper {
 	public int isEmailDuplicated(String email);
 
 	public String findUserId(Map<String, Object> map);
-	public long findByUserIdAndEmail(Map<String, Object> map);
+	public Long findByUserIdAndEmail(Map<String, Object> map);
 	public void updateUserPwd(Map<String, Object> map) throws SQLException;
 
 	public void insertRegion(RegionDto dto) throws SQLException;

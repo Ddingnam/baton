@@ -297,7 +297,7 @@ public class MemberRestController {
 			
 			if(userIdx <= 0) {
 				responseModel.put("state", "fail");
-				return ResponseEntity.ok(model);
+				return ResponseEntity.ok(responseModel);
 			}
 			
 			guestInfo.clearAll();

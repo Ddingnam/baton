@@ -25,18 +25,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "Users")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
-    @Column(name = "userIdx")
+    @Column(name = "useridx")
     private Long userIdx;
     
-    @Column(name = "userId", nullable = false, length = 100)
+    @Column(name = "userid", nullable = false, length = 100)
     private String userId;
-    
-    @Column(name = "oauthId")
-    private String oauthId;
     
     @Column(nullable = false)
     private String pwd;
@@ -62,19 +58,19 @@ public class User {
     @Column(name = "score", columnDefinition = "NUMBER(5, 2) DEFAULT 0")
     private Double score;
 
-    @Column(name = "userLevel")
+    @Column(name = "userlevel")
     private Integer userLevel;
 
-    @Column(name = "createdDate")
+    @Column(name = "createddate")
     private LocalDateTime createdDate;
     
-    @Column(name = "updatedDate")
+    @Column(name = "updateddate")
     private LocalDateTime updatedDate;
 
-    @Column(name = "lastLoginDate")
+    @Column(name = "lastlogindate")
     private LocalDateTime lastLoginDate;
 
-    @Column(name = "pwdFailCount")
+    @Column(name = "pwdfailcount")
     private Integer pwdFailCount;
 
     @Column(name = "status")
@@ -82,6 +78,10 @@ public class User {
 
     private Long batonpoint;
 
-    private String provider;
+    @Column(name = "isOnline")
+    private Integer isOnline;
+    
+    @Column(length = 20)
+    private String userTheme;
 }
 

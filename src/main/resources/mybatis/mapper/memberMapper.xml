@@ -214,8 +214,8 @@
 		SELECT userId FROM users WHERE name = #{name} AND email = #{email}
 	</select>
 
-	<select id="findByUserIdAndEmail" parameterType="map" resultType="long">
-		SELECT userIdx FROM users WHERE userId = #{userId} AND email = #{email}
+	<select id="findByUserIdAndEmail" parameterType="map" resultType="Long">
+		SELECT NVL(userIdx, 0) FROM users WHERE userId = #{userId} AND email = #{email}
 	</select>
 
 	<update id="updateUserPwd" parameterType="map">

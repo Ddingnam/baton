@@ -14,9 +14,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CrewBoardDto {
 	
     private Long crewBoardIdx;
@@ -41,7 +41,7 @@ public class CrewBoardDto {
         return CrewBoardDto.builder()
             .crewBoardIdx(entity.getCrewBoardIdx())
             .crewIdx(entity.getCrewIdx())
-            .userIdx(entity.getUserIdx())
+            .userIdx(entity.getUser().getUserIdx())
             .title(entity.getTitle())
             .content(entity.getContent())
             .isNotice(entity.getIsNotice())
@@ -51,6 +51,8 @@ public class CrewBoardDto {
                 entity.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : null)
             .updatedDate(entity.getUpdatedDate() != null ? 
                 entity.getUpdatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : null)
+            .authorNickname(entity.getUser().getNickname())
+            .authorProfilePhoto(entity.getUser().getProfilePhoto())
             .formattedDate(MyUtil.formatRelativeDate(entity.getCreatedDate()))
             .build();
     }

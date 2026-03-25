@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/crew/crew_detail_board.css">
 
@@ -97,7 +98,7 @@
 			        </div>
 			        
 			        <div class="cdb-post-side">
-			            <div class="cdb-detail-actions">
+			            <div class="cdb-detail-actions" v-if="currentPost.userIdx == ${sessionScope.member.userIdx}">
 			                <button class="cdb-action-btn edit" @click="goToEdit">
 			                    <i class="ri-edit-line"></i> 수정
 			                </button>

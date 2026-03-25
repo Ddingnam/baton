@@ -4,7 +4,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -40,20 +44,29 @@ public class CrewComment {
     private Long commentId;
 
     private Long crewBoardIdx;
-    private Long userIdx;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "userIdx", nullable = false) 
+    private User user;
     
     @Lob
     private String content;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
+    @Builder.Default
     private String isDeleted = "N";
+    
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PARENT_ID")
     private CrewComment parent;
 
+    @Builder.Default
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     @OrderBy("createdAt ASC")
     private List<CrewComment> children = new ArrayList<>();
@@ -66,5 +79,14 @@ public class CrewComment {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+    
+    public void updateContent(String content) {
+        this.content = content;
+        this.updatedAt = LocalDateTime.now();
+    }
+    
+    public void delete() {
+        this.isDeleted = "Y";
     }
 }

@@ -34,14 +34,13 @@ public class CrewBoard {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CREW_BOARD_SEQ")
     @SequenceGenerator(name = "CREW_BOARD_SEQ", sequenceName = "CREW_BOARD_SEQ", allocationSize = 1)
-    @Column(name = "crewBoardIdx")
     private Long crewBoardIdx;
 
-    @Column(name = "crewIdx")
     private Long crewIdx;
     
-    @Column(name = "userIdx")
-    private Long userIdx;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userIdx", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private String title;
@@ -50,25 +49,31 @@ public class CrewBoard {
     @Column(nullable = false)
     private String content;
 
-    @Column(name = "isNotice", length = 1)
+    @Builder.Default
+    @Column(length = 1)
     private String isNotice = "N";
 
+    @Builder.Default
     private String status = "ACTIVE";
     
-    @Column(name = "viewCount")
+    @Builder.Default
     private Integer viewCount = 0;
 
     @CreationTimestamp
-    @Column(name = "createdDate")
+    @Column(updatable = false)
     private LocalDateTime createdDate;
 
     @UpdateTimestamp
-    @Column(name = "updatedDate")
     private LocalDateTime updatedDate;
     
     public void update(String title, String content, String isNotice) {
         this.title = title;
         this.content = content;
         this.isNotice = isNotice;
+        this.updatedDate = LocalDateTime.now();
+    }
+    
+    public void delete() {
+        this.status = "DELETED";
     }
 }

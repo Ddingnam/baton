@@ -127,6 +127,43 @@ const CrewBoard = {
 	        };
 	        this.viewMode = 'edit';
 	    },
+		async deletePost() {
+		    if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+		        return;
+		    }
+
+		    try {
+				const deleteData = {
+				    crewBoardIdx: this.currentPost.crewBoardIdx,
+				    userIdx: this.currentPost.userIdx
+				};
+
+				const response = await fetch(`${contextPath}/api/crew/board/delete`, {
+				    method: 'POST',
+				    headers: { 'Content-Type': 'application/json' },
+				    body: JSON.stringify(deleteData)
+				});
+
+		        if (!response.ok) throw new Error('서버 응답 오류');
+
+		        const result = await response.json();
+
+		        if (result.status === 'success') {
+		            alert('게시글이 성공적으로 삭제되었습니다.');
+		            
+		            this.viewMode = 'list';
+		            this.currentPost = null;
+		            this.fetchPosts(this.currentPage); 
+		            window.scrollTo({ top: 0, behavior: 'smooth' });
+		        } else {
+		            alert('삭제 실패: ' + (result.message || '권한이 없거나 오류가 발생했습니다.'));
+		        }
+
+		    } catch (error) {
+		        console.error('삭제 중 에러 발생:', error);
+		        alert('서버와 통신 중 오류가 발생했습니다.');
+		    }
+		},
 	    cancelWrite() {
 	        if (this.viewMode === 'edit') {
 	            this.viewMode = 'detail';

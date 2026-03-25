@@ -294,19 +294,19 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public long findByUserIdAndEmail(Map<String, Object> map) {
-		long userIdx = 0;
+		Long userIdx = null;
 		try {
 			userIdx = mapper.findByUserIdAndEmail(map);
 		} catch (Exception e) {
 			log.info("findByUserIdAndEmail : ", e);
 		}
-		return userIdx;
+		return (userIdx == null) ? 0L : userIdx;
 	}
 
 	@Override
 	public void updateUserPwd(Map<String, Object> map) throws SQLException {
 		try {
-			String newPwd = bcryptEncoder.encode((String) map.get("newPwd"));
+			String newPwd = bcryptEncoder.encode((String) map.get("pwd"));
 			map.put("newPwd", newPwd);
 			mapper.updateUserPwd(map);
 		} catch (Exception e) {
