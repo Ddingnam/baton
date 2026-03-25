@@ -102,9 +102,8 @@
                                 <a href="${pageContext.request.contextPath}/wish/list" class="dropdown-item">
                                     <i class="ri-heart-3-line"></i> 찜 목록
                                 </a>
-                                <a href="${pageContext.request.contextPath}/chat/list" class="dropdown-item">
-                                    <i class="ri-chat-1-line"></i> 채팅 및 알림 <span class="badge-dot-inline" style="display: none;"></span>
-                                </a>
+                                <a href="javascript:void(0);" onclick="window.open('${pageContext.request.contextPath}/chat/list?mode=popup', 'BatonChatPopup', 'width=450,height=650,left='+(window.screen.width/2-225)+',top='+(window.screen.height/2-325)+',resizable=no,scrollbars=no');" class="dropdown-item"><i class="ri-chat-1-line">
+                                	</i> 채팅 및 알림 <span class="badge-dot-inline" style="display: none;"></span></a>
                                 <div class="dropdown-divider"></div>
                                 <a href="${pageContext.request.contextPath}/member/logout" class="dropdown-item text-danger">
                                     <i class="ri-logout-box-r-line"></i> 로그아웃

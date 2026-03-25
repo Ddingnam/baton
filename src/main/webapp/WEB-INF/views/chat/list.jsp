@@ -6,141 +6,276 @@
 <meta charset="UTF-8">
 <title>내 채팅방 | BATON</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
 <style>
-    .chat-list-wrapper { max-width: 800px; margin: 50px auto; min-height: 600px; }
-    .page-title { font-size: 24px; font-weight: 700; margin-bottom: 25px; color: #333; }
-    
-    .room-item { display: flex; align-items: center; background: #fff; padding: 20px; border: 1px solid #eaeaea; border-radius: 16px; margin-bottom: 15px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-    .room-item:hover { border-color: #00B050; box-shadow: 0 4px 15px rgba(0,176,80,0.08); transform: translateY(-2px); }
-    
-    .profile-area { position: relative; margin-right: 20px; width: 65px; height: 65px; }
-    .profile { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1px solid #eee; }
-    .trade-thumb { position: absolute; bottom: -5px; right: -5px; width: 30px; height: 30px; border-radius: 8px; border: 2px solid #fff; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    
-    .info-area { flex: 1; overflow: hidden; }
-    .top-row { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center;}
-    .nickname { font-weight: 700; font-size: 16px; color: #333; }
-    .trade-title { font-size: 13px; color: #888; margin-left: 8px; font-weight: normal; }
-    .date { font-size: 13px; color: #aaa; }
-    
-    .bottom-row { display: flex; justify-content: space-between; align-items: center; }
-    .recent-msg { font-size: 14px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 85%; }
-    .badge { background: #00B050; color: #fff; border-radius: 12px; padding: 3px 10px; font-size: 12px; font-weight: bold; }
-    
-    .empty-msg { text-align: center; color: #888; padding: 120px 0; font-size: 16px; background: #f8f9fa; border-radius: 16px; border: 1px dashed #eaeaea;}
-    .empty-msg i { font-size: 50px; color: #ddd; display: block; margin-bottom: 15px; }
 
-    .custom-context-menu { position: absolute; background: white; border: 1px solid #ddd; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; padding: 8px 0; z-index: 1000; width: 160px; font-size: 14px; display: none; }
-    .custom-context-menu .menu-item { padding: 10px 15px; cursor: pointer; color: #333; transition: background 0.2s; }
-    .custom-context-menu .menu-item:hover { background: #f4f6f8; }
+    body, html { 
+        margin: 0; padding: 0; height: 100%; 
+        font-family: 'Pretendard', sans-serif; 
+        background: #F4F6F8; 
+        color: #191F28;
+    }
     
-    .tab-container { display: flex; border-bottom: 2px solid #eaeaea; margin-bottom: 20px; }
-    .tab-btn { flex: 1; padding: 15px 0; background: none; border: none; font-size: 16px; font-weight: 700; color: #888; cursor: pointer; transition: 0.3s; position: relative; }
-    .tab-btn.active { color: #333; }
-    .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 3px; background: #00B050; border-radius: 3px 3px 0 0; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    .notif-item { padding: 20px; border: 1px solid #eaeaea; border-radius: 16px; margin-bottom: 15px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.02); background: #fff; }
-    .notif-item.unread { background: #F2FAF8; }
-    .notif-item:hover { border-color: #00B050; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,176,80,0.08); }
-    .notif-type { font-size: 12px; color: #00B050; font-weight: 700; margin-bottom: 5px; }
-    .notif-content { font-size: 15px; color: #333; margin-bottom: 8px; word-break: break-all; line-height: 1.4; }
-    .notif-date { font-size: 12px; color: #999; }
+    * { box-sizing: border-box; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #D1D6DB; border-radius: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+
+    .chat-list-wrapper { 
+        margin: 0; max-width: 100%; min-height: 100vh; padding: 0; 
+        background: #F4F6F8;
+    }
+
+    .tab-container { 
+        display: flex; 
+        background: #fff;
+        padding: 0 20px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        position: sticky;
+        top: 60px; 
+        z-index: 90;
+    }
+
+    .popup-mode .tab-container {
+        top: 0;
+    }
+    
+    .tab-btn { 
+        flex: 1; 
+        padding: 16px 0; 
+        background: none; 
+        border: none; 
+        font-size: 16px; 
+        font-weight: 600; 
+        color: #8B95A1; 
+        cursor: pointer; 
+        transition: all 0.2s ease; 
+        position: relative;
+    }
+    
+    .tab-btn:hover { color: #4E5968; }
+    .tab-btn.active { color: #191F28; font-weight: 800; }
+    
+    .tab-btn.active::after { 
+        content: ''; 
+        position: absolute; 
+        bottom: 0; left: 0; 
+        width: 100%; height: 3px; 
+        background: #3182F6; 
+        border-radius: 3px 3px 0 0;
+    }
+    
+    .tab-content { display: none; padding: 16px 20px; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .room-item { 
+        display: flex; 
+        align-items: center; 
+        background: #fff; 
+        padding: 18px; 
+        border: 1px solid rgba(0,0,0,0.03); 
+        border-radius: 16px; 
+        margin-bottom: 12px; 
+        cursor: pointer; 
+        transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); 
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02); 
+    }
+    
+    .room-item:hover { 
+        border-color: rgba(49, 130, 246, 0.2); 
+        box-shadow: 0 6px 16px rgba(0,0,0,0.06); 
+        transform: translateY(-2px); 
+    }
+    
+    .profile-area { 
+        position: relative; 
+        margin-right: 16px; 
+        width: 52px; 
+        height: 52px; 
+        flex-shrink: 0;
+    }
+    
+    .profile { 
+        width: 100%; height: 100%; 
+        border-radius: 20px; 
+        object-fit: cover; 
+        border: 1px solid rgba(0,0,0,0.05); 
+    }
+    
+    .trade-thumb { 
+        position: absolute; 
+        bottom: -4px; right: -4px; 
+        width: 24px; height: 24px; 
+        border-radius: 8px; 
+        border: 2px solid #fff; 
+        object-fit: cover; 
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
+    }
+    
+    .info-area { flex: 1; min-width: 0; }
+    
+    .top-row { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 6px; 
+    }
+    
+    .nickname { font-weight: 700; font-size: 15px; color: #191F28; }
+    .date { font-size: 12px; color: #8B95A1; font-weight: 500; }
+    
+    .bottom-row { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+    }
+    
+    .recent-msg { 
+        font-size: 14px; color: #4E5968; 
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+        max-width: 85%; 
+    }
+    
+    .badge { 
+        background: #FF4D4F; color: #fff; 
+        border-radius: 12px; padding: 2px 8px; 
+        font-size: 11px; font-weight: 800; 
+        box-shadow: 0 2px 6px rgba(255, 77, 79, 0.3);
+    }
+
+    .notif-action-row {
+        display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 12px;
+    }
+    
+    .notif-action-btn {
+        background: #fff; border: 1px solid #E5E8EB; 
+        padding: 6px 12px; border-radius: 8px; 
+        cursor: pointer; color: #4E5968; font-size: 13px; font-weight: 600;
+        transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    
+    .notif-action-btn:hover { background: #F9FAFB; border-color: #D1D6DB; color: #191F28; }
+    .notif-action-btn.danger:hover { color: #FF4D4F; border-color: #FF4D4F; background: #FFF1F0; }
+
+    .notif-item { 
+        padding: 18px; 
+        border: 1px solid rgba(0,0,0,0.03); 
+        border-radius: 16px; 
+        margin-bottom: 12px; 
+        cursor: pointer; 
+        transition: all 0.2s ease; 
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02); 
+        background: #fff; 
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .notif-item.unread { 
+        background: #F0F6FF; 
+        border-color: rgba(49, 130, 246, 0.1);
+    }
+    .notif-item.unread::before {
+        content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #3182F6;
+    }
+    
+    .notif-item:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.05); }
+    
+    .notif-type { font-size: 12px; color: #3182F6; font-weight: 800; margin-bottom: 6px; }
+    .notif-content { font-size: 14.5px; color: #191F28; margin-bottom: 8px; word-break: keep-all; line-height: 1.5; font-weight: 500; }
+    .notif-date { font-size: 12px; color: #8B95A1; }
+
+    .empty-msg { 
+        text-align: center; color: #8B95A1; padding: 100px 0; font-size: 15px; 
+        background: transparent; font-weight: 500; line-height: 1.6;
+    }
+    .empty-msg i { font-size: 48px; color: #D1D6DB; display: block; margin-bottom: 16px; }
+
+    .custom-context-menu { 
+        position: absolute; background: white; border: 1px solid rgba(0,0,0,0.08); 
+        box-shadow: 0 10px 24px rgba(0,0,0,0.1); border-radius: 12px; padding: 8px 0; 
+        z-index: 1000; width: 140px; font-size: 14px; display: none; overflow: hidden;
+    }
+    .custom-context-menu .menu-item { 
+        padding: 12px 16px; cursor: pointer; color: #333D4B; font-weight: 600; transition: background 0.2s; 
+    }
+    .custom-context-menu .menu-item:hover { background: #F2F4F6; color: #191F28; }
 </style>
 </head>
-<body>
+<body class="${param.mode == 'popup' ? 'popup-mode' : ''}">
+    
     <c:choose>
         <c:when test="${param.mode == 'popup'}">
-            <style>
-                body { background: #f4f6f8 !important; }
-                .chat-list-wrapper { margin: 0 !important; max-width: none !important; min-height: auto !important; padding: 0 !important; }
-                .page-title { display: none !important; }
-                .popup-header { background: #fff; padding: 15px 20px; font-weight: bold; font-size: 16px; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 100; }
-                .list-container { padding: 10px !important; display: flex !important; flex-direction: column !important; }
-                .room-item { box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important; padding: 15px !important; border: none !important; margin-bottom: 10px !important; border-radius: 12px !important; }
-                .profile-area { width: 50px !important; height: 50px !important; margin-right: 15px !important; }
-                .trade-thumb { display: none !important; }
-                .top-row { margin-bottom: 5px !important; }
-                .nickname { font-size: 15px !important; }
-                .trade-title { display: none !important; }
-                .date { font-size: 12px !important; }
-                .recent-msg { font-size: 13px !important; }
-                .badge { padding: 2px 8px !important; font-size: 11px !important; border-radius: 10px !important; }
-                
-            </style>
-            <div class="popup-header">내 채팅방 목록</div>
-        </c:when>
+            </c:when>
         <c:otherwise>
             <jsp:include page="/WEB-INF/views/layout/header.jsp" />
         </c:otherwise>
     </c:choose>
 
-    <div class="container chat-list-wrapper">
-        <h2 class="page-title">내 소식</h2>
-
+    <div class="chat-list-wrapper">
         <div class="tab-container">
             <button class="tab-btn active" onclick="switchTab('chat')">채팅</button>
-            <button class="tab-btn" onclick="switchTab('notif')">알림 <span id="notifTabBadge" class="badge" style="display:none; background:#FF4D4F; margin-left:4px;">0</span></button>
+            <button class="tab-btn" onclick="switchTab('notif')">
+                알림 <span id="notifTabBadge" class="badge" style="display:none; margin-left:4px;">0</span>
+            </button>
         </div>
 
         <div id="chatTab" class="tab-content active">
-
-        <div class="list-container" id="listContainer">
-            <c:if test="${empty list}">
-                <div class="empty-msg">
-                    <i class="ri-chat-3-line"></i>
-                    진행 중인 대화가 없습니다.<br>새로운 이웃과 따뜻한 거래를 시작해보세요!
-                </div>
-            </c:if>
-
-            <c:forEach var="room" items="${list}">
-                <div class="room-item" id="room-${room.roomIdx}" 
-                     data-room-idx="${room.roomIdx}" data-trade-idx="${room.tradeIdx}" data-user-idx="${room.userIdx}"
-                     onclick="openChatRoom(${room.tradeIdx}, ${room.userIdx})">
-                    <div class="profile-area">
-                        <img src="${empty room.profilePhoto ? pageContext.request.contextPath += '/dist/images/person.png' : pageContext.request.contextPath += '/uploads/profile/' += room.profilePhoto}" class="profile" onerror="this.src='${pageContext.request.contextPath}/dist/images/person.png'">
-                        <img src="${empty room.tradeSaveName ? pageContext.request.contextPath += '/dist/images/noimage.png' : pageContext.request.contextPath += '/uploads/trade/' += room.tradeSaveName}" class="trade-thumb" onerror="this.src='${pageContext.request.contextPath}/dist/images/noimage.png'">
+            <div class="list-container" id="listContainer">
+                <c:if test="${empty list}">
+                    <div class="empty-msg">
+                        <i class="ri-chat-smile-3-line"></i>
+                        진행 중인 대화가 없습니다.<br>새로운 이웃과 따뜻한 거래를 시작해보세요!
                     </div>
+                </c:if>
 
-                    <div class="info-area">
-                        <div class="top-row">
-                            <div style="display:flex; align-items:center;">
+                <c:forEach var="room" items="${list}">
+                    <div class="room-item" id="room-${room.roomIdx}" 
+                         data-room-idx="${room.roomIdx}" data-trade-idx="${room.tradeIdx}" data-user-idx="${room.userIdx}"
+                         onclick="openChatRoom(${room.tradeIdx}, ${room.userIdx})">
+                        
+                        <div class="profile-area">
+                            <img src="${empty room.profilePhoto ? pageContext.request.contextPath += '/dist/images/person.png' : pageContext.request.contextPath += '/uploads/profile/' += room.profilePhoto}" class="profile" onerror="this.src='${pageContext.request.contextPath}/dist/images/person.png'">
+                            <img src="${empty room.tradeSaveName ? pageContext.request.contextPath += '/dist/images/noimage.png' : pageContext.request.contextPath += '/uploads/trade/' += room.tradeSaveName}" class="trade-thumb" onerror="this.src='${pageContext.request.contextPath}/dist/images/noimage.png'">
+                        </div>
+
+                        <div class="info-area">
+                            <div class="top-row">
                                 <span class="nickname">${room.nickname}</span>
-                                <span class="trade-title">${room.tradeTitle}</span>
+                                <span class="date" id="date-${room.roomIdx}">${room.recentDate}</span>
                             </div>
-                            <span class="date" id="date-${room.roomIdx}">${room.recentDate}</span>
-                        </div>
-                        <div class="bottom-row">
-                            <span class="recent-msg" id="msg-${room.roomIdx}">${empty room.recentMessage ? '대화가 없습니다.' : room.recentMessage}</span>
-                            <span class="badge" id="badge-${room.roomIdx}" style="${room.unreadCount > 0 ? '' : 'display:none;'}">${room.unreadCount}</span>
+                            <div class="bottom-row">
+                                <span class="recent-msg" id="msg-${room.roomIdx}">${empty room.recentMessage ? '대화가 없습니다.' : room.recentMessage}</span>
+                                <span class="badge" id="badge-${room.roomIdx}" style="${room.unreadCount > 0 ? '' : 'display:none;'}">${room.unreadCount}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </c:forEach>
+                </c:forEach>
             </div> 
         </div> 
         
-	<div id="notifTab" class="tab-content">
-		    <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:10px;">
-		        <button onclick="markAllAsRead()" style="background:#f0f0f0; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; color:#555; font-size:13px;">모두 읽음</button>
-		        <button onclick="deleteAllNotifications()" style="background:#ffebe9; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; color:#e74c3c; font-size:13px;">모두 삭제</button>
-		    </div>
-	    	<div class="list-container" id="pageNotifList"></div>
-		</div>
-	</div>
-	<div id="contextMenu" class="custom-context-menu">
-        <div class="menu-item" onclick="menuAction('open')">채팅방 열기</div>
-        <div class="menu-item" style="color:#e74c3c;" onclick="menuAction('leave')">삭제하기</div>
+        <div id="notifTab" class="tab-content">
+            <div class="notif-action-row">
+                <button class="notif-action-btn" onclick="markAllAsRead()"><i class="ri-check-double-line"></i> 모두 읽음</button>
+                <button class="notif-action-btn danger" onclick="deleteAllNotifications()"><i class="ri-delete-bin-line"></i> 비우기</button>
+            </div>
+            <div class="list-container" id="pageNotifList"></div>
+        </div>
     </div>
-
-    <c:if test="${param.mode != 'popup'}">
-        <jsp:include page="/WEB-INF/views/layout/footer.jsp" />
-    </c:if>
+    
+    <div id="contextMenu" class="custom-context-menu">
+        <div class="menu-item" onclick="menuAction('open')"><i class="ri-chat-forward-line" style="margin-right:6px;"></i> 채팅방 열기</div>
+        <div class="menu-item" style="color:#FF4D4F;" onclick="menuAction('leave')"><i class="ri-delete-bin-line" style="margin-right:6px;"></i> 삭제하기</div>
+    </div>
 
 <script>
 const myUserIdx = ${myUserIdx};
@@ -148,7 +283,6 @@ let stompClient = null;
 
 function openChatRoom(tradeIdx, userIdx) {
     let url = '${pageContext.request.contextPath}/chat/room?tradeIdx=' + tradeIdx + '&toUserIdx=' + userIdx;
-    
     <c:choose>
         <c:when test="${param.mode == 'popup'}">
             location.href = url;
@@ -187,13 +321,11 @@ function connectList() {
             if(data.startsWith('room_deleted:')) {
                 let deletedRoomIdx = data.split(':')[1];
                 let roomEl = document.getElementById('room-' + deletedRoomIdx);
-                if(roomEl) {
-                    roomEl.remove();
-                }
+                if(roomEl) roomEl.remove();
                 
                 let listContainer = document.getElementById('listContainer');
                 if(listContainer.children.length === 0) {
-                    listContainer.innerHTML = '<div class="empty-msg"><i class="ri-chat-3-line"></i>진행 중인 대화가 없습니다.</div>';
+                    listContainer.innerHTML = '<div class="empty-msg"><i class="ri-chat-smile-3-line"></i><br>진행 중인 대화가 없습니다.</div>';
                 }
             }
         });
@@ -203,16 +335,15 @@ function connectList() {
 function updateRoomListUI(roomIdx, message) {
     let roomEl = document.getElementById('room-' + roomIdx);
     if(!roomEl) return;
-
+    
     let msgEl = document.getElementById('msg-' + roomIdx);
-    if(msgEl) msgEl.innerText = message.content;
+    if(msgEl) msgEl.innerText = (message.msgType === 5) ? '(사진)' : message.content;
 
     let now = new Date();
     let timeStr = String(now.getMonth()+1).padStart(2,'0') + "-" + String(now.getDate()).padStart(2,'0') + " " + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-    
     let dateEl = document.getElementById('date-' + roomIdx);
     if(dateEl) dateEl.innerText = timeStr;
-
+    
     if(message.userIdx !== myUserIdx) {
         let badge = document.getElementById('badge-' + roomIdx);
         if(badge) {
@@ -227,7 +358,6 @@ function updateRoomListUI(roomIdx, message) {
 }
 
 let selectedTradeIdx = null, selectedUserIdx = null, selectedRoomIdx = null;
-
 document.querySelectorAll('.room-item').forEach(item => {
     item.addEventListener('contextmenu', function(e) {
         e.preventDefault(); 
@@ -253,7 +383,6 @@ function menuAction(action) {
         openChatRoom(selectedTradeIdx, selectedUserIdx);
     } else if(action === 'leave') {
         if(!confirm('채팅방을 삭제하시겠습니까?')) return;
-        
         const params = new URLSearchParams();
         params.append('roomIdx', selectedRoomIdx);
         
@@ -264,16 +393,14 @@ function menuAction(action) {
         })
         .then(response => response.json())
         .then(data => {
-            if(data.state === 'true') {
-                location.reload();
-            }
+            if(data.state === 'true') location.reload();
         });
     }
 }
 
 window.onload = function() { 
     connectList();
-    updateTabBadges();
+    loadPageNotifications();
 };
 
 function switchTab(tabId) {
@@ -296,30 +423,40 @@ function loadPageNotifications() {
     .then(data => {
         let list = document.getElementById('pageNotifList');
         list.innerHTML = '';
+        
+        let unreadCount = 0;
+        
         if(!data || data.length === 0) {
-            list.innerHTML = '<div class="empty-msg"><i class="ri-notification-3-line"></i><br>새로운 알림이 없습니다.</div>';
+            list.innerHTML = '<div class="empty-msg"><i class="ri-notification-4-line"></i><br>새로운 알림이 없습니다.</div>';
         } else {
             data.forEach(n => {
+                if(n.isRead === 0) unreadCount++;
+                
                 let unreadClass = n.isRead === 0 ? 'unread' : '';
                 let html = '<div class="notif-item ' + unreadClass + '" onclick="readPageNotif(' + n.notifIdx + ', \'' + n.url + '\')">' +
-                           '<div class="notif-type">' + n.notifType + '</div>' +
+                           '<div class="notif-type"><i class="ri-notification-3-fill" style="margin-right:4px;"></i>' + n.notifType + '</div>' +
                            '<div class="notif-content">' + n.content + '</div>' +
                            '<div class="notif-date">' + n.createdAt + '</div>' +
                            '</div>';
                 list.insertAdjacentHTML('beforeend', html);
             });
         }
-        updateTabBadges();
+        
+        let badge = document.getElementById('notifTabBadge');
+        if(unreadCount > 0) {
+            badge.innerText = unreadCount;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+        notifyParent();
     });
 }
 
 function notifyParent() {
     if (window.opener && !window.opener.closed) {
         if(typeof window.opener.checkUnreadAlarms === 'function') window.opener.checkUnreadAlarms();
-        if(typeof window.opener.fetchNotifications === 'function') window.opener.fetchNotifications();
     }
-    if(typeof window.checkUnreadAlarms === 'function') window.checkUnreadAlarms();
-    if(typeof window.fetchNotifications === 'function') window.fetchNotifications();
 }
 
 function readPageNotif(notifIdx, url) {
@@ -328,29 +465,28 @@ function readPageNotif(notifIdx, url) {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'notifIdx=' + notifIdx
     }).then(() => {
-        notifyParent(); 
-        if(url && url !== 'null' && url !== '') location.href = '${pageContext.request.contextPath}' + url;
+        if(url && url !== 'null' && url !== '') {
+            if (window.opener && !window.opener.closed) {
+                window.opener.location.href = '${pageContext.request.contextPath}' + url;
+                window.close(); 
+            } else {
+                location.href = '${pageContext.request.contextPath}' + url;
+            }
+        }
         else loadPageNotifications();
     });
 }
 
 function markAllAsRead() {
     fetch('${pageContext.request.contextPath}/api/notification/readAll', { method: 'POST' })
-    .then(() => { 
-        notifyParent(); 
-        loadPageNotifications(); 
-    });
+    .then(() => { loadPageNotifications(); });
 }
 
 function deleteAllNotifications() {
-    if(!confirm('모든 알림을 삭제하시겠습니까?')) return;
+    if(!confirm('모든 알림을 비우시겠습니까?')) return;
     fetch('${pageContext.request.contextPath}/api/notification/deleteAll', { method: 'POST' })
-    .then(() => { 
-        notifyParent();
-        loadPageNotifications(); 
-    });
+    .then(() => { loadPageNotifications(); });
 }
-    
 </script>
 </body>
 </html>

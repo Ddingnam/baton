@@ -15,56 +15,104 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
 <style>
-    body, html { margin: 0; padding: 0; height: 100%; background: #fff; font-family: 'Noto Sans KR', sans-serif; }
-    .chat-container { width: 100%; height: 100vh; display: flex; flex-direction: column; background: #fff; }
-    .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; font-size: 16px; background: #fff; position: relative; z-index: 10; border-bottom: 1px solid #f0f0f0;}
-    .header-left i { font-size: 24px; cursor: pointer; color: #333; }
-    .header-center { flex: 1; text-align: center; font-weight: 700; color: #333; }
-    .header-right { width: 24px; } 
-    
-    .trade-banner { display: flex; flex-direction: column; padding: 14px 20px; background: #fafafa; border-bottom: 1px solid #eee; }
-    .trade-banner-info-wrap { display: flex; align-items: center; width: 100%; }
-    .trade-thumb { width: 45px; height: 45px; border-radius: 8px; background: #ddd; margin-right: 12px; object-fit: cover; border: 1px solid #eee;}
-    .trade-info { flex: 1; display: flex; flex-direction: column; }
-    .trade-title { font-size: 14px; font-weight: bold; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;}
-    .trade-date { font-size: 12px; color: #888; margin-top: 3px; }
-    
-    .review-btn-wrap { margin-top: 12px; width: 100%; }
-    .review-btn { width: 100%; padding: 10px; background: #fff; border: 1px solid #00B98D; color: #00B98D; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
-    .review-btn:hover { background: #E6F8F3; }
 
-    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; background: #fff; } 
-    .date-divider { text-align: center; margin: 20px 0; }
-    .date-divider span { background: #f0f0f0; color: #666; font-size: 12px; padding: 5px 15px; border-radius: 15px; }
-    .system-msg { text-align: center; margin-bottom: 20px; color: #888; font-size: 13px; }
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     
-    .msg-row { margin-bottom: 15px; display: flex; align-items: flex-end; }
+    body, html { margin: 0; padding: 0; height: 100%; background: #F9FAFB; font-family: 'Pretendard', sans-serif; }
+    .chat-container { width: 100%; height: 100vh; display: flex; flex-direction: column; background: #fff; max-width: 100%; position: relative; }
+
+    .chat-header { 
+        display: flex; justify-content: space-between; align-items: center; 
+        padding: 16px 20px; font-size: 17px; background: rgba(255, 255, 255, 0.95); 
+        backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 50; 
+        border-bottom: 1px solid rgba(0,0,0,0.05); 
+    }
+    .header-left i { font-size: 26px; cursor: pointer; color: #191F28; transition: color 0.2s; }
+    .header-left i:hover { color: #3182F6; }
+    .header-center { flex: 1; text-align: center; font-weight: 800; color: #191F28; letter-spacing: -0.3px; }
+    .header-right { width: 26px; } 
+
+    .trade-banner { 
+        display: flex; flex-direction: column; padding: 16px 20px; 
+        background: #fff; border-bottom: 1px solid rgba(0,0,0,0.05); 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02); z-index: 40;
+    }
+    .trade-banner-info-wrap { display: flex; align-items: center; width: 100%; cursor: pointer; }
+    .trade-thumb { 
+        width: 48px; height: 48px; border-radius: 12px; background: #F2F4F6; 
+        margin-right: 14px; object-fit: cover; border: 1px solid rgba(0,0,0,0.05);
+    }
+    .trade-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .trade-title { font-size: 15px; font-weight: 700; color: #191F28; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; margin-bottom: 2px; }
+    .trade-date { font-size: 13px; color: #8B95A1; font-weight: 500; }
+
+    .review-btn-wrap { margin-top: 14px; width: 100%; }
+    .review-btn { 
+        width: 100%; padding: 12px; background: #F2F4F6; color: #191F28; 
+        border: none; border-radius: 12px; font-size: 14px; font-weight: 700; 
+        cursor: pointer; display: flex; align-items: center; justify-content: center; 
+        gap: 6px; transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); 
+    }
+    .review-btn:hover { background: #00B98D; color: #fff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 185, 141, 0.2); }
+
+    .chat-messages { flex: 1; overflow-y: auto; padding: 24px 20px; background: #F9FAFB; } 
+    .chat-messages::-webkit-scrollbar { width: 6px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: #D1D6DB; border-radius: 10px; }
+    
+    .date-divider { text-align: center; margin: 24px 0; }
+    .date-divider span { 
+        background: rgba(0,0,0,0.05); color: #6B7684; font-size: 12px; font-weight: 600; 
+        padding: 6px 16px; border-radius: 20px; backdrop-filter: blur(4px);
+    }
+    .system-msg { text-align: center; margin-bottom: 24px; color: #8B95A1; font-size: 13px; font-weight: 500; }
+    
+    .msg-row { margin-bottom: 18px; display: flex; align-items: flex-end; }
     .msg-me { justify-content: flex-end; }
     .msg-other { justify-content: flex-start; }
-    .msg-bubble { padding: 10px 14px; border-radius: 14px; max-width: 75%; word-break: break-all; font-size: 14px; line-height: 1.4; }
-    .msg-me .msg-bubble { background: #00B050; color: #fff; border-bottom-right-radius: 4px; }
-    .msg-other .msg-bubble { background: #f4f6f8; color: #333; border-bottom-left-radius: 4px; } 
-    .msg-info { display: flex; flex-direction: column; justify-content: flex-end; margin: 0 6px; padding-bottom: 2px; }
-    .msg-time { font-size: 11px; color: #999; }
-    .unread-count { color: #00B050; font-weight: bold; font-size: 11px; text-align: right; margin-bottom: 2px; }
-    .profile-img { width: 36px; height: 36px; border-radius: 50%; margin-right: 10px; object-fit: cover; border: 1px solid #eaeaea; }
-    .nickname { font-size: 12px; margin-bottom: 4px; color: #555; }
-    
-    .image-preview-container { display: none; padding: 10px 20px; background: #f8f9fa; border-top: 1px solid #eee; position: relative; }
-    .preview-box { position: relative; display: inline-block; }
-    .preview-box img { height: 60px; border-radius: 8px; border: 1px solid #ddd; object-fit: cover; }
-    .preview-delete-btn { position: absolute; top: -6px; right: -6px; background: rgba(0,0,0,0.6); color: #fff; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; z-index: 10; }
 
-    .chat-input-box { display: flex; padding: 15px; background: #fff; border-top: 1px solid #eee; align-items: flex-end; }
-
-    .chat-input-box textarea { 
-        flex: 1; padding: 12px 15px; border: 1px solid #f0f0f0; background: #f8f9fa; 
-        border-radius: 20px; outline: none; resize: none; 
-        overflow-y: auto; height: 46px; max-height: 120px;
-        line-height: 20px; font-family: inherit; font-size: 14px; box-sizing: border-box;
+    .msg-bubble { 
+        padding: 12px 16px; border-radius: 20px; max-width: 70%; 
+        word-break: break-all; font-size: 14.5px; line-height: 1.5; font-weight: 500;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
-    .chat-input-box textarea:focus { border-color: #00B050; background: #fff; }
-    .chat-input-box button { width: 44px; height: 44px; margin-left: 10px; border: none; background: #00B050; color: white; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; flex-shrink: 0; }
+    .msg-me .msg-bubble { background: #3182F6; color: #fff; border-bottom-right-radius: 4px; }
+    .msg-other .msg-bubble { background: #fff; color: #191F28; border-bottom-left-radius: 4px; border: 1px solid rgba(0,0,0,0.03); } 
+    
+    .msg-info { display: flex; flex-direction: column; justify-content: flex-end; margin: 0 8px; padding-bottom: 4px; }
+    .msg-time { font-size: 11px; color: #8B95A1; font-weight: 500; }
+    .unread-count { color: #3182F6; font-weight: 800; font-size: 12px; text-align: right; margin-bottom: 2px; }
+    
+    .profile-img { width: 38px; height: 38px; border-radius: 40%; margin-right: 12px; object-fit: cover; border: 1px solid rgba(0,0,0,0.05); background: #fff; }
+    .nickname { font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #4E5968; }
+    
+    .image-preview-container { display: none; padding: 15px 20px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); position: relative; }
+    .preview-box { position: relative; display: inline-block; }
+    .preview-box img { height: 70px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08); object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .preview-delete-btn { position: absolute; top: -8px; right: -8px; background: rgba(25, 31, 40, 0.8); color: #fff; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 10; transition: 0.2s; }
+    .preview-delete-btn:hover { background: #FF4D4F; }
+
+    .chat-input-box { display: flex; padding: 14px 20px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); align-items: flex-end; }
+    
+    .chat-input-box textarea { 
+        flex: 1; padding: 14px 18px; border: 1px solid #E5E8EB; background: #F2F4F6; 
+        border-radius: 24px; outline: none; resize: none; 
+        overflow-y: hidden; height: 48px; max-height: 120px; 
+        line-height: 20px; font-family: inherit; font-size: 15px; color: #191F28; box-sizing: border-box;
+        transition: border-color 0.2s, background-color 0.2s;
+    }
+    .chat-input-box textarea::-webkit-scrollbar { width: 0px; background: transparent; } 
+    
+    .chat-input-box textarea:focus { border-color: #3182F6; background: #fff; box-shadow: 0 4px 12px rgba(49, 130, 246, 0.1); overflow-y: auto; }
+    .chat-input-box textarea:focus::-webkit-scrollbar { width: 4px; }
+    
+    .chat-input-box button { 
+        width: 48px; height: 48px; margin-left: 12px; border: none; background: #3182F6; 
+        color: white; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; 
+        align-items: center; transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); flex-shrink: 0; 
+        box-shadow: 0 4px 12px rgba(49, 130, 246, 0.25);
+    }
+    .chat-input-box button:hover { transform: translateY(-2px); background: #1B64DA; box-shadow: 0 6px 16px rgba(49, 130, 246, 0.35); }
+    .chat-input-box button:active { transform: translateY(0); }
 </style>
 </head>
 <body>
@@ -75,12 +123,12 @@
             </div>
             <div class="header-center">${counterpartName}</div>
             <div class="header-right" style="position:relative;">
-                <i class="ri-more-2-fill" style="font-size: 24px; cursor: pointer; color: #333;" onclick="toggleMenu()"></i>
-                <div id="roomMenu" style="display:none; position:absolute; right:0; top:35px; background:#fff; border:1px solid #eee; box-shadow:0 4px 16px rgba(0,0,0,0.10); border-radius:12px; z-index:100; width:130px; overflow:hidden;">
-                    <div onclick="leaveRoom()" style="padding:13px 16px; color:#555; cursor:pointer; font-size:14px; font-weight:600; text-align:center; transition:background 0.15s;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='transparent'">삭제하기</div>
+                <i class="ri-more-2-fill" style="font-size: 24px; cursor: pointer; color: #191F28;" onclick="toggleMenu()"></i>
+                <div id="roomMenu" style="display:none; position:absolute; right:0; top:40px; background:#fff; border:1px solid #E5E8EB; box-shadow:0 10px 30px rgba(0,0,0,0.1); border-radius:16px; z-index:100; width:140px; overflow:hidden;">
+                    <div onclick="leaveRoom()" style="padding:14px 16px; color:#4E5968; cursor:pointer; font-size:14px; font-weight:600; text-align:center; transition:background 0.2s;" onmouseover="this.style.background='#F2F4F6'" onmouseout="this.style.background='transparent'">삭제하기</div>
                     <c:if test="${not empty counterpartIdx}">
-                    <div style="height:1px; background:#f0f0f0; margin:0 12px;"></div>
-                    <div onclick="openReportModal('CHAT', ${roomIdx}, ${counterpartIdx})" style="padding:13px 16px; color:#FF4D4F; cursor:pointer; font-size:14px; font-weight:600; text-align:center; transition:background 0.15s;" onmouseover="this.style.background='#FFF1F0'" onmouseout="this.style.background='transparent'">신고하기</div>
+                    <div style="height:1px; background:#F2F4F6; margin:0 12px;"></div>
+                    <div onclick="openReportModal('CHAT', ${roomIdx}, ${counterpartIdx})" style="padding:14px 16px; color:#FF4D4F; cursor:pointer; font-size:14px; font-weight:600; text-align:center; transition:background 0.2s;" onmouseover="this.style.background='#FFF1F0'" onmouseout="this.style.background='transparent'">신고하기</div>
                     </c:if>
                 </div>
             </div>
@@ -88,7 +136,7 @@
         
         <c:if test="${not empty tradeInfo}">
             <div class="trade-banner">
-                <div class="trade-banner-info-wrap">
+                <div class="trade-banner-info-wrap" onclick="location.href='${pageContext.request.contextPath}/trade/article?productIdx=${tradeInfo.PRODUCTIDX}'">
                     <c:choose>
                         <c:when test="${not empty tradeInfo.SAVENAME}">
                             <img src="${pageContext.request.contextPath}/uploads/trade/${tradeInfo.SAVENAME}" class="trade-thumb" onerror="this.src='${pageContext.request.contextPath}/dist/images/noimage.png'">
@@ -99,7 +147,7 @@
                     </c:choose>
                     <div class="trade-info">
                         <span class="trade-title">${tradeInfo.TITLE}</span>
-                        <span class="trade-date">작성일: ${tradeInfo.CREATEDDATE}</span>
+                        <span class="trade-date">작성일: ${tradeInfo.CREATEDDATE} · <strong><fmt:formatNumber value="${tradeInfo.PRICE}" pattern="#,###"/>원</strong></span>
                     </div>
                 </div>
                 
@@ -145,8 +193,8 @@
                             
                             <c:choose>
                                 <c:when test="${chat.msgType == 5}">
-                                    <div class="msg-bubble" style="background: transparent; padding: 0;">
-                                        <img src="${pageContext.request.contextPath}/uploads/chat/${chat.content}" style="max-width: 200px; border-radius: 14px; border: 1px solid #eee;">
+                                    <div class="msg-bubble" style="background: transparent; padding: 0; box-shadow: none;">
+                                        <img src="${pageContext.request.contextPath}/uploads/chat/${chat.content}" style="max-width: 220px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
                                     </div>
                                 </c:when>
                                 <c:otherwise>
@@ -173,12 +221,12 @@
         </div>
 
         <div class="chat-input-box">
-            <i class="ri-attachment-line" style="font-size: 24px; color: #888; cursor: pointer; margin-right: 12px; margin-bottom: 10px; transition: color 0.2s;" onmouseover="this.style.color='#00B98D'" onmouseout="this.style.color='#888'" onclick="document.getElementById('chatImageFile').click()"></i>
+            <i class="ri-attachment-line" style="font-size: 26px; color: #8B95A1; cursor: pointer; margin-right: 14px; margin-bottom: 10px; transition: color 0.2s;" onmouseover="this.style.color='#3182F6'" onmouseout="this.style.color='#8B95A1'" onclick="document.getElementById('chatImageFile').click()"></i>
             <input type="file" id="chatImageFile" style="display:none;" accept="image/*" onchange="handleImageSelect(event)">
             
-            <textarea id="chatInput" placeholder="메시지 보내기..." onkeydown="handleEnter(event)" oninput="autoResize(this)"></textarea>
+            <textarea id="chatInput" placeholder="메시지를 입력하세요" onkeydown="handleEnter(event)" oninput="autoResize(this)"></textarea>
             
-            <button onclick="handleSendButtonClick()" style="margin-bottom: 2px;"><i class="ri-send-plane-fill" style="font-size:18px;"></i></button>
+            <button onclick="handleSendButtonClick()" style="margin-bottom: 0px;"><i class="ri-arrow-up-line" style="font-size:24px; font-weight:800;"></i></button>
         </div>
     </div>
 
@@ -190,8 +238,12 @@
     let currentDisplayDate = "${lastDate}";
 
     function autoResize(textarea) {
-        textarea.style.height = '46px'; 
-        textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        textarea.style.height = '48px'; 
+        let scrollHeight = textarea.scrollHeight;
+        if(scrollHeight > 48) {
+            textarea.style.height = Math.min(scrollHeight, 120) + 'px'; 
+            textarea.style.overflowY = scrollHeight > 120 ? 'auto' : 'hidden';
+        }
     }
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/chat/chat.js"></script>
