@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -114,35 +115,66 @@ public class MailController {
 	}
 	
 	@PostMapping("sendInquiry")
-    @ResponseBody
-    public Map<String, Object> sendInquiry(Mail dto) {
-        Map<String, Object> model = new HashMap<>();
-        boolean b = false;
-        
-        try {
-            dto.setReceiverEmail("hil03020@gmail.com"); 
-            
-            dto.setSubject("[고객문의] " + dto.getSenderName() + "님의 문의사항입니다.");
-            
-            String htmlContent = "<div style='font-family: sans-serif; padding: 20px; border: 1px solid #eee;'>"
-                + "<h2>고객센터 문의 접수</h2>"
-                + "<p><b>발신자:</b> " + dto.getSenderName() + " (" + dto.getSenderEmail() + ")</p>"
-                + "<hr>"
-                + "<p style='white-space: pre-wrap;'>" + dto.getContent().replaceAll("\n", "<br>") + "</p>"
-                + "</div>";
-            dto.setContent(htmlContent);
+	@ResponseBody
+	public Map<String, Object> sendInquiry(
+	        Mail dto, 
+	        @RequestParam("isLoggedIn") String isLoggedIn, 
+	        @RequestParam(value="userId", required=false) String userId) {
+	    
+	    Map<String, Object> model = new HashMap<>();
+	    
+	    try {
+	        dto.setReceiverEmail("hil03020@gmail.com"); 
+	        
+	        String prefix = "true".equals(isLoggedIn) ? "[고객문의]" : "[비회원 문의]";
+	        dto.setSubject(prefix + " " + dto.getSenderName() + "님의 문의사항입니다.");
+	        
+	        StringBuilder sb = new StringBuilder();
+	        sb.append("<div style='font-family: sans-serif; padding: 30px; background-color: #f8f9fa;'>");
+	        sb.append("  <div style='max-width: 600px; margin: 0 auto; background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);'>");
+	        
+	        sb.append("    <div style='background: linear-gradient(135deg, #00B98D, #2bb5a0); padding: 30px; text-align: center; color: #fff;'>");
+	        sb.append("      <h2 style='margin: 0; font-size: 24px; font-weight: 700;'>Baton 고객센터</h2>");
+	        sb.append("      <p style='margin: 10px 0 0; opacity: 0.9;'>새로운 문의사항이 접수되었습니다.</p>");
+	        sb.append("    </div>");
+	        
+	        sb.append("    <div style='padding: 30px;'>");
+	        sb.append("      <table style='width: 100%; border-collapse: collapse; margin-bottom: 25px;'>");
+	        
+	        sb.append("        <tr><td style='width: 100px; padding: 10px 0; color: #888; font-size: 14px;'>아이디</td>");
+	        if ("true".equals(isLoggedIn)) {
+	            sb.append("<td style='padding: 10px 0; font-weight: 700; color: #00B98D;'>").append(userId).append(" (회원)</td></tr>");
+	        } else {
+	            sb.append("<td style='padding: 10px 0; font-weight: 700; color: #F86D7D;'>비회원 문의</td></tr>");
+	        }
+	        
+	        sb.append("        <tr><td style='padding: 10px 0; color: #888; font-size: 14px;'>발신자</td><td style='padding: 10px 0; color: #333;'>").append(dto.getSenderName()).append("</td></tr>");
+	        sb.append("        <tr><td style='padding: 10px 0; color: #888; font-size: 14px;'>이메일</td><td style='padding: 10px 0; color: #333;'>").append(dto.getSenderEmail()).append("</td></tr>");
+	        sb.append("      </table>");
+	        
+	        sb.append("      <div style='background: #f1f3f5; padding: 25px; border-radius: 12px;'>");
+	        sb.append("        <p style='margin: 0; line-height: 1.6; color: #444; white-space: pre-wrap;'>").append(dto.getContent().replaceAll("\n", "<br>")).append("</p>");
+	        sb.append("      </div>");
+	        
+	        sb.append("    </div>");
+	        
+	        sb.append("    <div style='background: #f9f9f9; padding: 20px; text-align: center; border-top: 1px solid #eee;'>");
+	        sb.append("      <p style='margin: 0; font-size: 12px; color: #bbb;'>ⓒ 2026 BATON. All rights reserved.</p>");
+	        sb.append("    </div>");
+	        
+	        sb.append("  </div>");
+	        sb.append("</div>");
 
-            b = mailSender.mailSend(dto);
-            
-            if(b) {
-                model.put("status", "success");
-            } else {
-                model.put("status", "fail");
-            }
-        } catch (Exception e) {
-            model.put("status", "error");
-        }
-        
-        return model;
-    }
+	        dto.setContent(sb.toString());
+
+	        boolean b = mailSender.mailSend(dto);
+	        model.put("status", b ? "success" : "fail");
+	        
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        model.put("status", "error");
+	    }
+	    
+	    return model;
+	}
 }
