@@ -136,7 +136,7 @@
         
         <c:if test="${not empty tradeInfo}">
             <div class="trade-banner">
-                <div class="trade-banner-info-wrap" onclick="location.href='${pageContext.request.contextPath}/trade/article?productIdx=${tradeInfo.PRODUCTIDX}'">
+                <div class="trade-banner-info-wrap" onclick="location.href='${pageContext.request.contextPath}/trade/main?productIdx=${tradeInfo.PRODUCTIDX}'">
                     <c:choose>
                         <c:when test="${not empty tradeInfo.SAVENAME}">
                             <img src="${pageContext.request.contextPath}/uploads/trade/${tradeInfo.SAVENAME}" class="trade-thumb" onerror="this.src='${pageContext.request.contextPath}/dist/images/noimage.png'">
