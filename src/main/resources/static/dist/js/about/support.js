@@ -149,62 +149,64 @@ createApp({
 		
 		const appEl = document.getElementById('support-app');
 		const userData = appEl.dataset;
+		const userId = userData.userId;
 		
 		const showEmailDrawer = ref(false);
 		const inquiry = reactive({
 			name: userData.userName || '',
 			email: userData.userEmail || '',
-			content: ''
+		    content: '',
+		    isLoggedIn: !!userId
 		});
 
 		const openEmailInquiry = () => {
-			const userId = appEl.dataset.userId;
-
-			if (!userId || userId === "") {
-				setTimeout(() => {
-					showBatonToast('이메일 문의는 로그인이 필요합니다.');
-				}, 800);
-
-				setTimeout(() => {
-					location.href = '/member/login';
-				}, 3700);
-			}
-
-			inquiry.name = appEl.dataset.userName;
-			inquiry.email = appEl.dataset.userEmail;
 			showEmailDrawer.value = true;
 		};
 		
 		const sendInquiry = () => {
-			const formData = new URLSearchParams();
-			    formData.append('senderName', inquiry.name);
-			    formData.append('senderEmail', inquiry.email);
-			    formData.append('content', inquiry.content);
+		    if(!inquiry.name.trim() || !inquiry.email.trim() || !inquiry.content.trim()) {
+		        showBatonToast('모든 항목을 입력해주세요.');
+		        return;
+		    }
+			
+		    if (!isValidEmail(inquiry.email)) {
+		        showBatonToast('올바른 이메일 형식이 아닙니다.');
+		        return;
+		    }
 
-			    fetch('/mail/sendInquiry', {
-			        method: 'POST',
-			        headers: {
-			            'Content-Type': 'application/x-www-form-urlencoded',
-			        },
-			        body: formData
-			    })
-			    .then(response => response.json())
-			    .then(data => {
-			        if(data.status === 'success') {
-			            showBatonToast(`${inquiry.name}님의 문의가 성공적으로 접수되었습니다.`);
-			            
-			            inquiry.content = '';
-			            showEmailDrawer.value = false;
-			        } else {
-			            showBatonToast('메일 전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
-			        }
-			    })
-			    .catch(error => {
-			        console.error('Error:', error);
-			        showBatonToast('서버 오류가 발생했습니다.');
-			    });
+		    const safeContent = symbolHtml(inquiry.content);
+
+		    const formData = new URLSearchParams();
+		    formData.append('senderName', inquiry.name);
+		    formData.append('senderEmail', inquiry.email);
+		    formData.append('content', safeContent); 
+		    formData.append('isLoggedIn', inquiry.isLoggedIn ? "true" : "false");
+		    
+		    const actualUserId = appEl.dataset.userId || '비회원';
+		    formData.append('userId', actualUserId);
+
+		    fetch('/mail/sendInquiry', {
+		        method: 'POST',
+		        headers: {
+		            'Content-Type': 'application/x-www-form-urlencoded',
+		        },
+		        body: formData
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        if(data.status === 'success') {
+		            showBatonToast(`${inquiry.name}님의 문의가 성공적으로 접수되었습니다.`);
+		            inquiry.content = '';
+		            showEmailDrawer.value = false;
+		        } else {
+		            showBatonToast('메일 전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+		        }
+		    })
+		    .catch(error => {
+		        console.error('Error:', error);
+		        showBatonToast('서버 오류가 발생했습니다.');
+		    });
 		};
-		
 
         return {
             faqs, categories, badgeMap, quickTags, searchQuery, searchFocused, selectedCat, openIdx,

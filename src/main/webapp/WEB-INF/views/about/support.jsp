@@ -200,8 +200,10 @@
 				                </div>
 				                <div class="form-group">
 				                    <label>회신 받을 이메일</label>
-				                    <input type="email" 
-				                    	v-model="inquiry.email" readonly class="readonly-input">
+				                    <input type="email" v-model="inquiry.email" 
+							           :readonly="inquiry.isLoggedIn" 
+							           :class="{ 'readonly-input': inquiry.isLoggedIn }" 
+							           placeholder="example@mail.com">
 				                </div>
 				                <div class="form-group">
 				                    <label>문의 내용</label>
@@ -224,6 +226,7 @@
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 
 <jsp:include page="/WEB-INF/views/layout/footerResources.jsp"/>
+<script src="${pageContext.request.contextPath}/dist/js/util/util.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/about/support.js"></script>
 
 </body>

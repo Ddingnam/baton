@@ -357,13 +357,11 @@
     .faq-q-text { font-size: 13px; }
 }
 
-
-/* --- 이메일 문의 사이드 패널 (Drawer) --- */
 .email-drawer-overlay {
     position: fixed; inset: 0;
     background: rgba(10, 12, 25, 0.4);
     backdrop-filter: blur(4px);
-    z-index: 10001; /* 모달보다 높게 설정 */
+    z-index: 10001;
 }
 
 .email-drawer {
@@ -376,7 +374,6 @@
     padding: 40px;
 }
 
-/* 슬라이드 애니메이션 */
 .drawer-slide-enter-active, .drawer-slide-leave-active {
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
 }
