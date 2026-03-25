@@ -14,4 +14,5 @@ public interface JobApplyMapper {
     List<JobApplyDto> listApplyByUser(long userIdx);
     int updateStatus(Map<String,Object> map);
     int checkDuplicate(Map<String,Object> map);
+    List<JobApplyDto> listApplicantsByPosting(long postingIdx);
 }

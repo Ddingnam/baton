@@ -1,6 +1,8 @@
 package com.sp.app.service;
 
 import com.sp.app.common.StorageService;
+import com.sp.app.domain.dto.JobApplyDto;
+import com.sp.app.mapper.JobApplyMapper;
 import com.sp.app.mapper.JobPostingMapper;
 import com.sp.app.model.JobPosting;
 
@@ -22,6 +24,7 @@ import java.util.Map;
 public class JobPostingServiceImpl implements JobPostingService {
     private final JobPostingMapper mapper;
     private final StorageService storageService;
+    private final JobApplyMapper jobApplyMapper;
     
     
     @Value("${file.upload-root}/job")
@@ -180,6 +183,7 @@ public class JobPostingServiceImpl implements JobPostingService {
 	    return result;
 	}
 	
+
 	@Override
 	@Transactional
 	public void applyToAlba(long userIdx, long postingIdx, long profileIdx, String message) throws Exception {
@@ -190,11 +194,36 @@ public class JobPostingServiceImpl implements JobPostingService {
 	        map.put("profileIdx", profileIdx);
 	        map.put("message", message);
 
+	        // 1. 여기서 중복 지원 여부를 먼저 체크 (JobApplyMapper에 있는 쿼리 활용)
+	        // 주의: mapper.checkDuplicate() 형태로 연결할 수 있도록 JobPostingMapper나 JobApplyMapper를 적절히 호출해주세요.
+	        // int isDuplicate = mapper.checkDuplicate(map); 
+	        // if(isDuplicate > 0) {
+	        //     throw new DuplicateKeyException("이미 지원한 공고입니다.");
+	        // }
+
+	        // 2. 중복이 아니면 지원 데이터 삽입
 	        mapper.insertAlbaApply(map); 
 	    } catch (Exception e) {
 	        log.error("지원 실패", e);
 	        throw e;
 	    }
 	}
-    
+
+	@Override
+	public int applyCount(long postingIdx) throws Exception {
+		int result = 0;
+		try {
+			result = mapper.applyCount(postingIdx);
+		} catch (Exception e) {
+			log.info("지원자 수 카운트 에러", e);
+			throw e;
+		}
+		return result;
+	}
+
+	@Override
+	public List<JobApplyDto> listApplicantsByPosting(long postingIdx) {
+	    return jobApplyMapper.listApplicantsByPosting(postingIdx);
+	}
+	
 }

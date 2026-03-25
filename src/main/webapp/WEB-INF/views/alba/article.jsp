@@ -223,40 +223,47 @@
                 <i class="${isWished ? 'ri-heart-3-fill' : 'ri-heart-3-line'}"></i>
             </button>
         </div>
-       <div class="bottom-right">
+        <div class="bottom-right" style="width: ${loggedInUserId == dto.userIdx ? '100%' : 'calc(100% - 64px)'}; gap: 8px; display: flex;">
+            
             <sec:authorize access="isAnonymous()">
-                <button class="btn-action btn-call" onclick="location.href='${pageContext.request.contextPath}/member/login'">
+                <button class="btn-action btn-call" style="flex:1;" onclick="location.href='${pageContext.request.contextPath}/member/login'">
                     <i class="ri-wechat-line"></i> 1:1 문의
                 </button>
-                <button class="btn-action btn-apply" onclick="location.href='${pageContext.request.contextPath}/member/login'">
+                <button class="btn-action btn-apply" style="flex:2;" onclick="location.href='${pageContext.request.contextPath}/member/login'">
                     <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
                     <span>온라인 지원</span>
                 </button>
             </sec:authorize>
-
+        
             <sec:authorize access="isAuthenticated()">
-                <sec:authentication property="principal.member.userIdx" var="loggedInUserId" />
                 <c:choose>
                     <c:when test="${loggedInUserId == dto.userIdx}">
-                        <button class="btn-action btn-apply full-width" onclick="window.open('${pageContext.request.contextPath}/chat/albaList?albaIdx=${dto.postingIdx}', 'chatList', 'width=450,height=850')">
-                            <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
-                            <span>지원 내역 보기 (${dto.chatCount})</span>
+                        <button class="btn-action btn-call" style="flex:1; background: #f2f4f6; color: #4e5968; border: 1px solid #e5e8eb;" 
+                                onclick="window.open('${pageContext.request.contextPath}/chat/albaList?albaIdx=${dto.postingIdx}', 'chatList', 'width=450,height=850')">
+                            <i class="ri-wechat-line"></i> 1:1 문의 내역
+                        </button>
+                        <button class="btn-action btn-apply" style="flex:1;" 
+                                onclick="location.href='${pageContext.request.contextPath}/alba/manage?postingIdx=${dto.postingIdx}'">
+                            <i class="ri-group-line"></i> 지원 내역 보기 (${applyCount})
                         </button>
                     </c:when>
+        
                     <c:when test="${dto.recruitStatus == 'CLOSED'}">
-                        <button class="btn-action btn-apply disabled full-width" disabled>
+                        <button class="btn-action btn-apply disabled full-width" disabled style="flex:1;">
                             <span class="chip-dday">마감</span>
                             <span>모집이 완료되었습니다</span>
                         </button>
                     </c:when>
+        
                     <c:otherwise>
-                        <button class="btn-action btn-call" onclick="window.open('${pageContext.request.contextPath}/chat/albaRoom?albaIdx=${dto.postingIdx}&toUserIdx=${dto.userIdx}', 'chatRoom', 'width=450,height=850')">
+                        <button class="btn-action btn-call" style="flex:1;" 
+                                onclick="window.open('${pageContext.request.contextPath}/chat/albaRoom?albaIdx=${dto.postingIdx}&toUserIdx=${dto.userIdx}', 'chatRoom', 'width=450,height=850')">
                             <i class="ri-wechat-line"></i> 1:1 채팅하기
                         </button>
-                        <button class="btn-action btn-apply" onclick="openResumeModal()">
-						    <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
-						    <span>이력서 지원하기</span>
-						</button>
+                        <button class="btn-action btn-apply" style="flex:2;" onclick="openResumeModal()">
+                            <span class="chip-dday dday-calc" data-deadline="${dto.deadline}">D-?</span>
+                            <span>이력서 지원하기</span>
+                        </button>
                         <button type="button" class="btn-action btn-report-alba"
                                 onclick="openReportModal('ALBA', ${dto.postingIdx}, ${dto.userIdx})"
                                 title="신고하기">

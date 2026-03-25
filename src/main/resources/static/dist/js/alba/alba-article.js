@@ -385,35 +385,7 @@ document.addEventListener("DOMContentLoaded", function() {
       const countSpan = document.getElementById('applyMessageCount');
       if(countSpan) countSpan.innerText = currentLength;
   });
-/*
-  function submitResume() {
-      const resumeIdx = document.getElementById('resumeSelect').value;
-      const message = document.getElementById('applyMessage').value;
-      const postingIdx = document.getElementById('articleData').dataset.albaIdx;
-
-      if (!resumeIdx) {
-          alert('지원할 이력서를 선택해주세요.');
-          return;
-      }
-
-      fetch(CONTEXT_PATH + '/alba/apply', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ postingIdx, resumeIdx, message })
-      })
-      .then(res => res.json())
-      .then(data => {
-          if(data.success) {
-              alert('지원이 완료되었습니다.');
-              closeResumeModal();
-              location.reload();
-          } else {
-              alert(data.message || '오류 발생');
-          }
-      })
-      .catch(() => alert('네트워크 오류'));
-  }
- */
+  
   function openApplySuccess() {
       const modal = document.getElementById("applySuccessModal");
       if (!modal) return;

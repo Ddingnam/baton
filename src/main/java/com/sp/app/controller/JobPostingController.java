@@ -1,14 +1,12 @@
 package com.sp.app.controller;
 
-import com.sp.app.domain.dto.SessionInfo;
+import com.sp.app.domain.dto.JobApplyDto;
 import com.sp.app.model.JobPosting;
 import com.sp.app.model.JobProfile;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.JobPostingService;
-
 import com.sp.app.service.JobProfileService; // 이력서
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -127,6 +125,15 @@ public class JobPostingController {
 		                                   ? dto.getStartTime() + " ~ " + dto.getEndTime() 
 		                                   : "시간협의";
 		        model.addAttribute("computedWorkTime", computedWorkTime);
+		        
+		        int applyCount = 0;
+		        try {
+		            // 공고 번호(num)를 던져서 해당 공고의 지원자 수를 가져옵니다.
+		            applyCount = postingService.applyCount(num); 
+		        } catch (Exception e) {
+		            log.error("지원자 수 조회 실패", e);
+		        }
+		        model.addAttribute("applyCount", applyCount);
 
 		        boolean isUserScrap = false;
 		        if (userDetails != null) {
@@ -352,5 +359,32 @@ public class JobPostingController {
 
 		    return result;
 		}
-	
+		
+		@GetMapping("manage")
+		public String manage(@RequestParam("postingIdx") long postingIdx,
+		                     @AuthenticationPrincipal CustomUserDetails userDetails,
+		                     Model model) {
+
+		    if (userDetails == null) return "redirect:/member/login";
+
+		    JobPosting posting = postingService.findById(postingIdx);
+
+		    if (posting == null || posting.getUserIdx() != userDetails.getUserIdx()) {
+		        return "redirect:/alba/list";
+		    }
+
+		    List<JobApplyDto> list = postingService.listApplicantsByPosting(postingIdx);
+
+		    model.addAttribute("applicants", list);
+		    model.addAttribute("posting", posting);
+		    
+		    // 왕잠시 추가
+		    model.addAttribute("totalCount", list.size());
+		    model.addAttribute("waitCount", 0);
+		    model.addAttribute("reviewCount", 0);
+		    model.addAttribute("passCount", 0);
+		    model.addAttribute("failCount", 0);
+
+		    return "alba/manage";
+		}
 }

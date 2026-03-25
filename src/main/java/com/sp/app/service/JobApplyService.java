@@ -29,4 +29,6 @@ public class JobApplyService {
         Map<String,Object> map = Map.of("postingIdx", postingIdx, "userIdx", userIdx);
         return mapper.checkDuplicate(map) > 0;
     }
+    
+    
 }

@@ -5,35 +5,93 @@
 
 <mapper namespace="com.sp.app.mapper.JobApplyMapper">
 
-	 <insert id="insertApply" parameterType="com.sp.app.domain.dto.JobApplyDto">
-	  <selectKey keyProperty="applyIdx" resultType="long" order="BEFORE">
-	    SELECT seq_job_apply.NEXTVAL FROM dual
-	  </selectKey>
-	  INSERT INTO JOB_APPLY (apply_idx, posting_idx, user_idx, resume_idx, status, apply_date)
-	  VALUES (#{applyIdx}, #{postingIdx}, #{userIdx}, #{resumeIdx}, '열람대기', SYSDATE)
-	</insert>
-	
-	<select id="listApplyByUser" parameterType="long" resultType="com.sp.app.domain.dto.JobApplyDto">
-    SELECT 
-        a.apply_idx, a.posting_idx, a.status, a.apply_date,
-        p.title, p.employer, p.pay, p.pay_type AS payType
-    FROM JOB_APPLY a
-    JOIN job_posting p ON a.posting_idx = p.posting_idx
-    WHERE a.user_idx = #{userIdx}
-    ORDER BY a.apply_date DESC
-</select>
+    <!-- 지원하기 -->
+    <insert id="insertApply" parameterType="com.sp.app.domain.dto.JobApplyDto">
+        <selectKey keyProperty="applyIdx" resultType="long" order="BEFORE">
+            SELECT seq_job_apply.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO JOB_APPLY (
+            apply_idx, posting_idx, user_idx, resume_idx, status, apply_date, message
+        )
+        VALUES (
+            #{applyIdx},
+            #{postingIdx},
+            #{userIdx},
+            #{resumeIdx},
+            '열람대기',
+            SYSDATE,
+            #{message, jdbcType=VARCHAR}
+        )
+    </insert>
 
-  <update id="updateStatus" parameterType="map">
-    UPDATE JOB_APPLY
-    SET status = #{status}
-    WHERE apply_idx = #{applyIdx} AND user_idx = #{userIdx}
-  </update>
+    <!-- 내가 지원한 목록 -->
+    <select id="listApplyByUser" parameterType="long" resultType="com.sp.app.domain.dto.JobApplyDto">
+        SELECT 
+            a.apply_idx AS applyIdx,
+            a.posting_idx AS postingIdx,
+            a.status,
+            a.apply_date AS applyDate,
 
-  <select id="checkDuplicate" parameterType="map" resultType="int">
-    SELECT COUNT(*) FROM JOB_APPLY
-    WHERE posting_idx = #{postingIdx} AND user_idx = #{userIdx}
-  </select>
-  
-  
+            p.title,
+            p.employer,
+            p.pay,
+            p.pay_type AS payType
+
+        FROM JOB_APPLY a
+        JOIN job_posting p 
+            ON a.posting_idx = p.posting_idx
+
+        WHERE a.user_idx = #{userIdx}
+        ORDER BY a.apply_date DESC
+    </select>
+
+    <!-- 상태 변경 -->
+    <update id="updateStatus" parameterType="map">
+        UPDATE JOB_APPLY
+        SET status = #{status}
+        WHERE apply_idx = #{applyIdx}
+    </update>
+
+    <!-- 중복 지원 체크 -->
+    <select id="checkDuplicate" parameterType="map" resultType="int">
+        SELECT COUNT(*) 
+        FROM JOB_APPLY
+        WHERE posting_idx = #{postingIdx}
+          AND user_idx = #{userIdx}
+    </select>
+
+    <!-- 🔥 지원자 목록 (핵심) -->
+    <select id="listApplicantsByPosting" resultType="com.sp.app.domain.dto.JobApplyDto">
+        SELECT 
+            ja.apply_idx AS applyIdx,
+            ja.posting_idx AS postingIdx,
+            ja.user_idx AS userIdx,
+            ja.resume_idx AS resumeIdx,
+            ja.status,
+            ja.message,
+            ja.apply_date AS applyDate,
+
+            u.name AS applicantName,
+            u.tel AS applicantPhone,
+            u.email AS applicantEmail,
+            u.birth AS applicantBirth,
+
+            jp.gender AS applicantGender,
+            jp.profileTitle,
+            jp.photoUrl
+
+        FROM job_apply ja
+
+        JOIN users u 
+            ON ja.user_idx = u.userIdx
+
+        LEFT JOIN jobprofile jp
+            ON ja.user_idx = jp.userIdx
+            AND jp.isDefault = 'Y'
+
+        WHERE ja.posting_idx = #{postingIdx}
+
+        ORDER BY ja.apply_idx DESC
+    </select>
 
 </mapper>

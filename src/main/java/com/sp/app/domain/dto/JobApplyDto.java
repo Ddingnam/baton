@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -22,4 +23,14 @@ public class JobApplyDto {
     private String payType;
     private int pay;
     private LocalDateTime applyDate;
+    
+    private String message;
+    private String applicantName;
+    private String applicantPhone;
+    private String applicantEmail;
+    private String applicantGender;
+    private LocalDate applicantBirth;
+    private String profileTitle;
+    private String photoUrl; 
+    
 }

@@ -259,14 +259,22 @@
 		</select>
 		
 		<insert id="insertAlbaApply" parameterType="map">
-		    INSERT INTO JOB_APPLY (  apply_idx, posting_idx, user_idx, resume_idx, status, apply_date
+		    INSERT INTO JOB_APPLY (  apply_idx, posting_idx, user_idx, resume_idx, status, apply_date, message
 		    )
 		    VALUES (
 		        seq_job_apply.NEXTVAL, #{postingIdx},
 		        #{userIdx},
 		        #{profileIdx},         '열람대기',
-		        SYSDATE
+		        SYSDATE,
+		        #{message, jdbcType=VARCHAR}
 		    )
 		</insert>
+		
+		<select id="applyCount" resultType="Integer" parameterType="Long">
+	    SELECT NVL(COUNT(*), 0)
+	    FROM JOB_APPLY
+	    WHERE posting_idx = #{postingIdx}
+		</select>
+	
 
 </mapper>

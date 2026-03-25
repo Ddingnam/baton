@@ -1,5 +1,6 @@
 package com.sp.app.service;
 
+import com.sp.app.domain.dto.JobApplyDto;
 import com.sp.app.model.JobPosting;
 import java.util.List;
 import java.util.Map;
@@ -35,4 +36,8 @@ public interface JobPostingService {
 	public int checkJobScrap(Map<String, Object> map) throws Exception;
 	
 	void applyToAlba(long userIdx, long postingIdx, long profileIdx, String message) throws Exception;
+
+	public int applyCount(long postingIdx) throws Exception;
+
+	List<JobApplyDto> listApplicantsByPosting(long postingIdx);
 }

@@ -1,5 +1,6 @@
 package com.sp.app.mapper;
 
+import com.sp.app.domain.dto.JobApplyDto;
 import com.sp.app.model.JobPosting;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -37,5 +38,9 @@ public interface JobPostingMapper {
     public List<JobPosting> listJobScrap(long memberId);
     
     void insertAlbaApply(Map<String, Object> map);
+	int applyCount(long postingIdx);
+	
+	List<JobApplyDto> listApplicantsByPosting(long postingIdx);
+	int updateStatusByOwner(Map<String,Object> map);
     
 }
