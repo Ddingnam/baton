@@ -111,48 +111,75 @@
                 
                 <div class="cdb-post-body ql-editor" v-html="currentPost.content"></div>
                 
-                <div class="cdb-comment-card">
-				    <h4 class="cdb-comment-title">댓글 <span class="cdb-comment-count">3</span></h4>
-				    
-				    <ul class="cdb-comment-list">
-				        <li class="cdb-comment-item">
-				            <div class="cdb-comment-info">
-				                <div class="cdb-author-meta">
-				                    <img src="https://via.placeholder.com/32" alt="프로필" class="cdb-profile-img">
-				                    <strong class="cdb-author-name">김철수</strong>
-				                </div>
-				                <span class="cdb-comment-date">2026.03.24</span>
-				            </div>
-				            <p class="cdb-comment-text">정말 유익한 포스팅이네요! 디자인이 깔끔해서 보기 좋습니다.</p>
-				        </li>
-				
-				        <li class="cdb-comment-item cdb-reply-item">
-				            <div class="cdb-comment-info">
-				                <div class="cdb-author-meta">
-				                    <img src="https://via.placeholder.com/32/ffcccc" alt="프로필" class="cdb-profile-img">
-				                    <strong class="cdb-author-name">작성자</strong>
-				                </div>
-				                <span class="cdb-comment-date">2026.03.24</span>
-				            </div>
-				            <p class="cdb-comment-text">철수님, 좋게 봐주셔서 감사합니다! 😊</p>
-				        </li>
-				
-				        <li class="cdb-comment-item">
-				            <div class="cdb-comment-info">
-				                <div class="cdb-author-meta">
-				                    <img src="https://via.placeholder.com/32/ccccff" alt="프로필" class="cdb-profile-img">
-				                    <strong class="cdb-author-name">이영희</strong>
-				                </div>
-				                <span class="cdb-comment-date">2026.03.23</span>
-				            </div>
-				            <p class="cdb-comment-text">혹시 사용하신 폰트 정보 좀 알 수 있을까요? 가독성이 너무 좋네요.</p>
-				        </li>
-				    </ul>
-				
-				    <div class="cdb-comment-form">
-				        <input type="text" class="cdb-comment-input" placeholder="따뜻한 댓글을 남겨주세요.">
-				        <button class="cdb-comment-submit"><i class="ri-send-plane-fill"></i></button>
+                <div class="cdb-comment-container cdb-glass-card">
+				    <div class="cdb-comment-header">
+				        <h4 class="cdb-comment-title">댓글 <span class="cdb-highlight">{{ commentTotalCount }}</span></h4>
 				    </div>
+				
+				    <div class="cdb-comment-write cdb-glass-inner">
+				        <textarea v-model="newComment" placeholder="따뜻한 댓글을 남겨주세요." class="cdb-glass-input" rows="3"></textarea>
+				        <div class="cdb-comment-actions-right">
+				            <button class="cdb-btn-primary" @click="submitComment">등록</button>
+				        </div>
+				    </div>
+				
+				    <ul class="cdb-comment-list">
+				        
+				        <template v-for="comment in comments" :key="comment.commentId">
+				            <li class="cdb-comment-item cdb-glass-inner">
+				                
+				                <div class="cdb-comment-top">
+				                    <div class="cdb-user-info">
+				                        <img :src="comment.authorProfilePhoto || '${pageContext.request.contextPath}/images/default-profile.png'" alt="프로필" class="cdb-profile-img">
+				                        <strong class="cdb-nickname">{{ comment.authorNickname || '알 수 없음' }}</strong>
+				                    </div>
+				                    <div class="cdb-action-btns" v-if="comment.userIdx === loginUserIdx">
+				                        <button class="cdb-btn-text" @click="editComment(comment)">수정</button>
+				                        <button class="cdb-btn-text cdb-danger" @click="deleteComment(comment.commentId)">삭제</button>
+				                    </div>
+				                </div>
+				                
+				                <div class="cdb-comment-body">
+				                    <p>{{ comment.content }}</p>
+				                </div>
+				                
+				                <div class="cdb-comment-bottom">
+				                    <button class="cdb-btn-reply-toggle" @click="toggleReplyForm(comment.commentId)">
+				                        <i class="ri-reply-line"></i> 답글
+				                    </button>
+				                </div>
+				
+				                <transition name="cdb-slide-fade">
+				                    <div v-if="activeReplyId === comment.commentId" class="cdb-reply-form cdb-glass-inner">
+				                        <textarea v-model="replyContent" placeholder="답글을 남겨주세요." class="cdb-glass-input" rows="2"></textarea>
+				                        <div class="cdb-comment-actions-right">
+				                            <button class="cdb-btn-outline" @click="toggleReplyForm(null)">취소</button>
+				                            <button class="cdb-btn-primary" @click="submitReply(comment.commentId)">답글 등록</button>
+				                        </div>
+				                    </div>
+				                </transition>
+				            </li>
+				
+				            <li v-for="child in comment.children" :key="child.commentId" class="cdb-comment-item cdb-reply-item cdb-glass-inner">
+				                <i class="ri-corner-down-right-line cdb-reply-icon"></i>
+				                <div class="cdb-reply-content-wrap">
+				                    <div class="cdb-comment-top">
+				                        <div class="cdb-user-info">
+				                            <img :src="child.authorProfilePhoto || '${pageContext.request.contextPath}/images/default-profile.png'" alt="프로필" class="cdb-profile-img">
+				                            <strong class="cdb-nickname">{{ child.authorNickname || '알 수 없음' }}</strong>
+				                        </div>
+				                        <div class="cdb-action-btns" v-if="child.userIdx === loginUserIdx">
+				                            <button class="cdb-btn-text" @click="editComment(child)">수정</button>
+				                            <button class="cdb-btn-text cdb-danger" @click="deleteComment(child.commentId)">삭제</button>
+				                        </div>
+				                    </div>
+				                    <div class="cdb-comment-body">
+				                        <p>{{ child.content }}</p>
+				                    </div>
+				                </div>
+				            </li>
+				        </template>
+				    </ul>
 				</div>
             </div>
 

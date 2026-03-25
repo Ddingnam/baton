@@ -176,132 +176,172 @@
 
 .cdb-post-body { font-size: 16px; line-height: 1.8; color: #191F28; min-height: 300px; margin-bottom: 40px; }
 
-/* 댓글 영역 */
-/* 1. 전체 카드 영역 */
-.cdb-comment-card {
-    background: #F2F4F6; 
-    border-radius: 20px;
-    padding: 20px;
+/* =========================================
+   [댓글 영역 전체 CSS - Glassmorphism]
+   ========================================= */
+
+/* 1. 컨테이너 기본 간격 */
+.cdb-comment-container {
     margin-top: 30px;
+    padding: 24px;
 }
 
-.cdb-comment-title { 
-    font-size: 16px; 
-    font-weight: 800; 
-    margin-bottom: 16px; 
-    padding-left: 4px;
-    color: #191F28;
+/* 2. 상단 헤더 (댓글 N개) */
+.cdb-comment-header {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+.cdb-comment-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+.cdb-highlight {
+    color: #4a90e2; /* 포인트 컬러 */
+    font-weight: bold;
 }
 
-.cdb-comment-count { color: var(--crew-pink); }
-
-/* 2. 댓글 리스트 및 아이템 */
-.cdb-comment-list { 
-    list-style: none; 
-    padding: 0; 
-    display: flex; 
-    flex-direction: column; 
-    gap: 8px; 
-    margin-bottom: 20px; 
+/* 3. 글래시모피즘 내부 카드 (댓글 작성폼, 개별 댓글 공통) */
+.cdb-glass-inner {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-.cdb-comment-item { 
-    padding: 14px 16px; 
-    background: #ffffff; 
-    border-radius: 14px; 
-    border: 1px solid rgba(0, 0, 0, 0.02);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); 
+/* 4. 메인 댓글 작성 폼 & 답글 폼 간격 */
+.cdb-comment-write {
+    margin-bottom: 24px;
+}
+.cdb-reply-form {
+    margin-top: 15px;
+    margin-bottom: 0; 
 }
 
-/* 대댓글 구분 */
-.cdb-comment-item.cdb-reply-item {
-    margin-left: 32px; 
-    background: rgba(255, 255, 255, 0.5); 
-    box-shadow: none;
-    border: 1px dashed #D1D6DB;
+/* 5. 입력 폼 (Textarea) 공통 스타일 */
+.cdb-glass-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    padding: 12px;
+    resize: none;
+    outline: none;
+    transition: background 0.3s;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+.cdb-glass-input:focus {
+    background: rgba(255, 255, 255, 0.9);
 }
 
-/* 3. 프로필 및 메타 정보 */
-.cdb-comment-info { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 6px; 
+/* 6. 버튼 우측 정렬 컨테이너 */
+.cdb-comment-actions-right {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 10px;
 }
 
-.cdb-author-meta { 
-    display: flex; 
-    align-items: center; 
-    gap: 8px; 
+/* 7. 댓글 리스트 초기화 */
+.cdb-comment-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.cdb-profile-img {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
+/* 8. 댓글 상단 (프로필, 닉네임, 우측 버튼) */
+.cdb-comment-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
 }
-
-.cdb-author-name { 
-    font-size: 13.5px; 
-    font-weight: 700; 
-    color: #191F28; 
-}
-
-.cdb-comment-date { 
-    font-size: 11px; 
-    color: #8B95A1; 
-    font-weight: 500; 
-}
-
-/* 4. 본문 가독성 설정 */
-.cdb-comment-text { 
-    font-size: 14.5px; 
-    color: #333D4B; 
-    margin: 0 0 0 36px; /* 프로필 이미지(28px) + 간격(8px) 만큼 내어쓰기 */
-    line-height: 1.5; 
-    letter-spacing: -0.01em;
-    word-break: break-all;
-}
-
-/* 5. 입력 폼 */
-.cdb-comment-form { 
-    display: flex; 
-    gap: 8px; 
-    background: #fff; 
-    padding: 6px 6px 6px 14px; 
-    border-radius: 12px; 
-    border: 1px solid #E5E8EB; 
-}
-
-.cdb-comment-input { 
-    flex: 1; 
-    border: none; 
-    outline: none; 
-    font-size: 14px; 
-    background: transparent; 
-    color: #191F28;
-}
-
-.cdb-comment-input::placeholder { color: #ADB5BD; }
-
-.cdb-comment-submit { 
-    width: 36px; 
-    height: 36px; 
-    background: #191F28; 
-    color: #fff; 
-    border: none; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    transition: 0.2s;
+.cdb-user-info {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 10px;
+}
+.cdb-profile-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(255,255,255,0.8);
+}
+.cdb-nickname {
+    font-size: 14px;
+    color: #333;
+    font-weight: 600;
 }
 
-.cdb-comment-submit:hover { 
-    background: var(--crew-pink); 
+/* 9. 액션 버튼 (수정, 삭제, 답글) */
+.cdb-action-btns {
+    display: flex;
+    gap: 5px;
+}
+.cdb-btn-text, .cdb-btn-reply-toggle {
+    background: none;
+    border: none;
+    font-size: 13px;
+    color: #666;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: color 0.2s;
+}
+.cdb-btn-text:hover, .cdb-btn-reply-toggle:hover { color: #333; }
+.cdb-btn-text.cdb-danger:hover { color: #e74c3c; }
+
+/* 10. 댓글 본문 텍스트 영역 */
+.cdb-comment-body {
+    margin: 12px 0;
+    font-size: 15px;
+    color: #444;
+    line-height: 1.6;
+}
+.cdb-comment-body p {
+    margin: 0;
+    white-space: pre-wrap; /* 줄바꿈 유지 */
+}
+
+/* 11. 하단 영역 (답글 버튼) */
+.cdb-comment-bottom {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 8px;
+}
+
+/* =========================================
+   [대댓글(답글) 전용 스타일]
+   ========================================= */
+.cdb-reply-item {
+    display: flex;
+    gap: 12px;
+    margin-left: 40px; /* 안쪽으로 들여쓰기 */
+    background: rgba(255, 255, 255, 0.2); /* 부모보다 조금 더 투명하게 */
+}
+.cdb-reply-icon {
+    font-size: 18px;
+    color: #888;
+    margin-top: 4px;
+}
+.cdb-reply-content-wrap {
+    flex: 1;
+}
+
+/* =========================================
+   [Vue 트랜지션 애니메이션]
+   ========================================= */
+.cdb-slide-fade-enter-active { transition: all 0.3s ease; }
+.cdb-slide-fade-leave-active { transition: all 0.2s cubic-bezier(1.0, 0.5, 0.8, 1.0); }
+.cdb-slide-fade-enter, .cdb-slide-fade-leave-to {
+    transform: translateY(-10px);
+    opacity: 0;
 }
 /* --- 4. 작성 뷰 --- */
 .cdb-form { display: flex; flex-direction: column; gap: 20px; }
