@@ -12,6 +12,28 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/main/main.css" />
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/alba/alba-list.css" />
+<style>
+/* 💡 그리드 뷰 CSS 추가! */
+.list-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+.grid-layout .alba-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.grid-layout .alba-card .card-body {
+  flex-direction: column;
+  align-items: flex-start;
+}
+</style>
 </head>
 <body>
 
@@ -224,7 +246,7 @@
 			  </div>
   
 			  <div class="list-controls">
-			    <select class="control-select" id="periodSelect">
+                <select class="control-select" id="periodSelect" onchange="applyFilters()">
 			      <option value="ALL">등록일 전체</option>
 			      <option value="TODAY">오늘 등록</option>
 			      <option value="WITHIN_THREE_DAYS">3일 이내</option>
@@ -237,7 +259,7 @@
 			      <option value="distance">거리순</option>
 			    </select>
 			
-			    <select class="control-select" id="sizeSelect">
+			    <select class="control-select" id="sizeSelect" onchange="applyFilters()">
 			      <option value="20">20개씩</option>
 			      <option value="30">30개씩</option>
 			      <option value="40">40개씩</option>
@@ -253,9 +275,9 @@
 			      </button>
 			    </div>
 			  </div>
-</div>
+		</div>
 
-            <div id="listView"></div>
+            <div id="listView" class="list-layout"></div>
             <div class="pagination" id="pagination"></div>
           </div>
 

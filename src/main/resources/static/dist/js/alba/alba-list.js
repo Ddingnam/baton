@@ -16,7 +16,7 @@ const CAT_INFO = {
 };
 
 let currentPage = 1;
-const PAGE_SIZE = 10;
+let PAGE_SIZE = 20; // 기본값을 20으로 변경 (셀렉트 박스 연동됨)
 let filteredJobs = [];
 
 function getRelativeTime(dateStr) {
@@ -39,18 +39,28 @@ function isFresh(dateStr) {
 function applyFilters() {
 	const keywordEl  = document.getElementById('searchInput');
 	const keyword    = keywordEl ? keywordEl.value.trim().toLowerCase() : '';
-	const periodEl   = document.querySelector('.filter-section[data-filter-type="period"] .chip.active');
+	
+    // 사이드바 필터
+    const periodEl   = document.querySelector('.filter-section[data-filter-type="period"] .chip.active');
 	const period     = periodEl ? periodEl.textContent.trim() : '전체';
 	const catEl      = document.querySelector('.filter-section[data-filter-type="category"] .chip.active');
 	const cat        = catEl ? catEl.textContent.trim() : '전체';
 	const minPayInput = document.getElementById('minPayInput');
 	const minPay     = minPayInput ? (parseInt(minPayInput.value) || 0) : 0;
-	const sortEl     = document.getElementById('sortSelect');
+	
+    // 상단 컨트롤 필터
+    const topPeriodEl= document.getElementById('periodSelect');
+    const topPeriod  = topPeriodEl ? topPeriodEl.value : 'ALL';
+    const sortEl     = document.getElementById('sortSelect');
 	const sort       = sortEl ? sortEl.value : 'latest';
+    const sizeEl     = document.getElementById('sizeSelect');
+    
+    if (sizeEl) PAGE_SIZE = parseInt(sizeEl.value) || 20; // 몇 개씩 볼지 세팅
 
 	let jobs = [...serverData];
 
-	if (keyword) {
+	// 1. 검색어 필터
+    if (keyword) {
 		jobs = jobs.filter(j =>
 			(j.title    || '').toLowerCase().includes(keyword) ||
 			(j.employer || '').toLowerCase().includes(keyword) ||
@@ -58,6 +68,21 @@ function applyFilters() {
 		);
 	}
 
+    // 2. 상단 등록일 필터 (오늘, 3일이내 등)
+    if (topPeriod !== 'ALL') {
+        const now = new Date();
+        jobs = jobs.filter(j => {
+            if (!j.createdDate) return false;
+            const d = new Date(j.createdDate);
+            const diffDays = (now - d) / (1000 * 60 * 60 * 24);
+            if (topPeriod === 'TODAY') return diffDays < 1;
+            if (topPeriod === 'WITHIN_THREE_DAYS') return diffDays <= 3;
+            if (topPeriod === 'WITHIN_SEVEN_DAYS') return diffDays <= 7;
+            return true;
+        });
+    }
+
+    // 3. 사이드바 근무기간 필터
 	if (period !== '전체') {
 		jobs = jobs.filter(j =>
 			(period === '1개월 이상' && j.workPeriod === 'MORE_THAN_A_MONTH') ||
@@ -65,18 +90,20 @@ function applyFilters() {
 		);
 	}
 
+    // 4. 업직종 & 최소시급 필터
 	if (cat !== '전체') {
 		const mappedCat = CAT_MAP[cat] || cat;
 		jobs = jobs.filter(j => j.category === mappedCat);
 	}
-
 	if (minPay > 0) {
 		jobs = jobs.filter(j => j.payType !== '시급' || j.pay >= minPay);
 	}
 
+    // 5. 정렬 처리
 	if (sort === 'pay_high') {
 		jobs.sort((a, b) => b.pay - a.pay);
 	} else {
+        // 기본 최신순 (거리순은 현재 좌표 데이터 기반 연산이 필요하므로 최신순으로 대체)
 		jobs.sort((a, b) => b.postingIdx - a.postingIdx);
 	}
 
@@ -131,13 +158,13 @@ function renderList(jobs) {
 		const isRecruiting = job.recruitStatus === 'RECRUITING';
 
 		return `
-		<div class="job-list-item ${!isRecruiting ? 'job-disabled' : ''}" 
+		<div class="job-list-item alba-card ${!isRecruiting ? 'job-disabled' : ''}" 
 		     onclick="${isRecruiting ? `location.href='${CONTEXT_PATH}/alba/article/${job.postingIdx}'` : ''}">
 
 			<div class="job-cat-bar ${catInfo.cls}"></div>
 			<div class="job-cat-icon">${catInfo.emoji}</div>
 
-			<div class="job-item-body">
+			<div class="job-item-body card-body">
 				<div class="job-article-col">
 					<div class="job-employer">${job.employer}</div>
 					<div class="job-title">${job.title}</div>
@@ -339,6 +366,41 @@ document.addEventListener('DOMContentLoaded', function() {
 	setupColumnSelection('col-sido');
 	setupColumnSelection('col-gugun');
 	setupColumnSelection('col-dong');
+
+    // 💡 뷰 토글(리스트/그리드) 이벤트 등록
+    const viewBtns = document.querySelectorAll('.view-btn');
+    const listContainer = document.getElementById('listView');
+    
+    if (viewBtns.length > 0 && listContainer) {
+        const savedView = localStorage.getItem('albaViewMode') || 'list';
+        applyViewMode(savedView);
+
+        viewBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const mode = e.currentTarget.title.includes('그리드') ? 'grid' : 'list';
+                applyViewMode(mode);
+                localStorage.setItem('albaViewMode', mode);
+            });
+        });
+
+        function applyViewMode(mode) {
+            viewBtns.forEach(btn => {
+                if (btn.title.includes(mode === 'grid' ? '그리드' : '리스트')) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            if (mode === 'grid') {
+                listContainer.classList.remove('list-layout');
+                listContainer.classList.add('grid-layout');
+            } else {
+                listContainer.classList.remove('grid-layout');
+                listContainer.classList.add('list-layout');
+            }
+        }
+    }
 });
 
 function applyAreaFilter() {
@@ -412,9 +474,8 @@ function normalizeSido(sido) {
 		.replace('특별자치시', '').replace('도', '');
 }
 
-function toggleScrap(event, postingIdx) {
+function toggleScrap(event, postingIdx, btn) {
 	event.stopPropagation();
-	const btn      = event.currentTarget;
 	const isAdding = !btn.classList.contains('active');
 
 	fetch(`${CONTEXT_PATH}/alba/scrap`, {
@@ -427,9 +488,11 @@ function toggleScrap(event, postingIdx) {
 		if (data.status === "login_required") {
 			alert("로그인이 필요한 기능입니다.");
 			location.href = CONTEXT_PATH + "/member/login";
-		} else if (data.status === "success") {
+        // 💡 내 공고 스크랩 방지 알림 추가!
+		} else if (data.status === "self_scrap") {
+            alert("본인이 작성한 공고는 찜(스크랩)할 수 없습니다.");
+        } else if (data.status === "success") {
 			btn.classList.toggle('active');
-            
 			if (isAdding) {
 				myScrapIds.push(Number(postingIdx));
 			} else {
@@ -439,15 +502,12 @@ function toggleScrap(event, postingIdx) {
 	})
 	.catch(err => console.error(err));
 }
+
 /* ===== 동네 범위 슬라이더 ===== */
 const RANGE_LABELS = ['내 동네', '가까운 동네', '먼 동네'];
 
-// 슬라이더 단계별 필터 조건
-// 0: 내 동네  → sido + gugun + dong 모두 일치
-// 1: 가까운 동네 → sido + gugun 일치 (dong 무관)
-// 2: 먼 동네  → sido 일치 (gugun, dong 무관)
 function getRangeFilter(step) {
-	if (!myRegion || !myRegion.sido) return null; // 동네 인증 안 된 경우 필터 없음
+	if (!myRegion || !myRegion.sido) return null; 
 	if (step === 0) return { sido: myRegion.sido, gugun: myRegion.gugun, dong: myRegion.dong };
 	if (step === 1) return { sido: myRegion.sido, gugun: myRegion.gugun, dong: '' };
 	if (step === 2) return { sido: myRegion.sido, gugun: '', dong: '' };
@@ -456,8 +516,6 @@ function getRangeFilter(step) {
 
 function applyRangeFilter(step) {
 	const filter = getRangeFilter(step);
-
-	// 라벨 + step 점 업데이트
 	const label = document.getElementById('rangeValueLabel');
 	if (label) label.textContent = RANGE_LABELS[step];
 
@@ -465,7 +523,6 @@ function applyRangeFilter(step) {
 		el.classList.toggle('active', Number(el.dataset.step) === step);
 	});
 
-	// 슬라이더 배경 진행도 업데이트
 	const slider = document.getElementById('rangeSlider');
 	if (slider) {
 		const pct = (step / (slider.max - slider.min)) * 100;
@@ -474,7 +531,6 @@ function applyRangeFilter(step) {
 	}
 
 	if (!filter) {
-		// 동네 인증 없으면 전체 목록 표시
 		applyFilters();
 		return;
 	}
@@ -513,7 +569,6 @@ document.addEventListener('DOMContentLoaded', function () {
 	const slider = document.getElementById('rangeSlider');
 	if (!slider) return;
 
-	// 초기 배경 세팅 (step=0 → 0%)
 	slider.style.background =
 		`linear-gradient(to right, var(--primary) 0%, var(--border-color) 0%)`;
 
@@ -521,7 +576,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		applyRangeFilter(Number(this.value));
 	});
 
-	// step 텍스트 클릭으로도 조작 가능
 	document.querySelectorAll('.range-step').forEach(el => {
 		el.addEventListener('click', function () {
 			const step = Number(this.dataset.step);
