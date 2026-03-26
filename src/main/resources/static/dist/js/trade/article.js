@@ -32,7 +32,7 @@ function useTradeArticle(shared) {
     const articleIsLoggedIn = ref(false);
     const articleIsOwner = ref(false);
     const articleCurrentUserIdx = ref(null);
-
+	
     const currentImg = ref(0);
     const lightboxOpen = ref(false);
     const lightboxIdx = ref(0);
@@ -130,6 +130,14 @@ function useTradeArticle(shared) {
     function openLightbox(i) { 
 		lightboxIdx.value = i; 
 		lightboxOpen.value = true; 
+	}
+	
+	function prevImg() {
+	    currentImg.value = (currentImg.value - 1 + articleImages.value.length) % articleImages.value.length;
+	}
+
+	function nextImg() {
+	    currentImg.value = (currentImg.value + 1) % articleImages.value.length;
 	}
 	
     function lightboxPrev()  {
@@ -315,7 +323,7 @@ function useTradeArticle(shared) {
         articleIsLiked, articleLikeCount, articleIsLoggedIn, articleIsOwner, articleCurrentUserIdx,
         currentImg, mainImgSrc, lightboxOpen, lightboxIdx, lightboxSrc,
         statusOpen, shippingOpen, reportOpen, shipping, report, articleStatusLabel,
-        loadArticle, openLightbox, lightboxPrev, lightboxNext,
+        loadArticle, openLightbox, prevImg, nextImg, lightboxPrev, lightboxNext,
         toggleWishArticle, updateStatus, pullUp, doDelete,
         openChatList, openChatRoom, shareArticle, goToCheckout, goToMyPage, goToTradePage,
         submitShipping, cancelTrade, confirmPurchase, requestRefund, submitReport,

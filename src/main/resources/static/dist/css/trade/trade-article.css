@@ -55,12 +55,67 @@ a { text-decoration: none; color: inherit; }
     cursor: zoom-in;
 }
 .ta-img-main img {
-    width: 100%; height: 100%;
+    width: 100%; 
+    height: 100%;
     object-fit: cover;
     display: block;
     transition: transform 0.5s ease;
 }
 .ta-img-main:hover img { transform: scale(1.03); }
+
+.slide-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.ta-img-main:hover .slide-arrow {
+    opacity: 1;
+}
+
+.slide-arrow:hover {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.slide-arrow.prev { left: 16px; }
+.slide-arrow.next { right: 16px; }
+
+.slide-dots {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+}
+
+.slide-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.slide-dot.active {
+    background: #fff;
+    width: 18px;
+    border-radius: 4px;
+}
 
 .status-overlay {
     position: absolute; inset: 0;
@@ -74,22 +129,6 @@ a { text-decoration: none; color: inherit; }
     border-radius: 10px;
     color: #fff; font-size: 17px; font-weight: 800; letter-spacing: 0.1em;
 }
-
-.ta-thumbs {
-    display: flex;
-    border-top: 1px solid var(--border-color);
-    background: #F8F9FB;
-}
-.ta-thumb {
-    flex: 1; aspect-ratio: 1/1; overflow: hidden;
-    cursor: pointer; opacity: 0.5;
-    transition: opacity 0.18s;
-    border-right: 1px solid var(--border-color);
-}
-.ta-thumb:last-child { border-right: none; }
-.ta-thumb:hover, .ta-thumb.active { opacity: 1; }
-.ta-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.ta-thumb.active { outline: 2.5px solid var(--primary); outline-offset: -2.5px; }
 
 .ta-product-info {
     padding: 28px 36px 24px;
@@ -431,7 +470,7 @@ a { text-decoration: none; color: inherit; }
 
 .lightbox {
     position: fixed; inset: 0; z-index: 9999;
-    background: rgba(0,0,0,0.92);
+    background: rgba(0,0,0,0.89);
     display: flex; align-items: center; justify-content: center;
     opacity: 0; pointer-events: none; transition: opacity 0.2s;
 }

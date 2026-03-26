@@ -11,21 +11,31 @@
             <div class="ta-layout">
                 <div class="ta-left">
                     <div class="ta-main-card">
-                        <div class="ta-img-main" style="cursor:zoom-in;" @click="openLightbox(currentImg)">
-                            <img id="mainImage" :src="mainImgSrc" :alt="article.title">
-                            <div v-if="['판매완료','예약중','숨기기'].includes(article.tradeStatus)" class="status-overlay">
-                                <span class="status-overlay-badge">
-                                    {{ article.tradeStatus === '예약중' ? '예약 중' : article.tradeStatus === '숨기기' ? '숨겨진 상품' : article.tradeStatus }}
-                                </span>
-                            </div>
-                        </div>
-                        <div v-if="articleImages.length > 1" class="ta-thumbs">
-                            <div v-for="(img, i) in articleImages" :key="i"
-                                 class="ta-thumb" :class="{ active: i === currentImg }" @click="currentImg = i">
-                                <img :src="img" :alt="'이미지 '+(i+1)">
-                            </div>
-                        </div>
-
+						<div class="ta-img-main" style="cursor:zoom-in;" @click="openLightbox(currentImg)">
+					        <img id="mainImage" :src="mainImgSrc" :alt="article.title">
+					        
+					        <template v-if="articleImages.length > 1">
+							    <button type="button" class="slide-arrow prev" @click.stop="prevImg">
+							        <i class="ri-arrow-left-s-line"></i>
+							    </button>
+							    <button type="button" class="slide-arrow next" @click.stop="nextImg">
+							        <i class="ri-arrow-right-s-line"></i>
+							    </button>
+							    
+							    <div class="slide-dots">
+							        <span v-for="(img, i) in articleImages" :key="i" 
+							              class="slide-dot" :class="{ active: i === currentImg }"
+							              @click.stop="currentImg = i"></span>
+							    </div>
+							</template>
+					
+					        <div v-if="['판매완료','예약중','숨기기'].includes(article.tradeStatus)" class="status-overlay">
+					            <span class="status-overlay-badge">
+					                {{ article.tradeStatus === '예약중' ? '예약 중' : article.tradeStatus === '숨기기' ? '숨겨진 상품' : article.tradeStatus }}
+					            </span>
+					        </div>
+					    </div>
+                        
                         <div class="ta-product-info">
                             <div class="ta-badges">
                                 <span v-if="article.categoryName" class="ta-badge ta-badge-cat">{{ article.categoryName }}</span>
