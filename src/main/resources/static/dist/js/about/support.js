@@ -1,4 +1,4 @@
-const { createApp, ref, computed, reactive } = Vue;
+const { createApp, ref, computed, reactive, onMounted } = Vue;
 
 createApp({
     setup() {
@@ -207,6 +207,24 @@ createApp({
 		        showBatonToast('서버 오류가 발생했습니다.');
 		    });
 		};
+		
+		onMounted(() => {
+			const urlParams = new URLSearchParams(window.location.search);
+		    const faqType = urlParams.get('faq');
+
+		    if (faqType === 'point-info') {
+				selectedCat.value = 'payment';
+		                
+		        openIdx.value = 0;
+
+				setTimeout(() => {
+					const faqSection = document.querySelector('.support-faq');
+					if (faqSection) {
+						faqSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					}
+				}, 300);
+			}
+		});
 
         return {
             faqs, categories, badgeMap, quickTags, searchQuery, searchFocused, selectedCat, openIdx,

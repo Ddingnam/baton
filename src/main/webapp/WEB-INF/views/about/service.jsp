@@ -228,7 +228,7 @@
                 <button class="btn-primary" onclick="location.href='${pageContext.request.contextPath}/member/join'">
                     무료로 시작하기
                 </button>
-                <button class="btn-secondary" onclick="location.href='${pageContext.request.contextPath}/trade/list'">
+                <button class="btn-secondary" onclick="location.href='${pageContext.request.contextPath}/trade/main#/'">
                     서비스 둘러보기
                 </button>
             </div>

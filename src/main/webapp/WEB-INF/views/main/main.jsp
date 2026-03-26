@@ -111,7 +111,10 @@
                     <div>
                         <h3 class="banner-title">신뢰를 잇는 기술,<br><span class="blue-text">바통 안전결제</span></h3>
                         <p class="banner-subtitle">이웃 간의 소중한 거래를<br>가장 안전한 방법으로 보호해 드립니다.</p>
-                        <button class="banner-action-btn">가이드 확인하기</button>
+                        <button class="banner-action-btn"
+                        	onclick="location.href='${pageContext.request.contextPath}/about/payment'">
+                        	가이드 확인하기
+                        </button>
                     </div>
                     <div class="shield-icon-container">
                         <i class="ri-shield-flash-fill"></i>

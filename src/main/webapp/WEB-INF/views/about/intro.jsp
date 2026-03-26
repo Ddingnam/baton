@@ -296,7 +296,7 @@
         <div class="frame centered">
             <h2 class="tit-cta">오늘, 당신의 동네와 연결되세요.</h2>
             <div class="btns">
-                <a href="${pageContext.request.contextPath}/trade/list" class="btn-main">서비스 둘러보기</a>
+                <a href="${pageContext.request.contextPath}/trade/main#/" class="btn-main">서비스 둘러보기</a>
                 <a href="${pageContext.request.contextPath}/member/join" class="btn-sub">회원가입</a>
             </div>
         </div>
