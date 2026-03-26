@@ -168,6 +168,11 @@ public class TradeRestController {
 			dto.setRegionCode(userDetails.getMember().getUserRegionInfo().getActiveRegion().getRegionCode());
 			tradeService.saveTradePost(dto, uploadPath);
 			
+			if(!"임시저장".equals(dto.getTradeStatus())) { 
+                memberService.updateBatonDistance(userDetails.getUserIdx(), 0.1); 
+                memberService.checkAndAwardBadge(userDetails.getUserIdx(), "TRADE_POST");
+            }
+			
 			result.put("status", "success");
 	        return ResponseEntity.ok(result);
 		} catch (Exception e) {
@@ -235,7 +240,7 @@ public class TradeRestController {
                         "/trade/article?productIdx=" + productIdx
                     );
                 }
-            }
+            }                    
             
             if("판매완료".equals(tradeStatus)) {
                 Long sellerIdx = trade.getUserIdx();

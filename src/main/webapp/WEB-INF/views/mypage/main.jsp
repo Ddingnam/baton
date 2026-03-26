@@ -15,6 +15,76 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/main/main.css?v=final">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/mypage/mypage_left.css?v=final">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/mypage/mypage_main.css?v=final">
+
+<style>
+    .mp-profile-banner {
+        background: #fff;
+        border-radius: 28px;
+        padding: 45px 50px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 35px;
+        position: relative;
+        overflow: hidden;
+        gap: 80px; 
+    }
+    .pb-left { display: flex; align-items: center; gap: 30px; flex: 1; max-width: 60%; }
+    .pb-avatar {
+        width: 90px; height: 90px; border-radius: 28px; background: #F2F4F6;
+        display: flex; justify-content: center; align-items: center;
+        font-size: 45px; color: #D1D6DB; box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+        border: 1px solid rgba(0,0,0,0.05); overflow: hidden;
+    }
+    .pb-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .pb-info { flex: 1; max-width: 500px; }
+    
+    .pb-name-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+    .pb-name { font-size: 1.6rem; font-weight: 800; color: #191F28; margin: 0; letter-spacing: -0.7px; }
+    .rep-badge {
+        padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 800;
+        display: inline-flex; align-items: center; gap: 4px;
+    }
+    
+    .pb-desc { 
+        font-size: 0.95rem; color: #6B7684; font-weight: 500; 
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 18px; margin-top: 5px; 
+    }
+    .pb-desc strong { font-weight: 800; font-size: 1.1rem; }
+
+    .baton-track-wrap { width: 100%; position: relative; padding-top: 15px; }
+    .baton-track-bg { width: 100%; height: 12px; background: #E5E8EB; border-radius: 12px; position: relative; }
+    .baton-track-fill {
+        height: 100%; border-radius: 10px; position: relative;
+        transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1); 
+    }
+    .runner-icon {
+        position: absolute; right: -18px; top: -14px;
+        width: 38px; height: 38px; background: #fff; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        border: 3px solid; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        z-index: 2;
+    }
+
+    .badge-grid { display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; }
+    .badge-item {
+        background: #fff; border: 1px solid rgba(0,0,0,0.06); border-radius: 20px;
+        padding: 16px 20px; display: flex; align-items: center; gap: 14px;
+        transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); width: calc(33.333% - 11px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02); cursor: pointer;
+    }
+    .badge-item:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-color: #3182F6; }
+    .badge-icon {
+        width: 48px; height: 48px; border-radius: 50%; background: #F4F6F8;
+        display: flex; align-items: center; justify-content: center; font-size: 24px;
+    }
+    .badge-info h4 { margin: 0 0 4px 0; font-size: 1rem; font-weight: 800; color: #191F28; letter-spacing: -0.3px; }
+    .badge-info p { margin: 0; font-size: 0.8rem; color: #8B95A1; font-weight: 500; }
+    
+    .badge-empty { width: 100%; text-align: center; padding: 40px 0; background: #F9FAFB; border-radius: 16px; color: #8B95A1; font-size: 0.95rem; font-weight: 500; }
+</style>
 </head>
 <body>
 
@@ -26,28 +96,70 @@
 
 		<main class="mp-main-wrapper" id="mp-theme-root">
 
-			<div class="mp-profile-banner">
+            <c:set var="dist" value="${empty userDto.batonDistance ? 10.0 : userDto.batonDistance}" />
+            <c:set var="percent" value="${(dist / 42.195) * 100}" />
+            <c:if test="${percent > 100}"><c:set var="percent" value="100" /></c:if>
+
+            <c:choose>
+                <c:when test="${dist >= 40.0}">
+                    <c:set var="bColor" value="#FFB300"/><c:set var="bName" value="골드 바톤"/><c:set var="bIcon" value="ri-vip-crown-fill"/>
+                </c:when>
+                <c:when test="${dist >= 30.0}">
+                    <c:set var="bColor" value="#3182F6"/><c:set var="bName" value="블루 바톤"/><c:set var="bIcon" value="ri-medal-fill"/>
+                </c:when>
+                <c:when test="${dist >= 20.0}">
+                    <c:set var="bColor" value="#00B98D"/><c:set var="bName" value="그린 바톤"/><c:set var="bIcon" value="ri-leaf-fill"/>
+                </c:when>
+                <c:when test="${dist >= 10.0}">
+                    <c:set var="bColor" value="#9CA3AF"/><c:set var="bName" value="알루미늄 바톤"/><c:set var="bIcon" value="ri-subtract-fill"/> 
+                </c:when>
+                <c:otherwise>
+                    <c:set var="bColor" value="#8B4513"/><c:set var="bName" value="나무 바톤"/><c:set var="bIcon" value="ri-seedling-fill"/>
+                </c:otherwise>
+            </c:choose>
+
+            <div class="mp-profile-banner">
 				<div class="pb-left">
-					<div class="pb-avatar"><i class="ri-user-smile-fill"></i></div>
+					<div class="pb-avatar">
+                        <c:choose>
+                            <c:when test="${not empty userDto.profile_photo}">
+                                <img src="${pageContext.request.contextPath}/uploads/profile/${userDto.profile_photo}">
+                            </c:when>
+                            <c:otherwise><i class="ri-user-smile-fill"></i></c:otherwise>
+                        </c:choose>
+                    </div>                   
 					<div class="pb-info">
-						<h2 class="pb-name">${userDto.nickname} 님</h2>
-						<span class="pb-desc">${region.dong} · 매너온도 <strong class="theme-text">${userDto.score}℃</strong></span>
-						<div class="manner-bar-wrap">
-							<div class="manner-bar-bg">
-								<div class="manner-bar-fill theme-bg" style="width: ${userDto.score}%"></div>
+                        <div class="pb-name-row">
+						    <h2 class="pb-name">${userDto.nickname}</h2>
+                            <span class="rep-badge" style="background:${bColor}15; color:${bColor}; border: 1px solid ${bColor}30;">
+                                <i class="${bIcon}" style="font-weight: 900; transform: rotate(45deg); display: inline-block;"></i> ${bName}
+                            </span>
+                        </div>
+						<span class="pb-desc">
+                            <span>${region.dong} 이웃</span>
+                            <span>
+                                달린 거리 <strong style="color:${bColor};">${dist}km</strong> / 42.195km 
+                                <i class="ri-flag-2-fill" style="color:#D1D6DB; font-size:18px; margin-left: 4px; vertical-align: middle;" title="풀코스 완주(42.195km)"></i>
+                            </span>
+                        </span>
+						<div class="baton-track-wrap">
+							<div class="baton-track-bg">
+								<div class="baton-track-fill" style="width: ${percent}%; background: ${bColor}; box-shadow: 0 0 15px ${bColor}60;">
+                                    <div class="runner-icon" style="border-color: ${bColor}; color: ${bColor};"><i class="ri-run-fill"></i></div>
+                                </div>
 							</div>
 						</div>
-					</div>
+					</div>					
 				</div>
 				<div class="pb-right">
 					<div class="pb-point">
 						<span>보유 바통 포인트</span>
 						<strong>
 					        <fmt:formatNumber value="${empty userPoint ? 0 : userPoint}" pattern="#,###"/>
-					        <span class="theme-text">P</span>
+					        <span class="theme-text" style="color: #3182F6;">P</span>
 					    </strong>
 					</div>
-					<button class="theme-btn" onclick="openChargeModal()">충전하기</button>
+					<button class="theme-btn" style="background:#3182F6;" onclick="openChargeModal()">충전하기</button>
 				</div>
 			</div>
 
@@ -65,6 +177,36 @@
 				<div class="mp-content-area">
 
 					<section id="sec-overview" class="mp-section active">
+
+                        <div class="list-card mb-24" style="background: transparent; box-shadow: none; padding: 0;">
+                            <div class="lc-header" style="margin-bottom: 5px;">
+                                <h3>나의 러너 배지 🏅</h3>
+                                <a href="#" class="theme-link">전체보기 <i class="ri-arrow-right-s-line"></i></a>
+                            </div>
+                            <div class="badge-grid">
+                                <div class="badge-item">
+                                    <div class="badge-icon" style="color: #00B98D; background: #E6F8F3;"><i class="ri-hand-coin-fill"></i></div>
+                                    <div class="badge-info">
+                                        <h4>첫 바톤 터치</h4>
+                                        <p>첫 중고거래 완료</p>
+                                    </div>
+                                </div>
+                                <div class="badge-item">
+                                    <div class="badge-icon" style="color: #3182F6; background: #E8F3FF;"><i class="ri-megaphone-fill"></i></div>
+                                    <div class="badge-info">
+                                        <h4>동네 확성기</h4>
+                                        <p>게시글 10회 작성</p>
+                                    </div>
+                                </div>
+                                <div class="badge-item">
+                                    <div class="badge-icon" style="color: #FFB300; background: #FFF8E6;"><i class="ri-thumb-up-fill"></i></div>
+                                    <div class="badge-info">
+                                        <h4>리액션 장인</h4>
+                                        <p>커뮤니티 댓글 30회</p>
+                                    </div>
+                                </div>
+                                </div>
+                        </div>
 
 						<div class="stat-grid">
 							<div class="stat-box">
@@ -149,7 +291,6 @@
 								<div class="mk-item"><i class="ri-thumb-up-fill theme-text"></i> 응답이 빨라요 <span class="mk-count">3</span></div>
 							</div>
 						</div>
-		
 					</section>
 
 					<section id="sec-trade" class="mp-section">
@@ -186,9 +327,7 @@
 													            <img src="${pageContext.request.contextPath}/uploads/trade/${item.imageList[0].saveName}" alt="상품이미지">
 													        </c:when>
 													        <c:otherwise>
-													            <div>
-													                <i class="ri-image-line"></i>
-													            </div>
+													            <div><i class="ri-image-line"></i></div>
 													        </c:otherwise>
 													    </c:choose>
 					                                </div>
@@ -201,12 +340,10 @@
 					                                <div class="item-right">
 					                                	<div class="item-status-row">
 														    <span class="${item.tradeStatus == '판매완료' ? 'theme-badge-done' : 'theme-badge'}">${item.tradeStatus}</span>
-														    
 														    <c:if test="${item.tradeStatus == '판매완료'}">
 														        <button class="btn-sm" onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/review/write?productIdx=${item.productIdx}&role=SELLER'">후기 쓰기</button>
 														    </c:if>
 													    </div>
-													    
 													    <strong class="price">
 													        <c:choose>
 													            <c:when test="${item.price == 0}">나눔</c:when>
@@ -214,7 +351,6 @@
 													        </c:choose>
 													    </strong>
 													</div>  
-													
 					                            </div>
 					                        </c:forEach>
 					                    </c:otherwise>
@@ -290,14 +426,12 @@
 							                                </c:otherwise>
 							                            </c:choose>
 							                        </div>
-							
 							                        <div class="item-info">
 							                            <h4>${item.title}</h4>
 							                            <p class="info-metrics">
 							                                <span class="time-ago" data-time="${item.lastUpDate}">${item.lastUpDate}</span> · 조회 ${item.hitCount} · 찜 ${item.likeCount}
 							                            </p>
 							                        </div>
-							
 							                        <div class="item-right">
 							                        	<span class="${item.tradeStatus == '판매완료' ? 'theme-badge-done' : 'theme-badge'}">${item.tradeStatus}</span>
 							                            <strong class="price">
@@ -316,17 +450,13 @@
 							
 							<div class="inner-section" id="trade-follower">
 							    <div class="lc-list">
-							        <div class="lc-empty">
-							        	<p>불러오는 중...</p>
-							        </div>
+							        <div class="lc-empty"><p>불러오는 중...</p></div>
 							    </div>
 							</div>
 							
 							<div class="inner-section" id="trade-following">
 							    <div class="lc-list">
-									<div class="lc-empty">
-										<p>불러오는 중...</p>
-									</div>
+									<div class="lc-empty"><p>불러오는 중...</p></div>
 							    </div>
 							</div>
 						</div>
@@ -338,12 +468,10 @@
 								<h3>나의 모임 현황</h3>
 								<a href="${pageContext.request.contextPath}/mypage/club/joined" class="theme-link">내 모임 관리 <i class="ri-arrow-right-s-line"></i></a>
 							</div>
-
 							<div class="inner-tabs">
 								<button class="inner-tab active" data-inner="club-joined">참여중</button>
 								<button class="inner-tab"        data-inner="club-hosted">내가 만든</button>
 							</div>
-
 							<div class="inner-section active" id="club-joined">
 								<div class="lc-list">
 									<div class="lc-item">
@@ -352,9 +480,7 @@
 											<h4>주말 아침 한강 러닝크루</h4>
 											<p class="info-metrics">참여멤버 12명 · 토요일 07:00 여의도 한강공원</p>
 										</div>
-										<div class="item-right">
-											<span class="theme-badge">D-3</span>
-										</div>
+										<div class="item-right"><span class="theme-badge">D-3</span></div>
 									</div>
 									<div class="lc-item">
 										<div class="item-icon theme-icon-bg"><i class="ri-camera-line"></i></div>
@@ -362,13 +488,10 @@
 											<h4>필름 카메라 산책 모임</h4>
 											<p class="info-metrics">참여멤버 6명 · 다음주 일요일 14:00</p>
 										</div>
-										<div class="item-right">
-											<span class="theme-badge">D-10</span>
-										</div>
+										<div class="item-right"><span class="theme-badge">D-10</span></div>
 									</div>
 								</div>
 							</div>
-
 							<div class="inner-section" id="club-hosted">
 								<div class="lc-list">
 									<div class="lc-item">
@@ -393,13 +516,11 @@
 								<h3>알바 활동 내역</h3>
 								<a href="${pageContext.request.contextPath}/resume/myList" class="theme-link">이력서 관리 <i class="ri-arrow-right-s-line"></i></a>
 							</div>
-
 							<div class="inner-tabs">
 								<button class="inner-tab active" data-inner="alba-apply">지원현황</button>
 								<button class="inner-tab" data-inner="alba-post">내 공고</button>
 								<button class="inner-tab" data-inner="alba-wish">관심 공고</button>
 							</div>
-
 							<div class="inner-section active" id="alba-apply">
 						    <div class="lc-list">
 						        <c:choose>
@@ -423,12 +544,8 @@
 						                        </div>
 						                        <div class="item-right">
 						                            <c:choose>
-						                                <c:when test="${apply.status == '열람대기'}">
-						                                    <span class="theme-badge-outline">열람대기</span>
-						                                </c:when>
-						                                <c:when test="${apply.status == '서류통과'}">
-						                                    <span class="theme-badge">서류통과</span>
-						                                </c:when>
+						                                <c:when test="${apply.status == '열람대기'}"><span class="theme-badge-outline">열람대기</span></c:when>
+						                                <c:when test="${apply.status == '서류통과'}"><span class="theme-badge">서류통과</span></c:when>
 						                                <c:when test="${apply.status == '불합격'}">
 						                                    <span style="background:#F2F4F6;color:#8B95A1;padding:6px 12px;border-radius:8px;font-size:13px;font-weight:700;">불합격</span>
 						                                </c:when>
@@ -469,9 +586,7 @@
 														        <c:when test="${alba.recruitStatus == 'PRIVATE'}">비공개</c:when>
 														    </c:choose>
 														</span>
-							                            <button class="btn-sm" onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/alba/manage?postingIdx=${alba.postingIdx}'">
-							                                지원자 보기
-							                            </button>
+							                            <button class="btn-sm" onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/alba/manage?postingIdx=${alba.postingIdx}'">지원자 보기</button>
 							                        </div>
 							                    </div>
 							                </c:forEach>
@@ -526,7 +641,6 @@
 								<h3>커뮤니티 활동</h3>
 								<a href="${pageContext.request.contextPath}/mypage/community/posts" class="theme-link">전체 활동 <i class="ri-arrow-right-s-line"></i></a>
 							</div>
-
 							<div class="inner-tabs">
 								<button class="inner-tab active" data-inner="comm-posts">작성한 글</button>
 								<button class="inner-tab"        data-inner="comm-comments">댓글단 글</button>
@@ -643,15 +757,9 @@
 														<div class="comm-stats">
 															<span><i class="ri-group-line"></i> 총 ${vote.totalVotes}명 참여</span>
 															<c:choose>
-																<c:when test="${vote.expired}">
-																	<span style="color:#8B95A1;">투표 종료</span>
-																</c:when>
-																<c:when test="${not empty vote.pollEndDate}">
-																	<span class="theme-text">~${vote.pollEndDate} 까지</span>
-																</c:when>
-																<c:otherwise>
-																	<span class="theme-text">진행중</span>
-																</c:otherwise>
+																<c:when test="${vote.expired}"><span style="color:#8B95A1;">투표 종료</span></c:when>
+																<c:when test="${not empty vote.pollEndDate}"><span class="theme-text">~${vote.pollEndDate} 까지</span></c:when>
+																<c:otherwise><span class="theme-text">진행중</span></c:otherwise>
 															</c:choose>
 														</div>
 													</div>
@@ -671,7 +779,6 @@
 									</c:choose>
 								</div>
 							</div>
-
 						</div>
 					</section>
 
@@ -688,9 +795,7 @@
 			            </button>
 			        </div>
 			    </div>
-			    
-			    <div id="pointHistoryListContainer" style="background:#fff; border-radius:16px; padding:0 25px; box-shadow:0 4px 15px rgba(0,0,0,0.03);">
-			        </div>
+			    <div id="pointHistoryListContainer" style="background:#fff; border-radius:16px; padding:0 25px; box-shadow:0 4px 15px rgba(0,0,0,0.03);"></div>
 			</div>
 			
 			<div id="tradeHistoryContent" style="display:none; margin-top:30px;">

@@ -119,7 +119,7 @@
 			status, createdDate, updatedDate, lastLoginDate,
 			TO_CHAR(birth, 'YYYY-MM-DD') birth,
 			profile_photo, score, userLevel, pwdFailCount,
-			m2.authority, batonpoint
+			m2.authority, batonpoint, baton_distance AS batonDistance
 		FROM users m1
 		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
 		WHERE m1.userIdx = #{member_id}
@@ -130,7 +130,7 @@
 			status, createdDate, updatedDate, lastLoginDate,
 			TO_CHAR(birth, 'YYYY-MM-DD') birth,
 			profile_photo, score, userLevel, pwdFailCount,
-			m2.authority, batonpoint
+			m2.authority, batonpoint, baton_distance AS batonDistance
 		FROM users m1
 		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
 		WHERE m1.userId = #{login_id}
@@ -141,7 +141,7 @@
 			status, createdDate, updatedDate, lastLoginDate,
 			TO_CHAR(birth, 'YYYY-MM-DD') birth,
 			profile_photo, score, userLevel, pwdFailCount,
-			m2.authority, batonpoint
+			m2.authority, batonpoint, baton_distance AS batonDistance
 		FROM users m1
 		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
 		WHERE m1.email = #{email}
