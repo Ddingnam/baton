@@ -110,19 +110,26 @@ body { background: var(--bg); font-family: 'Pretendard', sans-serif; }
       </div>
     </div>
     <div class="profile-stats">
-      <div class="stat-item" onclick="alert('지원 현황 페이지로 이동합니다.')">
-        <div class="stat-title">지원 완료</div>
-        <div class="stat-num highlight">3<span>건</span></div>
-      </div>
-      <div class="stat-item" onclick="alert('이력서 열람 기업 페이지로 이동합니다.')">
-        <div class="stat-title">이력서 열람 기업</div>
-        <div class="stat-num">1<span>곳</span></div>
-      </div>
-      <div class="stat-item" onclick="alert('스크랩한 알바 페이지로 이동합니다.')">
-        <div class="stat-title">스크랩한 알바</div>
-        <div class="stat-num">5<span>건</span></div>
-      </div>
-    </div>
+
+	  <div class="stat-item"
+	       onclick="location.href='${pageContext.request.contextPath}/mypage/main?tab=alba&inner=apply'">
+	    <div class="stat-title">지원 완료</div>
+	    <div class="stat-num highlight">3<span>건</span></div>
+	  </div>
+	
+	  <div class="stat-item"
+	       onclick="location.href='${pageContext.request.contextPath}/mypage/main?tab=alba&inner=view'">
+	    <div class="stat-title">이력서 열람</div>
+	    <div class="stat-num">1<span>곳</span></div>
+	  </div>
+	
+	  <div class="stat-item"
+	       onclick="location.href='${pageContext.request.contextPath}/mypage/main?tab=alba&inner=wish'">
+	    <div class="stat-title">스크랩한 알바</div>
+	    <div class="stat-num">5<span>건</span></div>
+	  </div>
+	
+	</div>
   </div>
 
   <c:choose>

@@ -53,19 +53,21 @@
             });
         });
 
-        if (targetTab) {
-            applyTheme(targetTab);
+		if (targetTab) {
+		    applyTheme(targetTab);
 
-            if (activeInnerParam) {
-                var prefix = activeTabParam === 'community' ? 'comm' : activeTabParam;
-                var selector = '.inner-tab[data-inner="' + prefix + '-' + activeInnerParam + '"]';
-                var targetInnerBtn = document.querySelector(selector);
+		    if (activeInnerParam) {
+		        var prefix = activeTabParam === 'community' ? 'comm' : activeTabParam;
+		        var selector = '.inner-tab[data-inner="' + prefix + '-' + activeInnerParam + '"]';
+		        var targetInnerBtn = document.querySelector(selector);
 
-                if (targetInnerBtn) {
-                    targetInnerBtn.click();
-                }
-            }
-        }
+		        if (targetInnerBtn) {
+		            setTimeout(function () {
+		                targetInnerBtn.click();
+		            }, 100);
+		        }
+		    }
+		}
     }
 
     if (document.readyState === 'loading') {
