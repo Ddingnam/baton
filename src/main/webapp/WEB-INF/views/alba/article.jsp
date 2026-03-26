@@ -239,7 +239,7 @@
                         </button>
                         <button class="btn-action btn-apply" style="flex:1;" 
                                 onclick="location.href='${pageContext.request.contextPath}/alba/manage?postingIdx=${dto.postingIdx}'">
-                            <i class="ri-group-line"></i> 지원 내역 보기 (${applyCount})
+                            <i class="ri-group-line"></i> 지원 내역 보기 (${dto.applyCount})
                         </button>
                     </c:when>
         

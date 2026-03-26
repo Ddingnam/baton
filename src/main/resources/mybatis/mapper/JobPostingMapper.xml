@@ -68,31 +68,31 @@
 
     <update id="updatePosting" parameterType="com.sp.app.model.JobPosting">
     UPDATE job_posting
-    SET title=#{title},
-        description=#{description, jdbcType=CLOB}, 
-        pay=#{pay},
-        pay_type=#{payType},
-        work_period=#{workPeriod}, 
-        work_days=#{workDays},
-        start_time=#{startTime},
-        end_time=#{endTime, jdbcType=VARCHAR},
-        time_negotiable=#{timeNegotiable, jdbcType=VARCHAR}, 
-        location=#{location, jdbcType=VARCHAR},
-        location_detail=#{locationDetail, jdbcType=VARCHAR},
+    SET 
+        title = #{title},
+        description = #{description, jdbcType=CLOB}, 
+        pay = #{pay},
+        pay_type = #{payType},
+        work_period = #{workPeriod}, 
+        work_days = #{workDays},
+        start_time = #{startTime, jdbcType=VARCHAR},
+        end_time = #{endTime, jdbcType=VARCHAR},
+        time_negotiable = #{timeNegotiable, jdbcType=VARCHAR}, 
+        location = #{location, jdbcType=VARCHAR},
+        location_detail = #{locationDetail, jdbcType=VARCHAR},
+        
+        /* 🚨 핵심: 값이 안 넘어오면 원래 DB에 있던 값을 그대로 유지해라 (NVL 처리) */
+        latitude = NVL(#{latitude, jdbcType=DOUBLE}, latitude),
+        longitude = NVL(#{longitude, jdbcType=DOUBLE}, longitude),
+        sido = NVL(#{sido, jdbcType=VARCHAR}, sido),
+        gugun = NVL(#{gugun, jdbcType=VARCHAR}, gugun),
+        dong = NVL(#{dong, jdbcType=VARCHAR}, dong),
+        recruit_status = NVL(#{recruitStatus, jdbcType=VARCHAR}, recruit_status),
 
-        latitude=#{latitude},
-        longitude=#{longitude},
-
-        sido=#{sido},
-        gugun=#{gugun},
-        dong=#{dong},
-
-        contact=#{contact, jdbcType=VARCHAR}, 
-        benefits=#{benefits, jdbcType=VARCHAR}, 
-        category=#{category}, 
-        deadline=#{deadline, jdbcType=DATE},
-        recruit_status=#{recruitStatus}
-
+        contact = #{contact, jdbcType=VARCHAR}, 
+        benefits = #{benefits, jdbcType=VARCHAR}, 
+        category = #{category}, 
+        deadline = #{deadline, jdbcType=DATE}
     WHERE posting_idx = #{postingIdx}
 </update>
 

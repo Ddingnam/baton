@@ -243,9 +243,9 @@
              <input type="hidden" id="latInput" name="latitude" value="${dto.locationLat}">
 			<input type="hidden" id="lngInput" name="longitude" value="${dto.locationLng}">
 			
-			<input type="hidden" name="sido" id="sidoInput">
-			<input type="hidden" name="gugun" id="gugunInput">
-			<input type="hidden" name="dong" id="dongInput">
+			<input type="hidden" name="sido" id="sidoInput" value="${dto.sido}">
+			<input type="hidden" name="gugun" id="gugunInput" value="${dto.gugun}">
+			<input type="hidden" name="dong" id="dongInput" value="${dto.dong}">
               
               <div class="input-with-btn">
                 <input type="text" id="location" name="location" readonly
