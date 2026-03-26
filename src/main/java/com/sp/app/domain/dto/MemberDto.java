@@ -21,6 +21,9 @@ public class MemberDto {
 	private String update_at;
 	private String last_login;
 	private int failure_cnt;
+	
+	private String nickname;
+	private Long userIdx;
 
 	private String name;
 	private String birth;

@@ -12,4 +12,9 @@ public class AdminController {
     public String loginForm() {
         return "admin/login/login"; 
     }
+    
+    @GetMapping("/calendar")
+    public String calendarPage() {
+    	 return "admin/cal/calendar";
+    }
 }

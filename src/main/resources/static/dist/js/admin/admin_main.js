@@ -458,34 +458,61 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    const profileSaveBtn = document.getElementById('profileSaveBtn');
-    if (profileSaveBtn) {
-        profileSaveBtn.addEventListener('click', function() {
-            const payload = {
-                name: (document.getElementById('profileNameInput') || {}).value || '',
-                nickname: (document.getElementById('profileNicknameInput') || {}).value || '',
-                email: (document.getElementById('profileEmailInput') || {}).value || ''
-            };
-            profileSaveBtn.disabled = true;
-            profileSaveBtn.textContent = '저장 중...';
-            apiPost(BASE + '/admin/util/profile/save', payload)
-                .then(function(data) {
-                    if (data && data.success) {
-                        syncProfileUi({ name: data.name, nickname: data.nickname, email: data.email, roleCode: data.roleCode || ((window.ADMIN_PROFILE || {}).roleCode) });
-                        if (typeof showToast === 'function') showToast('정보 변경이 완료되었습니다.', 'success');
-                    } else if (typeof showToast === 'function') {
-                        showToast((data && data.msg) || '프로필 저장에 실패했습니다.', 'error');
-                    }
-                })
-                .catch(function() {
-                    if (typeof showToast === 'function') showToast('프로필 저장 중 오류가 발생했습니다.', 'error');
-                })
-                .finally(function() {
-                    profileSaveBtn.disabled = false;
-                    profileSaveBtn.textContent = '저장하기';
-                });
-        });
-    }
+	const profileSaveBtn = document.getElementById('profileSaveBtn');
+	    if (profileSaveBtn) {
+	        profileSaveBtn.addEventListener('click', function() {
+	            const formData = new FormData();
+	            
+	            formData.append('name', (document.getElementById('profileNameInput') || {}).value || '');
+	            formData.append('nickname', (document.getElementById('profileNicknameInput') || {}).value || '');
+	            formData.append('email', (document.getElementById('profileEmailInput') || {}).value || '');
+
+	            const fileInput = document.getElementById('profilePhotoInput');
+	            if (fileInput && fileInput.files && fileInput.files[0]) {
+	                formData.append('profileFile', fileInput.files[0]);
+	            }
+
+	            const circle = document.getElementById('profileAvatarCircle');
+	            const isPhotoDeleted = circle && !circle.style.backgroundImage && (!fileInput || !fileInput.files || !fileInput.files[0]);
+	            formData.append('photoDeleted', isPhotoDeleted);
+				
+	            profileSaveBtn.disabled = true;
+	            profileSaveBtn.textContent = '저장 중...';
+
+	            fetch(BASE + '/admin/util/profile/save', {
+	                method: 'POST',
+	                credentials: 'same-origin',
+	                body: formData
+	            })
+	            .then(function(res) {
+	                if (!res.ok) throw new Error('HTTP ' + res.status);
+	                return res.json();
+	            })
+	            .then(function(data) {
+	                if (data && data.success) {
+	                    syncProfileUi({ 
+	                        name: data.name, 
+	                        nickname: data.nickname, 
+	                        email: data.email, 
+	                        roleCode: data.roleCode || ((window.ADMIN_PROFILE || {}).roleCode) 
+	                    });
+	                    if (typeof showToast === 'function') showToast('정보 변경이 완료되었습니다.', 'success');
+	                } else {
+	                    if (typeof showToast === 'function') showToast((data && data.msg) || '프로필 저장에 실패했습니다.', 'error');
+	                }
+	            })
+	            .catch(function(error) {
+	                console.error("Profile Save Error: ", error);
+	                if (typeof showToast === 'function') showToast('프로필 저장 중 오류가 발생했습니다.', 'error');
+	            })
+	            .finally(function() {
+	                profileSaveBtn.disabled = false;
+	                profileSaveBtn.textContent = '저장하기';
+	                
+	                if (fileInput) fileInput.value = ''; 
+	            });
+	        });
+	    }
 
     const passwordSaveBtn = document.getElementById('passwordSaveBtn');
     if (passwordSaveBtn) {
@@ -497,12 +524,22 @@ document.addEventListener("DOMContentLoaded", () => {
             };
             if (!payload.currentPassword || !payload.newPassword || !payload.confirmPassword) {
                 if (typeof showToast === 'function') showToast('비밀번호를 모두 입력해 주세요.', 'warning');
+                showAdminBanner('비밀번호를 모두 입력해 주세요.', 'warning');
                 return;
             }
             if (payload.newPassword !== payload.confirmPassword) {
                 if (typeof showToast === 'function') showToast('새 비밀번호가 일치하지 않습니다.', 'warning');
+                showAdminBanner('새 비밀번호가 일치하지 않습니다.', 'warning');
                 return;
             }
+            showAdminConfirm({
+                icon:    '<i class="ri-lock-password-line" style="color:#fff;"></i>',
+                iconBg:  'var(--grad-primary)',
+                title:   '비밀번호 변경',
+                desc:    '비밀번호를 변경하시겠습니까? 변경 후 자동으로 로그아웃됩니다.',
+                okLabel: '변경하기',
+                okBg:    'var(--grad-primary)'
+            }, function() {
             passwordSaveBtn.disabled = true;
             passwordSaveBtn.textContent = '변경 중...';
             apiPost(BASE + '/admin/util/profile/password', payload)
@@ -512,7 +549,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             const el = document.getElementById(id);
                             if (el) el.value = '';
                         });
-                        // 성공 토스트 + 카운트다운 후 로그아웃
+                        
                         var count = 3;
                         if (typeof showToast === 'function') showToast('비밀번호가 변경되었습니다. ' + count + '초 후 로그아웃됩니다.', 'success');
                         passwordSaveBtn.disabled = true;
@@ -535,12 +572,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (typeof showToast === 'function') showToast('비밀번호 변경 중 오류가 발생했습니다.', 'error');
                 })
                 .finally(function() {
-                    // 성공 시에는 버튼 복구 안 함 (카운트다운 중이므로)
+                    
                     if (!passwordSaveBtn.textContent.includes('초 후')) {
                         passwordSaveBtn.disabled = false;
                         passwordSaveBtn.textContent = '변경하기';
                     }
                 });
+            }); 
         });
     }
     function runClock() {
@@ -628,12 +666,35 @@ document.addEventListener("DOMContentLoaded", () => {
             preview.style.display = 'none';
         }
     }
-    const calPrevBtn  = document.getElementById('calPrev');
-    const calNextBtn  = document.getElementById('calNext');
-    const calTodayBtn = document.getElementById('calToday');
-    if (calPrevBtn)  calPrevBtn.addEventListener('click',  e => { e.stopPropagation(); calMonth--; if (calMonth < 0)  { calMonth = 11; calYear--; } loadCalMonth(); });
-    if (calNextBtn)  calNextBtn.addEventListener('click',  e => { e.stopPropagation(); calMonth++; if (calMonth > 11) { calMonth = 0;  calYear++; } loadCalMonth(); });
-    if (calTodayBtn) calTodayBtn.addEventListener('click', e => { e.stopPropagation(); calYear = today.getFullYear(); calMonth = today.getMonth(); loadCalMonth(); });
+	const calPrevBtn  = document.getElementById('calPrev');
+	const calNextBtn  = document.getElementById('calNext');
+	const calTodayBtn = document.getElementById('calToday');
+
+	if (calPrevBtn)  calPrevBtn.addEventListener('click',  e => {
+	    e.stopPropagation();
+	    calMonth--;
+	    if (calMonth < 0) {
+	        calMonth = 11;
+	        calYear--;
+	    }
+	    loadCalMonth();
+	});
+
+	if (calNextBtn)  calNextBtn.addEventListener('click',  e => {
+	    e.stopPropagation();
+	    calMonth++;
+	    if (calMonth > 11) {
+	        calMonth = 0;
+	        calYear++;
+	    }
+	    loadCalMonth();
+	});
+
+	if (calTodayBtn) calTodayBtn.addEventListener('click', e => {
+	    e.stopPropagation();
+	    location.href = BASE + '/admin/calendar';
+	});
+	
     const calMemoSaveBtn  = document.getElementById('calMemoSave');
     const calMemoClearBtn = document.getElementById('calMemoClear');
     const calMemoInputEl  = document.getElementById('calMemoInput');
@@ -701,6 +762,217 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     function todoEsc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    
+    let fcYear  = today.getFullYear();
+    let fcMonth = today.getMonth();
+    let fcSelectedKey  = null;
+    const fcMemos = {};
+
+    function openCalendarFull() {
+        const overlay = document.getElementById('calendarFullOverlay');
+        if (!overlay) return;
+        
+        if (modalUtility) modalUtility.classList.remove('show');
+        overlay.style.display = 'flex';
+        fcYear  = today.getFullYear();
+        fcMonth = today.getMonth();
+        fcLoadMonth();
+    }
+
+    function fcLoadMonth() {
+        const ym = fcYear + '-' + calPad(fcMonth + 1);
+        apiGet(BASE + '/admin/util/memo/month?yearMonth=' + ym)
+            .then(list => {
+                Object.keys(fcMemos).forEach(k => { if (k.startsWith(ym)) delete fcMemos[k]; });
+                if (Array.isArray(list)) list.forEach(m => { fcMemos[m.memoDate] = m.content; });
+                fcRenderGrid();
+                fcRenderSideList();
+            }).catch(() => { fcRenderGrid(); fcRenderSideList(); });
+    }
+
+    function fcRenderGrid() {
+        const grid  = document.getElementById('calFullGrid');
+        const label = document.getElementById('calFullMonthLabel');
+        if (!grid) return;
+        if (label) label.textContent = new Date(fcYear, fcMonth).toLocaleString('ko-KR', { year: 'numeric', month: 'long' });
+        const tDays = new Date(fcYear, fcMonth + 1, 0).getDate();
+        const sDay  = new Date(fcYear, fcMonth, 1).getDay();
+        const isCur = fcYear === today.getFullYear() && fcMonth === today.getMonth();
+        let h = '';
+        for (let i = 0; i < sDay; i++) h += '<div class="cal-full-cell empty"></div>';
+        for (let i = 1; i <= tDays; i++) {
+            const key  = fcYear + '-' + calPad(fcMonth + 1) + '-' + calPad(i);
+            const isToday   = isCur && i === today.getDate();
+            const hasMemo   = !!fcMemos[key];
+            const isSelected = key === fcSelectedKey;
+            const dow = (sDay + i - 1) % 7;
+            const isSun = dow === 0, isSat = dow === 6;
+            h += '<div class="cal-full-cell' +
+                (isToday ? ' today' : '') +
+                (hasMemo ? ' has-memo' : '') +
+                (isSelected ? ' selected' : '') +
+                (isSun ? ' sun' : '') +
+                (isSat ? ' sat' : '') +
+                '" data-key="' + key + '">' +
+                '<span class="cal-full-day-num">' + i + '</span>' +
+                (hasMemo ? '<div class="cal-full-memo-preview">' + todoEsc(fcMemos[key].substring(0, 30)) + (fcMemos[key].length > 30 ? '…' : '') + '</div>' : '') +
+                '</div>';
+        }
+        grid.innerHTML = h;
+        grid.querySelectorAll('.cal-full-cell[data-key]').forEach(cell => {
+            cell.addEventListener('click', () => fcSelectDate(cell.dataset.key));
+        });
+    }
+
+    function fcRenderSideList() {
+        const listEl = document.getElementById('calFullMemoList');
+        if (!listEl) return;
+        const ym = fcYear + '-' + calPad(fcMonth + 1);
+        const keys = Object.keys(fcMemos).filter(k => k.startsWith(ym)).sort();
+        if (!keys.length) {
+            listEl.innerHTML = '<div style="font-size:12px;color:#CBD5E1;text-align:center;padding:12px 0;">메모 없음</div>';
+            return;
+        }
+        listEl.innerHTML = keys.map(k => {
+            const p = k.split('-');
+            return '<div class="cal-full-side-item' + (k === fcSelectedKey ? ' active' : '') + '" data-key="' + k + '">' +
+                '<div style="font-size:11px;font-weight:800;color:var(--color-purple);">' + p[1] + '.' + p[2] + '</div>' +
+                '<div style="font-size:11px;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + todoEsc(fcMemos[k].substring(0, 18)) + '</div>' +
+                '</div>';
+        }).join('');
+        listEl.querySelectorAll('.cal-full-side-item[data-key]').forEach(el => {
+            el.addEventListener('click', () => fcSelectDate(el.dataset.key));
+        });
+    }
+
+    function fcSelectDate(key) {
+        fcSelectedKey = key;
+        const panel = document.getElementById('calFullEditPanel');
+        const label = document.getElementById('calFullEditDateLabel');
+        const input = document.getElementById('calFullEditInput');
+        if (!panel || !label || !input) return;
+        const p = key.split('-');
+        label.textContent = p[0] + '년 ' + p[1] + '월 ' + p[2] + '일';
+        input.value = fcMemos[key] || '';
+        panel.style.display = 'block';
+        fcRenderGrid();
+        fcRenderSideList();
+        setTimeout(() => input.focus(), 60);
+    }
+
+    (function() {
+        const overlay   = document.getElementById('calendarFullOverlay');
+        const closeBtn  = document.getElementById('calFullClose');
+        const prevBtn   = document.getElementById('calFullPrev');
+        const nextBtn   = document.getElementById('calFullNext');
+        const todayBtn  = document.getElementById('calFullToday');
+        const saveBtn   = document.getElementById('calFullEditSave');
+        const clearBtn  = document.getElementById('calFullEditClear');
+        const editClose = document.getElementById('calFullEditClose');
+        if (!overlay) return;
+
+        if (closeBtn)  closeBtn.addEventListener('click',  () => { overlay.style.display = 'none'; fcSelectedKey = null; });
+        if (prevBtn)   prevBtn.addEventListener('click',   () => { fcMonth--; if (fcMonth < 0)  { fcMonth = 11; fcYear--; } fcLoadMonth(); });
+        if (nextBtn)   nextBtn.addEventListener('click',   () => { fcMonth++; if (fcMonth > 11) { fcMonth = 0;  fcYear++; } fcLoadMonth(); });
+        if (todayBtn)  todayBtn.addEventListener('click',  () => { fcYear = today.getFullYear(); fcMonth = today.getMonth(); fcLoadMonth(); });
+        if (editClose) editClose.addEventListener('click', () => {
+            document.getElementById('calFullEditPanel').style.display = 'none';
+            fcSelectedKey = null;
+            fcRenderGrid();
+            fcRenderSideList();
+        });
+        if (clearBtn) clearBtn.addEventListener('click', () => {
+            const input = document.getElementById('calFullEditInput');
+            if (input) input.value = '';
+        });
+        if (saveBtn) saveBtn.addEventListener('click', () => {
+            if (!fcSelectedKey) return;
+            const val = (document.getElementById('calFullEditInput') || {}).value.trim();
+            saveBtn.disabled = true;
+            saveBtn.textContent = '저장 중...';
+            const done = (success) => {
+                saveBtn.disabled = false;
+                saveBtn.textContent = '저장';
+                if (success) {
+                    if (val) { fcMemos[fcSelectedKey] = val; } else { delete fcMemos[fcSelectedKey]; }
+                    document.getElementById('calFullEditPanel').style.display = 'none';
+                    fcSelectedKey = null;
+                    fcRenderGrid();
+                    fcRenderSideList();
+                    
+                    if (typeof loadCalMonth === 'function') loadCalMonth();
+                    showAdminBanner(val ? '메모가 저장되었습니다.' : '메모가 삭제되었습니다.', 'success');
+                } else {
+                    showAdminBanner('저장에 실패했습니다.', 'error');
+                }
+            };
+            if (val) {
+                apiPost(BASE + '/admin/util/memo/save', { date: fcSelectedKey, content: val })
+                    .then(d => done(!!(d && d.success))).catch(() => done(false));
+            } else {
+                apiPost(BASE + '/admin/util/memo/delete', { date: fcSelectedKey })
+                    .then(() => done(true)).catch(() => done(false));
+            }
+        });
+        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.style.display = 'none'; });
+    })();
+
+    
+    let teamMembers = [];
+
+    function loadTeamPresence() {
+        apiGet(BASE + '/api/presence/all')
+            .then(list => {
+                if (!Array.isArray(list) || !list.length) return;
+                teamMembers = list;
+                renderTeamRows();
+            }).catch(() => {});
+    }
+
+    function renderTeamRows() {
+        const rowsEl = document.getElementById('teamRows');
+        const badge  = document.getElementById('teamCountBadge');
+        if (!rowsEl) return;
+        if (!teamMembers.length) {
+            rowsEl.innerHTML = '<div style="padding:16px;text-align:center;color:#94A3B8;font-size:12px;">팀원 없음</div>';
+            return;
+        }
+        if (badge) badge.textContent = teamMembers.length + '명';
+        rowsEl.innerHTML = teamMembers.map(m => {
+            const nickname = m.nickname || ('user' + m.userIdx);
+            const initials = nickname.substring(0, 2);
+            const status   = Number(m.status || 0);
+            const isOnline = status === 1;
+            const isAway   = status === 2;
+            const pillCls  = isOnline ? 'online' : isAway ? 'away' : '';
+            const pillText = isOnline ? '온라인' : isAway ? '자리비움' : '오프라인';
+            return '<div class="t-row" id="team-row-' + m.userIdx + '">' +
+                '<div class="t-avt" id="team-avt-' + m.userIdx + '">' + todoEsc(initials) + '</div>' +
+                '<div class="t-info' + (isAway ? ' t-away' : '') + '" id="team-info-' + m.userIdx + '">' + todoEsc(nickname) + '</div>' +
+                (pillCls ? '<div class="t-status-pill ' + pillCls + '" id="team-pill-' + m.userIdx + '"><span class="t-status-dot"></span>' + pillText + '</div>' : '<div class="t-status-pill" id="team-pill-' + m.userIdx + '" style="color:#CBD5E1;"><span class="t-status-dot" style="background:#E2E8F0;"></span>' + pillText + '</div>') +
+                '</div>';
+        }).join('');
+    }
+
+    function updateTeamPresence(userIdx, status) {
+        const idx = teamMembers.findIndex(m => Number(m.userIdx) === Number(userIdx));
+        if (idx !== -1) teamMembers[idx].status = status;
+        const pill = document.getElementById('team-pill-' + userIdx);
+        const info = document.getElementById('team-info-' + userIdx);
+        if (!pill) return;
+        const isOnline = status === 1, isAway = status === 2;
+        const pillCls  = isOnline ? 'online' : isAway ? 'away' : '';
+        const pillText = isOnline ? '온라인' : isAway ? '자리비움' : '오프라인';
+        pill.className = 't-status-pill' + (pillCls ? ' ' + pillCls : '');
+        pill.innerHTML = '<span class="t-status-dot"' + (pillCls ? '' : ' style="background:#E2E8F0;"') + '></span>' + pillText;
+        if (info) { info.classList.toggle('t-away', isAway); }
+    }
+    window.updateTeamPresence = updateTeamPresence;
+
+    
+    loadTeamPresence();
+    setInterval(loadTeamPresence, 30000);
     let todos = [];
     function loadTodoList() {
         apiGet(BASE + '/admin/util/todo/list')
@@ -845,7 +1117,7 @@ document.addEventListener("DOMContentLoaded", () => {
         card.addEventListener('click', function() {
             document.querySelectorAll('.theme-card').forEach(function(c) { c.classList.remove('active'); });
             card.classList.add('active');
-            // 카드 클릭 즉시 미리보기 적용
+            
             applyTheme(card.dataset.theme);
         });
     });
@@ -872,6 +1144,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (typeof showToast === 'function') {
                 showToast('테마가 [' + name + ']으로 저장되었습니다.', 'success');
             }
+            showAdminBanner('✓  테마가 [' + name + ']으로 변경되었습니다!', 'success');
             saveThemeBtn.textContent = '✓ ' + name + ' 저장됨';
             saveThemeBtn.style.background = 'var(--grad-primary)';
             saveThemeBtn.style.opacity = '1';
@@ -952,6 +1225,77 @@ document.addEventListener("DOMContentLoaded", () => {
     function escHtml(s) {
         return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
+
+    
+    function showAdminConfirm(opts, onOk) {
+        var id = '__adminConfirmOverlay';
+        var overlay = document.getElementById(id);
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = id;
+            overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:99999;align-items:center;justify-content:center;';
+            overlay.innerHTML =
+                '<div style="background:var(--card-bg,#fff);border-radius:20px;padding:28px 28px 22px;width:340px;box-shadow:0 24px 60px rgba(0,0,0,0.18);border:1.5px solid var(--border-color,#eee);">' +
+                  '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">' +
+                    '<div id="__acIcon" style="width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;"></div>' +
+                    '<p id="__acTitle" style="font-size:15px;font-weight:800;color:var(--text-main,#111);margin:0;"></p>' +
+                  '</div>' +
+                  '<p id="__acDesc" style="font-size:13px;color:var(--text-light,#888);font-weight:500;line-height:1.6;margin:0 0 22px;padding-left:54px;"></p>' +
+                  '<div style="display:flex;gap:8px;justify-content:flex-end;">' +
+                    '<button id="__acCancel" style="padding:9px 20px;border-radius:10px;border:1.5px solid var(--border-color,#eee);background:none;color:var(--text-sub,#555);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">취소</button>' +
+                    '<button id="__acOk" style="padding:9px 20px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:#fff;"></button>' +
+                  '</div>' +
+                '</div>';
+            document.body.appendChild(overlay);
+        }
+        document.getElementById('__acIcon').style.background = opts.iconBg  || 'var(--grad-primary)';
+        document.getElementById('__acIcon').innerHTML        = opts.icon    || '<i class="ri-question-line" style="color:#fff;"></i>';
+        document.getElementById('__acTitle').textContent     = opts.title   || '확인';
+        document.getElementById('__acDesc').textContent      = opts.desc    || '';
+        document.getElementById('__acOk').textContent        = opts.okLabel || '확인';
+        document.getElementById('__acOk').style.background   = opts.okBg   || 'var(--grad-primary)';
+        overlay.style.display = 'flex';
+        function close() { overlay.style.display = 'none'; }
+        document.getElementById('__acOk').onclick     = function() { close(); if (onOk) onOk(); };
+        document.getElementById('__acCancel').onclick = close;
+        overlay.onclick = function(e) { if (e.target === overlay) close(); };
+    }
+
+    
+    function showAdminBanner(message, type) {
+        var existing = document.getElementById('__adminBanner');
+        if (existing) existing.remove();
+        var colors = {
+            success: { bg: 'linear-gradient(135deg,var(--color-purple,#7C3AED),var(--color-pink,#EC4899))', icon: 'ri-checkbox-circle-fill' },
+            error:   { bg: 'linear-gradient(135deg,#EF4444,#F97316)',                                       icon: 'ri-close-circle-fill'   },
+            warning: { bg: 'linear-gradient(135deg,#F59E0B,#F97316)',                                       icon: 'ri-error-warning-fill'  }
+        };
+        var c = colors[type] || colors.success;
+        var banner = document.createElement('div');
+        banner.id = '__adminBanner';
+        banner.style.cssText = [
+            'position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-100%);',
+            'z-index:99999;background:' + c.bg + ';color:#fff;',
+            'padding:14px 28px;border-radius:0 0 18px 18px;',
+            'display:flex;align-items:center;gap:10px;',
+            'box-shadow:0 8px 32px rgba(0,0,0,0.18);',
+            'font-size:14px;font-weight:700;font-family:inherit;',
+            'transition:transform 0.35s cubic-bezier(.34,1.56,.64,1);',
+            'white-space:nowrap;'
+        ].join('');
+        banner.innerHTML = '<i class="' + c.icon + '" style="font-size:18px;"></i><span>' + escHtml(message) + '</span>';
+        document.body.appendChild(banner);
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+                banner.style.transform = 'translateX(-50%) translateY(0)';
+            });
+        });
+        setTimeout(function() {
+            banner.style.transform = 'translateX(-50%) translateY(-100%)';
+            setTimeout(function() { banner.remove(); }, 400);
+        }, 3000);
+    }
+
     function apiGet(url) {
         return fetch(url, { credentials: 'same-origin' })
             .then(r => {

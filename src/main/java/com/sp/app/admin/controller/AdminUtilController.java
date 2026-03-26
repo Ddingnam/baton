@@ -3,16 +3,21 @@ package com.sp.app.admin.controller;
 import com.sp.app.admin.model.AdminCalMemo;
 import com.sp.app.admin.model.AdminTodo;
 import com.sp.app.admin.service.AdminUtilService;
+import com.sp.app.domain.dto.MemberDto;
 import com.sp.app.domain.dto.UserDto;
 import com.sp.app.model.Notification;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.MemberService;
 import com.sp.app.service.NotificationService;
+
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -239,6 +244,59 @@ public class AdminUtilController {
             result.put("success", true);
         } catch (Exception e) {
             result.put("success", false);
+        }
+        return result;
+    }
+    
+    @PostMapping("/profile/save")
+    public Map<String, Object> saveProfile(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "nickname", required = false) String nickname,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "profileFile", required = false) MultipartFile profileFile,
+            @RequestParam(value = "photoDeleted", defaultValue = "false") boolean photoDeleted,
+            @AuthenticationPrincipal CustomUserDetails u,
+            HttpSession session) {
+
+        Map<String, Object> result = new HashMap<>();
+        try {
+            Long adminIdx = getAdminIdx(u);
+            if (adminIdx == null) {
+                result.put("success", false);
+                result.put("msg", "인증 정보가 없습니다.");
+                return result;
+            }
+
+            String root = session.getServletContext().getRealPath("/");
+            String pathname = root + "uploads" + File.separator + "profile";
+
+            if (photoDeleted) {
+                Map<String, Object> paramMap = new HashMap<>();
+                paramMap.put("userIdx", adminIdx); 
+                memberService.deleteProfilePhoto(paramMap, pathname);
+            }
+
+            MemberDto dto = new MemberDto();
+            dto.setUserIdx(adminIdx); 
+            dto.setName(name);
+            dto.setNickname(nickname);
+            dto.setEmail(email);
+
+            if (profileFile != null && !profileFile.isEmpty()) {
+                dto.setSelectFile(profileFile);
+            }
+
+            memberService.updateMember(dto, pathname);
+
+            result.put("success", true);
+            result.put("name", name);
+            result.put("nickname", nickname);
+            result.put("email", email);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("success", false);
+            result.put("msg", "프로필 저장 중 오류가 발생했습니다.");
         }
         return result;
     }

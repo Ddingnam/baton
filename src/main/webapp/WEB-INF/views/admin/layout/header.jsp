@@ -100,7 +100,9 @@
                 <span id="modalMonth" class="wg-panel-title"></span>
                 <div class="cal-nav">
                     <button class="cal-nav-btn" id="calPrev"><i class="ri-arrow-left-s-line"></i></button>
-                    <button class="cal-nav-btn" id="calToday"><i class="ri-calendar-event-fill" style="color:var(--color-purple);"></i></button>
+                    <button class="cal-nav-btn" id="calToday" title="풀스크린 캘린더 열기">
+					    <i class="ri-calendar-event-fill" style="color:var(--color-purple);"></i>
+					</button>
                     <button class="cal-nav-btn" id="calNext"><i class="ri-arrow-right-s-line"></i></button>
                 </div>
             </div>
@@ -125,34 +127,10 @@
             <div class="wg-panel">
                 <div class="wg-panel-head">
                     <span class="wg-panel-title">팀 현황</span>
-                    <span class="team-count-badge">5명</span>
+                    <span class="team-count-badge" id="teamCountBadge">-</span>
                 </div>
-                <div class="team-rows">
-                    <div class="t-row">
-                        <div class="t-avt">OD</div>
-                        <div class="t-info">오다은</div>
-                        <div class="t-status-pill online"><span class="t-status-dot"></span>온라인</div>
-                    </div>
-                    <div class="t-row">
-                        <div class="t-avt">JY</div>
-                        <div class="t-info">이지영</div>
-                        <div class="t-status-pill online"><span class="t-status-dot"></span>온라인</div>
-                    </div>
-                    <div class="t-row">
-                        <div class="t-avt">HN</div>
-                        <div class="t-info">최하늘</div>
-                        <div class="t-status-pill online"><span class="t-status-dot"></span>온라인</div>
-                    </div>
-                    <div class="t-row">
-                        <div class="t-avt">MN</div>
-                        <div class="t-info t-away">정명남</div>
-                        <div class="t-status-pill away"><span class="t-status-dot"></span>자리비움</div>
-                    </div>
-                    <div class="t-row">
-                        <div class="t-avt">HS</div>
-                        <div class="t-info t-away">함형서</div>
-                        <div class="t-status-pill away"><span class="t-status-dot"></span>자리비움</div>
-                    </div>
+                <div class="team-rows" id="teamRows">
+                    <div style="padding:16px;text-align:center;color:#94A3B8;font-size:12px;font-weight:600;">불러오는 중...</div>
                 </div>
             </div>
 
@@ -178,6 +156,57 @@
         window.CTX = '${pageContext.request.contextPath}';
     }
 </script>
+
+<div class="fullscreen-overlay" id="calendarFullOverlay" style="display:none;">
+    <div class="fullscreen-modal cal-full-modal" id="calendarFullModal">
+        <div class="fm-sidebar">
+            <div class="fm-brand" style="display:flex;align-items:center;gap:8px;">
+                <i class="ri-calendar-2-fill" style="color:var(--color-purple);"></i>캘린더
+            </div>
+            <div style="padding:16px 12px 8px;">
+                <div style="font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-light);margin-bottom:10px;">이번 달 메모</div>
+                <div id="calFullMemoList" style="display:flex;flex-direction:column;gap:6px;max-height:400px;overflow-y:auto;"></div>
+            </div>
+        </div>
+        <div class="fm-content" style="padding:32px 40px;overflow-y:auto;">
+            <button class="fm-close" id="calFullClose"><i class="ri-close-line"></i></button>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;">
+                <div style="display:flex;align-items:center;gap:16px;">
+                    <button id="calFullPrev" style="width:36px;height:36px;border-radius:10px;border:1.5px solid var(--border-color);background:var(--card-bg);color:var(--text-sub);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all 0.15s;">
+                        <i class="ri-arrow-left-s-line"></i>
+                    </button>
+                    <h2 id="calFullMonthLabel" style="font-size:22px;font-weight:900;color:var(--text-main);margin:0;min-width:140px;text-align:center;"></h2>
+                    <button id="calFullNext" style="width:36px;height:36px;border-radius:10px;border:1.5px solid var(--border-color);background:var(--card-bg);color:var(--text-sub);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all 0.15s;">
+                        <i class="ri-arrow-right-s-line"></i>
+                    </button>
+                </div>
+                <button id="calFullToday" style="padding:8px 18px;border-radius:20px;border:none;background:var(--grad-primary);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">
+                    오늘
+                </button>
+            </div>
+
+            <div class="cal-full-grid-head">
+                <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
+            </div>
+            <div class="cal-full-grid" id="calFullGrid"></div>
+
+            <div class="cal-full-edit-panel" id="calFullEditPanel" style="display:none;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                    <div style="font-size:15px;font-weight:800;color:var(--text-main);" id="calFullEditDateLabel"></div>
+                    <button id="calFullEditClose" style="width:28px;height:28px;border:none;background:var(--base-bg);border-radius:8px;cursor:pointer;color:var(--text-sub);font-size:16px;display:flex;align-items:center;justify-content:center;">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                <textarea id="calFullEditInput" class="cal-memo-input" placeholder="이 날의 일정이나 메모를 적어보세요..." style="width:100%;min-height:100px;resize:vertical;"></textarea>
+                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
+                    <button id="calFullEditClear" class="cal-memo-clear">지우기</button>
+                    <button id="calFullEditSave" class="cal-memo-save">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="fullscreen-overlay" id="setupOverlay">
     <div class="fullscreen-modal" id="setupModal">
