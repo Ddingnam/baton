@@ -234,26 +234,30 @@ public class JobPostingController {
 	}
 
 	private String convertToKoreanDays(String days) {
-		if (days == null || days.trim().isEmpty())
-			return ""; 
+	    if (days == null || days.trim().isEmpty()) return "";
 
-		String[] dayArr = days.split(",");
-		String[] korNames = { "", "월", "화", "수", "목", "금", "토", "일" };
-		StringBuilder sb = new StringBuilder();
+	    String[] dayArr = days.split(",");
+	    Map<String, String> dayMap = new HashMap<>();
 
-		for (String d : dayArr) {
-			try {
-				int dayNum = Integer.parseInt(d.trim());
-				if (dayNum >= 1 && dayNum <= 7) {
-					if (sb.length() > 0)
-						sb.append(", ");
-					sb.append(korNames[dayNum]);
-				}
-			} catch (Exception e) {
-				continue;
-			}
-		}
-		return sb.toString();
+	    dayMap.put("MON", "월");
+	    dayMap.put("TUE", "화");
+	    dayMap.put("WED", "수");
+	    dayMap.put("THU", "목");
+	    dayMap.put("FRI", "금");
+	    dayMap.put("SAT", "토");
+	    dayMap.put("SUN", "일");
+
+	    StringBuilder sb = new StringBuilder();
+
+	    for (String d : dayArr) {
+	        String key = d.trim().toUpperCase();
+	        if (dayMap.containsKey(key)) {
+	            if (sb.length() > 0) sb.append(", ");
+	            sb.append(dayMap.get(key));
+	        }
+	    }
+
+	    return sb.toString();
 	}
 	
 	@GetMapping("/dong")

@@ -118,9 +118,9 @@ body { background: var(--bg); font-family: 'Pretendard', sans-serif; }
 	  </div>
 	
 	  <div class="stat-item"
-	       onclick="location.href='${pageContext.request.contextPath}/mypage/main?tab=alba&inner=view'">
-	    <div class="stat-title">이력서 열람</div>
-	    <div class="stat-num">1<span>곳</span></div>
+       	   onclick="location.href='${pageContext.request.contextPath}/mypage/main?tab=alba&inner=apply'">
+	    <div class="stat-title">지원 결과</div>
+	    <div class="stat-num">1<span>건</span></div>
 	  </div>
 	
 	  <div class="stat-item"
