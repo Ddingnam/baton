@@ -83,9 +83,7 @@
                         <transition name="cd-fade" mode="out-in">
                             <component 
                                 :is="Component" 
-                                :crew="crew" 
-                                :schedules="schedules" 
-                                :recent-posts="recentPosts" />
+                                :crew="crew" />
                         </transition>
                     </router-view>
                 </main>

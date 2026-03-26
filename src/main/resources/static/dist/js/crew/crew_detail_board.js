@@ -2,8 +2,10 @@ const CrewBoard = {
     template: '#crew-board-template',
     props: ['crew'],
     data() {
+		const targetIdx = this.$route.query.targetBoardIdx;
+		
         return {
-            viewMode: 'list',
+            viewMode: targetIdx ? 'detail' : 'list',
 			isBoardListLoading: false,
             currentPost: null,
             newComment: '',
@@ -48,7 +50,9 @@ const CrewBoard = {
 	    }
 	},
 	mounted() {
-        this.fetchPosts(1);
+		if (this.viewMode === 'list') {
+	        this.fetchPosts(1);
+	    }
     },
 	watch: {
 		viewMode(newMode) {
@@ -70,6 +74,12 @@ const CrewBoard = {
 	            this.quill = null;
 	        }
 	    }
+    },
+	async created() {
+        const targetIdx = this.$route.query.targetBoardIdx;
+        if (targetIdx) {
+            await this.fetchTargetDetail(targetIdx);
+		}
     },
     methods: {
 		initQuill() {
@@ -119,6 +129,24 @@ const CrewBoard = {
 		        alert('게시글 정보를 가져오지 못했습니다.');
 		    }
 		},
+		async fetchTargetDetail(idx) {
+            this.isBoardListLoading = true;
+            try {
+                const response = await fetch(`${contextPath}/api/crew/board/detail/${idx}`);
+                if (!response.ok) throw new Error('상세보기 서버 응답 오류');
+                const postData = await response.json();
+				
+                this.currentPost = postData;
+                
+                await this.fetchComments(idx);
+            } catch (error) {
+                console.error('초기 상세 로드 에러:', error);
+                this.viewMode = 'list';
+                this.fetchPosts(1);
+            } finally {
+                this.isBoardListLoading = false;
+            }
+        },
 		goToEdit() {
 	        this.writeForm = {
 	            crewBoardIdx: this.currentPost.crewBoardIdx,
@@ -357,7 +385,7 @@ const CrewBoard = {
                 });
                 const result = await response.json();
                 if (result.status === 'success') {
-                    this.fetchComments(this.currentPost.crewBoardIdx); // 리스트 갱신
+                    this.fetchComments(this.currentPost.crewBoardIdx);
                 } else {
                     alert('삭제 실패: ' + result.message);
                 }
@@ -396,8 +424,41 @@ const CrewBoard = {
             } catch (error) {
                 console.error('submitEditComment Error:', error);
             }
-        }
-		
-		
+        },
+		async toggleLike(boardIdx) {
+	        try {
+	            const response = await fetch(`${contextPath}/api/crew/like/toggle/${boardIdx}`, {
+	                method: 'POST',
+	                headers: { 'Content-Type': 'application/json' }
+	            });
+	
+	            if (response.status === 401) {
+	                alert('로그인이 필요한 기능입니다.');
+	                return;
+	            }
+	
+	            if (!response.ok) throw new Error('서버 응답 오류');
+	            const result = await response.json();
+	
+	            if (this.currentPost && this.currentPost.crewBoardIdx === boardIdx) {
+	                if (result.status === 'added') {
+	                    this.currentPost.liked = true;
+	                } else if (result.status === 'removed') {
+	                    this.currentPost.liked = false;
+	                }
+	                this.currentPost.likeCount = result.totalLikes;
+	            }
+	
+	            const listPostIndex = this.posts.findIndex(p => p.crewBoardIdx === boardIdx);
+	            if (listPostIndex !== -1) {
+	                this.posts[listPostIndex].liked = this.currentPost.liked;
+	                this.posts[listPostIndex].likeCount = this.currentPost.likeCount;
+	            }
+	
+	        } catch (error) {
+	            console.error('toggleLike Error:', error);
+	            alert('좋아요 처리 중 통신 오류가 발생했습니다.');
+	        }
+	    }
     }
 };

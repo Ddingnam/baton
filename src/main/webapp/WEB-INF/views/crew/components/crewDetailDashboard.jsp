@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/crew/crew_detail_main.css">
 
 <template id="crew-dashboard-template">
-    <div class="cd-dashboard-grid">
+    <div class="cd-dashboard-grid" v-if="crew">
         
         <div class="cd-widget cd-glass-card cd-full-width">
             <div class="cd-widget-header">
@@ -17,27 +17,35 @@
         </div>
 
         <div class="cd-widget cd-glass-card cd-span-7">
-            <div class="cd-widget-header">
-                <h4><i class="ri-leaf-line"></i> 우리 모임을 소개해요</h4>
-            </div>
-            <div class="cd-intro-body">
-                <p class="cd-intro-text">{{ crew.introduction || '배턴을 통해 만난 우리 동네 개발자들의 모임입니다. 매주 함께 성장하고 있어요.' }}</p>
-                <div class="cd-intro-tags">
-                    <span class="cd-intro-tag">#열정가득</span>
-                    <span class="cd-intro-tag">#동네친구</span>
-                </div>
-            </div>
-        </div>
+		    <div class="cd-widget-header">
+		        <h4><i class="ri-leaf-line"></i> 모임 소개</h4>
+		    </div>
+		    <div class="cd-intro-body">
+		        <div class="cd-intro-desc-container">
+		            <p class="cd-intro-description">
+		                {{ crew.description || '배턴을 통해 만난 우리 동네 개발자들의 모임입니다. 매주 함께 성장하고 있어요.' }}
+		            </p>
+		        </div>
+		    </div>
+		</div>
 
         <div class="cd-widget cd-glass-card cd-span-3">
-            <div class="cd-widget-header" style="justify-content: center;">
-                <h4><i class="ri-fire-line"></i> 활력 지수</h4>
-            </div>
-            <div class="cd-vitality-body">
-                <div class="cd-vitality-score">85<span style="font-size:18px;">℃</span></div>
-                <div class="cd-vitality-gauge"><div class="cd-vitality-fill" style="width: 85%;"></div></div>
-            </div>
-        </div>
+		    <div class="cd-widget-header">
+		        <h4><i class="ri-fire-line"></i> 활력 지수</h4>
+		    </div>
+		    <div class="cd-vitality-body">
+		        <div class="cd-vitality-main">
+		            <div class="cd-vitality-score">85<span style="font-size:20px;">℃</span></div>
+		            <span class="cd-vitality-status">매우 활발 🔥</span>
+		        </div>
+		
+		        <div class="cd-vitality-gauge-wrapper">
+		            <div class="cd-vitality-gauge">
+		                <div class="cd-vitality-fill" style="width: 85%;"></div>
+		            </div>
+		        </div>
+		    </div>
+		</div>
 
         <div class="cd-widget cd-glass-card cd-full-width">
             <div class="cd-widget-header">
@@ -61,26 +69,31 @@
         </div>
 
         <div class="cd-widget cd-glass-card cd-post-widget cd-span-6-double">
-            <div class="cd-widget-header">
-                <h4><i class="ri-discuss-line"></i> 최근 올라온 이야기</h4>
-                <span class="cd-view-more" @click="$router.push(`/article/${crew.crewIdx}/board`)">
-                    더보기 <i class="ri-arrow-right-s-line"></i>
-                </span>
-            </div>
-            <div class="cd-post-grid" v-if="recentPosts && recentPosts.length > 0">
-                <div v-for="post in recentPosts" :key="post.id" class="cd-post-item">
-                    <div class="cd-post-header">
-                        <span class="cd-post-author">{{ post.author }}</span>
-                        <span class="cd-post-time">{{ post.time }}</span>
-                    </div>
-                    <strong class="cd-post-title">{{ post.title }}</strong>
-                    <div class="cd-post-meta">
-                        <span><i class="ri-heart-3-line"></i> {{ post.likes }}</span>
-                    </div>
-                </div>
-            </div>
-            <div v-else class="cd-no-data">새로운 이야기가 없습니다.</div>
-        </div>
+		    <div class="cd-widget-header">
+		        <h4><i class="ri-discuss-line"></i> 최근 올라온 이야기</h4>
+		        <span class="cd-view-more" @click="$router.push('/article/' + crew.crewIdx + '/board')">
+		            더보기 <i class="ri-arrow-right-s-line"></i>
+		        </span>
+		    </div>
+		
+		    <div class="cd-post-list-vertical" v-if="recentPosts && recentPosts.length > 0">
+		        <div v-for="post in recentPosts.slice(0, 3)" :key="post.id" class="cd-post-item"
+		        @click="goToBoardDetail(post.crewBoardIdx)" style="cursor: pointer;">
+		            <div class="cd-post-header">
+		                <span class="cd-post-author">{{ post.authorNickname }}</span>
+		                <span class="cd-post-time">{{ post.formattedDate }}</span>
+		            </div>
+		            
+		            <strong class="cd-post-title">{{ post.title }}</strong>
+		            
+		            <div class="cd-post-meta">
+		                <span><i class="ri-chat-3-line"></i> {{ post.commentCount || 0 }}</span>
+		                <span><i class="ri-heart-3-fill"></i> {{ post.likeCount || 0 }}</span>
+		            </div>
+		        </div>
+		    </div>
+		    <div v-else class="cd-no-data">새로운 이야기가 없습니다.</div>
+		</div>
 
         <div class="cd-widget cd-glass-card cd-span-4" style="padding: 20px;">
             <div class="cd-widget-header" style="margin-bottom: 10px;">

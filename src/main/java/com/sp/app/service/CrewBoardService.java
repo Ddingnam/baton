@@ -10,12 +10,15 @@ public interface CrewBoardService {
     void updatePost(CrewBoardDto dto);
     void deletePost(long crewBoardIdx, long userIdx);
     
-    CrewBoardDto getPostDetail(Long boardIdx);
-    Map<String, Object> getPostList(Long crewIdx, int page, int size);
+    CrewBoardDto getPostDetail(Long boardIdx, Long userIdx);
+    Map<String, Object> getPostList(Long crewIdx, Long userIdx, int page, int size);
     
     Long saveComment(CrewCommentDto dto);
     void updateComment(CrewCommentDto dto);
     void deleteComment(Long commentId, Long userIdx);
     
     Map<String, Object> getCommentList(Long boardIdx, int page, int size);
+    
+    Map<String, Object> toggleLike(Long boardIdx, Long userIdx);
+    boolean isLikedByUser(Long boardIdx, Long userIdx);
 }

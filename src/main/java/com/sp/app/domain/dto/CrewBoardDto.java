@@ -4,7 +4,6 @@ import java.time.format.DateTimeFormatter;
 
 import com.sp.app.common.MyUtil;
 import com.sp.app.domain.entity.CrewBoard;
-import com.sp.app.service.MemberService;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +33,10 @@ public class CrewBoardDto {
     private String authorProfilePhoto;
     
     private String formattedDate;
+    
+    private Integer commentCount;
+    private Integer likeCount;
+    private boolean isLiked;
     
     public static CrewBoardDto fromEntity(CrewBoard entity) {
         if (entity == null) return null;

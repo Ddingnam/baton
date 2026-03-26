@@ -111,6 +111,17 @@
                 
                 <div class="cdb-post-body ql-editor" v-html="currentPost.content"></div>
                 
+                <div class="cdb-like-section">
+			        <button 
+			            class="cdb-like-btn" 
+			            :class="{ 'active': currentPost.liked }"
+			            @click="toggleLike(currentPost.crewBoardIdx)">
+			            <i :class="currentPost.liked ? 'ri-heart-3-fill' : 'ri-heart-3-line'"></i>
+			            <span class="cdb-like-text">좋아요</span>
+			            <strong class="cdb-like-count">{{ currentPost.likeCount || 0 }}</strong>
+			        </button>
+			    </div>
+                
                 <div class="cdb-comment-container cdb-glass-card">
 				    <div class="cdb-comment-header">
 				        <h4 class="cdb-comment-title">댓글 <span class="cdb-highlight">{{ commentTotalCount }}</span></h4>
@@ -124,7 +135,6 @@
 				    </div>
 				
 				    <ul class="cdb-comment-list">
-				        
 				        <template v-for="comment in comments" :key="comment.commentId">
 				            <li class="cdb-comment-item cdb-glass-inner">
 				                

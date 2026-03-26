@@ -208,15 +208,50 @@
 .cd-view-more:hover { color: var(--crew-pink); }
 
 /* 공지사항 위젯 */
+/* --- [수정] 코어 색상을 유지한 양각 느낌의 공지사항 위젯 --- */
 .cd-notice-body {
-    display: flex; justify-content: space-between; align-items: center;
-    background: linear-gradient(90deg, rgba(248, 109, 125, 0.1) 0%, rgba(248, 109, 125, 0.05) 100%);
-    padding: 16px 20px; border-radius: 14px; border: 1px solid rgba(248, 109, 125, 0.2);
-    cursor: pointer; transition: 0.3s;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    background: linear-gradient(
+        90deg, 
+        rgba(248, 109, 125, 0.12) 0%, 
+        rgba(248, 109, 125, 0.06) 100%
+    );
+    padding: 18px 22px; 
+    border-radius: 18px; 
+    border: 1px solid rgba(248, 109, 125, 0.15);
+    box-shadow: 
+        0 4px 12px rgba(248, 109, 125, 0.04), 
+        0 1px 3px rgba(0, 0, 0, 0.02);
+    
+    cursor: pointer; 
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
-.cd-notice-body:hover { background: rgba(248, 109, 125, 0.15); transform: translateX(5px); }
-.cd-notice-title { font-size: 15px; font-weight: 700; color: var(--text-main); margin: 0; }
-.cd-notice-date { font-size: 13px; font-weight: 600; color: var(--crew-pink); }
+
+.cd-notice-body:hover { 
+    background: #ffffff;
+    border-color: var(--crew-pink);
+    transform: translateY(-2px); /* 양각 느낌을 위해 위로도 살짝 띄움 */
+    box-shadow: 0 8px 20px rgba(248, 109, 125, 0.1); 
+}
+
+.cd-notice-title { 
+    font-size: 15px; 
+    font-weight: 800; /* 소개글처럼 좀 더 뚜렷하게 강조 */
+    color: var(--text-main); 
+    margin: 0; 
+    letter-spacing: -0.01em;
+}
+
+.cd-notice-date { 
+    font-size: 13px; 
+    font-weight: 700; 
+    color: var(--crew-pink); 
+    background: rgba(248, 109, 125, 0.05); /* 날짜 부분에 미세한 배경 추가로 가독성 확보 */
+    padding: 4px 10px;
+    border-radius: 8px;
+}
 
 /* 날씨 위젯 */
 .cd-weather-body { display: flex; align-items: center; gap: 12px; justify-content: center; padding: 10px 0; }
@@ -249,19 +284,63 @@
 
 /* 게시글 위젯 */
 .cd-post-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.cd-post-list-vertical {
+    display: flex;
+    flex-direction: column; /* 세로 방향 나열 */
+    gap: 16px; /* 아이템 간 간격 */
+    flex: 1;
+}
+
 .cd-post-item { 
-    background: rgba(255,255,255,0.5); padding: 18px; border-radius: 20px; 
-    border: 1px solid rgba(255,255,255,0.8); cursor: pointer; 
-    transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); display: flex; flex-direction: column;
+    background: rgba(255, 255, 255, 0.85); 
+    padding: 12px 20px; /* 상하 20px -> 12px로 축소 */
+    border-radius: 16px; /* 조금 더 각진 느낌으로 컴팩트하게 */
+    border: 1px solid rgba(255, 255, 255, 1); 
+    display: flex; 
+    flex-direction: column;
+    gap: 4px; /* 내부 요소 간 간격 축소 */
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
+
 .cd-post-item:hover { 
-    background: #fff; border-color: var(--crew-pink); transform: translateY(-5px); 
-    box-shadow: 0 15px 30px rgba(0,0,0,0.05), 0 0 0 1px rgba(248, 109, 125, 0.2); 
+    background: #ffffff; 
+    transform: translateY(-3px); 
+    border-color: rgba(248, 109, 125, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06); 
 }
-.cd-post-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: var(--text-light); }
-.cd-post-title { font-size: 15px; font-weight: 800; color: var(--text-main); margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
-.cd-post-meta { margin-top: auto; font-size: 12px; color: var(--text-light); font-weight: 600; }
-.cd-post-meta i { color: var(--crew-pink); margin-right: 3px;}
+
+.cd-post-header { 
+    display: flex; 
+    justify-content: space-between; 
+    font-size: 11px; 
+    font-weight: 700; 
+    color: var(--text-light); 
+}
+.cd-post-author { color: var(--text-sub); }
+
+.cd-post-title { 
+    font-size: 14.5px; /* 16px -> 14.5px */
+    line-height: 1.3; /* 줄 간격 축소 */
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cd-post-meta { 
+    display: flex;
+    justify-content: flex-end; /* 우측 하단 배치 */
+    gap: 12px;
+    font-size: 11px; 
+    font-weight: 700; 
+    color: var(--text-light); 
+}
+.cd-post-meta i { 
+    color: var(--crew-pink); 
+    margin-right: 4px;
+    font-size: 12px;
+}
 
 /* --- 4. 기타 및 애니메이션 --- */
 .cd-loading-state {
@@ -311,16 +390,105 @@
 .cd-dashboard-grid > .cd-widget > .cd-post-grid { flex: 1; }
 
 /* --- [신규] 모임 소개 --- */
-.cd-intro-body { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+.cd-intro-body { display: flex; flex-direction: column; gap: 12px; height: 100%; margin-top: 10px; }
 .cd-intro-text { margin: 0; font-size: 15px; line-height: 1.6; color: var(--text-sub); }
 .cd-intro-tags { display: flex; gap: 8px; }
 .cd-intro-tag { font-size: 13px; font-weight: 700; color: var(--crew-pink); background: rgba(248, 109, 125, 0.1); padding: 4px 12px; border-radius: 20px; }
 
-/* --- [신규] 활력 지수 --- */
-.cd-vitality-body { margin: auto 0; text-align: center; }
-.cd-vitality-score { font-size: 32px; font-weight: 900; color: var(--text-main); margin-bottom: 8px; }
-.cd-vitality-gauge { width: 100%; height: 8px; background: rgba(0,0,0,0.05); border-radius: 10px; overflow: hidden; }
-.cd-vitality-fill { height: 100%; background: var(--crew-pink); border-radius: 10px; }
+.cd-intro-desc-container {
+    background: rgba(255, 255, 255, 0.85); 
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(255, 255, 255, 1);
+    box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.03),
+        0 2px 6px rgba(0, 0, 0, 0.02);
+    flex: 1;
+    min-height: 120px;
+    height: 0;
+    overflow-y: auto;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.cd-intro-description {
+    margin: 0;
+    font-weight: 600; 
+    font-size: 15px; 
+    line-height: 1.8; 
+    letter-spacing: -0.02em; 
+    color: var(--text-main); 
+    word-break: keep-all;
+    white-space: pre-wrap;
+}
+
+.cd-intro-desc-container::-webkit-scrollbar { width: 4px; }
+.cd-intro-desc-container::-webkit-scrollbar-thumb { 
+    background: var(--crew-pink-glow); 
+    border-radius: 10px; 
+}
+
+/* --- [고도화] 활력 지수 확장형 스타일 --- */
+.cd-vitality-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* 요소들을 위아래로 분산 배치 */
+    padding: 10px 0;
+}
+
+/* 메인 스코어 영역 강조 */
+.cd-vitality-main {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.cd-vitality-score { 
+    font-size: 48px; /* 크기 확대 */
+    font-weight: 900; 
+    color: var(--text-main); 
+    margin-bottom: 4px;
+    letter-spacing: -1px;
+}
+
+.cd-vitality-status {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--crew-pink);
+    background: rgba(248, 109, 125, 0.1);
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+/* 활동 통계 그리드 (추가 내용) */
+.cd-vitality-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.cd-stat-box {
+    background: rgba(255, 255, 255, 0.5);
+    padding: 12px;
+    border-radius: 16px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.cd-stat-label { font-size: 11px; color: var(--text-light); font-weight: 600; display: block; margin-bottom: 4px; }
+.cd-stat-value { font-size: 15px; color: var(--text-main); font-weight: 800; }
+
+/* 게이지바 하단 배치 */
+.cd-vitality-gauge-wrapper { margin-top: auto; }
+.cd-vitality-gauge { width: 100%; height: 12px; background: rgba(0,0,0,0.05); border-radius: 10px; overflow: hidden; }
+.cd-vitality-fill { 
+    height: 100%; 
+    background: linear-gradient(90deg, #FF9A8B 0%, var(--crew-pink) 100%); 
+    border-radius: 10px; 
+    box-shadow: 0 0 10px var(--crew-pink-glow);
+}
 
 /* --- [신규] 주간 날씨 캐러셀 --- */
 .cd-weather-carousel { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 5px; margin-top: auto; }

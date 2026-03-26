@@ -3,6 +3,7 @@ package com.sp.app.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
@@ -13,8 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sp.app.domain.dto.CrewBoardDto;
 import com.sp.app.domain.dto.CrewCommentDto;
 import com.sp.app.domain.entity.CrewBoard;
+import com.sp.app.domain.entity.CrewBoardLike;
 import com.sp.app.domain.entity.CrewComment;
 import com.sp.app.domain.entity.User;
+import com.sp.app.repository.CrewBoardLikeRepository;
 import com.sp.app.repository.CrewBoardRepository;
 import com.sp.app.repository.CrewCommentRepository;
 import com.sp.app.repository.UserRepository;
@@ -29,6 +32,7 @@ public class CrewBoardServiceImpl implements CrewBoardService{
 	private final UserRepository userRepository;
 	private final CrewBoardRepository boardRepository;
 	private final CrewCommentRepository commentRepository;
+	private final CrewBoardLikeRepository likeRepository;
 	
 	@Override
 	public Long savePost(CrewBoardDto dto) {
@@ -71,21 +75,35 @@ public class CrewBoardServiceImpl implements CrewBoardService{
 	}
 	
 	@Override
-	public CrewBoardDto getPostDetail(Long boardIdx) {
+	public CrewBoardDto getPostDetail(Long boardIdx, Long userIdx) {
 		boardRepository.updateViewCount(boardIdx);
 		CrewBoard board = boardRepository.findById(boardIdx)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
-        return CrewBoardDto.fromEntity(board);
+		CrewBoardDto dto = CrewBoardDto.fromEntity(board);
+		
+		dto.setCommentCount(commentRepository.countByCrewBoardIdxAndIsDeleted(boardIdx, "N"));
+		dto.setLikeCount(likeRepository.countByCrewBoardIdx(boardIdx));
+		dto.setLiked(likeRepository.existsByCrewBoardIdxAndUserIdx(boardIdx, userIdx));
+		
+		
+        return dto;
 	}
 
 	@Override
-	public Map<String, Object> getPostList(Long crewIdx, int page, int size) {
+	public Map<String, Object> getPostList(Long crewIdx, Long userIdx, int page, int size) {
 		Pageable pageable = PageRequest.of(page - 1, size);
 	    
 	    List<CrewBoard> posts = boardRepository.findActiveBoardsWithUser(crewIdx, pageable);
 	    
 	    List<CrewBoardDto> postList = posts.stream()
-	            .map(CrewBoardDto::fromEntity)
+	            .map(post -> {
+	            		CrewBoardDto dto = CrewBoardDto.fromEntity(post);
+	            		dto.setCommentCount(commentRepository.countByCrewBoardIdxAndIsDeleted(post.getCrewBoardIdx(), "N"));
+	                    dto.setLikeCount(likeRepository.countByCrewBoardIdx(post.getCrewBoardIdx()));
+	                    dto.setLiked(likeRepository.existsByCrewBoardIdxAndUserIdx(post.getCrewBoardIdx(), userIdx));
+	                    return dto;
+		            }
+	            )
 	            .collect(Collectors.toList());
 	    
 	    long totalElements = boardRepository.countByCrewIdx(crewIdx);
@@ -164,6 +182,36 @@ public class CrewBoardServiceImpl implements CrewBoardService{
 	    result.put("totalPages", totalPages);
 	    
 	    return result;
+	}
+	
+	@Override
+	public Map<String, Object> toggleLike(Long boardIdx, Long userIdx) {
+        Map<String, Object> result = new HashMap<>();
+        
+        Optional<CrewBoardLike> existingLike = likeRepository.findByCrewBoardIdxAndUserIdx(boardIdx, userIdx);
+
+        if (existingLike.isPresent()) {
+            likeRepository.delete(existingLike.get());
+            result.put("status", "removed");
+        } else {
+            CrewBoardLike newLike = CrewBoardLike.builder()
+                    .crewBoardIdx(boardIdx)
+                    .userIdx(userIdx)
+                    .build();
+            
+            likeRepository.save(newLike);
+            result.put("status", "added");
+        }
+
+        long totalLikes = likeRepository.countByCrewBoardIdx(boardIdx);
+        result.put("totalLikes", totalLikes);
+
+        return result;
+    }
+	
+	@Override
+	public boolean isLikedByUser(Long boardIdx, Long userIdx) {
+	    return likeRepository.existsByCrewBoardIdxAndUserIdx(boardIdx, userIdx);
 	}
 
 }

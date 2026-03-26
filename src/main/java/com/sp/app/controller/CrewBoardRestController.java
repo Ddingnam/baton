@@ -98,11 +98,16 @@ public class CrewBoardRestController {
     public ResponseEntity<?> boardList(
     		@PathVariable("crewIdx") Long crewIdx,
     		@RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "5") int size) {
+            @RequestParam(value = "size", defaultValue = "5") int size,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 		Map<String, Object> model = new HashMap<>();
 		try {
-            model = service.getPostList(crewIdx, page, size);
+			SessionInfo info = userDetails.getMember();
+        	Long userIdx = info.getUserIdx();
+        	
+            model = service.getPostList(crewIdx, userIdx, page, size);
             model.put("status", "success");
+            
             return ResponseEntity.ok(model);
         } catch (Exception e) {
             log.error("boardList error : ", e);
@@ -112,15 +117,19 @@ public class CrewBoardRestController {
     }
 
     @GetMapping("detail/{boardIdx}")
-    public ResponseEntity<CrewBoardDto> getPostDetail(@PathVariable("boardIdx") Long boardIdx) {
+    public ResponseEntity<CrewBoardDto> getPostDetail(
+    		@PathVariable("boardIdx") Long boardIdx,
+    		@AuthenticationPrincipal CustomUserDetails userDetails) {
     	try {
-            CrewBoardDto dto = service.getPostDetail(boardIdx);
+    		SessionInfo info = userDetails.getMember();
+        	Long userIdx = info.getUserIdx();
+        	
+            CrewBoardDto dto = service.getPostDetail(boardIdx, userIdx);
+            
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
             log.error("getPostDetail error : ", e);
             return ResponseEntity.internalServerError().build();
         }
     }
-	
-	
 }
