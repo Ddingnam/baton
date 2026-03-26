@@ -109,56 +109,61 @@ public class JobPostingController {
 	}
 
 	@GetMapping("article/{num}")
-	public String article(@PathVariable("num") long num, 
+	public String article(@PathVariable("num") long num,
 	                      @RequestParam(value = "page", defaultValue = "1") String page,
 	                      @AuthenticationPrincipal CustomUserDetails userDetails,
 	                      Model model) {
+
 	    try {
-	        postingService.updateHitCount(num); 
+	        postingService.updateHitCount(num);
+
 	        JobPosting dto = postingService.findById(num);
-	        
-	        if (dto == null) return "redirect:/alba/list?page=" + page;
+	        if (dto == null) {
+	            return "redirect:/alba/list?page=" + page;
+	        }
 
 	        String koreanDays = convertToKoreanDays(dto.getWorkDays());
 	        model.addAttribute("koreanDays", koreanDays);
 
-	        String computedWorkTime = (dto.getStartTime() != null && !dto.getStartTime().isEmpty() && 
-	                                   dto.getEndTime() != null && !dto.getEndTime().isEmpty()) 
-	                                   ? dto.getStartTime() + " ~ " + dto.getEndTime() 
-	                                   : "시간협의";
-	        model.addAttribute("computedWorkTime", computedWorkTime);
-	        
-	        int applyCount = 0;
+	        String workTime;
+	        if (dto.getStartTime() != null && dto.getEndTime() != null &&
+	                !dto.getStartTime().isEmpty() && !dto.getEndTime().isEmpty()) {
+	            workTime = dto.getStartTime() + " ~ " + dto.getEndTime();
+	        } else {
+	            workTime = "시간협의";
+	        }
+	        model.addAttribute("workTime", workTime);
+
 	        try {
-	            applyCount = postingService.applyCount(num); 
+	            int applyCount = postingService.applyCount(num);
+	            dto.setApplyCount(applyCount);
 	        } catch (Exception e) {
 	            log.error("지원자 수 조회 실패", e);
+	            dto.setApplyCount(0);
 	        }
-	        model.addAttribute("applyCount", applyCount);
 
 	        boolean isUserScrap = false;
 	        if (userDetails != null) {
 	            Map<String, Object> map = new HashMap<>();
 	            map.put("memberId", userDetails.getUserIdx());
 	            map.put("postingIdx", num);
-	            int scrapCount = postingService.checkJobScrap(map);
-	            if (scrapCount > 0) {
-	                isUserScrap = true;
-	            }
-	        }
-	        model.addAttribute("userScrap", isUserScrap); 
 
+	            isUserScrap = postingService.checkJobScrap(map) > 0;
+	        }
+
+	        model.addAttribute("userScrap", isUserScrap);
 	        model.addAttribute("dto", dto);
 	        model.addAttribute("page", page);
-	        
+
 	        if (userDetails != null) {
-	        	List<JobProfile> resumeList = jobProfileService.listJobProfile(userDetails.getUserIdx());
-	        	model.addAttribute("resumeList", resumeList);
+	            List<JobProfile> resumeList = jobProfileService.listJobProfile(userDetails.getUserIdx());
+	            model.addAttribute("resumeList", resumeList);
 	        }
-	        
-	        return "alba/article"; 
+
+	        return "alba/article";
+
 	    } catch (Exception e) {
-	        log.error("상세보기 에러: ", e);
+	        log.error("상세보기 에러", e);
 	        return "redirect:/alba/list?page=" + page;
 	    }
 	}

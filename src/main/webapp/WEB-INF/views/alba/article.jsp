@@ -108,7 +108,7 @@
 	            <i class="ri-time-line"></i>
 	            <div class="summary-text">
 	                <span class="label">근무시간</span>
-	                <span class="value">${dto.workTime}</span>
+	                <span class="value">${workTime}</span>
 	            </div>
 	        </li>
 	    </ul>
@@ -218,11 +218,6 @@
 
 <div class="bottom-fixed-bar">
     <div class="bottom-inner">
-        <div class="bottom-left">
-            <button class="btn-wish ${isWished ? 'active' : ''}" id="wishBtnLarge" onclick="WishModule.toggle()">
-                <i class="${isWished ? 'ri-heart-3-fill' : 'ri-heart-3-line'}"></i>
-            </button>
-        </div>
         <div class="bottom-right" style="width: ${loggedInUserId == dto.userIdx ? '100%' : 'calc(100% - 64px)'}; gap: 8px; display: flex;">
             
             <sec:authorize access="isAnonymous()">
