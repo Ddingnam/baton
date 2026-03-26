@@ -3,11 +3,14 @@ package com.sp.app.admin.controller;
 import com.sp.app.admin.model.AdminCalMemo;
 import com.sp.app.admin.model.AdminTodo;
 import com.sp.app.admin.service.AdminUtilService;
+import com.sp.app.domain.dto.UserDto;
 import com.sp.app.model.Notification;
 import com.sp.app.security.CustomUserDetails;
+import com.sp.app.service.MemberService;
 import com.sp.app.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -21,6 +24,8 @@ public class AdminUtilController {
 
     private final AdminUtilService utilService;
     private final NotificationService notificationService;
+    private final MemberService memberService;
+    private final PasswordEncoder passwordEncoder;
 
     private Long getAdminIdx(CustomUserDetails u) {
         return u == null ? null : u.getUserIdx();
@@ -234,6 +239,60 @@ public class AdminUtilController {
             result.put("success", true);
         } catch (Exception e) {
             result.put("success", false);
+        }
+        return result;
+    }
+
+    @PostMapping("/profile/password")
+    public Map<String, Object> changePassword(
+            @RequestBody Map<String, String> body,
+            @AuthenticationPrincipal CustomUserDetails u) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            Long adminIdx = getAdminIdx(u);
+            if (adminIdx == null) {
+                result.put("success", false);
+                result.put("msg", "인증 정보가 없습니다.");
+                return result;
+            }
+
+            String currentPassword = body.get("currentPassword");
+            String newPassword     = body.get("newPassword");
+            String confirmPassword = body.get("confirmPassword");
+
+            if (currentPassword == null || newPassword == null || confirmPassword == null
+                    || currentPassword.isBlank() || newPassword.isBlank() || confirmPassword.isBlank()) {
+                result.put("success", false);
+                result.put("msg", "비밀번호를 모두 입력해 주세요.");
+                return result;
+            }
+            if (!newPassword.equals(confirmPassword)) {
+                result.put("success", false);
+                result.put("msg", "새 비밀번호가 일치하지 않습니다.");
+                return result;
+            }
+            if (newPassword.length() < 4) {
+                result.put("success", false);
+                result.put("msg", "새 비밀번호는 4자 이상이어야 합니다.");
+                return result;
+            }
+
+            UserDto userDto = memberService.findById(adminIdx);
+            if (userDto == null || !passwordEncoder.matches(currentPassword, userDto.getPwd())) {
+                result.put("success", false);
+                result.put("msg", "현재 비밀번호가 일치하지 않습니다.");
+                return result;
+            }
+            
+            Map<String, Object> map = new HashMap<>();
+            map.put("userIdx", adminIdx);
+            map.put("pwd", newPassword);
+            memberService.updateUserPwd(map);
+
+            result.put("success", true);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "비밀번호 변경 중 오류가 발생했습니다.");
         }
         return result;
     }

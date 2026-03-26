@@ -202,7 +202,25 @@
                                             <span class="chat-msg-time">${msgTime}</span>
                                             <span class="chat-msg-name">${myNickname}</span>
                                         </div>
-                                        <div class="chat-bubble mine theme-${myTheme}">${chat.content}</div>
+                                        <div class="chat-bubble mine theme-${myTheme}">
+                                            <c:choose>
+                                                <c:when test="${fn:startsWith(chat.content, '__IMG__')}">
+                                                    <c:set var="imgSrc" value="${fn:substring(chat.content, 7, fn:length(chat.content))}"/>
+                                                    <img src="${imgSrc}" style="max-width:220px;max-height:200px;border-radius:8px;cursor:pointer;display:block;"
+                                                         onclick="window.open(this.src)" onerror="this.style.display='none'"/>
+                                                </c:when>
+                                                <c:when test="${fn:startsWith(chat.content, '__FILE__')}">
+                                                    <c:set var="fileUrl" value="${fn:substring(chat.content, 8, fn:length(chat.content))}"/>
+                                                    <a href="${fileUrl}" download target="_blank"
+                                                       style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.25);border-radius:10px;color:inherit;text-decoration:none;font-size:13px;font-weight:600;">
+                                                        <i class="ri-file-download-line" style="font-size:18px;"></i>
+                                                        <span>${fn:substringAfter(fileUrl, 'chat/')}</span>
+                                                        <i class="ri-download-2-line" style="font-size:14px;opacity:0.7;"></i>
+                                                    </a>
+                                                </c:when>
+                                                <c:otherwise>${chat.content}</c:otherwise>
+                                            </c:choose>
+                                        </div>
                                     </div>
                                     <div class="chat-avt me">${fn:substring(myNickname, 0, 2)}</div>
                                 </div>
@@ -215,7 +233,25 @@
                                             <span class="chat-msg-name">${chat.nickname}</span>
                                             <span class="chat-msg-time">${msgTime}</span>
                                         </div>
-                                        <div class="chat-bubble">${chat.content}</div>
+                                        <div class="chat-bubble">
+                                            <c:choose>
+                                                <c:when test="${fn:startsWith(chat.content, '__IMG__')}">
+                                                    <c:set var="imgSrc" value="${fn:substring(chat.content, 7, fn:length(chat.content))}"/>
+                                                    <img src="${imgSrc}" style="max-width:220px;max-height:200px;border-radius:8px;cursor:pointer;display:block;"
+                                                         onclick="window.open(this.src)" onerror="this.style.display='none'"/>
+                                                </c:when>
+                                                <c:when test="${fn:startsWith(chat.content, '__FILE__')}">
+                                                    <c:set var="fileUrl" value="${fn:substring(chat.content, 8, fn:length(chat.content))}"/>
+                                                    <a href="${fileUrl}" download target="_blank"
+                                                       style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.25);border-radius:10px;color:inherit;text-decoration:none;font-size:13px;font-weight:600;">
+                                                        <i class="ri-file-download-line" style="font-size:18px;"></i>
+                                                        <span>${fn:substringAfter(fileUrl, 'chat/')}</span>
+                                                        <i class="ri-download-2-line" style="font-size:14px;opacity:0.7;"></i>
+                                                    </a>
+                                                </c:when>
+                                                <c:otherwise>${chat.content}</c:otherwise>
+                                            </c:choose>
+                                        </div>
                                     </div>
                                 </div>
                             </c:otherwise>

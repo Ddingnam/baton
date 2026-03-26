@@ -512,7 +512,21 @@ document.addEventListener("DOMContentLoaded", () => {
                             const el = document.getElementById(id);
                             if (el) el.value = '';
                         });
-                        if (typeof showToast === 'function') showToast('정보 변경이 완료되었습니다.', 'success');
+                        // 성공 토스트 + 카운트다운 후 로그아웃
+                        var count = 3;
+                        if (typeof showToast === 'function') showToast('비밀번호가 변경되었습니다. ' + count + '초 후 로그아웃됩니다.', 'success');
+                        passwordSaveBtn.disabled = true;
+                        passwordSaveBtn.textContent = count + '초 후 로그아웃...';
+                        var countdown = setInterval(function() {
+                            count--;
+                            if (count > 0) {
+                                if (typeof showToast === 'function') showToast('비밀번호가 변경되었습니다. ' + count + '초 후 로그아웃됩니다.', 'success');
+                                passwordSaveBtn.textContent = count + '초 후 로그아웃...';
+                            } else {
+                                clearInterval(countdown);
+                                location.href = BASE + '/admin/login';
+                            }
+                        }, 1000);
                     } else if (typeof showToast === 'function') {
                         showToast((data && data.msg) || '비밀번호 변경에 실패했습니다.', 'error');
                     }
@@ -521,8 +535,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (typeof showToast === 'function') showToast('비밀번호 변경 중 오류가 발생했습니다.', 'error');
                 })
                 .finally(function() {
-                    passwordSaveBtn.disabled = false;
-                    passwordSaveBtn.textContent = '변경하기';
+                    // 성공 시에는 버튼 복구 안 함 (카운트다운 중이므로)
+                    if (!passwordSaveBtn.textContent.includes('초 후')) {
+                        passwordSaveBtn.disabled = false;
+                        passwordSaveBtn.textContent = '변경하기';
+                    }
                 });
         });
     }
@@ -828,6 +845,8 @@ document.addEventListener("DOMContentLoaded", () => {
         card.addEventListener('click', function() {
             document.querySelectorAll('.theme-card').forEach(function(c) { c.classList.remove('active'); });
             card.classList.add('active');
+            // 카드 클릭 즉시 미리보기 적용
+            applyTheme(card.dataset.theme);
         });
     });
     var THEME_NAMES = {
@@ -840,7 +859,6 @@ document.addEventListener("DOMContentLoaded", () => {
             var active = document.querySelector('.theme-card.active');
             if (!active) return;
             var theme = active.dataset.theme;
-            var prevTheme = localStorage.getItem(THEME_KEY) || 'purple';
             applyTheme(theme);
             localStorage.setItem(THEME_KEY, theme);
             localStorage.setItem('baton-admin-theme', theme);
@@ -852,16 +870,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }).catch(function() {});
             var name = THEME_NAMES[theme] || theme;
             if (typeof showToast === 'function') {
-                if (theme === prevTheme) {
-                    showToast('이미 적용된 테마입니다.', 'info');
-                } else {
-                    showToast('테마가 [' + name + ']으로 변경되었습니다.', 'success');
-                }
+                showToast('테마가 [' + name + ']으로 저장되었습니다.', 'success');
             }
-            saveThemeBtn.textContent = '✓ ' + name + ' 적용됨';
-            saveThemeBtn.style.opacity = '0.8';
+            saveThemeBtn.textContent = '✓ ' + name + ' 저장됨';
+            saveThemeBtn.style.background = 'var(--grad-primary)';
+            saveThemeBtn.style.opacity = '1';
             setTimeout(function() {
                 saveThemeBtn.textContent = '변경사항 저장';
+                saveThemeBtn.style.background = '';
                 saveThemeBtn.style.opacity = '';
             }, 2000);
         });

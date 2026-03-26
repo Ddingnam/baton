@@ -1022,15 +1022,20 @@ function leaveDM(roomIdx) {
         });
     }
 
-    if (typeof window._batonConfirm === 'function') {
-        window._batonConfirm({
-            icon:    '<i class="ri-door-open-line" style="color:#fff;"></i>',
-            iconBg:  'linear-gradient(135deg,#F97316,#EF4444)',
-            title:   '대화방 나가기',
-            desc:    '이 대화를 나가시겠어요? 대화 내용은 삭제되지 않습니다.',
-            okLabel: '나가기',
-            okBg:    '#EF4444'
-        }, doLeave);
+    var overlay = document.getElementById('customConfirmOverlay');
+    if (overlay) {
+        document.getElementById('confirmIcon').style.background  = 'var(--grad-primary)';
+        document.getElementById('confirmIcon').innerHTML         = '<i class="ri-logout-box-r-line" style="color:#fff;"></i>';
+        document.getElementById('confirmTitle').textContent      = '대화방 나가기';
+        document.getElementById('confirmDesc').textContent       = '이 대화를 나가시겠어요? 대화 내용은 삭제되지 않습니다.';
+        document.getElementById('confirmOkBtn').textContent      = '나가기';
+        document.getElementById('confirmOkBtn').style.background = 'var(--grad-primary)';
+        document.getElementById('confirmOkBtn').style.color      = '#fff';
+        overlay.style.display = 'flex';
+        function closeOverlay() { overlay.style.display = 'none'; }
+        document.getElementById('confirmOkBtn').onclick     = function() { closeOverlay(); doLeave(); };
+        document.getElementById('confirmCancelBtn').onclick = closeOverlay;
+        overlay.onclick = function(e) { if (e.target === overlay) closeOverlay(); };
     } else {
         if (confirm('이 대화를 나가시겠어요?')) doLeave();
     }
