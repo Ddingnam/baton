@@ -45,14 +45,12 @@
         ORDER BY a.apply_date DESC
     </select>
 
-    <!-- 상태 변경 -->
     <update id="updateStatus" parameterType="map">
         UPDATE JOB_APPLY
         SET status = #{status}
         WHERE apply_idx = #{applyIdx}
     </update>
 
-    <!-- 중복 지원 체크 -->
     <select id="checkDuplicate" parameterType="map" resultType="int">
         SELECT COUNT(*) 
         FROM JOB_APPLY

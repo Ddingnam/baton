@@ -233,10 +233,41 @@
 
           <div class="content">
             <div class="content-header">
-              <div class="result-count">
-                채용정보 <span id="resultCount">0</span>건
-              </div>
-            </div>
+			  <div class="result-count">
+			    총 <span id="resultCount">555</span>건
+			  </div>
+  
+			  <div class="list-controls">
+			    <select class="control-select" id="periodSelect">
+			      <option value="ALL">등록일 전체</option>
+			      <option value="TODAY">오늘 등록</option>
+			      <option value="WITHIN_THREE_DAYS">3일 이내</option>
+			      <option value="WITHIN_SEVEN_DAYS">7일 이내</option>
+			    </select>
+			
+			    <select class="control-select" id="sortSelect" onchange="applyFilters()">
+			      <option value="latest" selected>최신등록순</option>
+			      <option value="pay_high">시급높은순</option>
+			      <option value="distance">거리순</option>
+			    </select>
+			
+			    <select class="control-select" id="sizeSelect">
+			      <option value="20">20개씩</option>
+			      <option value="30">30개씩</option>
+			      <option value="40">40개씩</option>
+			      <option value="50">50개씩</option>
+			    </select>
+			
+			    <div class="view-toggle">
+			      <button type="button" class="view-btn active" title="리스트 보기">
+			        <i class="ri-list-unordered"></i>
+			      </button>
+			      <button type="button" class="view-btn" title="그리드 보기">
+			        <i class="ri-grid-fill"></i>
+			      </button>
+			    </div>
+			  </div>
+</div>
 
             <div id="listView"></div>
             <div class="pagination" id="pagination"></div>
