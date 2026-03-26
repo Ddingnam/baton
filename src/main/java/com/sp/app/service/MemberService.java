@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import com.sp.app.domain.dto.BadgeDto;
 import com.sp.app.domain.dto.MemberDto;
 import com.sp.app.domain.dto.RegionDto;
 import com.sp.app.domain.dto.SnsUserDto;
@@ -75,4 +76,6 @@ public interface MemberService {
 	
 	public void updateBatonDistance(Long userIdx, double distance) throws Exception;
 	public void checkAndAwardBadge(Long userIdx, String actionType) throws Exception;
+	
+	public List<BadgeDto> getUserBadgeProgress(Long userIdx) throws Exception;
 }

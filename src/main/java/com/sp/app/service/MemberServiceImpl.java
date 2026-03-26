@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sp.app.common.MyUtil;
 import com.sp.app.common.StorageService;
+import com.sp.app.domain.dto.BadgeDto;
 import com.sp.app.domain.dto.MemberDto;
 import com.sp.app.domain.dto.RegionDto;
 import com.sp.app.domain.dto.SnsUserDto;
@@ -526,6 +527,52 @@ public class MemberServiceImpl implements MemberService {
 			
 		} catch (Exception e) {
 			log.info("checkAndAwardBadge : ", e);
+			throw e;
+		}
+	}
+	
+	@Override
+	public List<BadgeDto> getUserBadgeProgress(Long userIdx) throws Exception {
+		try {
+			List<BadgeDto> allBadges = mapper.getAllBadges();
+			List<Integer> acquiredIds = mapper.getAcquiredBadgeIds(userIdx);
+
+			int tradeCount = mapper.countTradeCompleted(userIdx);
+			int reviewCount = mapper.countReviewBest(userIdx);
+			int postCount = mapper.countCommunityPost(userIdx);
+			int replyCount = mapper.countCommunityReply(userIdx);
+			int pollCount = mapper.countCommunityPoll(userIdx);
+			int chargeCount = mapper.countPointCharge(userIdx);
+			int scrapCount = mapper.countAlbaScrap(userIdx);
+
+			for (com.sp.app.domain.dto.BadgeDto badge : allBadges) {
+				badge.setAcquired(acquiredIds.contains(badge.getBadgeId()));
+				
+				switch (badge.getBadgeId()) {
+					case 1: badge.setCurrentCount(tradeCount); badge.setTargetCount(1); badge.setIconImage("ri-hand-coin-fill"); break;
+					case 2: badge.setCurrentCount(reviewCount); badge.setTargetCount(5); badge.setIconImage("ri-star-smile-fill"); break;
+					case 3: badge.setCurrentCount(postCount); badge.setTargetCount(10); badge.setIconImage("ri-megaphone-fill"); break;
+					case 4: badge.setCurrentCount(replyCount); badge.setTargetCount(30); badge.setIconImage("ri-thumb-up-fill"); break;
+					case 5: badge.setCurrentCount(pollCount); badge.setTargetCount(5); badge.setIconImage("ri-ball-pen-fill"); break;
+					case 6: badge.setCurrentCount(chargeCount); badge.setTargetCount(1); badge.setIconImage("ri-money-dollar-circle-fill"); break;
+					case 7: badge.setCurrentCount(scrapCount); badge.setTargetCount(5); badge.setIconImage("ri-briefcase-4-fill"); break;
+				}
+				
+				if (badge.getCurrentCount() > badge.getTargetCount()) {
+					badge.setCurrentCount(badge.getTargetCount());
+				}
+				badge.setProgressPercent((int) ((double) badge.getCurrentCount() / badge.getTargetCount() * 100));
+			}
+
+			allBadges.sort((b1, b2) -> {
+				if (b1.isAcquired() && !b2.isAcquired()) return -1;
+				if (!b1.isAcquired() && b2.isAcquired()) return 1;
+				return Integer.compare(b2.getProgressPercent(), b1.getProgressPercent());
+			});
+
+			return allBadges;
+		} catch (Exception e) {
+			log.info("getUserBadgeProgress : ", e);
 			throw e;
 		}
 	}

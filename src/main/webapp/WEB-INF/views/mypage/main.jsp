@@ -73,16 +73,28 @@
         background: #fff; border: 1px solid rgba(0,0,0,0.06); border-radius: 20px;
         padding: 16px 20px; display: flex; align-items: center; gap: 14px;
         transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); width: calc(33.333% - 11px);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.02); cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02); 
     }
+    .badge-item.locked { filter: grayscale(100%); opacity: 0.5; }
+    .badge-item.acquired { border-color: #3182F6; box-shadow: 0 4px 15px rgba(49,130,246,0.1); }
     .badge-item:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-color: #3182F6; }
     .badge-icon {
         width: 48px; height: 48px; border-radius: 50%; background: #F4F6F8;
         display: flex; align-items: center; justify-content: center; font-size: 24px;
+        color: #191F28;
     }
+    .badge-info { flex: 1; }
     .badge-info h4 { margin: 0 0 4px 0; font-size: 1rem; font-weight: 800; color: #191F28; letter-spacing: -0.3px; }
     .badge-info p { margin: 0; font-size: 0.8rem; color: #8B95A1; font-weight: 500; }
+
+    .badge-progress-wrap { margin-top: 8px; display: flex; align-items: center; gap: 8px; }
+    .badge-progress-bar { flex: 1; height: 6px; background: #E5E8EB; border-radius: 4px; overflow: hidden; }
+    .badge-progress-fill { height: 100%; background: #3182F6; border-radius: 4px; transition: width 0.5s ease; }
+    .badge-progress-text { font-size: 0.75rem; color: #8B95A1; font-weight: 700; width: 35px; text-align: right; }
     
+    .badge-empty-box { width: 100%; padding: 30px; text-align: center; background: #F9FAFB; border-radius: 16px; border: 1px dashed #E5E8EB; margin-bottom: 15px; }
+    .badge-empty-box p { margin: 0; color: #6B7684; font-weight: 600; font-size: 0.95rem; }
+    .badge-empty-box span { display: block; font-size: 0.8rem; color: #8B95A1; margin-top: 4px; }
     .badge-empty { width: 100%; text-align: center; padding: 40px 0; background: #F9FAFB; border-radius: 16px; color: #8B95A1; font-size: 0.95rem; font-weight: 500; }
 </style>
 </head>
@@ -181,31 +193,40 @@
                         <div class="list-card mb-24" style="background: transparent; box-shadow: none; padding: 0;">
                             <div class="lc-header" style="margin-bottom: 5px;">
                                 <h3>나의 러너 배지 🏅</h3>
-                                <a href="#" class="theme-link">전체보기 <i class="ri-arrow-right-s-line"></i></a>
+                                <a href="javascript:void(0);" onclick="document.getElementById('badgeAllModal').style.display='flex'" class="theme-link">전체보기 <i class="ri-arrow-right-s-line"></i></a>
                             </div>
+                            
+                            <c:set var="acquiredCount" value="0" />
+                            <c:forEach var="chk" items="${badgeList}">
+                                <c:if test="${chk.acquired}"><c:set var="acquiredCount" value="${acquiredCount + 1}" /></c:if>
+                            </c:forEach>
+                            
+                            <c:if test="${acquiredCount == 0}">
+                                <div class="badge-empty-box">
+                                    <p>현재 획득한 배지가 없습니다.</p>
+                                    <span>활동을 시작하고 아래의 배지들을 모아보세요!</span>
+                                </div>
+                            </c:if>
+
                             <div class="badge-grid">
-                                <div class="badge-item">
-                                    <div class="badge-icon" style="color: #00B98D; background: #E6F8F3;"><i class="ri-hand-coin-fill"></i></div>
-                                    <div class="badge-info">
-                                        <h4>첫 바톤 터치</h4>
-                                        <p>첫 중고거래 완료</p>
+                                <c:forEach var="badge" items="${badgeList}" end="2">
+                                    <div class="badge-item ${badge.acquired ? 'acquired' : 'locked'}">
+                                        <div class="badge-icon" style="${badge.acquired ? 'color: #3182F6; background: #E8F3FF;' : ''}">
+                                            <i class="${badge.iconImage}"></i>
+                                        </div>
+                                        <div class="badge-info">
+                                            <h4>${badge.badgeName}</h4>
+                                            <p>${badge.description}</p>
+                                            <div class="badge-progress-wrap">
+                                                <div class="badge-progress-bar">
+                                                    <div class="badge-progress-fill" style="width: ${badge.progressPercent}%; ${badge.acquired ? 'background:#00B98D;' : ''}"></div>
+                                                </div>
+                                                <span class="badge-progress-text">${badge.currentCount}/${badge.targetCount}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="badge-item">
-                                    <div class="badge-icon" style="color: #3182F6; background: #E8F3FF;"><i class="ri-megaphone-fill"></i></div>
-                                    <div class="badge-info">
-                                        <h4>동네 확성기</h4>
-                                        <p>게시글 10회 작성</p>
-                                    </div>
-                                </div>
-                                <div class="badge-item">
-                                    <div class="badge-icon" style="color: #FFB300; background: #FFF8E6;"><i class="ri-thumb-up-fill"></i></div>
-                                    <div class="badge-info">
-                                        <h4>리액션 장인</h4>
-                                        <p>커뮤니티 댓글 30회</p>
-                                    </div>
-                                </div>
-                                </div>
+                                </c:forEach>
+                            </div>
                         </div>
 
 						<div class="stat-grid">
@@ -808,6 +829,38 @@
 		</main>
 	</div>
 
+	<div id="badgeAllModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 99999;" onclick="if(event.target===this) this.style.display='none'">
+        <div class="modal-content" style="background: #fff; border-radius: 24px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #191F28; padding-bottom: 15px; margin-bottom: 20px;">
+                <h3 style="margin:0; font-size: 1.3rem; font-weight: 800;">전체 배지 목록</h3>
+                <button type="button" style="background:none; border:none; font-size:24px; cursor:pointer; color: #191F28;" onclick="document.getElementById('badgeAllModal').style.display='none'"><i class="ri-close-line"></i></button>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <c:forEach var="badge" items="${badgeList}">
+                    <div class="badge-item ${badge.acquired ? 'acquired' : 'locked'}" style="width: 100%; display: flex; align-items: center; gap: 14px; padding: 16px 20px; border: 1px solid rgba(0,0,0,0.06); border-radius: 20px; ${badge.acquired ? 'border-color: #3182F6; box-shadow: 0 4px 15px rgba(49,130,246,0.1);' : 'filter: grayscale(100%); opacity: 0.5;'}">
+                        <div class="badge-icon" style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; ${badge.acquired ? 'color: #3182F6; background: #E8F3FF;' : 'color: #191F28; background: #F4F6F8;'}">
+                            <i class="${badge.iconImage}"></i>
+                        </div>
+                        <div class="badge-info" style="flex: 1;">
+                            <h4 style="margin: 0 0 4px 0; font-size: 1rem; font-weight: 800; color: #191F28;">${badge.badgeName}</h4>
+                            <p style="margin: 0; font-size: 0.8rem; color: #8B95A1; font-weight: 500;">${badge.description}</p>
+                            <div class="badge-progress-wrap" style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+                                <div class="badge-progress-bar" style="flex: 1; height: 6px; background: #E5E8EB; border-radius: 4px; overflow: hidden;">
+                                    <div class="badge-progress-fill" style="height: 100%; width: ${badge.progressPercent}%; ${badge.acquired ? 'background:#00B98D;' : 'background:#3182F6;'}"></div>
+                                </div>
+                                <span class="badge-progress-text" style="font-size: 0.75rem; color: #8B95A1; font-weight: 700; width: 35px; text-align: right;">${badge.currentCount}/${badge.targetCount}</span>
+                            </div>
+                        </div>
+                        <c:if test="${badge.acquired}">
+                            <div style="color: #00B98D; font-weight: 800; font-size: 1.5rem; transform: rotate(-15deg); margin-left: 20px;"><i class="ri-verified-badge-fill"></i></div>
+                        </c:if>
+                    </div>
+                </c:forEach>
+            </div>
+        </div>
+    </div>
+    
 	<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 	<jsp:include page="/WEB-INF/views/payment/chargeModal.jsp" />
 	<script src="https://cdn.iamport.kr/v1/iamport.js"></script>

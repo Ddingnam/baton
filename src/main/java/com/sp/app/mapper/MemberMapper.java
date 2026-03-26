@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.sp.app.domain.dto.BadgeDto;
 import com.sp.app.domain.dto.MemberDto;
 import com.sp.app.domain.dto.RegionDto;
 import com.sp.app.domain.dto.SnsUserDto;
@@ -88,4 +89,7 @@ public interface MemberMapper {
 	public int countCommunityPoll(Long userIdx) throws SQLException;
 	public int countPointCharge(Long userIdx) throws SQLException;
 	public int countAlbaScrap(Long userIdx) throws SQLException;
+	
+	public List<BadgeDto> getAllBadges();
+	public List<Integer> getAcquiredBadgeIds(Long userIdx);
 }

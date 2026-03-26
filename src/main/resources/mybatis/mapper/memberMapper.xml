@@ -359,4 +359,21 @@
     <select id="countAlbaScrap" parameterType="Long" resultType="int">
         SELECT COUNT(*) FROM job_scrap WHERE memberid = #{userIdx}
     </select>
+    
+    <select id="getAllBadges" resultType="com.sp.app.domain.dto.BadgeDto">
+        SELECT 
+            badge_id AS badgeId, 
+            badge_name AS badgeName, 
+            description AS description, 
+            icon_image AS iconImage,
+            0 AS currentCount,
+            0 AS targetCount,
+            0 AS progressPercent
+        FROM badge 
+        ORDER BY badge_id ASC
+    </select>
+    
+    <select id="getAcquiredBadgeIds" parameterType="Long" resultType="Integer">
+        SELECT badge_id FROM user_badge WHERE useridx = #{userIdx}
+    </select>
 </mapper>

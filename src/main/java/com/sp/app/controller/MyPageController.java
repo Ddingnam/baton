@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.sp.app.domain.dto.BadgeDto;
 import com.sp.app.domain.dto.UserDto;
 import com.sp.app.domain.entity.User;
 import com.sp.app.mapper.PaymentMapper;
@@ -83,6 +84,33 @@ public class MyPageController {
             model.addAttribute("albaPostList", jobPostingService.postListByUserId(userIdx));
             model.addAttribute("albaScrapList", jobPostingService.listJobScrap(userIdx));
             model.addAttribute("albaApplyList", jobApplyService.listApplyByUser(userIdx)); 
+            
+            try {
+                List<BadgeDto> badgeList = memberService.getUserBadgeProgress(userIdx);
+                log.info("===============================================");
+                
+                log.info("가져온 배지 개수: {}개", (badgeList != null ? badgeList.size() : 0));
+                log.info("===============================================");
+                
+                if (badgeList == null || badgeList.isEmpty()) {
+                    log.warn("★★ DB에서 배지를 가져오지 못했습니다! 화면(CSS) 테스트를 위해 가짜 배지를 1개 생성합니다. ★★");
+                    
+                    badgeList = new java.util.ArrayList<>();
+                    BadgeDto testBadge = new BadgeDto();
+                    testBadge.setBadgeId(999);
+                    testBadge.setBadgeName("테스트용 임시 배지");
+                    testBadge.setDescription("이 배지가 보인다면 CSS는 정상입니다!");
+                    testBadge.setIconImage("ri-bug-fill"); 
+                    testBadge.setAcquired(true);
+                    testBadge.setCurrentCount(5);
+                    testBadge.setTargetCount(10);
+                    testBadge.setProgressPercent(50);
+                    badgeList.add(testBadge);
+                }
+                model.addAttribute("badgeList", badgeList);
+            } catch(Exception e) {
+                log.error("배지 정보 로드 실패", e);
+            }
         }
 
         return "mypage/main";
