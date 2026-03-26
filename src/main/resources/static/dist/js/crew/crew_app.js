@@ -26,7 +26,31 @@ const router = VueRouter.createRouter({
                     path: 'board',
                     name: 'crew-board',
                     component: CrewBoard,
-					props: true
+					props: true,
+					children: [
+				        {
+				            path: '',
+				            name: 'crew-board-list',
+				            component: CrewBoard
+				        },
+				        {
+				            path: 'write',
+				            name: 'crew-board-write',
+				            component: CrewBoard
+				        },
+						{
+					        path: 'edit/:boardIdx',
+					        name: 'crew-board-edit',
+					        component: CrewBoard,
+					        props: true
+					    },
+				        {
+				            path: ':boardIdx',
+				            name: 'crew-board-detail',
+				            component: CrewBoard,
+				            props: true
+				        }
+				    ]
                 },
                 {
                     path: 'schedule',
