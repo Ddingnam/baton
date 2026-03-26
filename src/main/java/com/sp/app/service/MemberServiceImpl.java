@@ -133,9 +133,29 @@ public class MemberServiceImpl implements MemberService {
 		}
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public void updateMember(MemberDto dto, String uploadPath) throws Exception {
-		mapper.updateMember1(dto);
+		try {
+			UserDto before = mapper.findById(dto.getUserIdx());
+			
+			mapper.updateMember1(dto);
+
+			if (dto.getSelectFile() != null && !dto.getSelectFile().isEmpty()) {
+				String saveFilename = storageService.uploadFileToServer(dto.getSelectFile(), uploadPath);
+				if (saveFilename != null) {
+					dto.setProfile_photo(saveFilename);
+					mapper.updateMember2(dto);
+					
+					if (before != null && before.getProfile_photo() != null && !before.getProfile_photo().isBlank()) {
+						storageService.deleteFile(uploadPath, before.getProfile_photo());
+					}
+				}
+			}
+		} catch (Exception e) {
+			log.info("updateMember : ", e);
+			throw e;
+		}
 	}
 
 	@Override
@@ -224,7 +244,21 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public void deleteProfilePhoto(Map<String, Object> map, String uploadPath) throws Exception {
-		mapper.deleteProfilePhoto(map);
+		try {
+			Object userIdxObj = map.get("userIdx");
+			Long userIdx = userIdxObj instanceof Long ? (Long) userIdxObj : Long.valueOf(String.valueOf(userIdxObj));
+			
+			UserDto before = mapper.findById(userIdx);
+			
+			mapper.deleteProfilePhoto(map);
+			
+			if (before != null && before.getProfile_photo() != null && !before.getProfile_photo().isBlank()) {
+				storageService.deleteFile(uploadPath, before.getProfile_photo());
+			}
+		} catch (Exception e) {
+			log.info("deleteProfilePhoto : ", e);
+			throw e;
+		}
 	}
 
 	@Override
