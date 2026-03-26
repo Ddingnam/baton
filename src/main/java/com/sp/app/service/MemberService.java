@@ -72,4 +72,7 @@ public interface MemberService {
 	public int countActiveTrades(Long userIdx);
 	public int countPendingReports(Long userIdx);
 	public void requestWithdraw(Map<String, Object> map) throws Exception;
+	
+	public void updateBatonDistance(Long userIdx, double distance) throws Exception;
+	public void checkAndAwardBadge(Long userIdx, String actionType) throws Exception;
 }

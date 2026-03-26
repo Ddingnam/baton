@@ -432,4 +432,101 @@ public class MemberServiceImpl implements MemberService {
 		statusMap.put("status",  8);
 		mapper.updateUserEnabled(statusMap);
 	}
+	
+	@Override
+	public void updateBatonDistance(Long userIdx, double distance) throws Exception {
+		try {
+			Map<String, Object> map = new HashMap<>();
+			map.put("userIdx", userIdx);
+			map.put("distance", distance);
+			mapper.updateBatonDistance(map);
+		} catch (Exception e) {
+			log.info("updateBatonDistance : ", e);
+			throw e;
+		}
+	}
+
+	@Override
+	public void checkAndAwardBadge(Long userIdx, String actionType) throws Exception {
+		try {
+			int badgeId = 0;
+			boolean conditionMet = false;
+			
+			if ("TRADE".equals(actionType)) {
+				Map<String, Object> map = new HashMap<>();
+				map.put("userIdx", userIdx);
+				map.put("badgeId", 1);
+				if (mapper.checkUserBadge(map) == 0) {
+					if (mapper.countTradeCompleted(userIdx) >= 1) {
+						badgeId = 1; conditionMet = true;
+					}
+				}
+			} else if ("REVIEW".equals(actionType)) {
+				Map<String, Object> map = new HashMap<>();
+				map.put("userIdx", userIdx);
+				map.put("badgeId", 2);
+				if (mapper.checkUserBadge(map) == 0) {
+					if (mapper.countReviewBest(userIdx) >= 5) {
+						badgeId = 2; conditionMet = true;
+					}
+				}
+			} else if ("COMMUNITY_POST".equals(actionType)) {
+				Map<String, Object> map = new HashMap<>();
+				map.put("userIdx", userIdx);
+				map.put("badgeId", 3);
+				if (mapper.checkUserBadge(map) == 0) {
+					if (mapper.countCommunityPost(userIdx) >= 10) {
+						badgeId = 3; conditionMet = true;
+					}
+				}
+			} else if ("COMMUNITY_REPLY".equals(actionType)) {
+				Map<String, Object> map = new HashMap<>();
+				map.put("userIdx", userIdx);
+				map.put("badgeId", 4);
+				if (mapper.checkUserBadge(map) == 0) {
+					if (mapper.countCommunityReply(userIdx) >= 30) {
+						badgeId = 4; conditionMet = true;
+					}
+				}
+			} else if ("POLL".equals(actionType)) {
+				Map<String, Object> map = new HashMap<>();
+				map.put("userIdx", userIdx);
+				map.put("badgeId", 5);
+				if (mapper.checkUserBadge(map) == 0) {
+					if (mapper.countCommunityPoll(userIdx) >= 5) {
+						badgeId = 5; conditionMet = true;
+					}
+				}
+			} else if ("CHARGE".equals(actionType)) {
+				Map<String, Object> map = new HashMap<>();
+				map.put("userIdx", userIdx);
+				map.put("badgeId", 6);
+				if (mapper.checkUserBadge(map) == 0) {
+					if (mapper.countPointCharge(userIdx) >= 1) {
+						badgeId = 6; conditionMet = true;
+					}
+				}
+			} else if ("ALBA_SCRAP".equals(actionType)) {
+				Map<String, Object> map = new HashMap<>();
+				map.put("userIdx", userIdx);
+				map.put("badgeId", 7);
+				if (mapper.checkUserBadge(map) == 0) {
+					if (mapper.countAlbaScrap(userIdx) >= 5) {
+						badgeId = 7; conditionMet = true;
+					}
+				}
+			}
+			
+			if (conditionMet && badgeId > 0) {
+				Map<String, Object> map = new HashMap<>();
+				map.put("userIdx", userIdx);
+				map.put("badgeId", badgeId);
+				mapper.insertUserBadge(map);
+			}
+			
+		} catch (Exception e) {
+			log.info("checkAndAwardBadge : ", e);
+			throw e;
+		}
+	}
 }

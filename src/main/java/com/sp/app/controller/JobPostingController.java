@@ -6,6 +6,7 @@ import com.sp.app.model.JobProfile;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.JobPostingService;
 import com.sp.app.service.JobProfileService;
+import com.sp.app.service.MemberService;
 import com.sp.app.service.NotificationService; 
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class JobPostingController {
 	private final JobPostingService postingService;
 	private final JobProfileService jobProfileService;
 	private final NotificationService notificationService;
+	private final MemberService memberService;
 
 	@GetMapping("list")
 	public String list(@RequestParam(value = "page", defaultValue = "1") int current_page,
@@ -328,6 +330,8 @@ public class JobPostingController {
                         "/alba/article/" + postingIdx
                     );
                 }
+                
+                memberService.checkAndAwardBadge(userDetails.getUserIdx(), "ALBA_SCRAP");
                 
 	        } else {
 	            postingService.deleteJobScrap(map);

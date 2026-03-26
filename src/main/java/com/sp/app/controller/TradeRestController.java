@@ -24,6 +24,7 @@ import com.sp.app.model.TradeAiResponse;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.EscrowService;
 import com.sp.app.service.FollowService;
+import com.sp.app.service.MemberService;
 import com.sp.app.service.TradeAiService;
 import com.sp.app.service.TradeService;
 import com.sp.app.service.WishListService;
@@ -46,7 +47,8 @@ public class TradeRestController {
     private final TradeAiService tradeAiService;
     private final NotificationService notificationService;
     private final TradeMapper tradeMapper;
-
+    private final MemberService memberService;
+    
     @Value("${file.upload-root}/trade")
     private String uploadPath;
 
@@ -234,6 +236,14 @@ public class TradeRestController {
                     );
                 }
             }
+            
+            if("판매완료".equals(tradeStatus)) {
+                Long sellerIdx = trade.getUserIdx();
+               
+                memberService.updateBatonDistance(sellerIdx, 0.1);
+                memberService.checkAndAwardBadge(sellerIdx, "TRADE");
+            }
+            
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

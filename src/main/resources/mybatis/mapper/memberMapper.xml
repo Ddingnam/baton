@@ -14,7 +14,8 @@
 			status, createdDate, updatedDate, lastLoginDate,
 			TO_CHAR(birth, 'YYYY-MM-DD') birth,
 			profile_photo, score, userLevel, pwdFailCount,
-			m2.authority, batonpoint
+			m2.authority, batonpoint,
+			baton_distance AS batonDistance
 		FROM users m1
 		LEFT OUTER JOIN userAuthority m2 ON m1.userId = m2.userId
 		WHERE m1.userId = #{userId}
@@ -310,4 +311,52 @@
         WHERE reportedUserIdx = #{userIdx} AND processStatus = 0
     </select>
 
+	<update id="updateBatonDistance" parameterType="map">
+        UPDATE users SET baton_distance = LEAST(GREATEST(NVL(baton_distance, 10.0) + #{distance}, 0.0), 42.195)
+        WHERE useridx = #{userIdx}
+    </update>
+    
+    <insert id="insertUserBadge" parameterType="map">
+        INSERT INTO user_badge(useridx, badge_id, is_representative, acquired_date)
+        VALUES(#{userIdx}, #{badgeId}, 0, SYSDATE)
+    </insert>
+    
+    <select id="checkUserBadge" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM user_badge WHERE useridx = #{userIdx} AND badge_id = #{badgeId}
+    </select>
+    
+    <select id="countTradeCompleted" parameterType="Long" resultType="int">
+        SELECT COUNT(*) FROM tradetransaction WHERE (selleridx = #{userIdx} OR buyeridx = #{userIdx}) AND tradestatus = '판매완료'
+    </select>
+    
+    <select id="countReviewBest" parameterType="Long" resultType="int">
+        SELECT COUNT(*) FROM tradingreviews r
+        WHERE r.ishidden = 0 AND r.score = 5
+        AND EXISTS (
+            SELECT 1 FROM tradetransaction t 
+            WHERE t.productidx = r.productidx 
+            AND ((t.selleridx = #{userIdx} AND r.salereviewtype = 'BUYER') 
+              OR (t.buyeridx = #{userIdx} AND r.salereviewtype = 'SELLER'))
+        )
+    </select>
+    
+    <select id="countCommunityPost" parameterType="Long" resultType="int">
+        SELECT COUNT(*) FROM community WHERE member_idx = #{userIdx} AND temporary = 0
+    </select>
+    
+    <select id="countCommunityReply" parameterType="Long" resultType="int">
+        SELECT COUNT(*) FROM community_reply WHERE member_idx = #{userIdx} AND is_deleted = 0
+    </select>
+    
+    <select id="countCommunityPoll" parameterType="Long" resultType="int">
+        SELECT COUNT(DISTINCT poll_id) FROM poll_vote WHERE member_idx = #{userIdx}
+    </select>
+    
+    <select id="countPointCharge" parameterType="Long" resultType="int">
+        SELECT COUNT(*) FROM payment WHERE useridx = #{userIdx}
+    </select>
+    
+    <select id="countAlbaScrap" parameterType="Long" resultType="int">
+        SELECT COUNT(*) FROM job_scrap WHERE memberid = #{userIdx}
+    </select>
 </mapper>

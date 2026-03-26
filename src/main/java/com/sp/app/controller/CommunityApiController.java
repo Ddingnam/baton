@@ -29,6 +29,7 @@ import com.sp.app.domain.entity.CommunityPoll;
 import com.sp.app.repository.CommunityPollRepository;
 import com.sp.app.repository.PollVoteRepository;
 import com.sp.app.service.CommunityService;
+import com.sp.app.service.MemberService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,7 @@ public class CommunityApiController {
     private final CommunityService communityService;
     private final CommunityPollRepository communityPollRepository;
     private final PollVoteRepository pollVoteRepository;
+    private final MemberService memberService;
 
     @Value("${file.upload-root}/community")
     private String uploadPath;
@@ -70,6 +72,11 @@ public class CommunityApiController {
 			String path = root + "uploads" + File.separator + "community";
 
 			communityService.insertCommunity(dto, path);
+			
+			if(!dto.isTemporary()) {
+                memberService.updateBatonDistance(info.getUserIdx(), 0.05);
+                memberService.checkAndAwardBadge(info.getUserIdx(), "COMMUNITY_POST");
+            }
 
 			state.put("status", "true");
 			state.put("message", "게시글이 등록되었습니다.");
@@ -252,6 +259,10 @@ public class CommunityApiController {
             communityService.cancelVote(pollId, info.getUserIdx());
             communityService.votePoll(pollId, info.getUserIdx(), optionIds);
             result.put("success", true);
+            
+            memberService.updateBatonDistance(info.getUserIdx(), 0.05);
+            memberService.checkAndAwardBadge(info.getUserIdx(), "POLL");
+            
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             log.error("투표 실패", e);

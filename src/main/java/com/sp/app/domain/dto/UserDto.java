@@ -25,6 +25,7 @@ public class UserDto {
 	private String profile_photo;
 	
 	private double score;
+	private Double batonDistance;
 	private int userLevel;
 	private int pwdFailCount;
 	private int status;

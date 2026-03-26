@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.sp.app.mapper.TradingReviewsMapper;
 import com.sp.app.model.TradingReviews;
 import com.sp.app.security.CustomUserDetails;
+import com.sp.app.service.MemberService;
 import com.sp.app.service.NotificationService;
 
 @Controller
@@ -26,10 +27,12 @@ public class TradingReviewsController {
 
     private final TradingReviewsMapper reviewMapper;
     private final NotificationService notificationService;
-
-    public TradingReviewsController(TradingReviewsMapper reviewMapper, NotificationService notificationService) {
+    private final MemberService memberService;
+    
+    public TradingReviewsController(TradingReviewsMapper reviewMapper, NotificationService notificationService, MemberService memberService) {
         this.reviewMapper = reviewMapper;
         this.notificationService = notificationService;
+        this.memberService = memberService;
     }
 
     @GetMapping("/write")
@@ -74,6 +77,17 @@ public class TradingReviewsController {
                     String msg = userDetails.getMember().getNickname() + "님이 따뜻한 거래 후기를 남겼습니다.";
                     String url = "/review/list?type=RECEIVED";
                     notificationService.sendNotification(targetUserIdx, "REVIEW", msg, url);
+                    
+                    double diff = 0.0;
+                    if(dto.getScore() == 5) diff = +0.2;      
+                    else if(dto.getScore() == 3) diff = +0.1; 
+                    else if(dto.getScore() == 1) diff = -0.5;
+                    
+                    memberService.updateBatonDistance(targetUserIdx, diff);
+        
+                    if(dto.getScore() == 5) {
+                        memberService.checkAndAwardBadge(targetUserIdx, "REVIEW");
+                    }
                 }
             }
         } catch (Exception e) {

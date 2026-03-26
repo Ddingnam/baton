@@ -83,5 +83,8 @@ public class User {
     
     @Column(length = 20)
     private String userTheme;
+    
+    @Column(name = "baton_distance", columnDefinition = "NUMBER(5, 2) DEFAULT 10.0")
+    private Double batonDistance;
 }
 

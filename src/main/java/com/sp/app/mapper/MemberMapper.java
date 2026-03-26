@@ -77,4 +77,15 @@ public interface MemberMapper {
 	public void insertWithdrawRequest(Map<String, Object> map) throws SQLException;
 	public int countActiveTrades(Long userIdx);
 	public int countPendingReports(Long userIdx);
+	
+	public void updateBatonDistance(Map<String, Object> map) throws SQLException;
+	public void insertUserBadge(Map<String, Object> map) throws SQLException;
+	public int checkUserBadge(Map<String, Object> map) throws SQLException;
+	public int countTradeCompleted(Long userIdx) throws SQLException;
+	public int countReviewBest(Long userIdx) throws SQLException;
+	public int countCommunityPost(Long userIdx) throws SQLException;
+	public int countCommunityReply(Long userIdx) throws SQLException;
+	public int countCommunityPoll(Long userIdx) throws SQLException;
+	public int countPointCharge(Long userIdx) throws SQLException;
+	public int countAlbaScrap(Long userIdx) throws SQLException;
 }
