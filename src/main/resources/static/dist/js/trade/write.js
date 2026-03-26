@@ -1,8 +1,9 @@
 function useTradeWrite(shared) {
-    const { Vue, ContextPath } = window;
+    const { Vue } = window;
     const { ref, reactive, computed, watch, nextTick } = Vue;
 
-    const { categories, viewMode } = shared;
+    const { categories, viewMode, router } = shared;
+    shared.router = router;
 
     const writeMode = ref('write');
     const currentProductIdx = ref('');
@@ -309,8 +310,10 @@ function useTradeWrite(shared) {
 	    const lngInput = f.querySelector('[name="longitude"]');
 
 	    if (type === '택배' || !wForm.latitude) {
-	        latInput.disabled = true;
-	        lngInput.disabled = true;
+			latInput.disabled = false; // 전송 가능하게 유지
+			lngInput.disabled = false;
+			latInput.value = ""; 
+			lngInput.value = "";
 	    } else {
 	        latInput.disabled = false;
 	        latInput.value = wForm.latitude;
@@ -335,7 +338,11 @@ function useTradeWrite(shared) {
 			const result = await response.json();
 
 			if (result.status === 'success') {
-				location.href = '/trade/main';
+				if (shared && shared.router) {
+					shared.router.push('/');
+				} else {
+					location.href = '/trade/main';
+				}
 			} else {
 				showBatonToast('저장에 실패했습니다: ' + (result.message || '알 수 없는 오류'));
 			}

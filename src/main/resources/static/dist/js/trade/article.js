@@ -1,5 +1,5 @@
 function useTradeArticle(shared) {
-    const { Vue, ContextPath } = window;
+    const { Vue } = window;
     const { ref, reactive, computed, nextTick } = Vue;
 
     function csrfHeaders() {
@@ -8,6 +8,19 @@ function useTradeArticle(shared) {
         const h = { 'Content-Type': 'application/x-www-form-urlencoded' };
         if (token && header) h[header] = token;
         return h;
+    }
+
+    function formatTimeAgo(dateString) {
+        if (!dateString) return '';
+        const clean = dateString.trim().split('.')[0].replace(/-/g, '/');
+        const date  = new Date(clean);
+        const diff  = Math.floor((Date.now() - date) / 1000);
+        if (isNaN(date.getTime())) return dateString;
+        if (diff < 60) return '방금 전';
+        if (diff < 3600) return Math.floor(diff / 60) + '분 전';
+        if (diff < 86400) return Math.floor(diff / 3600) + '시간 전';
+        if (diff < 2592000) return Math.floor(diff / 86400) + '일 전';
+        return dateString.split(' ')[0];
     }
 
     const article = ref(null);
@@ -169,7 +182,7 @@ function useTradeArticle(shared) {
 		}
         if (!confirm('이 게시글을 목록 맨 위로 올리시겠습니까?')) return;
 		
-        const res  = await fetch('/api/trade/pullUp', { 
+        const res = await fetch('/api/trade/pullUp', { 
 			method: 'POST', 
 			headers: csrfHeaders(), 
 			body: new URLSearchParams({ productIdx: article.value.productIdx }) 
@@ -196,10 +209,9 @@ function useTradeArticle(shared) {
 	        if (data.status === 'success') {
 	            if (typeof showBatonToast === 'function') {
 					showBatonToast('게시글이 삭제되었습니다.');
-					location.replace('/trade/main');
 	            }
-	            if (typeof shared.viewMode !== 'undefined') {
-	                shared.viewMode.value = 'LIST';
+	            if (shared.router) {
+	                shared.router.push('/');
 	            } else {
 	                location.href = '/trade/main';
 	            }
@@ -306,6 +318,7 @@ function useTradeArticle(shared) {
         loadArticle, openLightbox, lightboxPrev, lightboxNext,
         toggleWishArticle, updateStatus, pullUp, doDelete,
         openChatList, openChatRoom, shareArticle, goToCheckout, goToMyPage, goToTradePage,
-        submitShipping, cancelTrade, confirmPurchase, requestRefund, submitReport
+        submitShipping, cancelTrade, confirmPurchase, requestRefund, submitReport,
+        formatTimeAgo
     };
 }

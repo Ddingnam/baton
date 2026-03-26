@@ -2,10 +2,10 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
-<div v-show="viewMode === 'WRITE'">
+<template id="tpl-trade-write">
     <div class="page-wrap">
         <div class="header-content">
-            <button class="back-btn" @click="goList()">
+            <button class="back-btn" @click="$router.push('/')">
                 <i class="ri-arrow-left-s-line" style="font-size:24px;"></i>
             </button>
             <div class="title-set">
@@ -105,18 +105,18 @@
                             <div class="field" style="margin-bottom:0;">
                                 <label>태그</label>
                                 <div class="tag-outer-container">
-								    <div v-for="(tag, i) in tags" :key="i" class="tag-item">
-								        <span class="tag-hash">#</span>
-								        <span class="tag-text">{{ tag }}</span>
-								        <span class="tag-remove" @click="removeTag(i)">&times;</span>
-								    </div>
-								    <input type="text" 
-								           v-model="tagInput" 
-								           @keydown.enter.prevent="addTag" 
-								           @keydown.backspace="onTagBackspace"
-								           placeholder="태그 입력 후 엔터"
-								           class="tag-input-field">
-								</div>
+                                    <div v-for="(tag, i) in tags" :key="i" class="tag-item">
+                                        <span class="tag-hash">#</span>
+                                        <span class="tag-text">{{ tag }}</span>
+                                        <span class="tag-remove" @click="removeTag(i)">&times;</span>
+                                    </div>
+                                    <input type="text"
+                                           v-model="tagInput"
+                                           @keydown.enter.prevent="addTag"
+                                           @keydown.backspace="onTagBackspace"
+                                           placeholder="태그 입력 후 엔터"
+                                           class="tag-input-field">
+                                </div>
                                 <input type="hidden" name="tags" id="finalTags" :value="tags.join(',')">
                             </div>
                         </div>
@@ -145,9 +145,9 @@
                                 <label>배송비</label>
                                 <div class="price-wrap">
                                     <span class="won-sign">₩</span>
-                                    <input type="text" name="shippingFee" id="shippingFeeInput" placeholder="0" 
-                                    	:value="wForm.shippingFee ? Number(wForm.shippingFee).toLocaleString('ko-KR') : ''"
-                                    	@keydown="onlyNumberKey" @input="validateNumber">
+                                    <input type="text" name="shippingFee" id="shippingFeeInput" placeholder="0"
+                                           :value="wForm.shippingFee ? Number(wForm.shippingFee).toLocaleString('ko-KR') : ''"
+                                           @keydown="onlyNumberKey" @input="validateNumber">
                                 </div>
                             </div>
                             <div class="field" id="locationField" v-show="wForm.tradeType === '직거래' || wForm.tradeType === '둘다가능'">
@@ -173,10 +173,10 @@
                         <button type="button" class="submit-btn" @click="submitForm(wForm.tradeStatus === '임시저장' ? '판매중' : (wForm.tradeStatus || '판매중'))">
                             {{ (writeMode === 'update' && wForm.tradeStatus !== '임시저장') ? '수정 완료하기' : '게시글 등록하기' }}
                         </button>
-                        <button type="button" class="cancel-btn" @click="goList()">취소</button>
+                        <button type="button" class="cancel-btn" @click="$router.push('/')">취소</button>
                     </div>
                 </div>
             </div>
         </form>
     </div>
-</div>
+</template>
