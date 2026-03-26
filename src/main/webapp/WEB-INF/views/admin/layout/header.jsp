@@ -7,6 +7,7 @@
 <c:set var="adminNickname" value="${empty adminMember.nickname ? adminName : adminMember.nickname}"/>
 <c:set var="adminEmail" value="${empty adminMember.email ? '' : adminMember.email}"/>
 <c:set var="adminAvatarText" value="${fn:length(adminNickname) >= 2 ? fn:substring(adminNickname, 0, 2) : adminNickname}"/>
+<c:set var="adminAvatarUrl" value="${empty adminMember.avatar ? '' : pageContext.request.contextPath.concat('/uploads/profile/').concat(adminMember.avatar)}"/>
 <c:set var="adminRoleCode" value="${adminMember.userLevel >= 99 ? 'admin' : 'emp'}"/>
 <c:set var="adminRoleLabel" value="${adminMember.userLevel >= 99 ? 'ADMIN' : 'EMP'}"/>
 
@@ -26,11 +27,11 @@
             <span class="noti-count-badge" id="notiCountBadge" style="display:none;"></span>
         </div>
 
-        <div class="user-avt-btn" id="profileTrigger">${adminAvatarText}</div>
+        <div class="user-avt-btn" id="profileTrigger" <c:if test="${not empty adminAvatarUrl}">style="background-image:url('${adminAvatarUrl}');background-size:cover;background-position:center;color:transparent;font-size:0;"</c:if>>${adminAvatarText}</div>
 
         <div class="pop-modal" id="profileModal">
             <div class="sq-user">
-                <div class="sq-avt" id="profileQuickAvatar">${adminAvatarText}</div>
+                <div class="sq-avt" id="profileQuickAvatar" <c:if test="${not empty adminAvatarUrl}">style="background-image:url('${adminAvatarUrl}');background-size:cover;background-position:center;color:transparent;font-size:0;"</c:if>>${adminAvatarText}</div>
                 <div class="sq-info">
                     <span class="sq-name" id="profileQuickName">${adminNickname}</span>
                     <span class="sq-role" id="profileQuickRole">${adminRoleCode}</span>
@@ -511,7 +512,7 @@
                 <p class="fm-tab-desc">프로필 사진과 이름, 닉네임을 변경합니다.</p>
                 <div class="fm-section">
                     <div class="profile-avatar-edit">
-                        <div class="profile-av-circle" id="profileAvatarCircle">${adminAvatarText}</div>
+                        <div class="profile-av-circle" id="profileAvatarCircle" data-photo-deleted="false" <c:if test="${not empty adminAvatarUrl}">style="background-image:url('${adminAvatarUrl}');background-size:cover;background-position:center;color:transparent;font-size:0;"</c:if>>${adminAvatarText}</div>
                         <div class="profile-av-actions">
                             <button class="btn-pill btn-light" type="button" id="profilePhotoBtn" style="font-size:13px;padding:8px 16px;">사진 변경</button>
                             <button class="btn-text" type="button" id="profilePhotoClearBtn" style="font-size:13px;">삭제</button>
@@ -528,7 +529,8 @@
                     </div>
                     <div class="fm-field">
                         <label class="fm-label">이메일</label>
-                        <input type="email" class="fm-input" id="profileEmailInput" value="${adminEmail}" placeholder="이메일">
+                        <input type="email" class="fm-input" id="profileEmailInput" value="${adminEmail}" placeholder="이메일" readonly>
+                        <div style="margin-top:8px;font-size:12px;color:#94A3B8;font-weight:600;">이메일은 관리자 계정 보안을 위해 수정할 수 없습니다.</div>
                     </div>
                 </div>
                 <div class="fm-actions">
@@ -587,6 +589,7 @@
         name: '${fn:escapeXml(adminName)}',
         nickname: '${fn:escapeXml(adminNickname)}',
         email: '${fn:escapeXml(adminEmail)}',
+        avatarUrl: '${fn:escapeXml(adminAvatarUrl)}',
         roleCode: '${adminRoleCode}',
         roleLabel: '${adminRoleLabel}'
     };

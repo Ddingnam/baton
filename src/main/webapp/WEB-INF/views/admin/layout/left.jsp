@@ -7,6 +7,7 @@
 <c:set var="adminName" value="${empty adminMember.name ? '관리자' : adminMember.name}"/>
 <c:set var="adminNickname" value="${empty adminMember.nickname ? adminName : adminMember.nickname}"/>
 <c:set var="adminAvatarText" value="${fn:length(adminNickname) >= 2 ? fn:substring(adminNickname, 0, 2) : adminNickname}"/>
+<c:set var="adminAvatarUrl" value="${empty adminMember.avatar ? '' : pageContext.request.contextPath.concat('/uploads/profile/').concat(adminMember.avatar)}"/>
 <c:set var="adminRoleCode" value="${adminMember.userLevel >= 99 ? 'admin' : 'emp'}"/>
 
 <aside class="agency-sidebar">
@@ -87,7 +88,7 @@
             <div class="chat-unread-badge" id="studioChatBadge" style="display:none;"></div>
         </button>
         <div class="user-badge">
-            <div class="avt-circle" id="sidebarAvatarText">${adminAvatarText}</div>
+            <div class="avt-circle" id="sidebarAvatarText" <c:if test="${not empty adminAvatarUrl}">style="background-image:url('${adminAvatarUrl}');background-size:cover;background-position:center;color:transparent;font-size:0;"</c:if>>${adminAvatarText}</div>
             <div class="user-texts">
                 <span class="u-name" id="sidebarUserName">${adminNickname}</span>
                 <span class="u-role" id="sidebarUserRole">${adminRoleCode}</span>

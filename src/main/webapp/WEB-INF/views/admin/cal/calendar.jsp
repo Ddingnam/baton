@@ -163,9 +163,9 @@ window.CTX='${pageContext.request.contextPath}';
                     </div>
                 </div>
             </div>
-            <div class="cp-form-group mt-2">
-                <div class="cp-allday-row">
-                    <label class="cp-allday-label"><i class="ri-sun-line"></i> 종일 일정</label>
+            <div class="cp-form-group cp-schedule-form mt-2">
+                <div class="cp-allday-row cp-allday-inline">
+                    <label class="cp-allday-label"><i class="ri-sun-line"></i> 종일</label>
                     <label class="cp-toggle">
                         <input type="checkbox" id="evAllDay">
                         <span class="cp-toggle-slider"></span>
@@ -173,17 +173,17 @@ window.CTX='${pageContext.request.contextPath}';
                 </div>
                 <div class="cp-field">
                     <label class="cp-field-label">날짜</label>
-                    <input type="date" class="cp-input" id="evDate">
+                    <input type="text" class="cp-input cp-picker-input cp-date-input" id="evDate" readonly placeholder="날짜 선택">
                 </div>
                 <div class="cp-time-row" id="timeFieldsRow">
                     <div class="cp-field half">
                         <label class="cp-field-label">시작</label>
-                        <input type="time" class="cp-input" id="evStart">
+                        <input type="text" class="cp-input cp-picker-input cp-time-input" id="evStart" readonly placeholder="시작 시간">
                     </div>
                     <span class="cp-time-arrow"><i class="ri-arrow-right-line"></i></span>
                     <div class="cp-field half">
                         <label class="cp-field-label">종료</label>
-                        <input type="time" class="cp-input" id="evEnd">
+                        <input type="text" class="cp-input cp-picker-input cp-time-input" id="evEnd" readonly placeholder="종료 시간">
                     </div>
                 </div>
             </div>

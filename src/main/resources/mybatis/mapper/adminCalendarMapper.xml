@@ -2,70 +2,81 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.admin.mapper.AdminCalendarMapper">
 
-    <select id="listEvents" resultType="com.sp.app.admin.model.AdminCalendarEvent">
-        SELECT calendar_idx AS id,
-               admin_idx AS adminIdx,
-               title,
-               event_date AS date,
-               start_time AS startTime,
-               end_time AS endTime,
-               CASE WHEN all_day = 1 THEN 1 ELSE 0 END AS allDay,
-               color,
-               memo,
-               event_type AS type,
-               TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI') AS createdAt,
-               TO_CHAR(updated_at, 'YYYY-MM-DD HH24:MI') AS updatedAt
+    <resultMap id="calendarEventMap" type="com.sp.app.admin.model.AdminCalendarEvent">
+        <id property="id" column="CALENDAR_IDX"/>
+        <result property="adminIdx" column="ADMIN_IDX"/>
+        <result property="title" column="TITLE"/>
+        <result property="date" column="EVENT_DATE"/>
+        <result property="startTime" column="START_TIME"/>
+        <result property="endTime" column="END_TIME"/>
+        <result property="allDay" column="ALL_DAY"/>
+        <result property="color" column="COLOR"/>
+        <result property="memo" column="MEMO"/>
+        <result property="type" column="EVENT_TYPE"/>
+        <result property="createdAt" column="CREATED_AT"/>
+        <result property="updatedAt" column="UPDATED_AT"/>
+    </resultMap>
+
+    <select id="listEvents" parameterType="map" resultMap="calendarEventMap">
+        SELECT CALENDAR_IDX,
+               ADMIN_IDX,
+               TITLE,
+               EVENT_DATE,
+               START_TIME,
+               END_TIME,
+               ALL_DAY,
+               COLOR,
+               MEMO,
+               EVENT_TYPE,
+               TO_CHAR(CREATED_AT, 'YYYY-MM-DD HH24:MI') AS CREATED_AT,
+               TO_CHAR(UPDATED_AT, 'YYYY-MM-DD HH24:MI') AS UPDATED_AT
         FROM ADMIN_CALENDAR_EVENT
-        WHERE admin_idx = #{adminIdx}
-          AND event_date BETWEEN #{from} AND #{to}
-        ORDER BY event_date ASC,
-                 CASE WHEN start_time IS NULL THEN '00:00' ELSE start_time END ASC,
-                 calendar_idx ASC
+        WHERE ADMIN_IDX = #{adminIdx}
+          AND EVENT_DATE BETWEEN #{from} AND #{to}
+        ORDER BY EVENT_DATE ASC,
+                 NVL(START_TIME, '00:00') ASC,
+                 CALENDAR_IDX ASC
     </select>
 
-    <select id="findById" resultType="com.sp.app.admin.model.AdminCalendarEvent">
-        SELECT calendar_idx AS id,
-               admin_idx AS adminIdx,
-               title,
-               event_date AS date,
-               start_time AS startTime,
-               end_time AS endTime,
-               CASE WHEN all_day = 1 THEN 1 ELSE 0 END AS allDay,
-               color,
-               memo,
-               event_type AS type,
-               TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI') AS createdAt,
-               TO_CHAR(updated_at, 'YYYY-MM-DD HH24:MI') AS updatedAt
+    <select id="getEvent" parameterType="long" resultMap="calendarEventMap">
+        SELECT CALENDAR_IDX,
+               ADMIN_IDX,
+               TITLE,
+               EVENT_DATE,
+               START_TIME,
+               END_TIME,
+               ALL_DAY,
+               COLOR,
+               MEMO,
+               EVENT_TYPE,
+               TO_CHAR(CREATED_AT, 'YYYY-MM-DD HH24:MI') AS CREATED_AT,
+               TO_CHAR(UPDATED_AT, 'YYYY-MM-DD HH24:MI') AS UPDATED_AT
         FROM ADMIN_CALENDAR_EVENT
-        WHERE calendar_idx = #{id}
-          AND admin_idx = #{adminIdx}
+        WHERE CALENDAR_IDX = #{id}
     </select>
 
     <insert id="insertEvent" parameterType="com.sp.app.admin.model.AdminCalendarEvent">
-        <selectKey keyProperty="id" resultType="long" order="BEFORE">
-            SELECT admin_calendar_event_seq.NEXTVAL FROM dual
-        </selectKey>
         INSERT INTO ADMIN_CALENDAR_EVENT (
-            calendar_idx,
-            admin_idx,
-            title,
-            event_date,
-            start_time,
-            end_time,
-            all_day,
-            color,
-            memo,
-            event_type,
-            created_at,
-            updated_at
+            CALENDAR_IDX,
+            ADMIN_IDX,
+            TITLE,
+            EVENT_DATE,
+            START_TIME,
+            END_TIME,
+            ALL_DAY,
+            COLOR,
+            MEMO,
+            EVENT_TYPE,
+            CREATED_AT,
+            UPDATED_AT
         ) VALUES (
-            #{id},
+            ADMIN_CALENDAR_EVENT_SEQ.NEXTVAL,
             #{adminIdx},
             #{title},
             #{date},
             #{startTime},
             #{endTime},
-            <choose><when test="allDay == true">1</when><otherwise>0</otherwise></choose>,
+            #{allDay},
             #{color},
             #{memo},
             #{type},
@@ -76,23 +87,23 @@
 
     <update id="updateEvent" parameterType="com.sp.app.admin.model.AdminCalendarEvent">
         UPDATE ADMIN_CALENDAR_EVENT
-        SET title = #{title},
-            event_date = #{date},
-            start_time = #{startTime},
-            end_time = #{endTime},
-            all_day = <choose><when test="allDay == true">1</when><otherwise>0</otherwise></choose>,
-            color = #{color},
-            memo = #{memo},
-            event_type = #{type},
-            updated_at = SYSTIMESTAMP
-        WHERE calendar_idx = #{id}
-          AND admin_idx = #{adminIdx}
+        SET TITLE = #{title},
+            EVENT_DATE = #{date},
+            START_TIME = #{startTime},
+            END_TIME = #{endTime},
+            ALL_DAY = #{allDay},
+            COLOR = #{color},
+            MEMO = #{memo},
+            EVENT_TYPE = #{type},
+            UPDATED_AT = SYSTIMESTAMP
+        WHERE CALENDAR_IDX = #{id}
+          AND ADMIN_IDX = #{adminIdx}
     </update>
 
-    <delete id="deleteEvent">
+    <delete id="deleteEvent" parameterType="map">
         DELETE FROM ADMIN_CALENDAR_EVENT
-        WHERE calendar_idx = #{id}
-          AND admin_idx = #{adminIdx}
+        WHERE CALENDAR_IDX = #{id}
+          AND ADMIN_IDX = #{adminIdx}
     </delete>
 
 </mapper>

@@ -385,9 +385,26 @@ document.addEventListener("DOMContentLoaded", () => {
         return text ? text.substring(0, 2) : 'AD';
     }
 
+    function syncAvatarEl(id, text, avatarUrl) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (avatarUrl) {
+            el.style.backgroundImage = 'url(' + avatarUrl + ')';
+            el.style.backgroundSize = 'cover';
+            el.style.backgroundPosition = 'center';
+            el.textContent = '';
+        } else {
+            el.style.backgroundImage = '';
+            el.style.backgroundSize = '';
+            el.style.backgroundPosition = '';
+            el.textContent = text || '';
+        }
+    }
+
     function syncProfileUi(profile) {
         if (!profile) return;
         const avatar = getAvatarText(profile.nickname || profile.name);
+        const avatarUrl = profile.avatarUrl || '';
         const setText = (id, value) => {
             const el = document.getElementById(id);
             if (el) el.textContent = value || '';
@@ -396,18 +413,20 @@ document.addEventListener("DOMContentLoaded", () => {
             const el = document.getElementById(id);
             if (el) el.value = value || '';
         };
-        setText('profileTrigger', avatar);
-        setText('profileQuickAvatar', avatar);
+        syncAvatarEl('profileTrigger', avatar, avatarUrl);
+        syncAvatarEl('profileQuickAvatar', avatar, avatarUrl);
+        syncAvatarEl('sidebarAvatarText', avatar, avatarUrl);
+        syncAvatarEl('profileAvatarCircle', avatar, avatarUrl);
+        const profileCircle = document.getElementById('profileAvatarCircle');
+        if (profileCircle) profileCircle.dataset.photoDeleted = 'false';
         setText('profileQuickName', profile.nickname || profile.name || '');
         setText('profileQuickRole', profile.roleCode || 'emp');
-        setText('sidebarAvatarText', avatar);
         setText('sidebarUserName', profile.nickname || profile.name || '');
         setText('sidebarUserRole', profile.roleCode || 'emp');
-        setText('profileAvatarCircle', avatar);
         setValue('profileNameInput', profile.name || '');
         setValue('profileNicknameInput', profile.nickname || '');
         setValue('profileEmailInput', profile.email || '');
-        window.ADMIN_PROFILE = Object.assign({}, window.ADMIN_PROFILE || {}, profile);
+        window.ADMIN_PROFILE = Object.assign({}, window.ADMIN_PROFILE || {}, profile, { avatarUrl: avatarUrl });
     }
 
     syncProfileUi(window.ADMIN_PROFILE || {});
@@ -430,6 +449,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 circle.style.backgroundImage = 'url(' + e.target.result + ')';
                 circle.style.backgroundSize = 'cover';
                 circle.style.backgroundPosition = 'center';
+                circle.dataset.photoDeleted = 'false';
             };
             reader.readAsDataURL(file);
         });
@@ -442,6 +462,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 circle.style.backgroundSize = '';
                 circle.style.backgroundPosition = '';
                 circle.textContent = getAvatarText((document.getElementById('profileNicknameInput') || {}).value || (document.getElementById('profileNameInput') || {}).value);
+                circle.dataset.photoDeleted = 'true';
             }
             if (profilePhotoInput) profilePhotoInput.value = '';
         });
@@ -462,10 +483,14 @@ document.addEventListener("DOMContentLoaded", () => {
 	    if (profileSaveBtn) {
 	        profileSaveBtn.addEventListener('click', function() {
 	            const formData = new FormData();
-	            
-	            formData.append('name', (document.getElementById('profileNameInput') || {}).value || '');
-	            formData.append('nickname', (document.getElementById('profileNicknameInput') || {}).value || '');
-	            formData.append('email', (document.getElementById('profileEmailInput') || {}).value || '');
+	            const nameValue = ((document.getElementById('profileNameInput') || {}).value || '').trim();
+	            const nicknameValue = ((document.getElementById('profileNicknameInput') || {}).value || '').trim();
+	            if (!nameValue || !nicknameValue) {
+	                if (typeof showToast === 'function') showToast('이름과 닉네임을 입력해 주세요.', 'warning');
+	                return;
+	            }
+	            formData.append('name', nameValue);
+	            formData.append('nickname', nicknameValue);
 
 	            const fileInput = document.getElementById('profilePhotoInput');
 	            if (fileInput && fileInput.files && fileInput.files[0]) {
@@ -473,7 +498,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	            }
 
 	            const circle = document.getElementById('profileAvatarCircle');
-	            const isPhotoDeleted = circle && !circle.style.backgroundImage && (!fileInput || !fileInput.files || !fileInput.files[0]);
+	            const isPhotoDeleted = !!(circle && circle.dataset.photoDeleted === 'true');
 	            formData.append('photoDeleted', isPhotoDeleted);
 				
 	            profileSaveBtn.disabled = true;
@@ -494,6 +519,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	                        name: data.name, 
 	                        nickname: data.nickname, 
 	                        email: data.email, 
+                        avatarUrl: data.avatarUrl,
 	                        roleCode: data.roleCode || ((window.ADMIN_PROFILE || {}).roleCode) 
 	                    });
 	                    if (typeof showToast === 'function') showToast('정보 변경이 완료되었습니다.', 'success');

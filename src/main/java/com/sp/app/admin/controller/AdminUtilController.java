@@ -4,6 +4,7 @@ import com.sp.app.admin.model.AdminCalMemo;
 import com.sp.app.admin.model.AdminTodo;
 import com.sp.app.admin.service.AdminUtilService;
 import com.sp.app.domain.dto.MemberDto;
+import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.domain.dto.UserDto;
 import com.sp.app.model.Notification;
 import com.sp.app.security.CustomUserDetails;
@@ -12,12 +13,13 @@ import com.sp.app.service.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,9 @@ public class AdminUtilController {
     private final AdminUtilService utilService;
     private final NotificationService notificationService;
     private final MemberService memberService;
+
+    @Value("${file.upload-root}/profile")
+    private String profileUploadPath;
     private final PasswordEncoder passwordEncoder;
 
     private Long getAdminIdx(CustomUserDetails u) {
@@ -252,7 +257,6 @@ public class AdminUtilController {
     public Map<String, Object> saveProfile(
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "nickname", required = false) String nickname,
-            @RequestParam(value = "email", required = false) String email,
             @RequestParam(value = "profileFile", required = false) MultipartFile profileFile,
             @RequestParam(value = "photoDeleted", defaultValue = "false") boolean photoDeleted,
             @AuthenticationPrincipal CustomUserDetails u,
@@ -267,20 +271,26 @@ public class AdminUtilController {
                 return result;
             }
 
-            String root = session.getServletContext().getRealPath("/");
-            String pathname = root + "uploads" + File.separator + "profile";
+            UserDto currentUser = memberService.findById(adminIdx);
+            if (currentUser == null) {
+                result.put("success", false);
+                result.put("msg", "관리자 정보를 찾을 수 없습니다.");
+                return result;
+            }
+
+            String pathname = profileUploadPath;
 
             if (photoDeleted) {
                 Map<String, Object> paramMap = new HashMap<>();
-                paramMap.put("userIdx", adminIdx); 
+                paramMap.put("userIdx", adminIdx);
                 memberService.deleteProfilePhoto(paramMap, pathname);
             }
 
             MemberDto dto = new MemberDto();
-            dto.setUserIdx(adminIdx); 
+            dto.setUserIdx(adminIdx);
             dto.setName(name);
             dto.setNickname(nickname);
-            dto.setEmail(email);
+            dto.setEmail(currentUser.getEmail());
 
             if (profileFile != null && !profileFile.isEmpty()) {
                 dto.setSelectFile(profileFile);
@@ -288,10 +298,22 @@ public class AdminUtilController {
 
             memberService.updateMember(dto, pathname);
 
+            UserDto updatedUser = memberService.findById(adminIdx);
+            SessionInfo sessionInfo = (SessionInfo) session.getAttribute("member");
+            if (sessionInfo != null && updatedUser != null) {
+                sessionInfo.setName(updatedUser.getName());
+                sessionInfo.setNickname(updatedUser.getNickname());
+                sessionInfo.setEmail(updatedUser.getEmail());
+                sessionInfo.setAvatar(updatedUser.getProfile_photo());
+                session.setAttribute("member", sessionInfo);
+            }
+
             result.put("success", true);
-            result.put("name", name);
-            result.put("nickname", nickname);
-            result.put("email", email);
+            result.put("name", updatedUser != null ? updatedUser.getName() : name);
+            result.put("nickname", updatedUser != null ? updatedUser.getNickname() : nickname);
+            result.put("email", updatedUser != null ? updatedUser.getEmail() : currentUser.getEmail());
+            result.put("avatarUrl", updatedUser != null && updatedUser.getProfile_photo() != null && !updatedUser.getProfile_photo().isBlank()
+                    ? "/uploads/profile/" + updatedUser.getProfile_photo() : "");
 
         } catch (Exception e) {
             e.printStackTrace();

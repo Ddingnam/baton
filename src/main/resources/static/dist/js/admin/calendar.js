@@ -55,7 +55,6 @@ let resizingEv    = null;
 let resizeStartY  = 0;
 let resizeOrigEnd = 0;
 let resizeBlock   = null;
-let pendingDeleteId = null;
 
 function pad(n)      { return String(n).padStart(2,'0'); }
 function dateKey(d)  { return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
@@ -82,7 +81,6 @@ function timeToMin(t) {
 }
 function minToTime(m) { return pad(Math.floor(m/60))+':'+pad(m%60); }
 function colorHex(id) { return (COLORS.find(c=>c.id===id)||COLORS[0]).hex; }
-function typeTone(type) { return type==='important' ? 'important' : (type==='sticker' ? 'sticker' : 'basic'); }
 function esc(s) {
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -118,10 +116,13 @@ function loadEvents() {
     const to   = getLoadTo();
     apiGet(BASE+'/admin/calendar/events?from='+from+'&to='+to)
         .then(list => {
-            if (!Array.isArray(list)) return;
-            const serverIds = new Set(list.map(e=>e.id));
-            state.events = state.events.filter(e=>!serverIds.has(e.id));
-            state.events.push(...list);
+            const memoOnly = state.events.filter(e => e._memo);
+            if (!Array.isArray(list)) {
+                state.events = memoOnly;
+                renderAll();
+                return;
+            }
+            state.events = memoOnly.concat(list);
             renderAll();
         })
         .catch(() => renderAll());
@@ -374,6 +375,7 @@ function renderWeek() {
     renderWeekHeader();
     renderWeekGrid();
     scrollToCurrentHour();
+    startNowLine();
 }
 
 function renderWeekHeader() {
@@ -582,62 +584,32 @@ function getOrCreateDayOverlay(grid, key) {
 function renderWeekAllDay() {
     const header = document.getElementById('weekHeader');
     if (!header) return;
-    header.querySelectorAll('.cp-week-allday-row').forEach(r=>r.remove());
-    const rowDiv = document.createElement('div');
-    rowDiv.className = 'cp-week-allday-row';
-    rowDiv.innerHTML = '<div class="cp-week-allday-label">종일</div>';
+    header.querySelectorAll('.cp-allday-row').forEach(r=>r.remove());
     const allDayEvs = state.events.filter(e=>e.allDay);
+    if (!allDayEvs.length) return;
     const byDate = {};
     allDayEvs.forEach(ev=>{
         if (!byDate[ev.date]) byDate[ev.date]=[];
         byDate[ev.date].push(ev);
     });
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'cp-allday-row';
+    rowDiv.style.cssText = 'display:grid;grid-template-columns:60px repeat(7,minmax(0,1fr));border-top:1px solid var(--border-color);';
+    rowDiv.innerHTML = '<div style="padding:4px 8px;font-size:9px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;">종일</div>';
     for (let i=0;i<7;i++) {
-        const d = addDays(state.weekStart, i);
+        const d   = addDays(state.weekStart, i);
         const key = dateKey(d);
+        const evs = byDate[key]||[];
         const cell = document.createElement('div');
-        cell.className = 'cp-week-allday-cell';
-        cell.dataset.key = key;
-        (byDate[key]||[]).forEach(ev=>{
+        cell.style.cssText = 'padding:3px 4px;min-height:28px;border-left:1px solid var(--border-color);display:flex;flex-wrap:wrap;gap:2px;';
+        evs.forEach(ev=>{
             const chip = document.createElement('div');
-            chip.className = 'cp-allday-chip';
             chip.dataset.id = ev.id;
-            chip.style.background = colorHex(ev.color);
+            chip.style.cssText = 'background:'+colorHex(ev.color)+';color:#fff;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;';
             chip.textContent = ev.title||'(제목 없음)';
-            chip.setAttribute('draggable','true');
-            chip.addEventListener('dragstart', e => {
-                draggedEv = ev;
-                chip.classList.add('is-dragging');
-                const ghost = makeDragGhost(ev);
-                e.dataTransfer.setDragImage(ghost, 60, 18);
-                setTimeout(() => ghost.remove(), 0);
-            });
-            chip.addEventListener('dragend', () => {
-                chip.classList.remove('is-dragging');
-                draggedEv = null;
-                clearDragOver();
-            });
             chip.addEventListener('click', ()=>showPopover(ev, chip));
             chip.addEventListener('contextmenu', e=>{ e.preventDefault(); showEventContextMenu(e, ev); });
             cell.appendChild(chip);
-        });
-        cell.addEventListener('dragover', e => {
-            if (!draggedEv || !draggedEv.allDay) return;
-            e.preventDefault();
-            clearDragOver();
-            cell.classList.add('drag-over');
-        });
-        cell.addEventListener('dragleave', e => {
-            if (!cell.contains(e.relatedTarget)) cell.classList.remove('drag-over');
-        });
-        cell.addEventListener('drop', e => {
-            e.preventDefault();
-            cell.classList.remove('drag-over');
-            if (!draggedEv || !draggedEv.allDay) return;
-            draggedEv.date = key;
-            saveEvent(draggedEv);
-            renderAll();
-            showToast('종일 일정을 이동했습니다.', 'success');
         });
         rowDiv.appendChild(cell);
     }
@@ -709,37 +681,28 @@ function renderDay() {
             attachBlockEvents(block, ev);
         });
     }
-    const body = document.getElementById('dayBody');
-    body?.querySelectorAll('.cp-day-allday-bar').forEach(el=>el.remove());
     const allDay = state.events.filter(e=>e.date===key && e.allDay);
-    if (allDay.length && body) {
+    if (allDay.length) {
         const bar = document.createElement('div');
-        bar.className = 'cp-day-allday-bar';
+        bar.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;padding:6px 12px;background:var(--card-bg);border-bottom:1px solid var(--border-color);';
         allDay.forEach(ev=>{
             const chip = document.createElement('div');
-            chip.className = 'cp-allday-chip';
-            chip.style.background = colorHex(ev.color);
+            chip.style.cssText = 'background:'+colorHex(ev.color)+';color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:5px;cursor:pointer;';
             chip.textContent = ev.title||'(제목 없음)';
-            chip.setAttribute('draggable','true');
-            chip.addEventListener('dragstart', e => {
-                draggedEv = ev;
-                chip.classList.add('is-dragging');
-                const ghost = makeDragGhost(ev);
-                e.dataTransfer.setDragImage(ghost, 60, 18);
-                setTimeout(() => ghost.remove(), 0);
-            });
-            chip.addEventListener('dragend', () => {
-                chip.classList.remove('is-dragging');
-                draggedEv = null;
-                clearDragOver();
-            });
             chip.addEventListener('click', ()=>showPopover(ev, chip));
             chip.addEventListener('contextmenu', e=>{ e.preventDefault(); showEventContextMenu(e, ev); });
             bar.appendChild(chip);
         });
-        body.prepend(bar);
+        const body = document.getElementById('dayBody');
+        if (body) body.prepend(bar);
     }
-
+    if (isSameDay(d, today)) {
+        const nowLine = document.createElement('div');
+        nowLine.id = 'dayNowLine';
+        nowLine.className = 'cp-now-line';
+        if (cell0) { cell0.style.position = 'relative'; cell0.appendChild(nowLine); }
+        updateNowLine('dayNowLine');
+    }
     grid.querySelectorAll('.cp-day-col-single').forEach(col=>{
         col.addEventListener('dragover', e => {
             e.preventDefault();
@@ -832,93 +795,13 @@ function buildColorRow() {
         '<div class="cp-color-swatch'+(c.id===state.selectedColor?' active':'')+'"' +
         ' data-color="'+c.id+'" style="background:'+c.hex+';color:'+c.hex+';" title="'+c.id+'"></div>'
     ).join('');
-    updateModalAccent(state.selectedColor);
     row.querySelectorAll('.cp-color-swatch').forEach(el=>{
         el.addEventListener('click', ()=>{
             state.selectedColor = el.dataset.color;
             row.querySelectorAll('.cp-color-swatch').forEach(s=>s.classList.remove('active'));
             el.classList.add('active');
-            updateModalAccent(state.selectedColor);
         });
     });
-}
-
-function updateModalAccent(colorId) {
-    const indicator = document.getElementById('modalIndicator');
-    if (indicator) indicator.style.background = colorHex(colorId || getThemeDefaultColor());
-}
-
-function setEventType(value) {
-    const typeInput = document.getElementById('evType');
-    const selectbox = document.getElementById('evTypeSelect');
-    const labelEl = document.getElementById('evTypeLabel');
-    const trigger = document.getElementById('evTypeTrigger');
-    if (!typeInput || !selectbox || !labelEl) return;
-    const option = document.querySelector('.cp-select-option[data-value="'+value+'"]') || document.querySelector('.cp-select-option[data-value="basic"]');
-    if (!option) return;
-    const nextValue = option.dataset.value;
-    typeInput.value = nextValue;
-    labelEl.textContent = option.dataset.label || option.textContent.trim();
-    selectbox.dataset.value = nextValue;
-    selectbox.dataset.tone = typeTone(nextValue);
-    document.querySelectorAll('.cp-select-option').forEach(el => el.classList.toggle('active', el === option));
-    if (trigger) trigger.setAttribute('aria-expanded', 'false');
-}
-
-function closeTypeMenu() {
-    const selectbox = document.getElementById('evTypeSelect');
-    const trigger = document.getElementById('evTypeTrigger');
-    if (selectbox) selectbox.classList.remove('open');
-    if (trigger) trigger.setAttribute('aria-expanded', 'false');
-}
-
-function toggleTypeMenu(forceOpen) {
-    const selectbox = document.getElementById('evTypeSelect');
-    const trigger = document.getElementById('evTypeTrigger');
-    if (!selectbox) return;
-    const open = typeof forceOpen === 'boolean' ? forceOpen : !selectbox.classList.contains('open');
-    selectbox.classList.toggle('open', open);
-    if (trigger) trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
-}
-
-function initTypeSelect() {
-    const selectbox = document.getElementById('evTypeSelect');
-    const trigger = document.getElementById('evTypeTrigger');
-    if (!selectbox || !trigger) return;
-    trigger.addEventListener('click', e => {
-        e.stopPropagation();
-        toggleTypeMenu();
-    });
-    selectbox.querySelectorAll('.cp-select-option').forEach(option => {
-        option.addEventListener('click', e => {
-            e.stopPropagation();
-            setEventType(option.dataset.value);
-            closeTypeMenu();
-        });
-    });
-    selectbox.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            toggleTypeMenu();
-        }
-        if (e.key === 'Escape') closeTypeMenu();
-    });
-    document.addEventListener('click', e => {
-        if (!selectbox.contains(e.target)) closeTypeMenu();
-    });
-    setEventType('basic');
-}
-
-function openDeleteConfirm(id) {
-    pendingDeleteId = id;
-    const overlay = document.getElementById('confirmOverlay');
-    if (overlay) overlay.classList.add('open');
-}
-
-function closeDeleteConfirm() {
-    pendingDeleteId = null;
-    const overlay = document.getElementById('confirmOverlay');
-    if (overlay) overlay.classList.remove('open');
 }
 
 function openEditorNew(id, date, startTime, endTime) {
@@ -934,12 +817,11 @@ function openEditorNew(id, date, startTime, endTime) {
     setField('evStart',  sTime);
     setField('evEnd',    eTime);
     setField('evMemo',   '');
-    setEventType('basic');
+    setField('evType',   'basic');
     setCheck('evAllDay', false);
     toggleTimeFields(false);
     const delBtn = document.getElementById('evDeleteBtn');
     if (delBtn) delBtn.classList.add('hidden');
-    updateModalAccent(state.selectedColor);
     openModal();
 }
 
@@ -953,12 +835,11 @@ function openEditorForEvent(ev) {
     setField('evStart',  ev.startTime||'09:00');
     setField('evEnd',    ev.endTime||'10:00');
     setField('evMemo',   ev.memo||'');
-    setEventType(ev.type||'basic');
+    setField('evType',   ev.type||'basic');
     setCheck('evAllDay', !!ev.allDay);
     toggleTimeFields(!!ev.allDay);
     const delBtn = document.getElementById('evDeleteBtn');
     if (delBtn) delBtn.classList.remove('hidden');
-    updateModalAccent(state.selectedColor);
     openModal();
 }
 
@@ -995,6 +876,7 @@ function showPopover(ev, anchorEl) {
     pop.className = 'cp-popover';
     pop.id = 'cpPopover';
     pop.innerHTML =
+        '<div class="cp-popover-stripe" style="background:'+hex+';"></div>' +
         '<div class="cp-popover-inner">' +
         '<div class="cp-popover-title">'+esc(ev.title||'(제목 없음)')+'</div>' +
         '<div class="cp-popover-meta"><i class="ri-calendar-line"></i>'+esc(ev.date)+
@@ -1015,7 +897,7 @@ function showPopover(ev, anchorEl) {
     pop.style.left = left+'px';
     pop.style.top  = top+'px';
     pop.querySelector('#popEditBtn').addEventListener('click', ()=>{ closePopover(); openEditorForEvent(ev); });
-    pop.querySelector('#popDelBtn').addEventListener('click', ()=>{ closePopover(); openDeleteConfirm(ev.id); });
+    pop.querySelector('#popDelBtn').addEventListener('click', ()=>{ closePopover(); doDeleteEvent(ev.id); });
     setTimeout(()=>{
         document.addEventListener('click', closePopoverOnOutside, { once:true });
     }, 10);
@@ -1045,7 +927,7 @@ function showEventContextMenu(e, ev) {
     document.body.appendChild(menu);
     positionMenu(menu, e.clientX, e.clientY);
     menu.querySelector('#ctxEdit').addEventListener('click', ()=>{ closeContextMenu(); openEditorForEvent(ev); });
-    menu.querySelector('#ctxDel').addEventListener('click', ()=>{ closeContextMenu(); openDeleteConfirm(ev.id); });
+    menu.querySelector('#ctxDel').addEventListener('click', ()=>{ closeContextMenu(); doDeleteEvent(ev.id); });
     setTimeout(()=>{ document.addEventListener('click', closeContextMenuOnOutside, { once:true }); }, 10);
 }
 
@@ -1092,47 +974,47 @@ function doSaveEvent() {
     const memo   = getField('evMemo');
     const type   = getField('evType');
     const color  = state.selectedColor;
-    if (!date) { showToast('날짜를 선택해주세요.', 'error'); return; }
-    if (!allDay && (!start || !end || start >= end)) { showToast('시간 범위를 다시 확인해주세요.', 'error'); return; }
-    const ev = {
-        id:        state.editingId || uid(),
-        title:     title || '(제목 없음)',
-        date,
-        startTime: allDay ? null : start,
-        endTime:   allDay ? null : end,
-        allDay,
-        color,
-        memo,
-        type
-    };
-    if (state.editingId) {
-        const idx = state.events.findIndex(e=>e.id===state.editingId);
-        if (idx>-1) state.events[idx] = ev; else state.events.push(ev);
-    } else {
-        state.events.push(ev);
+
+    if (!date) {
+        showToast('날짜를 선택해주세요.', 'error');
+        return;
     }
-    closeModal();
-    renderAll();
-    showToast(state.editingId ? '일정이 수정되었습니다.' : '일정이 저장되었습니다.', 'success');
+
+	const ev = {
+	    id: state.editingId ? state.editingId : null,
+	    title: title || '(제목 없음)',
+	    date,
+	    startTime: allDay ? null : start,
+	    endTime: allDay ? null : end,
+	    allDay: allDay ? 1 : 0,
+	    color,
+	    memo,
+	    type
+	};
+
     saveEvent(ev)
-        .then(d=>{
-            if (d && d.id && d.id!==ev.id) {
-                const idx = state.events.findIndex(e=>e.id===ev.id);
-                if (idx>-1) state.events[idx].id = d.id;
+        .then(d => {
+            if (!d || d.success === false) {
+                throw new Error((d && d.msg) || 'save failed');
             }
+            closeModal();
+            showToast(state.editingId ? '일정이 수정되었습니다.' : '일정이 저장되었습니다.', 'success');
+            loadEvents();
         })
-        .catch(()=> showToast('서버 저장에 실패했습니다.', 'error'));
+        .catch(() => showToast('서버 저장에 실패했습니다.', 'error'));
 }
 
 function doDeleteEvent(id) {
-    if (!id) return;
-    state.events = state.events.filter(e=>e.id!==id);
-    closeDeleteConfirm();
-    closeModal();
-    closePopover();
-    renderAll();
-    showToast('일정이 삭제되었습니다.', 'success');
-    deleteEvent(id).catch(()=> showToast('삭제 중 오류가 발생했습니다.', 'error'));
+    deleteEvent(id)
+        .then(d => {
+            if (!d || d.success === false) {
+                throw new Error((d && d.msg) || 'delete failed');
+            }
+            renderAll();
+            showToast('일정이 삭제되었습니다.', 'success');
+            loadEvents();
+        })
+        .catch(() => showToast('삭제 중 오류가 발생했습니다.', 'error'));
 }
 
 function setView(v) {
@@ -1202,6 +1084,12 @@ function showToast(msg, type) {
     toastTimer = setTimeout(()=>el.classList.remove('show'), 2800);
 }
 
+/**
+ * applyTheme — admin_main.js의 applyTheme과 동일한 방식.
+ * data-theme 속성 적용, localStorage 저장, 서버 저장(/admin/theme/save).
+ * calendar.js에서는 이 함수만 사용하며, 사이드바 테마바 UI는 제거됨.
+ * (테마 변경은 어드민 헤더 설정에서 수행)
+ */
 function applyTheme(theme) {
     if (theme === 'purple') {
         document.documentElement.removeAttribute('data-theme');
@@ -1225,6 +1113,7 @@ function saveThemeToServer(theme) {
     }).catch(() => {});
 }
 
+/** 헤더 테마 드롭다운(.header-theme-dot)이 있을 경우 이벤트 연결 */
 function initHeaderTheme() {
     const dots = document.querySelectorAll('.header-theme-dot[data-theme]');
     if (!dots.length) return;
@@ -1237,11 +1126,11 @@ function initHeaderTheme() {
             saveThemeToServer(theme);
             dots.forEach(d => d.classList.remove('active'));
             el.classList.add('active');
-            
+            /* 헤더 프리뷰 색상 동기화 */
             if (typeof window.syncHeaderThemePreview === 'function') {
                 window.syncHeaderThemePreview();
             }
-            
+            /* 모달 색상 스트립도 현재 선택 색상에 맞춰 갱신 */
             updateModalAccent(state.selectedColor);
             showToast('테마가 변경되었습니다.', 'success');
         });
@@ -1308,19 +1197,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(evSaveBtn) evSaveBtn.addEventListener('click', doSaveEvent);
     const evDeleteBtn = document.getElementById('evDeleteBtn');
     if(evDeleteBtn) evDeleteBtn.addEventListener('click', ()=>{
-        if (state.editingId) openDeleteConfirm(state.editingId);
+        if (state.editingId) { closeModal(); doDeleteEvent(state.editingId); }
     });
-    const confirmCancelBtn = document.getElementById('confirmCancelBtn');
-    if(confirmCancelBtn) confirmCancelBtn.addEventListener('click', closeDeleteConfirm);
-    const confirmOkBtn = document.getElementById('confirmOkBtn');
-    if(confirmOkBtn) confirmOkBtn.addEventListener('click', ()=>doDeleteEvent(pendingDeleteId));
     const modalOverlay = document.getElementById('modalOverlay');
     if(modalOverlay) modalOverlay.addEventListener('click', e=>{
         if (e.target===document.getElementById('modalOverlay')) closeModal();
-    });
-    const confirmOverlay = document.getElementById('confirmOverlay');
-    if(confirmOverlay) confirmOverlay.addEventListener('click', e=>{
-        if (e.target===confirmOverlay) closeDeleteConfirm();
     });
     const evAllDay = document.getElementById('evAllDay');
     if(evAllDay) evAllDay.addEventListener('change', e=>{
@@ -1331,7 +1212,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
             closeModal();
             closePopover();
             closeContextMenu();
-            closeDeleteConfirm();
         }
         if (e.key==='ArrowLeft'  && !isInputFocused()) navigate(-1);
         if (e.key==='ArrowRight' && !isInputFocused()) navigate(1);
@@ -1350,7 +1230,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
         closeContextMenu();
     });
     initHeaderTheme();
-    initTypeSelect();
     setView('week');
 });
 
