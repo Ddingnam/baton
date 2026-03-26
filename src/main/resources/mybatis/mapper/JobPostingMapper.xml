@@ -3,43 +3,54 @@
 <mapper namespace="com.sp.app.mapper.JobPostingMapper">
 
    <insert id="insertPosting" parameterType="com.sp.app.model.JobPosting">
-        <selectKey keyProperty="postingIdx" resultType="long" order="BEFORE">
-            SELECT seq_job_posting.NEXTVAL FROM dual
-        </selectKey>
-        INSERT INTO job_posting (
-            posting_idx, title, employer, description, pay, pay_type,
-            work_period, work_days, start_time, end_time, time_negotiable,
-            location, location_detail,
-            latitude, longitude,
-            sido, gugun, dong,
-            subway_info,
-            contact, benefits, user_idx, region_idx, category,
-            deadline, recruit_status, created_date
-        )
-        VALUES (
-            #{postingIdx}, #{title},
-            #{employer, jdbcType=VARCHAR},
-            #{description, jdbcType=CLOB},
-            #{pay},
-            #{payType},
-            #{workPeriod},
-            #{workDays},
-            #{startTime, jdbcType=VARCHAR},
-            #{endTime, jdbcType=VARCHAR},
-            #{timeNegotiable, jdbcType=VARCHAR},
-            #{location},
-            #{locationDetail, jdbcType=VARCHAR},
-            #{latitude, jdbcType=DOUBLE},  #{longitude, jdbcType=DOUBLE}, #{sido, jdbcType=VARCHAR},     #{gugun, jdbcType=VARCHAR},    #{dong, jdbcType=VARCHAR},     #{subwayInfo, jdbcType=VARCHAR},
-            #{contact, jdbcType=VARCHAR},
-            #{benefits, jdbcType=VARCHAR},
-            #{userIdx},
-            #{regionIdx},
-            #{category},
-            #{deadline, jdbcType=DATE},
-            'RECRUITING',
-            SYSDATE
-        )
-    </insert>
+    <selectKey keyProperty="postingIdx" resultType="long" order="BEFORE">
+        SELECT seq_job_posting.NEXTVAL FROM dual
+    </selectKey>
+
+    INSERT INTO job_posting (
+        posting_idx, title, employer, description, pay, pay_type,
+        work_period, work_days, start_time, end_time, time_negotiable,
+        location, location_detail,
+        latitude, longitude,
+        sido, gugun, dong,
+        subway_info,
+        contact, benefits, user_idx, region_idx, category,
+        deadline, recruit_status, created_date
+    )
+    VALUES (
+        #{postingIdx},
+        #{title},
+        #{employer, jdbcType=VARCHAR},
+        #{description, jdbcType=CLOB},
+        #{pay},
+        #{payType},
+        #{workPeriod},
+        #{workDays},
+        #{startTime, jdbcType=VARCHAR},
+        #{endTime, jdbcType=VARCHAR},
+        #{timeNegotiable, jdbcType=VARCHAR},
+        #{location},
+        #{locationDetail, jdbcType=VARCHAR},
+
+        #{latitude, jdbcType=DOUBLE},
+        #{longitude, jdbcType=DOUBLE},
+
+        #{sido, jdbcType=VARCHAR},
+        #{gugun, jdbcType=VARCHAR},
+        #{dong, jdbcType=VARCHAR},
+        #{subwayInfo, jdbcType=VARCHAR},
+
+        #{contact, jdbcType=VARCHAR},
+        #{benefits, jdbcType=VARCHAR},
+        #{userIdx},
+        #{regionIdx},
+        #{category},
+
+        #{deadline, jdbcType=DATE},
+        'RECRUITING',
+        SYSDATE
+    )
+</insert>
 
     <insert id="insertPostingImage">
         INSERT INTO job_posting_image(
@@ -56,30 +67,34 @@
     </insert>
 
     <update id="updatePosting" parameterType="com.sp.app.model.JobPosting">
-        UPDATE job_posting
-        SET title=#{title},
-            description=#{description, jdbcType=CLOB}, 
-            pay=#{pay},
-            pay_type=#{payType},
-            work_period=#{workPeriod}, 
-            work_days=#{workDays},
-            start_time=#{startTime},
-            end_time=#{endTime, jdbcType=VARCHAR},
-            time_negotiable=#{timeNegotiable, jdbcType=VARCHAR}, 
-            location=#{location, jdbcType=VARCHAR},
-            location_detail=#{locationDetail, jdbcType=VARCHAR},
-            latitude=#{latitude},
-            longitude=#{longitude},
-            sido=#{sido},
-            gugun=#{gugun},
-            dong=#{dong},
-            contact=#{contact, jdbcType=VARCHAR}, 
-            benefits=#{benefits, jdbcType=VARCHAR}, 
-            category=#{category}, 
-            deadline=#{deadline, jdbcType=DATE},
-            recruit_status=#{recruitStatus}
-        WHERE posting_idx = #{postingIdx}
-    </update>
+    UPDATE job_posting
+    SET title=#{title},
+        description=#{description, jdbcType=CLOB}, 
+        pay=#{pay},
+        pay_type=#{payType},
+        work_period=#{workPeriod}, 
+        work_days=#{workDays},
+        start_time=#{startTime},
+        end_time=#{endTime, jdbcType=VARCHAR},
+        time_negotiable=#{timeNegotiable, jdbcType=VARCHAR}, 
+        location=#{location, jdbcType=VARCHAR},
+        location_detail=#{locationDetail, jdbcType=VARCHAR},
+
+        latitude=#{latitude},
+        longitude=#{longitude},
+
+        sido=#{sido},
+        gugun=#{gugun},
+        dong=#{dong},
+
+        contact=#{contact, jdbcType=VARCHAR}, 
+        benefits=#{benefits, jdbcType=VARCHAR}, 
+        category=#{category}, 
+        deadline=#{deadline, jdbcType=DATE},
+        recruit_status=#{recruitStatus}
+
+    WHERE posting_idx = #{postingIdx}
+</update>
 
     <delete id="deletePosting" parameterType="long">
         DELETE FROM job_posting

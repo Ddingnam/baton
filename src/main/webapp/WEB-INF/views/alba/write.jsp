@@ -240,8 +240,8 @@
             <div class="form-group">
               <label>주소 <span class="req">*</span></label>
               
-             <input type="hidden" id="latInput" name="locationLat" value="${dto.locationLat}">
-			<input type="hidden" id="lngInput" name="locationLng" value="${dto.locationLng}">
+             <input type="hidden" id="latInput" name="latitude" value="${dto.locationLat}">
+			<input type="hidden" id="lngInput" name="longitude" value="${dto.locationLng}">
 			
 			<input type="hidden" name="sido" id="sidoInput">
 			<input type="hidden" name="gugun" id="gugunInput">

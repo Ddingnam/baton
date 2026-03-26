@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -38,7 +40,8 @@ public class JobPosting {
     private Double locationLat;
     private Double locationLng;
     
-    private String deadline;
+    //private String deadline;
+    private LocalDate deadline;
     private String contact;
     private String benefits;
     

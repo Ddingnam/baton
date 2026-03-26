@@ -144,21 +144,7 @@
               </button>
             </div>
           </div>
-        </div>
-
-        <div class="toolbar-bottom">
-          <div class="price-select-group">
-            <input type="number" class="tl-price-input" id="minPayInput"
-                   placeholder="최소 시급" value="${param.minPay}" />
-            <button class="tl-price-apply" onclick="applyFilters()">적용</button>
-          </div>
-          <div class="action-group">
-            <select class="detail-select sort-select" id="sortSelect" onchange="applyFilters()">
-              <option value="latest"   ${param.sort == 'latest'   ? 'selected' : ''}>최신순</option>
-              <option value="pay_high" ${param.sort == 'pay_high' ? 'selected' : ''}>시급 높은순</option>
-            </select>
-          </div>
-        </div>
+        </div>   
       </div>
 
       <div id="alba-layout-container">
