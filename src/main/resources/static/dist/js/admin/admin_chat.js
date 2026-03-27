@@ -215,6 +215,10 @@
     function clearUnreadBadges() {
         const badge = document.getElementById('badge-' + CHAT_ROOM_IDX);
         if (badge) badge.remove();
+        fetch(CHAT_CTX + '/admin/chat/read/' + CHAT_ROOM_IDX, {
+            method: 'POST',
+            credentials: 'same-origin'
+        }).catch(function() {});
         updateStudioUnreadBadge();
     }
     const avatarClasses = ['jy','hn','mn','hs','op','cs'];

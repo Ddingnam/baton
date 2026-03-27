@@ -102,10 +102,16 @@
     </select>
     
     <select id="getUnreadTotalCount" parameterType="Long" resultType="int">
-        SELECT COUNT(*) 
+        SELECT COUNT(*)
         FROM chatMessage m
-        JOIN chatMember cm ON m.roomIdx = cm.roomIdx AND cm.userIdx = #{myUserIdx} AND cm.visible = 1
-        WHERE m.userIdx != #{myUserIdx} 
+        JOIN chatMember cm ON m.roomIdx = cm.roomIdx AND cm.userIdx = #{myUserIdx}
+        JOIN chatRoom cr ON m.roomIdx = cr.roomIdx
+        WHERE m.userIdx != #{myUserIdx}
+        AND m.msgType != 4
+        AND (
+            cr.roomType IN (2, 3)
+            OR cm.visible = 1
+        )
         AND <![CDATA[ m.sendDate > NVL(cm.lastReadDate, TO_TIMESTAMP('2000-01-01', 'YYYY-MM-DD')) ]]>
     </select>
     

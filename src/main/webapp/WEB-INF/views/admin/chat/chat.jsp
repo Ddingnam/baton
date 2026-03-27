@@ -89,7 +89,16 @@
                         <div class="chat-room-item ${dm.roomIdx == currentRoomIdx ? 'active' : ''} dm-item"
                              data-roomidx="${dm.roomIdx}" data-roomname="${dm.nickname}" data-type="dm">
                             <div class="chat-dm-avt-wrap">
-                                <div class="chat-dm-avt-sm" id="avt-dm-${dm.userIdx}">${fn:substring(dm.nickname, 0, 2)}</div>
+                                <div class="chat-dm-avt-sm" id="avt-dm-${dm.userIdx}">
+                                    <c:choose>
+                                        <c:when test="${not empty dm.profilePhoto}">
+                                            <img src="${pageContext.request.contextPath}/uploads/profile/${dm.profilePhoto}"
+                                                 style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
+                                                 onerror="this.parentNode.textContent='${fn:substring(dm.nickname, 0, 2)}'">
+                                        </c:when>
+                                        <c:otherwise>${fn:substring(dm.nickname, 0, 2)}</c:otherwise>
+                                    </c:choose>
+                                </div>
                                 <span class="chat-dm-status-dot ${dm.isOnline == 1 ? 'online' : dm.isOnline == 2 ? 'away' : ''}" id="status-${dm.userIdx}"></span>
                             </div>
                             <div class="chat-room-info">
@@ -118,7 +127,16 @@
 
                 
                 <div class="chat-my-profile">
-                    <div class="chat-my-avt">${fn:substring(myNickname, 0, 2)}</div>
+                    <div class="chat-my-avt">
+                        <c:choose>
+                            <c:when test="${not empty myProfilePhoto}">
+                                <img src="${pageContext.request.contextPath}/uploads/profile/${myProfilePhoto}"
+                                     style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
+                                     onerror="this.parentNode.textContent='${fn:substring(myNickname, 0, 2)}'">
+                            </c:when>
+                            <c:otherwise>${fn:substring(myNickname, 0, 2)}</c:otherwise>
+                        </c:choose>
+                    </div>
                     <div class="chat-my-info">
                         <span class="chat-my-name">${myNickname}</span>
                         <span class="chat-my-status"><span class="status-dot-green"></span>온라인</span>
@@ -180,7 +198,20 @@
                     </c:if>
                     <c:if test="${not empty currentRoomName and currentRoomType == 'dm'}">
                         <div class="chat-welcome-banner dm-banner">
-                            <div class="chat-welcome-dm-avt">${fn:substring(currentRoomName, 0, 2)}</div>
+                            <div class="chat-welcome-dm-avt">
+                                <c:forEach var="dm" items="${dmList}">
+                                    <c:if test="${dm.roomIdx == currentRoomIdx}">
+                                        <c:choose>
+                                            <c:when test="${not empty dm.profilePhoto}">
+                                                <img src="${pageContext.request.contextPath}/uploads/profile/${dm.profilePhoto}"
+                                                     style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
+                                                     onerror="this.style.display='none';this.parentNode.innerHTML='${fn:substring(currentRoomName,0,2)}'">
+                                            </c:when>
+                                            <c:otherwise>${fn:substring(currentRoomName, 0, 2)}</c:otherwise>
+                                        </c:choose>
+                                    </c:if>
+                                </c:forEach>
+                            </div>
                             <h3>${currentRoomName}</h3>
                             <p>이 대화는 나와 <strong>${currentRoomName}</strong>님만 볼 수 있어요.</p>
                         </div>
@@ -222,12 +253,30 @@
                                             </c:choose>
                                         </div>
                                     </div>
-                                    <div class="chat-avt me">${fn:substring(myNickname, 0, 2)}</div>
+                                    <div class="chat-avt me">
+                                        <c:choose>
+                                            <c:when test="${not empty myProfilePhoto}">
+                                                <img src="${pageContext.request.contextPath}/uploads/profile/${myProfilePhoto}"
+                                                     style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
+                                                     onerror="this.style.display='none';this.parentNode.innerHTML='${fn:substring(myNickname,0,2)}'">
+                                            </c:when>
+                                            <c:otherwise>${fn:substring(myNickname, 0, 2)}</c:otherwise>
+                                        </c:choose>
+                                    </div>
                                 </div>
                             </c:when>
                             <c:otherwise>
                                 <div class="chat-msg-group">
-                                    <div class="chat-avt" data-uid="${chat.userIdx}">${fn:substring(chat.nickname, 0, 2)}</div>
+                                <div class="chat-avt" data-uid="${chat.userIdx}">
+                                        <c:choose>
+                                            <c:when test="${not empty chat.profilePhoto}">
+                                                <img src="${pageContext.request.contextPath}/uploads/profile/${chat.profilePhoto}"
+                                                     style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
+                                                     onerror="this.style.display='none';this.parentNode.innerHTML='${fn:substring(chat.nickname,0,2)}'">
+                                            </c:when>
+                                            <c:otherwise>${fn:substring(chat.nickname, 0, 2)}</c:otherwise>
+                                        </c:choose>
+                                    </div>
                                     <div class="chat-msg-body">
                                         <div class="chat-msg-meta">
                                             <span class="chat-msg-name">${chat.nickname}</span>
@@ -313,7 +362,14 @@
                          data-useridx="${member.userIdx}" data-nickname="${member.nickname}">
                         <div class="chat-dm-avt ${member.isOnline == 1 ? 'online' : member.isOnline == 2 ? 'away' : ''}" 
                              id="avt-${member.userIdx}">
-                            ${fn:substring(member.nickname, 0, 2)}
+                            <c:choose>
+                                <c:when test="${not empty member.profile_photo}">
+                                    <img src="${pageContext.request.contextPath}/uploads/profile/${member.profile_photo}"
+                                         style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
+                                         onerror="this.parentNode.textContent='${fn:substring(member.nickname, 0, 2)}'">
+                                </c:when>
+                                <c:otherwise>${fn:substring(member.nickname, 0, 2)}</c:otherwise>
+                            </c:choose>
                         </div>
                         <div class="chat-member-info">
                             <span class="chat-member-name">

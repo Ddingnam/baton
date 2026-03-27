@@ -109,4 +109,8 @@ public class CustomUserDetails implements UserDetails{
 	public int getUserLevel() {
 		return member.getUserLevel();
 	}
+
+	public String getProfilePhoto() {
+		return member.getAvatar();
+	}
 }
