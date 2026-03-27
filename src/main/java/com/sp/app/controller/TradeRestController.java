@@ -15,21 +15,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sp.app.mapper.TradeMapper;
 import com.sp.app.model.Trade;
 import com.sp.app.model.TradeAiResponse;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.EscrowService;
 import com.sp.app.service.FollowService;
 import com.sp.app.service.MemberService;
+import com.sp.app.service.NotificationService;
 import com.sp.app.service.TradeAiService;
 import com.sp.app.service.TradeService;
 import com.sp.app.service.WishListService;
-import com.sp.app.service.NotificationService;
-import com.sp.app.mapper.TradeMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -237,7 +236,7 @@ public class TradeRestController {
                     notificationService.sendTradeNotification(
                         uId, 
                         "찜하신 [" + trade.getTitle() + "] 상품이 " + tradeStatus + "로 변경되었습니다.", 
-                        "/trade/article?productIdx=" + productIdx
+                        "/trade/main#/article/" + productIdx
                     );
                 }
             }                    
@@ -330,7 +329,7 @@ public class TradeRestController {
                 notificationService.sendTradeNotification(
                     uId, 
                     "찜하신 [" + trade.getTitle() + "] 상품이 끌어올림 되었습니다.", 
-                    "/trade/article?productIdx=" + productIdx
+                    "/trade/main#/article/" + productIdx
                 );
             }
             

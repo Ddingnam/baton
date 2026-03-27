@@ -39,7 +39,7 @@ public class ChatRoomController {
         Long myUserIdx = userDetails.getUserIdx();
 
         if (myUserIdx.equals(toUserIdx)) {
-            return "redirect:/api/trade/article/" + tradeIdx; 
+            return "redirect:/trade/main?productIdx=" + tradeIdx;
         }
 
         Long roomIdx = chatService.createOrGetRoom(tradeIdx, myUserIdx, toUserIdx);

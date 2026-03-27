@@ -59,7 +59,7 @@ public class WishListServiceImpl implements WishListService{
                     notificationService.sendTradeNotification(
                         tradeDto.getUserIdx(), 
                         "누군가 회원님의 [" + tradeDto.getTitle() + "] 상품을 찜했습니다.", 
-                        "/trade/article?productIdx=" + productIdx
+                        "/trade/main#/article/" + productIdx
                     );
                 }
 			}
