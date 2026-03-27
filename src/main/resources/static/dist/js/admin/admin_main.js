@@ -1193,12 +1193,14 @@ function fcSelectDate(key) {
     if (ctx) {
         const ctx2d = ctx.getContext('2d');
         const g = buildChartGradients(ctx2d);
+        const labels = Array.isArray(window.dashboardChartLabels) && window.dashboardChartLabels.length ? window.dashboardChartLabels : ['월', '화', '수', '목', '금', '토', '일'];
+        const values = Array.isArray(window.dashboardChartData) && window.dashboardChartData.length ? window.dashboardChartData : [32000, 45000, 38000, 52000, 48000, 65000, 58000];
         window.dashChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['월', '화', '수', '목', '금', '토', '일'],
+                labels: labels,
                 datasets: [{
-                    label: '매출', data: [32000, 45000, 38000, 52000, 48000, 65000, 58000],
+                    label: '매출', data: values,
                     borderColor: g.stroke, borderWidth: 4, backgroundColor: g.fill, fill: true,
                     pointBackgroundColor: '#FFFFFF', pointBorderColor: g.c1, pointBorderWidth: 3,
                     pointRadius: 6, pointHoverRadius: 8, tension: 0.5

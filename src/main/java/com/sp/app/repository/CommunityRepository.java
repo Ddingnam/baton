@@ -20,6 +20,12 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     public List<Community> findByMemberIdxAndTemporaryTrueOrderByRegDateDesc(Long memberIdx);
     public List<Community> findByMemberIdxAndTemporaryTrue(Long memberIdx);
     
+    public Page<Community> findByTemporaryFalseAndHashTags_TagNameContaining(String tagName, Pageable pageable);
+    public Page<Community> findByTemporaryFalseAndCategoryAndHashTags_TagNameContaining(String category, String tagName, Pageable pageable);
+    public Page<Community> findByTemporaryFalseAndRegionCodeAndHashTags_TagNameContaining(String regionCode, String tagName, Pageable pageable);
+    public Page<Community> findByTemporaryFalseAndRegionCodeAndCategoryAndHashTags_TagNameContaining(String regionCode, String category, String tagName, Pageable pageable);
+    
+    
     public List<Community> findByMemberIdxAndTemporaryFalseOrderByRegDateDesc(Long memberIdx);
     public Page<Community> findByMemberIdxAndTemporaryFalse(Long memberIdx, Pageable pageable);
     public long countByMemberIdxAndTemporaryFalse(Long memberIdx);

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sp.app.admin.mapper.AdminDashboardMapper">
+
+    <select id="getSummary" resultType="map">
+        SELECT
+            (SELECT NVL(COUNT(*), 0) FROM USERS) AS "totalMemberCount",
+            (SELECT NVL(COUNT(*), 0)
+               FROM USERS
+              WHERE TRUNC(createdDate) = TRUNC(SYSDATE)) AS "todayMemberCount",
+            (SELECT NVL(COUNT(*), 0)
+               FROM USERS
+              WHERE TRUNC(createdDate) = TRUNC(SYSDATE - 1)) AS "yesterdayMemberCount",
+            (SELECT NVL(SUM(CHARGEAMOUNT), 0)
+               FROM PAYMENT
+              WHERE PAYSTATUS = 'PAID'
+                AND TRUNC(PAIDAT) = TRUNC(SYSDATE)) AS "todayRevenue",
+            (SELECT NVL(SUM(CHARGEAMOUNT), 0)
+               FROM PAYMENT
+              WHERE PAYSTATUS = 'PAID'
+                AND TRUNC(PAIDAT) = TRUNC(SYSDATE - 1)) AS "yesterdayRevenue",
+            (SELECT NVL(COUNT(*), 0)
+               FROM TRADETRANSACTION
+              WHERE TRUNC(TRADEDATE) = TRUNC(SYSDATE)) AS "todayTradeCount",
+            (SELECT NVL(COUNT(*), 0)
+               FROM TRADETRANSACTION
+              WHERE TRUNC(TRADEDATE) = TRUNC(SYSDATE - 1)) AS "yesterdayTradeCount",
+            (SELECT NVL(COUNT(*), 0)
+               FROM adminReport
+              WHERE processStatus = 0) AS "pendingReportCount"
+        FROM DUAL
+    </select>
+
+    <select id="listRevenueChart" resultType="map">
+        SELECT TO_CHAR(d.dt, 'MM/DD') AS "label",
+               NVL((
+                    SELECT SUM(p.CHARGEAMOUNT)
+                      FROM PAYMENT p
+                     WHERE p.PAYSTATUS = 'PAID'
+                       AND TRUNC(p.PAIDAT) = d.dt
+               ), 0) AS "amount"
+          FROM (
+                SELECT TRUNC(SYSDATE) - 6 + LEVEL - 1 AS dt
+                  FROM DUAL
+                CONNECT BY LEVEL &lt;= 7
+               ) d
+         ORDER BY d.dt
+    </select>
+
+    <select id="listRecentActivities" resultType="map">
+        SELECT *
+          FROM (
+                SELECT 'MEMBER' AS "activityType",
+                       u.nickname AS "title",
+                       '님이 BATON에 가입했습니다' AS "description",
+                       'ri-user-add-fill' AS "iconClass",
+                       'bg-pink' AS "bgClass",
+                       TO_CHAR(u.createdDate, 'YYYY-MM-DD HH24:MI') AS "eventDate"
+                  FROM USERS u
+                UNION ALL
+                SELECT 'PAYMENT' AS "activityType",
+                       NVL(p.MERCHANTUID, '포인트 결제') AS "title",
+                       '결제가 완료되었습니다' AS "description",
+                       'ri-coin-fill' AS "iconClass",
+                       'bg-blue' AS "bgClass",
+                       TO_CHAR(p.PAIDAT, 'YYYY-MM-DD HH24:MI') AS "eventDate"
+                  FROM PAYMENT p
+                 WHERE p.PAYSTATUS = 'PAID'
+                UNION ALL
+                SELECT 'REPORT' AS "activityType",
+                       '커뮤니티 신고' AS "title",
+                       '새 신고가 접수되었습니다' AS "description",
+                       'ri-error-warning-fill' AS "iconClass",
+                       'bg-orange' AS "bgClass",
+                       TO_CHAR(r.reportDate, 'YYYY-MM-DD HH24:MI') AS "eventDate"
+                  FROM adminReport r
+                UNION ALL
+                SELECT 'TRADE' AS "activityType",
+                       NVL(pr.title, '중고거래') AS "title",
+                       '거래가 생성되었습니다' AS "description",
+                       'ri-shopping-bag-3-fill' AS "iconClass",
+                       'bg-green' AS "bgClass",
+                       TO_CHAR(t.tradeDate, 'YYYY-MM-DD HH24:MI') AS "eventDate"
+                  FROM TRADETRANSACTION t
+                  LEFT JOIN PRODUCT pr ON pr.PRODUCTIDX = t.PRODUCTIDX
+               )
+         ORDER BY "eventDate" DESC
+         FETCH FIRST 8 ROWS ONLY
+    </select>
+
+    <select id="listRecentTransactions" resultType="map">
+        SELECT *
+          FROM (
+                SELECT t.TRADEIDX AS "tradeIdx",
+                       NVL(p.TITLE, '상품명 없음') AS "productTitle",
+                       NVL(s.NICKNAME, '-') AS "sellerName",
+                       NVL(b.NICKNAME, '-') AS "buyerName",
+                       NVL(t.TRADEPRICE, 0) AS "tradePrice",
+                       t.TRADESTATUS AS "tradeStatus",
+                       TO_CHAR(t.TRADEDATE, 'MM-DD HH24:MI') AS "tradeDate",
+                       CASE
+                           WHEN t.TRADESTATUS IN ('SHIPPING', '배송중') THEN 'tag-blue'
+                           WHEN t.TRADESTATUS IN ('PAY_COMPLETED', 'CONFIRMED', '거래완료', 'COMPLETED') THEN 'tag-green'
+                           WHEN t.TRADESTATUS IN ('CANCELED', 'CANCELLED', '취소됨') THEN 'tag-red'
+                           ELSE 'tag-gray'
+                       END AS "statusClass",
+                       CASE
+                           WHEN p.CATEGORYIDX IS NOT NULL AND MOD(p.CATEGORYIDX, 5) = 0 THEN 'ri-headphone-line'
+                           WHEN p.CATEGORYIDX IS NOT NULL AND MOD(p.CATEGORYIDX, 5) = 1 THEN 'ri-smartphone-line'
+                           WHEN p.CATEGORYIDX IS NOT NULL AND MOD(p.CATEGORYIDX, 5) = 2 THEN 'ri-macbook-line'
+                           WHEN p.CATEGORYIDX IS NOT NULL AND MOD(p.CATEGORYIDX, 5) = 3 THEN 'ri-gamepad-line'
+                           ELSE 'ri-shopping-bag-3-line'
+                       END AS "productIcon"
+                  FROM TRADETRANSACTION t
+                  LEFT JOIN PRODUCT p ON p.PRODUCTIDX = t.PRODUCTIDX
+                  LEFT JOIN USERS s ON s.USERIDX = t.SELLERIDX
+                  LEFT JOIN USERS b ON b.USERIDX = t.BUYERIDX
+                 ORDER BY t.TRADEDATE DESC
+               )
+         WHERE ROWNUM &lt;= 6
+    </select>
+
+</mapper>

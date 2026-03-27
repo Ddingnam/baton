@@ -457,7 +457,38 @@ ul, li { list-style: none; }
 .cal-memo-clear:hover { background: #F1F5F9; }
 .cal-memo-save { padding: 6px 16px; border-radius: 8px; background: var(--grad-primary); border: none; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; font-family: inherit; transition: opacity 0.15s; box-shadow: 0 3px 10px rgba(124,58,237,0.25); }
 .cal-memo-save:hover { opacity: 0.88; }
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 88px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+}
 
+.status-badge.success {
+    background: rgba(34, 197, 94, 0.12);
+    color: #22c55e;
+}
+
+.status-badge.danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+}
+
+.status-badge.warning {
+    background: rgba(251, 191, 36, 0.12);
+    color: #f59e0b;
+}
+
+.status-badge.default {
+    background: rgba(148, 163, 184, 0.12);
+    color: #64748b;
+}
 .team-rows { display: flex; flex-direction: column; gap: 9px; }
 .t-row { display: flex; align-items: center; gap: 10px; }
 .t-avt { width: 30px; height: 30px; border-radius: 50%; background: var(--grad-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; flex-shrink: 0; box-shadow: 0 3px 8px rgba(124,58,237,0.25); }

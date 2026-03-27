@@ -166,6 +166,8 @@ public class CommunityServiceImpl implements CommunityService {
 	            entities = communityRepository.findByTemporaryFalseAndSubjectContaining(kwd, pageable);
 	        } else if ("content".equals(schType)) {
 	            entities = communityRepository.findByTemporaryFalseAndContentContaining(kwd, pageable);
+	        } else if ("tag".equals(schType)) {
+	            entities = communityRepository.findByTemporaryFalseAndHashTags_TagNameContaining(kwd, pageable);
 	        } else {
 	            entities = communityRepository.findByTemporaryFalseAndSubjectContainingOrTemporaryFalseAndContentContaining(kwd, kwd, pageable);
 	        }
@@ -186,6 +188,8 @@ public class CommunityServiceImpl implements CommunityService {
 	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndCategoryAndSubjectContaining(regionCode, category, kwd, pageable);
 	            } else if ("content".equals(schType)) {
 	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndCategoryAndContentContaining(regionCode, category, kwd, pageable);
+	            } else if ("tag".equals(schType)) {
+	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndCategoryAndHashTags_TagNameContaining(regionCode, category, kwd, pageable);
 	            } else {
 	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndCategoryAndSubjectContaining(regionCode, category, kwd, pageable);
 	            }
@@ -198,6 +202,8 @@ public class CommunityServiceImpl implements CommunityService {
 	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndSubjectContaining(regionCode, kwd, pageable);
 	            } else if ("content".equals(schType)) {
 	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndContentContaining(regionCode, kwd, pageable);
+	            } else if ("tag".equals(schType)) {
+	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndHashTags_TagNameContaining(regionCode, kwd, pageable);
 	            } else {
 	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndSubjectContainingOrTemporaryFalseAndRegionCodeAndContentContaining(regionCode, kwd, regionCode, kwd, pageable);
 	            }
@@ -218,6 +224,8 @@ public class CommunityServiceImpl implements CommunityService {
 	        entities = communityRepository.findByTemporaryFalseAndCategoryAndSubjectContaining(category, kwd, pageable);
 	    } else if ("content".equals(schType)) {
 	        entities = communityRepository.findByTemporaryFalseAndCategoryAndContentContaining(category, kwd, pageable);
+	    } else if ("tag".equals(schType)) {
+	        entities = communityRepository.findByTemporaryFalseAndCategoryAndHashTags_TagNameContaining(category, kwd, pageable);
 	    } else {
 	        entities = communityRepository.findByTemporaryFalseAndCategoryAndSubjectContaining(category, kwd, pageable);
 	    }
