@@ -19,8 +19,6 @@ const RANGE_LABELS = ["내 동네", "가까운 동네", "먼 동네"];
 
 let currentPage = 1;
 let PAGE_SIZE = 20;
-let allJobs = [...serverData];
-let filteredJobs = [];
 
 function getRelativeTime(dateStr) {
     if (!dateStr) return "";
@@ -99,7 +97,7 @@ function applyFilters() {
 
     if (sizeEl) PAGE_SIZE = parseInt(sizeEl.value, 10) || 20;
 
-    let jobs = [...allJobs];
+    let jobs = [...serverData];
 
     if (keyword) {
         jobs = jobs.filter(j =>
@@ -140,7 +138,7 @@ function applyFilters() {
     }
 
     if (sort === "pay_high") {
-        jobs.sort((a, b) => Number(b.pay) - Number(a.pay));
+        jobs.sort((a, b) => b.pay - a.pay);
     } else {
         jobs.sort((a, b) => Number(b.postingIdx) - Number(a.postingIdx));
     }
@@ -225,6 +223,7 @@ function renderList(jobs) {
                     onclick="toggleScrap(event, ${job.postingIdx}, this)">
                 <i class="ri-star-fill"></i>
             </button>
+
         </div>`;
     }).join("");
 }
@@ -345,7 +344,6 @@ function resetFilters() {
     if (areaSearch) areaSearch.value = "";
     if (slider) slider.value = 0;
 
-    allJobs = [...serverData];
     applyRangeFilter(0);
 }
 
@@ -461,16 +459,21 @@ function applyAreaFilter() {
 
     fetchAreaJobs(sido, gugun, dong)
         .then(jobs => {
-            allJobs = jobs;
-            applyFilters();
+            filteredJobs = jobs;
+            currentPage = 1;
+            updateCounts(filteredJobs.length);
+            renderCurrentPage();
+            renderPagination();
         })
         .catch(err => console.error(err));
 }
 
 async function applyAreaFilterAuto(sido, gugun, dong) {
-    allJobs = await fetchAreaJobs(sido, gugun, dong);
+    filteredJobs = await fetchAreaJobs(sido, gugun, dong);
     currentPage = 1;
-    applyFilters();
+    updateCounts(filteredJobs.length);
+    renderCurrentPage();
+    renderPagination();
 
     const sidoEl = [...document.querySelectorAll("#col-sido li")]
         .find(li => li.textContent.includes(normalizeSido(sido)));
@@ -567,22 +570,35 @@ function applyRangeFilter(step) {
     }
 
     if (!filter) {
-        allJobs = [...serverData];
         applyFilters();
         return;
     }
 
     fetchAreaJobs(filter.sido, filter.gugun, filter.dong)
         .then(jobs => {
-            allJobs = jobs;
+            filteredJobs = jobs;
             currentPage = 1;
+            updateCounts(filteredJobs.length);
+            renderCurrentPage();
+            renderPagination();
             syncRegionSelection(filter.sido, filter.gugun, filter.dong);
-            applyFilters();
         })
         .catch(err => console.error(err));
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    if (myRegion && myRegion.sido) {
+        applyAreaFilterAuto(myRegion.sido, myRegion.gugun, myRegion.dong)
+            .then(() => {
+                if (filteredJobs.length === 0) {
+                    applyFilters();
+                }
+            })
+            .catch(() => applyFilters());
+    } else {
+        setTimeout(applyFilters, 100);
+    }
+
     document.querySelectorAll('.filter-section .filter-chips, .filter-section[data-filter-type="category"]').forEach(group => {
         group.querySelectorAll(".chip").forEach(chip => {
             chip.addEventListener("click", function () {
@@ -662,7 +678,4 @@ document.addEventListener("DOMContentLoaded", function () {
             applyRangeFilter(step);
         });
     });
-
-    allJobs = [...serverData];
-    applyFilters();
 });
