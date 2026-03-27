@@ -597,18 +597,28 @@ public class MemberServiceImpl implements MemberService {
                     case 12: badge.setCurrentCount(pollCount); badge.setTargetCount(20); badge.setIconImage("ri-pie-chart-2-fill"); break;
 				}
 				
-				if (badge.getCurrentCount() >= badge.getTargetCount()) {
-                    badge.setCurrentCount(badge.getTargetCount()); 
-                    
-                    if (!badge.isAcquired()) { 
-                        Map<String, Object> param = new HashMap<>();
-                        param.put("userIdx", userIdx);
-                        param.put("badgeId", badge.getBadgeId());
-                        try { mapper.insertUserBadge(param); } catch(Exception ignored) {}
-                        badge.setAcquired(true); 
-                    }
-                }
-                badge.setProgressPercent((int) ((double) badge.getCurrentCount() / badge.getTargetCount() * 100));
+				if (userIdx == 1) {
+			        badge.setCurrentCount(badge.getTargetCount()); 
+			        badge.setProgressPercent(100);               
+			        badge.setAcquired(true);                      
+			    } else {		        	
+			        if (badge.getCurrentCount() >= badge.getTargetCount()) {
+			            badge.setCurrentCount(badge.getTargetCount()); 
+			            badge.setProgressPercent(100); 
+
+			            if (!badge.isAcquired()) { 
+			                Map<String, Object> param = new HashMap<>();
+			                param.put("userIdx", userIdx);
+			                param.put("badgeId", badge.getBadgeId());
+			                try { 
+			                    mapper.insertUserBadge(param); 
+			                    badge.setAcquired(true); 
+			                } catch(Exception ignored) {}
+			            }
+			        } else {	                    
+			            badge.setProgressPercent((int) ((double) badge.getCurrentCount() / badge.getTargetCount() * 100));
+			        } 
+			    }
 			}
 
 			allBadges.sort((b1, b2) -> {
