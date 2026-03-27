@@ -349,7 +349,7 @@
     </select>
     
     <select id="countCommunityPoll" parameterType="Long" resultType="int">
-        SELECT COUNT(DISTINCT poll_id) FROM poll_vote WHERE member_idx = #{userIdx}
+        SELECT COUNT(DISTINCT poll_id) FROM poll_vote WHERE member_id = #{userIdx}
     </select>
     
     <select id="countPointCharge" parameterType="Long" resultType="int">
@@ -357,7 +357,7 @@
     </select>
     
     <select id="countAlbaScrap" parameterType="Long" resultType="int">
-        SELECT COUNT(*) FROM job_scrap WHERE memberid = #{userIdx}
+        SELECT COUNT(*) FROM job_scrap WHERE member_id = #{userIdx}
     </select>
     
     <select id="getAllBadges" resultType="com.sp.app.domain.dto.BadgeDto">

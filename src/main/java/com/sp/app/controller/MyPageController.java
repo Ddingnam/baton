@@ -1,5 +1,6 @@
 package com.sp.app.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,7 @@ public class MyPageController {
             map.put("userIdx", userIdx);
             List<Trade> tradeList = tradeService.findByUserIdx(map);
 
-            for (Trade trade : tradeList) {
+            for (Trade trade : tradeList) {            	
                 List<TradeImg> images = tradeService.findImgsByIdx(trade.getProductIdx());
                 trade.setImageList(images);
             }
@@ -84,38 +85,49 @@ public class MyPageController {
             model.addAttribute("albaPostList", jobPostingService.postListByUserId(userIdx));
             model.addAttribute("albaScrapList", jobPostingService.listJobScrap(userIdx));
             model.addAttribute("albaApplyList", jobApplyService.listApplyByUser(userIdx)); 
+
+            List<BadgeDto> badgeList = new java.util.ArrayList<>();
             
             try {
-                List<BadgeDto> badgeList = memberService.getUserBadgeProgress(userIdx);
+                badgeList = memberService.getUserBadgeProgress(userIdx);
+                log.info("===============================================");
+                log.info("정상적으로 가져온 배지 개수: {}개", badgeList.size());
                 log.info("===============================================");
                 
-                log.info("가져온 배지 개수: {}개", (badgeList != null ? badgeList.size() : 0));
-                log.info("===============================================");
-                
-                if (badgeList == null || badgeList.isEmpty()) {
-                    log.warn("★★ DB에서 배지를 가져오지 못했습니다! 화면(CSS) 테스트를 위해 가짜 배지를 1개 생성합니다. ★★");
-                    
-                    badgeList = new java.util.ArrayList<>();
-                    BadgeDto testBadge = new BadgeDto();
-                    testBadge.setBadgeId(999);
-                    testBadge.setBadgeName("테스트용 임시 배지");
-                    testBadge.setDescription("이 배지가 보인다면 CSS는 정상입니다!");
-                    testBadge.setIconImage("ri-bug-fill"); 
-                    testBadge.setAcquired(true);
-                    testBadge.setCurrentCount(5);
-                    testBadge.setTargetCount(10);
-                    testBadge.setProgressPercent(50);
-                    badgeList.add(testBadge);
-                }
-                model.addAttribute("badgeList", badgeList);
             } catch(Exception e) {
-                log.error("배지 정보 로드 실패", e);
+                log.error("★★ 배지 정보 로드 중 DB 쿼리 에러 발생! ★★", e);
+
+                BadgeDto errorBadge = new BadgeDto();
+                errorBadge.setBadgeId(999);
+                errorBadge.setBadgeName("DB 쿼리 에러 발생!");
+                errorBadge.setDescription("원인: " + e.getMessage());
+                errorBadge.setIconImage("ri-error-warning-fill"); 
+                errorBadge.setAcquired(true);
+                errorBadge.setCurrentCount(0);
+                errorBadge.setTargetCount(1);
+                errorBadge.setProgressPercent(0);
+                badgeList.add(errorBadge);
             }
+
+            if (badgeList.isEmpty()) {
+                BadgeDto testBadge = new BadgeDto();
+                testBadge.setBadgeId(999);
+                testBadge.setBadgeName("가입 환영 배지");
+                testBadge.setDescription("활동을 시작하고 첫 배지를 획득해 보세요!");
+                testBadge.setIconImage("ri-sparkling-fill"); 
+                testBadge.setAcquired(true);
+                testBadge.setCurrentCount(0);
+                testBadge.setTargetCount(10);
+                testBadge.setProgressPercent(0);
+                badgeList.add(testBadge);
+            }
+
+            model.addAttribute("badgeList", badgeList);
         }
 
         return "mypage/main";
     }
-
+    
     @GetMapping("/tradeUserMain")
     public String tradeUserMain(
             @AuthenticationPrincipal CustomUserDetails userDetails,
