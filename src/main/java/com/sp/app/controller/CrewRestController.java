@@ -13,11 +13,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sp.app.domain.dto.CrewDto;
+import com.sp.app.domain.dto.CrewMemberDto;
+import com.sp.app.domain.dto.CrewRequestDto;
 import com.sp.app.domain.dto.RegionDto;
 import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.security.CustomUserDetails;
@@ -120,18 +123,71 @@ public class CrewRestController {
 	}
 	
 	@GetMapping("article/{crewIdx}")
-    public ResponseEntity<?> getCrewDetail(@PathVariable("crewIdx") long crewIdx) {
+    public ResponseEntity<?> getCrewDetail(
+    		@PathVariable("crewIdx") long crewIdx,
+    		@AuthenticationPrincipal CustomUserDetails userDetails) {
+		Map<String, Object> response = new HashMap<>();
+		
+		if (userDetails == null || userDetails.getMember() == null) {
+			response.put("state", "login_required");
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+	    }
+		
         try {
+        	Long loginUserIdx = userDetails.getMember().getUserIdx();
             CrewDto crew = service.findByCrewIdx(crewIdx); 
-            if (crew != null) {
-                return ResponseEntity.ok(crew);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("모임을 찾을 수 없습니다.");
-            }
+            CrewMemberDto myStatus = service.getCrewMemberInfo(crewIdx, loginUserIdx);
+            
+            response.put("crew", crew);
+            response.put("myStatus", myStatus);
+            
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        	log.error("getCrewDetail Error : ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
         }
     }
 	
-	
+	@PostMapping("join")
+    public ResponseEntity<String> joinCrew(
+    		@RequestBody CrewRequestDto dto,
+    		@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long loginUserIdx = userDetails.getMember().getUserIdx();
+        try {
+	        service.joinCrew(dto.getCrewIdx(), loginUserIdx, dto.getReason());
+	        return ResponseEntity.ok("가입 신청이 완료되었습니다.");
+        } catch (Exception e) {
+            log.error("joinCrew Error : ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+        }
+    }
+
+    @PostMapping("exit")
+    public ResponseEntity<String> exitCrew(
+    		@RequestBody CrewRequestDto dto,
+    		@AuthenticationPrincipal CustomUserDetails userDetails) {
+    	Long loginUserIdx = userDetails.getMember().getUserIdx();
+        
+    	try {
+	        service.exitCrew(dto.getCrewIdx(), loginUserIdx, dto.getReason());
+	        return ResponseEntity.ok("탈퇴 처리가 완료되었습니다.");
+    	} catch (Exception e) {
+            log.error("exitCrew Error : ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+        }
+    }
+
+    @PostMapping("ban")
+    public ResponseEntity<String> banMember(
+    		@RequestBody CrewRequestDto dto,
+    		@AuthenticationPrincipal CustomUserDetails userDetails) {
+    	Long loginUserIdx = userDetails.getMember().getUserIdx();
+        try {
+	        service.banMember(loginUserIdx, dto.getCrewIdx(), dto.getTargetUserIdx(), dto.getReason());
+	        return ResponseEntity.ok("해당 멤버를 강퇴 처리하였습니다.");
+        } catch (Exception e) {
+            log.error("banMember Error : ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+        }
+    }
 }

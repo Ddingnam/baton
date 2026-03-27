@@ -83,7 +83,9 @@
 .col-title { flex: 1; font-weight: 700; color: #191F28; padding: 0 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; }
 .col-author { flex: 0 0 100px; text-align: center; font-size: 14px; color: #4E5968; font-weight: 600; }
 .col-date { flex: 0 0 90px; text-align: center; font-size: 13px; color: var(--text-sub); }
-.col-view { flex: 0 0 55px; text-align: center; font-size: 13px; color: var(--text-sub); }
+.col-view { flex: 0 0 50px; text-align: center; font-size: 13px; color: var(--text-sub); }
+.col-like { flex: 0 0 50px; text-align: center; font-size: 13px; color: var(--text-sub); }
+.col-comment { flex: 0 0 50px; text-align: center; font-size: 13px; color: var(--text-sub); }
 
 .cdb-badge-notice { background: var(--crew-pink); color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 6px; margin-right: 8px; font-weight: 800; }
 .cdb-comment-count { color: var(--crew-pink); font-size: 13px; font-weight: 800; margin-left: 5px; }
@@ -581,4 +583,27 @@
     0% { transform: scale(1); }
     50% { transform: scale(1.3); }
     100% { transform: scale(1); }
+}
+
+/* 전체 페이지가 아래에서 위로 떠오르는 효과 */
+.cdb-fade-up-enter-active,
+.cdb-fade-up-leave-active {
+    transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* 나갈 때: 제자리에서 서서히 사라짐 */
+.cdb-fade-up-leave-to {
+    opacity: 0;
+    transform: translateY(-3px);
+}
+
+/* 들어올 때: 아래에서 위로 슥~ */
+.cdb-fade-up-enter-from {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+/* 💡 트랜지션 도중 레이아웃 깨짐 방지 */
+.cdb-board-wrapper {
+    will-change: transform, opacity;
 }

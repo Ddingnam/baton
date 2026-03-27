@@ -38,15 +38,15 @@ const CrewDashboard = {
                 this.isLoading = false;
             }
         },
-		goToBoardDetail(postIdx) {
+		goToBoardDetail(boardIdx) {
 			window.scrollTo({ top: 0, behavior: 'smooth' });
-	        this.$router.push({
-	            path: `/article/${this.crewIdx}/board`, 
-	            query: { 
-	                ...this.$route.query,
-	                targetBoardIdx: postIdx
-	            }
-	        });
+	        this.$router.push({ 
+	            name: 'crew-board-detail', 
+	            params: { 
+	                crewIdx: this.crew.crewIdx, 
+	                boardIdx: boardIdx 
+	            } 
+	        }).catch(() => {});
 	    }
     },
     watch: {

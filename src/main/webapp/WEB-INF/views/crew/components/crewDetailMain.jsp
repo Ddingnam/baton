@@ -73,7 +73,12 @@
                     </nav>
     
                     <div class="cd-action-card cd-glass-card cd-sidebar-footer">
-                        <button class="cd-action-btn primary">모임 가입하기</button>
+                        <button class="cd-action-btn" 
+						        :class="buttonClass"
+						        :disabled="isJoinDisabled"
+						        @click="handleButtonClick">
+						    {{ joinButtonText }}
+						</button>
                     </div>
                 
                 </aside>

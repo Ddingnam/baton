@@ -3,10 +3,11 @@ const CrewDetail = {
     components: {
         'crew-dashboard': CrewDashboard 
     },
-    data() {
+	data() {
         return {
             isLoading: false,
-            crew: null
+            crew: null,
+            myStatus: null
         }
     },
     
@@ -15,6 +16,44 @@ const CrewDetail = {
         const crewIdx = this.$route.params.crewIdx;
         if (crewIdx) {
             await this.loadAllData(crewIdx);
+        }
+    },
+	computed: {
+        joinButtonText() {
+            if (this.myStatus) {
+                if (this.myStatus.status === 'ACTIVE') return '모임 탈퇴하기';
+                if (this.myStatus.status === 'WAIT') return '가입 승인 대기 중';
+                if (this.myStatus.status === 'BANNED') return '가입이 제한된 모임';
+            }
+
+            if (this.crew && this.crew.currentMember >= this.crew.maxMember) {
+                return '모집 정원 초과';
+            }
+
+            return this.crew.joinType === 'A' ? '가입 신청하기' : '모임 가입하기';
+        },
+
+        isJoinDisabled() {
+            if (this.myStatus && ['WAIT', 'BANNED'].includes(this.myStatus.status)) {
+                return true;
+            }
+			
+            if (this.crew && this.crew.currentMember >= this.crew.maxMember) {
+                return true;
+            }
+            return false;
+        },
+		
+		buttonClass() {
+	        if (this.myStatus && this.myStatus.status === 'ACTIVE') return 'btn-danger';
+	        if (this.isJoinDisabled) return 'btn-disabled';
+	        return 'primary';
+	    }
+    },
+	
+	watch: {
+        '$route.params.crewIdx': function(newIdx) {
+            if (newIdx) this.loadAllData(newIdx);
         }
     },
 
@@ -35,14 +74,95 @@ const CrewDetail = {
 
         async fetchCrewDetail(idx) {
             const response = await fetch(`/api/crew/article/${idx}`);
-            if (!response.ok) throw new Error("상세 정보 호출 실패");
-            this.crew = await response.json();
-        }
-    },
+			if (response.status === 401) {
+                const errorData = await response.json();
+                if (errorData.state === 'login_required') {
+                    alert("로그인이 필요한 메뉴입니다. 로그인 페이지로 이동합니다.");
+					throw new Error("login_required");
+                }
+            }
 
-    watch: {
-        '$route.params.crewIdx': function(newIdx) {
-            if (newIdx) this.loadAllData(newIdx);
-        }
+            if (!response.ok) throw new Error("상세 정보 호출 실패");
+
+            const responseData = await response.json();
+            this.crew = responseData.crew;
+            this.myStatus = responseData.myStatus;
+        },
+		
+		async handleButtonClick() {
+	        if (this.myStatus && this.myStatus.status === 'ACTIVE') {
+	            await this.handleExitCrew();
+	            return;
+	        }
+
+	        if (this.crew.joinType === 'F') {
+	            await this.handleJoinCrew();
+	        } else {
+	            alert("승인제 모임입니다. 가입 사유 입력 모달을 준비 중입니다!");
+	        }
+	    },
+		
+		async handleJoinCrew() {
+			if (!confirm("이 모임에 바로 참여하시겠습니까?")) return;
+            try {
+                this.isLoading = true;
+                
+                const response = await fetch('/api/crew/join', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        crewIdx: this.crew.crewIdx,
+                        reason: "모임 가입"
+                    })
+                });
+
+                if (response.status === 401) {
+                    alert("로그인이 필요한 서비스입니다.");
+                    return;
+                }
+
+                if (!response.ok) {
+                    const errorMsg = await response.text();
+                    throw new Error(errorMsg || "가입 처리 중 오류가 발생했습니다.");
+                }
+
+                alert("🎉 모임 가입이 완료되었습니다!");
+                
+                await this.fetchCrewDetail(this.crew.crewIdx);
+            } catch (error) {
+                console.error("❌ 가입 신청 실패:", error);
+                alert(error.message);
+            } finally {
+                this.isLoading = false;
+            }
+        },
+		
+		async handleExitCrew() {
+	        if (!confirm("정말로 이 모임을 탈퇴하시겠습니까?\n탈퇴 후 재가입은 모임 설정에 따라 제한될 수 있습니다.")) return;
+
+	        try {
+	            this.isLoading = true;
+	            const response = await fetch('/api/crew/exit', {
+	                method: 'POST',
+	                headers: { 'Content-Type': 'application/json' },
+	                body: JSON.stringify({ 
+	                    crewIdx: this.crew.crewIdx,
+	                    reason: "사용자 자진 탈퇴" 
+	                })
+	            });
+
+	            if (!response.ok) throw new Error("탈퇴 처리 중 오류가 발생했습니다.");
+
+	            alert("정상적으로 탈퇴 처리되었습니다.");
+	            await this.fetchCrewDetail(this.crew.crewIdx);
+
+	        } catch (error) {
+	            alert(error.message);
+	        } finally {
+	            this.isLoading = false;
+	        }
+	    }
     }
 };

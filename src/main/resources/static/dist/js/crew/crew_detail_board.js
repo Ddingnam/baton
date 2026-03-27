@@ -51,18 +51,20 @@ const CrewBoard = {
 	watch: {
 		viewMode(newMode) {
 	        if (newMode === 'write' || newMode === 'edit') {
-	            this.$nextTick(() => {
-	                const el = this.$refs.quillEditor;
-	                if (!el) return;
-	                
-	                if (!this.quill) this.initQuill();
-					
-					if (newMode === 'edit') {
-	                    this.quill.root.innerHTML = this.writeForm.content;
-	                } else if (newMode === 'write') {
-	                    this.quill.root.innerHTML = '';
-	                }
-	            });
+				setTimeout(() => {
+		            this.$nextTick(() => {
+		                const el = this.$refs.quillEditor;
+		                if (!el) return;
+		                
+		                if (!this.quill) this.initQuill();
+						
+						if (newMode === 'edit') {
+		                    this.quill.root.innerHTML = this.writeForm.content;
+		                } else if (newMode === 'write') {
+		                    this.quill.root.innerHTML = '';
+		                }
+		            });
+				}, 150);
 	        } else {
 	            this.quill = null;
 	        }
@@ -167,6 +169,13 @@ const CrewBoard = {
 		        this.isBoardListLoading = false;
 		    }
 		},
+		goToWrite() {
+		    this.currentPost = null; 
+		    this.$router.push({ 
+		        name: 'crew-board-write', 
+		        params: { crewIdx: this.crew.crewIdx } 
+		    }).catch(() => {});
+		},
 		goToEdit() {
 			this.$router.push({ 
 		        name: 'crew-board-edit', 
@@ -193,10 +202,7 @@ const CrewBoard = {
 
 		        if (result.status === 'success') {
 		            alert('게시글이 성공적으로 삭제되었습니다.');
-		            
-		            this.viewMode = 'list';
-		            this.currentPost = null;
-		            this.fetchPosts(this.currentPage); 
+		            this.backToList();
 		            window.scrollTo({ top: 0, behavior: 'smooth' });
 		        } else {
 		            alert('삭제 실패: ' + (result.message || '권한이 없거나 오류가 발생했습니다.'));
@@ -207,14 +213,13 @@ const CrewBoard = {
 		        alert('서버와 통신 중 오류가 발생했습니다.');
 		    }
 		},
-	    cancelWrite() {
-	        if (this.viewMode === 'edit') {
-	            this.viewMode = 'detail';
-	        } else {
-	            this.writeForm = { title: '', content: '', isNotice: 'N', status: 'ACTIVE' }; // 폼 초기화
-	            this.viewMode = 'list';
-	        }
-	    },
+		cancelWrite() {
+		    if (this.viewMode === 'edit') {
+		        this.goToDetail(this.currentPost);
+		    } else {
+		        this.backToList();
+		    }
+		},
 		async fetchPosts(page = 1) {
             if (!this.crew || !this.crew.crewIdx) return;
 			
@@ -247,9 +252,8 @@ const CrewBoard = {
         },
 		
 		backToList() {
-		    this.viewMode = 'list';
-		    this.fetchPosts(this.currentPage); 
 		    this.currentPost = null;
+		    this.$router.push({ name: 'crew-board-list', params: { crewIdx: this.crew.crewIdx } }).catch(() => {});
 		},
 
         changePage(page) {
@@ -297,12 +301,10 @@ const CrewBoard = {
 		            if (this.quill) this.quill.setContents([]);
 		            
 					if (isEdit) {
-		                this.goToDetail(this.currentPost); 
-		            } else {
-		                this.viewMode = 'list';
-		                this.fetchPosts(1); 
-		                window.scrollTo(0, 0);
-		            }
+					    this.goToDetail(this.currentPost);
+					} else {
+					    this.backToList();
+					}
 		        } else {
 		            alert((isEdit ? '수정' : '등록') + ' 실패: ' + result.message);
 		        }

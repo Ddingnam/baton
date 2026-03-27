@@ -71,7 +71,7 @@
         <div class="cd-widget cd-glass-card cd-post-widget cd-span-6-double">
 		    <div class="cd-widget-header">
 		        <h4><i class="ri-discuss-line"></i> 최근 올라온 이야기</h4>
-		        <span class="cd-view-more" @click="$router.push('/article/' + crew.crewIdx + '/board')">
+		        <span class="cd-view-more" @click="$router.push({ name: 'crew-board-list', params: { crewIdx: crew.crewIdx } })">
 		            더보기 <i class="ri-arrow-right-s-line"></i>
 		        </span>
 		    </div>
