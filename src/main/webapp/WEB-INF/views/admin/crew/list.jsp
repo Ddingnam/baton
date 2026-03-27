@@ -12,6 +12,7 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_main.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_crew.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_report.css">
 </head>
 <body>
 <div class="agency-layout">
@@ -30,14 +31,18 @@
             <div class="member-toolbar block-card" style="border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
                 <form class="toolbar-form" method="get" action="${pageContext.request.contextPath}/admin/crew/list">
                     <div class="status-tabs">
-                        <a href="?joinType=all&kwd=${kwd}" class="status-tab ${joinType == 'all' ? 'active' : ''}">전체</a>
-                        <a href="?joinType=free&kwd=${kwd}" class="status-tab ${joinType == 'free' ? 'active' : ''}">자유가입</a>
-                        <a href="?joinType=approval&kwd=${kwd}" class="status-tab ${joinType == 'approval' ? 'active' : ''}">승인가입</a>
+                        <a href="?joinType=all&schType=${schType}&kwd=${kwd}" class="status-tab ${joinType == 'all' || empty joinType ? 'active' : ''}">전체</a>
+                        <a href="?joinType=free&schType=${schType}&kwd=${kwd}" class="status-tab ${joinType == 'free' ? 'active' : ''}">자유가입</a>
+                        <a href="?joinType=approval&schType=${schType}&kwd=${kwd}" class="status-tab ${joinType == 'approval' ? 'active' : ''}">승인가입</a>
                     </div>
                     <div class="search-group">
+                        <select name="schType" class="fm-select" style="width: 130px; border-radius: 12px; border: 1px solid #E2E8F0; padding: 0 14px; font-weight: 600; color: #475569; outline: none; background: #fff;">
+                            <option value="name" ${schType == 'name' ? 'selected' : ''}>모임 이름</option>
+                            <option value="hostNickname" ${schType == 'hostNickname' ? 'selected' : ''}>호스트명</option>
+                        </select>
                         <div class="search-input-wrap">
                             <i class="ri-search-2-line"></i>
-                            <input type="text" name="kwd" class="fm-input" value="${kwd}" placeholder="모임 이름 검색...">
+                            <input type="text" name="kwd" class="fm-input" value="${kwd}" placeholder="검색어 입력...">
                         </div>
                         <input type="hidden" name="joinType" value="${joinType}">
                         <button type="submit" class="btn-pill btn-gradient" style="border-radius: 12px;">검색</button>
@@ -55,17 +60,11 @@
                                 <img src="${pageContext.request.contextPath}/uploads/crew/${crew.logoImage}" alt="cover">
                             </c:if>
                             
-                            <c:choose>
-                                <c:when test="${crew.status == 'active' || empty crew.status}">
-                                    <span class="crew-badge active">활성</span>
-                                </c:when>
-                                <c:when test="${crew.status == 'inactive'}">
-                                    <span class="crew-badge inactive">비활성(해산)</span>
-                                </c:when>
-                                <c:otherwise>
-                                    <span class="crew-badge approval">${crew.status}</span>
-                                </c:otherwise>
-                            </c:choose>
+                            <c:set var="cName" value="일반" />
+                            <c:if test="${not empty crew.categories}">
+                                <c:set var="cName" value="${not empty crew.categories[0].name ? crew.categories[0].name : (not empty crew.categories[0].categoryName ? crew.categories[0].categoryName : '일반')}" />
+                            </c:if>
+                            <span class="crew-badge" style="background: rgba(124,58,237,0.15); color: #6D28D9; border: 1px solid rgba(124,58,237,0.2); backdrop-filter: blur(4px);">${cName}</span>
 
                             <div class="crew-avatar-wrap">
                                 <div class="crew-avatar">
@@ -102,8 +101,8 @@
 
                         <div class="crew-card-footer">
                             <span class="date-text"><i class="ri-calendar-event-line"></i> ${fn:substring(crew.createdDate, 0, 10)} 개설</span>
-                            <button type="button" class="btn-admin-action" onclick="openAdminPanel(${crew.crewIdx}, '${fn:escapeXml(crew.name)}')">
-                                <i class="ri-settings-4-line"></i> 점검
+                            <button type="button" class="btn-admin-action" onclick="openAdminPanel(${crew.crewIdx})">
+                                <i class="ri-eye-line" style="font-size: 15px;"></i> 점검
                             </button>
                         </div>
                     </div>
@@ -120,13 +119,13 @@
             <c:if test="${total_page > 1}">
                 <div class="pagination">
                     <c:if test="${page > 1}">
-                        <a href="?page=${page-1}&joinType=${joinType}&kwd=${kwd}" class="page-btn"><i class="ri-arrow-left-s-line"></i></a>
+                        <a href="?page=${page-1}&joinType=${joinType}&schType=${schType}&kwd=${kwd}" class="page-btn"><i class="ri-arrow-left-s-line"></i></a>
                     </c:if>
                     <c:forEach begin="1" end="${total_page}" var="p">
-                        <a href="?page=${p}&joinType=${joinType}&kwd=${kwd}" class="page-btn ${p == page ? 'active' : ''}">${p}</a>
+                        <a href="?page=${p}&joinType=${joinType}&schType=${schType}&kwd=${kwd}" class="page-btn ${p == page ? 'active' : ''}">${p}</a>
                     </c:forEach>
                     <c:if test="${page < total_page}">
-                        <a href="?page=${page+1}&joinType=${joinType}&kwd=${kwd}" class="page-btn"><i class="ri-arrow-right-s-line"></i></a>
+                        <a href="?page=${page+1}&joinType=${joinType}&schType=${schType}&kwd=${kwd}" class="page-btn"><i class="ri-arrow-right-s-line"></i></a>
                     </c:if>
                 </div>
             </c:if>
@@ -134,63 +133,96 @@
     </main>
 </div>
 
-<div class="premium-overlay" id="crewDetailModal">
-    <div class="premium-modal" style="width: 580px; max-width: 90vw;">
-        <div style="padding: 24px 32px; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: space-between;">
-            <div>
-                <p style="font-size: 11px; font-weight: 800; color: #7C3AED; letter-spacing: 0.1em; margin-bottom: 4px;">CREW INFO</p>
-                <h2 id="cdTitle" style="font-size: 20px; font-weight: 800; color: #0F172A; margin: 0;">모임 상세</h2>
+<div class="fullscreen-overlay" id="crewDetailOverlay">
+    <div id="cwModalBox" style="background:#fff;border-radius:24px;width:660px;max-width:96vw;height:82vh;max-height:820px;min-height:480px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.26);transform:translateY(20px) scale(0.97);transition:transform 0.35s cubic-bezier(0.16,1,0.3,1),opacity 0.35s;opacity:0;">
+        
+        <div style="background:linear-gradient(135deg,#1E1B4B 0%,#312E81 100%);padding:20px 24px 18px;flex-shrink:0;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none;"></div>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:relative;">
+                <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                    <div style="width:38px;height:38px;border-radius:12px;background:rgba(165,180,252,0.15);border:1px solid rgba(165,180,252,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;color:#A5B4FC;flex-shrink:0;">
+                        <i class="ri-team-line"></i>
+                    </div>
+                    <div style="min-width:0;">
+                        <div style="font-size:9px;font-weight:700;letter-spacing:0.14em;color:rgba(255,255,255,0.3);margin-bottom:4px;">CREW DETAIL</div>
+                        <div id="cwTitle" style="font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px;line-height:1.3;word-break:break-word;"></div>
+                    </div>
+                </div>
+                <button onclick="closeCrewDetail()" style="width:30px;height:30px;border-radius:8px;flex-shrink:0;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:16px;color:rgba(255,255,255,0.4);cursor:pointer;transition:all 0.15s;"><i class="ri-close-line"></i></button>
             </div>
-            <button onclick="closeModal('crewDetailModal')" style="font-size: 24px; color: #94A3B8; transition: color 0.2s;"><i class="ri-close-line"></i></button>
+            
+            <div style="display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap;position:relative;">
+                <div id="cwStatusChip"></div>
+                <div id="cwJoinTypeChip"></div>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+                    <span id="cwViewStat" style="display:flex;align-items:center;gap:4px;font-size:12px;color:rgba(255,255,255,0.45);"></span>
+                </div>
+            </div>
+        </div>
+
+        <div style="flex:1;overflow-y:auto;padding:0;" id="cwScrollBody">
+            <div style="padding:16px 24px 14px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;gap:12px;">
+                <div id="cwAvatar" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,0.3);"></div>
+                <div>
+                    <div id="cwHostName" style="font-size:14px;font-weight:800;color:#1E293B;"></div>
+                    <div id="cwHostSub" style="font-size:11px;color:#94A3B8;margin-top:1px;"></div>
+                </div>
+                <div id="cwMemberProgress" style="margin-left:auto; width:120px; text-align:right;"></div>
+            </div>
+
+            <div style="padding:20px 24px;border-bottom:1px solid #F1F5F9;">
+                <div style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;display:flex;align-items:center;gap:5px;">
+                    <i class="ri-file-text-line"></i>모임 소개 및 규칙
+                </div>
+                <div id="cwContent" style="font-size:14px;color:#334155;line-height:1.85;word-break:break-word;"></div>
+            </div>
+
+            <div style="padding:16px 24px 24px;">
+                <div style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;display:flex;align-items:center;gap:5px;">
+                    <i class="ri-article-line"></i>최근 활동 게시글
+                </div>
+                <div id="cwPostsWrap" style="display:flex;flex-direction:column;gap:8px;"></div>
+            </div>
         </div>
         
-        <div style="padding: 32px; flex: 1; overflow-y: auto;">
-            <div id="cdContent" style="font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 24px; background: #F1F5F9; padding: 16px; border-radius: 16px;">
-                로딩 중...
-            </div>
-            <h3 style="font-size: 14px; font-weight: 800; color: #1E293B; margin-bottom: 12px;"><i class="ri-team-line"></i> 현재 참여 멤버</h3>
-            <div id="cdMembers" style="display: flex; flex-direction: column; gap: 8px;"></div>
-        </div>
-        
-        <div style="padding: 16px 32px; background: #fff; border-top: 1px solid #E2E8F0; text-align: right;">
-            <button class="btn-pill btn-light" onclick="closeModal('crewDetailModal')">닫기</button>
+        <div style="padding:12px 20px;border-top:1px solid #F1F5F9;display:flex;justify-content:flex-end;align-items:center;flex-shrink:0;background:#FAFAFA;">
+            <button onclick="closeCrewDetail()" class="btn-pill btn-light">닫기</button>
         </div>
     </div>
 </div>
 
-<div class="premium-overlay" id="adminPanelModal">
-    <div class="premium-modal" style="width: 480px; max-width: 90vw;">
-        <div style="padding: 24px 32px; background: #0F172A; color: white; display: flex; align-items: center; justify-content: space-between;">
-            <div>
-                <p style="font-size: 11px; font-weight: 800; color: #38BDF8; letter-spacing: 0.1em; margin-bottom: 4px;">ADMINISTRATION</p>
-                <h2 id="apTitle" style="font-size: 20px; font-weight: 800; margin: 0;">관리자 점검</h2>
+<div class="fullscreen-overlay" id="crewAdminOverlay">
+    <div class="rpt-modal" style="width:520px;">
+        <div class="rpt-modal-header">
+            <div class="rpt-header-left">
+                <div class="rpt-header-icon"><i class="ri-settings-4-line"></i></div>
+                <div>
+                    <p class="rpt-header-eyebrow">CREW MANAGEMENT</p>
+                    <p class="rpt-header-title" id="caTitle">모임 상태 점검</p>
+                </div>
             </div>
-            <button onclick="closeModal('adminPanelModal')" style="font-size: 24px; color: rgba(255,255,255,0.5); transition: color 0.2s;"><i class="ri-close-line"></i></button>
+            <button class="rpt-close-btn" onclick="closeAdminPanel()"><i class="ri-close-line"></i></button>
         </div>
         
-        <div style="padding: 32px; background: #fff;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-                <div style="padding: 16px; border-radius: 16px; border: 1px solid #E2E8F0; text-align: center;">
-                    <p style="font-size: 12px; color: #64748B; font-weight: 700; margin-bottom: 4px;">게시글 활동량</p>
-                    <p id="apPosts" style="font-size: 24px; font-weight: 900; color: #7C3AED;">-</p>
-                </div>
-                <div style="padding: 16px; border-radius: 16px; border: 1px solid #E2E8F0; text-align: center;">
-                    <p style="font-size: 12px; color: #64748B; font-weight: 700; margin-bottom: 4px;">신고 누적 건수</p>
-                    <p id="apReports" style="font-size: 24px; font-weight: 900; color: #EF4444;">-</p>
-                </div>
+        <div class="rpt-modal-body">
+            <div class="rpt-info-list" id="caInfoList">
+                <div style="text-align:center;padding:20px 0;"><i class="ri-loader-4-line ri-spin" style="font-size:24px;color:#94A3B8;"></i></div>
             </div>
             
-            <label style="font-size: 12px; font-weight: 800; color: #475569; display: block; margin-bottom: 8px;">관리자 메모 (점검 사항)</label>
-            <textarea style="width: 100%; height: 80px; padding: 12px; border: 1px solid #CBD5E1; border-radius: 12px; resize: none; font-family: inherit; font-size: 13px; color: #1E293B;" placeholder="해당 모임에 대한 관리자 메모를 남기세요..."></textarea>
+            <div class="rpt-divider"></div>
+            
+            <div class="rpt-field">
+                <p class="rpt-field-label">최근 활동 요약</p>
+                <div class="rpt-field-box" id="caActivitySummary">-</div>
+            </div>
         </div>
         
-        <div style="padding: 20px 32px; background: #F8FAFC; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-between;">
-            <button class="btn-admin-action" style="background: #FEF2F2; color: #EF4444; border-color: #FCA5A5;" id="btnDeleteCrew">
-                <i class="ri-delete-bin-line"></i> 강제 해산
-            </button>
-            <div style="display: flex; gap: 8px;">
-                <button class="btn-pill btn-light" onclick="closeModal('adminPanelModal')">취소</button>
-                <button class="btn-pill btn-gradient" style="border-radius: 12px; padding: 0 20px;" onclick="closeModal('adminPanelModal')">메모 저장</button>
+        <div class="rpt-modal-footer">
+            <button class="rpt-btn-cancel" onclick="closeAdminPanel()">닫기</button>
+            <div class="rpt-footer-actions">
+                <button class="rpt-btn-reject" id="caDeleteBtn" style="gap: 6px;">
+                    <i class="ri-delete-bin-line"></i> 강제 해산 (삭제)
+                </button>
             </div>
         </div>
     </div>
@@ -198,78 +230,135 @@
 
 <script>
     var CTX = '${pageContext.request.contextPath}';
-    
-    function openModal(id) {
-        document.getElementById(id).classList.add('show');
-    }
-    function closeModal(id) {
-        document.getElementById(id).classList.remove('show');
-    }
 
-    function openCrewDetail(idx, name) {
-        document.getElementById('cdTitle').textContent = name;
-        document.getElementById('cdContent').innerHTML = '<i class="ri-loader-4-line ri-spin"></i> 데이터를 불러오는 중...';
-        document.getElementById('cdMembers').innerHTML = '';
-        openModal('crewDetailModal');
+    // ==========================================
+    // 1. 모임 상세(글보기) 모달 스크립트
+    // ==========================================
+    var cdOverlay = document.getElementById('crewDetailOverlay');
+    var cdBox = document.getElementById('cwModalBox');
 
-        fetch(CTX + '/admin/crew/detail?crewIdx=' + idx)
-            .then(r => r.json())
-            .then(d => {
-                if(d.success) {
-                    var desc = d.crew.description ? d.crew.description.replace(/\n/g, '<br>') : '모임 소개가 없습니다.';
-                    document.getElementById('cdContent').innerHTML = desc;
-                    
-                    document.getElementById('cdMembers').innerHTML = `
-                        <div style="padding: 12px 16px; background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;">
-                            <span style="font-size: 13px; font-weight: 700; color: #1E293B;">\${d.crew.hostNickname} (호스트)</span>
-                            <span style="font-size: 11px; color: #94A3B8; background: #F1F5F9; padding: 4px 8px; border-radius: 6px;">개설자</span>
-                        </div>
-                    `;
-                }
-            }).catch(() => {
-                document.getElementById('cdContent').innerHTML = '데이터를 불러오는 데 실패했습니다.';
-            });
-    }
-
-    var targetCrewIdx = null;
-    function openAdminPanel(idx, name) {
-        targetCrewIdx = idx;
-        document.getElementById('apTitle').textContent = name;
-        document.getElementById('apPosts').textContent = '로딩..';
-        document.getElementById('apReports').textContent = '로딩..';
-        openModal('adminPanelModal');
-
-        fetch(CTX + '/admin/crew/inspection?crewIdx=' + idx)
-            .then(r => r.json())
-            .then(d => {
-                if(d.success) {
-                    document.getElementById('apPosts').textContent = (d.postCount || 0) + '건';
-                    document.getElementById('apReports').textContent = (d.reportCount || 0) + '건';
-                }
-            });
-    }
-
-    document.getElementById('btnDeleteCrew').addEventListener('click', function() {
-        if(!confirm('정말 이 동네모임을 강제 해산(삭제)하시겠습니까?')) return;
+    function openCrewDetail(crewIdx, name) {
+        document.getElementById('cwTitle').textContent = name || '불러오는 중...';
+        document.getElementById('cwContent').innerHTML = '<div style="text-align:center;padding:20px 0;"><i class="ri-loader-4-line ri-spin" style="font-size:24px;color:#94A3B8;"></i></div>';
         
-        fetch(CTX + '/admin/crew/delete', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ crewIdx: targetCrewIdx })
-        }).then(r => r.json()).then(d => {
-            if(d.success) {
-                alert('해산 처리되었습니다.');
-                location.reload();
-            } else {
-                alert('처리 실패: ' + d.msg);
-            }
+        cdOverlay.classList.add('show');
+        requestAnimationFrame(() => {
+            cdBox.style.opacity = '1';
+            cdBox.style.transform = 'translateY(0) scale(1)';
         });
-    });
 
-    document.querySelectorAll('.premium-overlay').forEach(el => {
-        el.addEventListener('click', e => {
-            if(e.target === el) closeModal(el.id);
-        });
+        // 실제 모임 데이터 연동
+        fetch(CTX + '/admin/crew/detail?crewIdx=' + crewIdx)
+            .then(r => r.json())
+            .then(d => {
+                if(!d.success) { document.getElementById('cwContent').textContent = '오류가 발생했습니다.'; return; }
+                
+                var crew = d.crew || {};
+                var posts = d.recentPosts || [];
+
+                document.getElementById('cwStatusChip').innerHTML = `<span style="padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(16,185,129,0.15);color:#10B981;border:1px solid rgba(16,185,129,0.3);"><i class="ri-checkbox-circle-line" style="margin-right:4px;"></i>활성</span>`;
+                document.getElementById('cwJoinTypeChip').innerHTML = `<span style="padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(139,92,246,0.15);color:#A78BFA;border:1px solid rgba(139,92,246,0.3);"><i class="ri-door-open-line" style="margin-right:4px;"></i>\${crew.joinType === 'free' ? '자유가입' : '승인가입'}</span>`;
+                document.getElementById('cwViewStat').innerHTML = `<i class="ri-eye-line"></i> \${crew.viewCount||0}`;
+
+                var nick = crew.hostNickname || '익명';
+                document.getElementById('cwAvatar').textContent = nick.charAt(0).toUpperCase();
+                document.getElementById('cwHostName').textContent = nick + ' (호스트)';
+                document.getElementById('cwHostSub').textContent = '생성일: ' + (crew.createdDate ? crew.createdDate.substring(0,10) : '-');
+
+                var cur = crew.currentMember || 0;
+                var max = crew.maxMember || 0;
+                var pct = max > 0 ? Math.min(Math.round(cur * 100 / max), 100) : 0;
+                document.getElementById('cwMemberProgress').innerHTML = `
+                    <div style="font-size:11px;font-weight:700;color:#64748B;margin-bottom:4px;">\${cur} / \${max}명 (\${pct}%)</div>
+                    <div style="height:6px;background:#E2E8F0;border-radius:3px;overflow:hidden;">
+                        <div style="width:\${pct}%;height:100%;background:var(--color-purple);"></div>
+                    </div>`;
+
+                document.getElementById('cwContent').innerHTML = String(crew.description || '<span style="color:#94A3B8;">소개가 없습니다.</span>').replace(/\n/g, '<br>');
+
+                if(posts.length === 0) {
+                    document.getElementById('cwPostsWrap').innerHTML = '<div style="background:#F8FAFC;border:1px dashed #E2E8F0;padding:20px;text-align:center;border-radius:12px;color:#94A3B8;font-size:13px;">게시글이 없습니다.</div>';
+                } else {
+                    document.getElementById('cwPostsWrap').innerHTML = posts.map((p, i) => `
+                        <div style="background:#fff;border:1px solid #E2E8F0;padding:12px 16px;border-radius:12px;display:flex;align-items:center;gap:12px;">
+                            <div style="width:28px;height:28px;background:#F1F5F9;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#64748B;flex-shrink:0;">\${i+1}</div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:13px;font-weight:700;color:#1E293B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\${p.title}</div>
+                                <div style="font-size:11px;color:#94A3B8;margin-top:4px;">\${p.writerNickname} · \${p.createdDate.substring(0,10)}</div>
+                            </div>
+                        </div>`).join('');
+                }
+            }).catch(() => { document.getElementById('cwContent').innerHTML = '통신 오류'; });
+    }
+
+    function closeCrewDetail() {
+        cdBox.style.opacity = '0';
+        cdBox.style.transform = 'translateY(20px) scale(0.97)';
+        setTimeout(() => cdOverlay.classList.remove('show'), 300);
+    }
+    cdOverlay.addEventListener('click', e => { if (e.target === cdOverlay) closeCrewDetail(); });
+
+    // ==========================================
+    // 2. 상태관리(눈/점검) 모달 스크립트
+    // ==========================================
+    var caOverlay = document.getElementById('crewAdminOverlay');
+    var currentCrewIdx = null;
+
+    function openAdminPanel(crewIdx) {
+        currentCrewIdx = crewIdx;
+        caOverlay.classList.add('show');
+        document.getElementById('caTitle').textContent = '정보 불러오는 중...';
+
+        fetch(CTX + '/admin/crew/inspection?crewIdx=' + crewIdx)
+            .then(r => r.json())
+            .then(d => {
+                if(!d.success) return;
+                var crew = d.crew || {};
+                
+                document.getElementById('caTitle').textContent = crew.name;
+                
+                var rows = [
+                    { label: '모임장', val: crew.hostNickname || '없음' },
+                    { label: '가입방식', val: crew.joinType === 'free' ? '자유가입' : '승인가입' },
+                    { label: '생성일자', val: crew.createdDate ? crew.createdDate.substring(0,10) : '-' },
+                    { label: '멤버/게시글 수', val: `\${crew.currentMember||0}명 / \${d.postCount||0}건` }
+                ];
+                
+                document.getElementById('caInfoList').innerHTML = rows.map((row, i) => `
+                    \${i > 0 ? '<div style="height:1px;background:#F1F5F9;"></div>' : ''}
+                    <div class="rpt-info-row">
+                        <span class="rpt-info-key">\${row.label}</span>
+                        <span class="rpt-info-val">\${row.val}</span>
+                    </div>`).join('');
+
+                document.getElementById('caActivitySummary').innerHTML = `
+                    <div style="background:#F8FAFC;padding:12px 16px;border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:13px;color:#64748B;font-weight:700;">모임 활동 참여율 지표</span>
+                        <span style="font-size:15px;color:var(--color-purple);font-weight:800;">\${d.participationRate||0}%</span>
+                    </div>`;
+            });
+    }
+
+    function closeAdminPanel() { caOverlay.classList.remove('show'); }
+    caOverlay.addEventListener('click', e => { if (e.target === caOverlay) closeAdminPanel(); });
+
+    // 강제 해산(삭제) 로직
+    document.getElementById('caDeleteBtn').addEventListener('click', function() {
+        if(!currentCrewIdx) return;
+        if(confirm('해당 동네모임을 강제 해산(삭제)하시겠습니까? 관련 데이터가 모두 지워집니다.')) {
+            fetch(CTX + '/admin/crew/delete', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ crewIdx: currentCrewIdx })
+            }).then(r => r.json()).then(d => {
+                if(d.success) {
+                    alert('정상적으로 해산되었습니다.');
+                    location.reload();
+                } else {
+                    alert('삭제 실패: ' + d.msg);
+                }
+            });
+        }
     });
 </script>
 </body>
