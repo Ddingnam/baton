@@ -150,20 +150,20 @@
         <c:if test="${not empty imageList}">
             <div class="gallery-section-inner">
             
-                    <div class="main-image-wrap">
-                        <img id="mainImage"
-                             src="${pageContext.request.contextPath}${imageList[0].imgUrl}">
-                    </div>
-            
-                    <c:if test="${imageList.size() > 1}">
-                        <div class="image-indicators">
-                            <c:forEach var="item" items="${imageList}" varStatus="st">
-                                <button class="indicator-dot ${st.index==0?'active':''}"
-                                        data-src="${item.imgUrl}"
-                                        onclick="Gallery.go(${st.index})"></button>
-                            </c:forEach>
-                        </div>
-                    </c:if>
+                   <div class="main-image-wrap">
+				    <img id="mainImage"
+				        src="${pageContext.request.contextPath}/uploads/job/${imageList[0].imgUrl}">
+					</div>
+				
+				<c:if test="${imageList.size() > 1}">
+				    <div class="image-indicators">
+				        <c:forEach var="item" items="${imageList}" varStatus="st">
+				            <button class="indicator-dot ${st.index==0?'active':''}"
+				                    data-src="${pageContext.request.contextPath}/uploads/job/${item.imgUrl}"
+				                    onclick="Gallery.go(${st.index})"></button>
+				        </c:forEach>
+				    </div>
+				</c:if>
                 </div>
             </c:if>
 

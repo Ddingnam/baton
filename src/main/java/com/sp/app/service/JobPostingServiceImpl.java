@@ -5,6 +5,7 @@ import com.sp.app.domain.dto.JobApplyDto;
 import com.sp.app.mapper.JobApplyMapper;
 import com.sp.app.mapper.JobPostingMapper;
 import com.sp.app.model.JobPosting;
+import com.sp.app.model.JobPostingImage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,17 +37,19 @@ public class JobPostingServiceImpl implements JobPostingService {
         try {
             mapper.insertPosting(dto);
 
-            if(dto.getImages() != null) {
-
+           
+            if(dto.getImages() != null && !dto.getImages().isEmpty()) {
                 for(MultipartFile mf : dto.getImages()) {
-
                     if(mf.isEmpty()) continue;
 
+                  
                     String saveFilename = storageService.upload(mf, uploadPath);
 
-                    dto.setThumbUrl(saveFilename);
+                    JobPostingImage imgDto = new JobPostingImage();
+                    imgDto.setPostingIdx(dto.getPostingIdx()); 
+                    imgDto.setImgUrl(saveFilename);          
 
-                    mapper.insertPostingImage(dto);
+                    mapper.insertPostingImage(imgDto);
                 }
             }
 
@@ -145,19 +148,35 @@ public class JobPostingServiceImpl implements JobPostingService {
 	@Override
 	public void insertJobScrap(Map<String, Object> map) throws Exception {
 	    try {
-	        mapper.insertJobScrap(map);
+	        int count = mapper.checkJobScrap(map);
+
+	        if (count == 0) {
+	            mapper.insertJobScrap(map);
+	        } else {
+	            log.info("이미 스크랩 존재 → insert 안함");
+	        }
+
 	    } catch (Exception e) {
-	        log.warn("이미 스크랩된 데이터", e);
-	        // 그냥 무시 (중복 클릭 방지)
+	        log.error("스크랩 insert 실패", e);
+	        throw e;
 	    }
 	}
 
 	@Override
+	@Transactional
 	public void deleteJobScrap(Map<String, Object> map) throws Exception {
 	    try {
-	        mapper.deleteJobScrap(map);
+	        int result = mapper.deleteJobScrap(map);
+
+	        if (result == 0) {
+	            log.warn("삭제된 데이터 없음 → 이미 없거나 조건 불일치");
+	        } else {
+	            log.info("스크랩 삭제 성공");
+	        }
+
 	    } catch (Exception e) {
-	        log.warn("스크랩 삭제 실패", e);
+	        log.error("스크랩 삭제 실패", e);
+	        throw e;
 	    }
 	}
 	
@@ -224,6 +243,17 @@ public class JobPostingServiceImpl implements JobPostingService {
 	@Override
 	public List<JobApplyDto> listApplicantsByPosting(long postingIdx) {
 	    return jobApplyMapper.listApplicantsByPosting(postingIdx);
+	}
+	
+	@Override
+	public List<JobPostingImage> listPostingImage(long postingIdx) {
+	    List<JobPostingImage> list = null;
+	    try {
+	        list = mapper.listPostingImage(postingIdx);
+	    } catch (Exception e) {
+	        log.error("listPostingImage error : ", e);
+	    }
+	    return list;
 	}
 	
 }

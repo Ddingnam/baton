@@ -1,8 +1,10 @@
 package com.sp.app.mapper;
 
+import com.sp.app.model.JobPostingImage;
 import com.sp.app.domain.dto.JobApplyDto;
 import com.sp.app.model.JobPosting;
 import org.apache.ibatis.annotations.Mapper;
+
 
 import java.sql.SQLException;
 import java.util.List;
@@ -14,9 +16,10 @@ public interface JobPostingMapper {
     void insertPosting(JobPosting dto);
     void updatePosting(JobPosting dto);
     void deletePosting(long postingIdx);
-
-    void insertPostingImage(JobPosting dto);
-    List<String> findImages(long postingIdx);
+    
+    void insertPostingImage(JobPostingImage dto);
+   // List<String> findImages(long postingIdx);
+    List<JobPostingImage> listPostingImage(long postingIdx);
     void deleteImages(long postingIdx);
      
     int dataCount(Map<String, Object> map);
@@ -32,7 +35,7 @@ public interface JobPostingMapper {
     public List<JobPosting> postListByUserIdx(long userIdx);
     
     public void insertJobScrap(Map<String, Object> map) throws SQLException;
-    public void deleteJobScrap(Map<String, Object> map) throws SQLException;
+    int deleteJobScrap(Map<String, Object> map) throws SQLException;
     public int checkJobScrap(Map<String, Object> map);
     
     public List<JobPosting> listJobScrap(long memberId);
@@ -42,5 +45,6 @@ public interface JobPostingMapper {
 	
 	List<JobApplyDto> listApplicantsByPosting(long postingIdx);
 	int updateStatusByOwner(Map<String,Object> map);
+	List<String> findImagesByPostingIdx(long postingIdx);
     
 }

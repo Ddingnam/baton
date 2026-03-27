@@ -2,6 +2,7 @@ package com.sp.app.controller;
 
 import com.sp.app.domain.dto.JobApplyDto;
 import com.sp.app.model.JobPosting;
+import com.sp.app.model.JobPostingImage;
 import com.sp.app.model.JobProfile;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.JobPostingService;
@@ -123,6 +124,9 @@ public class JobPostingController {
 	        if (dto == null) {
 	            return "redirect:/alba/list?page=" + page;
 	        }
+	        
+	        List<JobPostingImage> imageList = postingService.listPostingImage(num);
+	        model.addAttribute("imageList", imageList);
 
 	        String koreanDays = convertToKoreanDays(dto.getWorkDays());
 	        model.addAttribute("koreanDays", koreanDays);
@@ -149,6 +153,7 @@ public class JobPostingController {
 	            Map<String, Object> map = new HashMap<>();
 	            map.put("memberId", userDetails.getUserIdx());
 	            map.put("postingIdx", num);
+	            
 
 	            isUserScrap = postingService.checkJobScrap(map) > 0;
 	        }
@@ -156,6 +161,7 @@ public class JobPostingController {
 	        model.addAttribute("userScrap", isUserScrap);
 	        model.addAttribute("dto", dto);
 	        model.addAttribute("page", page);
+	        
 
 	        if (userDetails != null) {
 	            List<JobProfile> resumeList = jobProfileService.listJobProfile(userDetails.getUserIdx());
@@ -320,7 +326,7 @@ public class JobPostingController {
 
 	    try {
 	        Map<String, Object> map = new HashMap<>();
-	        map.put("memberId", userDetails.getUserIdx()); 
+	        map.put("memberId", userDetails.getUserIdx());  
 	        map.put("postingIdx", postingIdx);
 
 	        if (isScrap) {

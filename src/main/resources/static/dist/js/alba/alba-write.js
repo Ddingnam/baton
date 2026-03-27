@@ -210,17 +210,28 @@ function updateProgress() {
 }
 
 function submitForm() {
-	  console.log("lat:", document.getElementById('latInput').value);
-	  console.log("lng:", document.getElementById('lngInput').value); // 일단 테스트용으로 넣어봄	
+  console.log("lat:", document.getElementById('latInput').value);
+  console.log("lng:", document.getElementById('lngInput').value);
 	
   const title = document.getElementById('title').value.trim();
   const pay = document.getElementById('pay').value;
   const loc = document.getElementById('location').value.trim();
   const days = document.getElementById('workDaysHidden').value;
+  
   if (!title || !pay || !days || !loc) {
     alert('필수 항목을 모두 입력해주세요.');
     return;
   }
+  
+  const dataTransfer = new DataTransfer();
+  uploadedFiles.forEach(file => {
+      dataTransfer.items.add(file);
+  });
+  
+  // 💡💡💡 [추가된 부분] 묶어둔 파일들을 실제 input 태그의 files 속성에 덮어씌웁니다 💡💡💡
+  document.getElementById('imageInput').files = dataTransfer.files;
+  
+  // 이제 파일이 담겼으니 폼 전송!
   document.getElementById('writeForm').submit();
 }
 

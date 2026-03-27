@@ -475,32 +475,52 @@ function normalizeSido(sido) {
 }
 
 function toggleScrap(event, postingIdx, btn) {
-	event.stopPropagation();
-	const isAdding = !btn.classList.contains('active');
+    event.stopPropagation();
 
-	fetch(`${CONTEXT_PATH}/alba/scrap`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-		body: `postingIdx=${postingIdx}&isScrap=${isAdding}`
-	})
-	.then(res => res.json())
-	.then(data => {
-		if (data.status === "login_required") {
-			alert("로그인이 필요한 기능입니다.");
-			location.href = CONTEXT_PATH + "/member/login";
-        // 💡 내 공고 스크랩 방지 알림 추가!
-		} else if (data.status === "self_scrap") {
-            alert("본인이 작성한 공고는 찜(스크랩)할 수 없습니다.");
-        } else if (data.status === "success") {
-			btn.classList.toggle('active');
-			if (isAdding) {
-				myScrapIds.push(Number(postingIdx));
-			} else {
-				myScrapIds = myScrapIds.filter(id => id !== Number(postingIdx));
-			}
+    if (btn.disabled) return;
+    btn.disabled = true;
+
+    const isAdding = !btn.classList.contains('active');
+
+    fetch(`${CONTEXT_PATH}/alba/scrap`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `postingIdx=${postingIdx}&isScrap=${isAdding}`
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.status === "login_required") {
+            alert("로그인이 필요합니다.");
+            location.href = CONTEXT_PATH + "/member/login";
+            return;
+        }
+
+		if (data.status === "duplicate") {
+		    btn.classList.add('active'); // 이미 스크랩됨 → active로 강제 보정
+		    if (!myScrapIds.includes(Number(postingIdx))) {
+		        myScrapIds.push(Number(postingIdx));
+		    }
+		    return;
 		}
-	})
-	.catch(err => console.error(err));
+
+        if (data.status === "success") {
+            btn.classList.toggle('active');
+
+            if (isAdding) {
+                if (!myScrapIds.includes(Number(postingIdx))) {
+                    myScrapIds.push(Number(postingIdx));
+                }
+            } else {
+				myScrapIds = myScrapIds.filter(id => id !== Number(postingIdx));
+				btn.classList.remove('active'); // toggle 대신 명시적으로 제거
+            }
+        }
+    })
+    .catch(err => console.error(err))
+    .finally(() => {
+        btn.disabled = false; // ✅ 다시 활성화
+    });
 }
 
 /* ===== 동네 범위 슬라이더 ===== */

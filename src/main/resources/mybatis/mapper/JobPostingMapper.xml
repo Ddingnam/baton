@@ -53,18 +53,16 @@
 </insert>
 
     <insert id="insertPostingImage">
-        INSERT INTO job_posting_image(
-            img_idx,
-            posting_idx,
-            img_url,
-            created_date
-        ) VALUES(
-            seq_job_posting_img.NEXTVAL,
-            #{postingIdx},
-            #{imgUrl},
-            SYSDATE
-        )
-    </insert>
+	    INSERT INTO job_posting_image(
+	        posting_idx,
+	        img_url,
+	        created_date
+	    ) VALUES(
+	        #{postingIdx},
+	        #{imgUrl},
+	        SYSDATE
+	    )
+	</insert>
 
     <update id="updatePosting" parameterType="com.sp.app.model.JobPosting">
     UPDATE job_posting
@@ -168,11 +166,14 @@
         WHERE posting_idx = #{postingIdx}
     </update>
 
-    <select id="findImagesByPostingIdx" resultType="String">
-        SELECT img_url
-        FROM job_posting_image
-        WHERE posting_idx = #{postingIdx}
-    </select>
+    <select id="listPostingImage" parameterType="long" resultType="com.sp.app.model.JobPostingImage">
+	    SELECT 
+	        img_idx AS imgIdx, 
+	        posting_idx AS postingIdx, 
+	        img_url AS imgUrl
+	    FROM job_posting_image
+	    WHERE posting_idx = #{postingIdx}
+	</select>
 
     <select id="listPostingByArea" parameterType="map" resultType="com.sp.app.model.JobPosting">
     SELECT
@@ -245,14 +246,15 @@
         ORDER BY created_date DESC
     </select>
     
-		 <insert id="insertJobScrap" parameterType="map">
+		<insert id="insertJobScrap" parameterType="map">
 		    INSERT INTO JOB_SCRAP(MEMBER_ID, POSTING_IDX) 
 		    VALUES (#{memberId}, #{postingIdx})
 		</insert>
 		
 		<delete id="deleteJobScrap" parameterType="map">
 		    DELETE FROM JOB_SCRAP 
-		    WHERE MEMBER_ID = #{memberId} AND POSTING_IDX = #{postingIdx}
+		    WHERE MEMBER_ID = #{memberId}
+		    AND POSTING_IDX = #{postingIdx}
 		</delete>
 		
 		<select id="checkJobScrap" parameterType="map" resultType="int">
