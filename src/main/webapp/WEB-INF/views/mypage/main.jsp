@@ -341,7 +341,7 @@
 					                    </c:when>
 					                    <c:otherwise>
 					                        <c:forEach var="item" items="${tradeList}">
-					                            <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/main?productIdx=${item.productIdx}'">
+					                            <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/main#/article/${item.productIdx}'">
 					                                <div class="item-thumb">
 					                                    <c:choose>
 													        <c:when test="${not empty item.imageList}">
@@ -390,7 +390,7 @@
 							            </c:when>
 							            <c:otherwise>
 							                <c:forEach var="item" items="${buyList}">
-							                    <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/main?productIdx=${item.productIdx}'">
+							                    <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/main#/article/${item.productIdx}'">
 							                        <div class="item-thumb">
 							                            <c:if test="${not empty item.imageList}">
 							                                <img src="${pageContext.request.contextPath}/uploads/trade/${item.imageList[0].saveName}" alt="상품이미지">
@@ -433,7 +433,7 @@
 							            </c:when>
 							            <c:otherwise>
 							                <c:forEach var="item" items="${wishList}">
-							                    <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/main?productIdx=${item.productIdx}'">
+							                    <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/main#/article/${item.productIdx}'">
 							                        <div class="item-thumb">
 							                            <c:choose>
 							                                <c:when test="${not empty item.imageList}">

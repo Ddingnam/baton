@@ -200,7 +200,7 @@
         .then(data => {
             if (data.state === 'true') {
                 alert(data.msg); 
-                location.href = '${pageContext.request.contextPath}/trade/main?productIdx=${product.productIdx}'; 
+                location.href = '${pageContext.request.contextPath}/trade/main#/article/${product.productIdx}'; 
             } else {
                 alert(data.msg); 
                 payBtn.disabled = false;
