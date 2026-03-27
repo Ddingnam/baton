@@ -590,12 +590,25 @@ public class MemberServiceImpl implements MemberService {
 					case 5: badge.setCurrentCount(pollCount); badge.setTargetCount(5); badge.setIconImage("ri-ball-pen-fill"); break;
 					case 6: badge.setCurrentCount(chargeCount); badge.setTargetCount(1); badge.setIconImage("ri-money-dollar-circle-fill"); break;
 					case 7: badge.setCurrentCount(scrapCount); badge.setTargetCount(5); badge.setIconImage("ri-briefcase-4-fill"); break;
+					case 8: badge.setCurrentCount(tradeCount); badge.setTargetCount(10); badge.setIconImage("ri-store-2-fill"); break; 
+                    case 9: badge.setCurrentCount(reviewCount); badge.setTargetCount(15); badge.setIconImage("ri-award-fill"); break; 
+                    case 10: badge.setCurrentCount(postCount); badge.setTargetCount(50); badge.setIconImage("ri-fire-fill"); break; 
+                    case 11: badge.setCurrentCount(replyCount); badge.setTargetCount(100); badge.setIconImage("ri-chat-smile-3-fill"); break; 
+                    case 12: badge.setCurrentCount(pollCount); badge.setTargetCount(20); badge.setIconImage("ri-pie-chart-2-fill"); break;
 				}
 				
-				if (badge.getCurrentCount() > badge.getTargetCount()) {
-					badge.setCurrentCount(badge.getTargetCount());
-				}
-				badge.setProgressPercent((int) ((double) badge.getCurrentCount() / badge.getTargetCount() * 100));
+				if (badge.getCurrentCount() >= badge.getTargetCount()) {
+                    badge.setCurrentCount(badge.getTargetCount()); 
+                    
+                    if (!badge.isAcquired()) { 
+                        Map<String, Object> param = new HashMap<>();
+                        param.put("userIdx", userIdx);
+                        param.put("badgeId", badge.getBadgeId());
+                        try { mapper.insertUserBadge(param); } catch(Exception ignored) {}
+                        badge.setAcquired(true); 
+                    }
+                }
+                badge.setProgressPercent((int) ((double) badge.getCurrentCount() / badge.getTargetCount() * 100));
 			}
 
 			allBadges.sort((b1, b2) -> {

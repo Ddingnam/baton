@@ -16,86 +16,23 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/mypage/mypage_left.css?v=final">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/mypage/mypage_main.css?v=final">
 
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/mypage/mypage_badge.css?v=final">
+
 <style>
-    .mp-profile-banner {
-        background: #fff;
-        border-radius: 28px;
-        padding: 45px 50px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.03);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 35px;
-        position: relative;
-        overflow: hidden;
-        gap: 80px; 
-    }
+    .mp-profile-banner { background: #fff; border-radius: 28px; padding: 45px 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; position: relative; overflow: hidden; gap: 80px; }
     .pb-left { display: flex; align-items: center; gap: 30px; flex: 1; max-width: 60%; }
-    .pb-avatar {
-        width: 90px; height: 90px; border-radius: 28px; background: #F2F4F6;
-        display: flex; justify-content: center; align-items: center;
-        font-size: 45px; color: #D1D6DB; box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
-        border: 1px solid rgba(0,0,0,0.05); overflow: hidden;
-    }
+    .pb-avatar { width: 90px; height: 90px; border-radius: 28px; background: #F2F4F6; display: flex; justify-content: center; align-items: center; font-size: 45px; color: #D1D6DB; box-shadow: inset 0 2px 6px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); overflow: hidden; }
     .pb-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .pb-info { flex: 1; max-width: 500px; }
-    
     .pb-name-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
     .pb-name { font-size: 1.6rem; font-weight: 800; color: #191F28; margin: 0; letter-spacing: -0.7px; }
-    .rep-badge {
-        padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 800;
-        display: inline-flex; align-items: center; gap: 4px;
-    }
-    
-    .pb-desc { 
-        font-size: 0.95rem; color: #6B7684; font-weight: 500; 
-        display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 18px; margin-top: 5px; 
-    }
+    .rep-badge { padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
+    .pb-desc { font-size: 0.95rem; color: #6B7684; font-weight: 500; display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; margin-top: 5px; }
     .pb-desc strong { font-weight: 800; font-size: 1.1rem; }
-
     .baton-track-wrap { width: 100%; position: relative; padding-top: 15px; }
     .baton-track-bg { width: 100%; height: 12px; background: #E5E8EB; border-radius: 12px; position: relative; }
-    .baton-track-fill {
-        height: 100%; border-radius: 10px; position: relative;
-        transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1); 
-    }
-    .runner-icon {
-        position: absolute; right: -18px; top: -14px;
-        width: 38px; height: 38px; background: #fff; border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        border: 3px solid; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        z-index: 2;
-    }
-
-    .badge-grid { display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; }
-    .badge-item {
-        background: #fff; border: 1px solid rgba(0,0,0,0.06); border-radius: 20px;
-        padding: 16px 20px; display: flex; align-items: center; gap: 14px;
-        transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); width: calc(33.333% - 11px);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.02); 
-    }
-    .badge-item.locked { filter: grayscale(100%); opacity: 0.5; }
-    .badge-item.acquired { border-color: #3182F6; box-shadow: 0 4px 15px rgba(49,130,246,0.1); }
-    .badge-item:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-color: #3182F6; }
-    .badge-icon {
-        width: 48px; height: 48px; border-radius: 50%; background: #F4F6F8;
-        display: flex; align-items: center; justify-content: center; font-size: 24px;
-        color: #191F28;
-    }
-    .badge-info { flex: 1; }
-    .badge-info h4 { margin: 0 0 4px 0; font-size: 1rem; font-weight: 800; color: #191F28; letter-spacing: -0.3px; }
-    .badge-info p { margin: 0; font-size: 0.8rem; color: #8B95A1; font-weight: 500; }
-
-    .badge-progress-wrap { margin-top: 8px; display: flex; align-items: center; gap: 8px; }
-    .badge-progress-bar { flex: 1; height: 6px; background: #E5E8EB; border-radius: 4px; overflow: hidden; }
-    .badge-progress-fill { height: 100%; background: #3182F6; border-radius: 4px; transition: width 0.5s ease; }
-    .badge-progress-text { font-size: 0.75rem; color: #8B95A1; font-weight: 700; width: 35px; text-align: right; }
-    
-    .badge-empty-box { width: 100%; padding: 30px; text-align: center; background: #F9FAFB; border-radius: 16px; border: 1px dashed #E5E8EB; margin-bottom: 15px; }
-    .badge-empty-box p { margin: 0; color: #6B7684; font-weight: 600; font-size: 0.95rem; }
-    .badge-empty-box span { display: block; font-size: 0.8rem; color: #8B95A1; margin-top: 4px; }
-    .badge-empty { width: 100%; text-align: center; padding: 40px 0; background: #F9FAFB; border-radius: 16px; color: #8B95A1; font-size: 0.95rem; font-weight: 500; }
+    .baton-track-fill { height: 100%; border-radius: 10px; position: relative; transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .runner-icon { position: absolute; right: -18px; top: -14px; width: 38px; height: 38px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); z-index: 2; }
 </style>
 </head>
 <body>
@@ -193,7 +130,7 @@
                         <div class="list-card mb-24" style="background: transparent; box-shadow: none; padding: 0;">
                             <div class="lc-header" style="margin-bottom: 5px;">
                                 <h3>나의 러너 배지 🏅</h3>
-                                <a href="javascript:void(0);" onclick="document.getElementById('badgeAllModal').style.display='flex'" class="theme-link">전체보기 <i class="ri-arrow-right-s-line"></i></a>
+                                <a href="javascript:void(0);" onclick="openBadgeModal()" class="theme-link">전체보기 <i class="ri-arrow-right-s-line"></i></a>
                             </div>
                             
                             <c:set var="acquiredCount" value="0" />
@@ -829,37 +766,43 @@
 		</main>
 	</div>
 
-	<div id="badgeAllModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 99999;" onclick="if(event.target===this) this.style.display='none'">
-        <div class="modal-content" style="background: #fff; border-radius: 24px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #191F28; padding-bottom: 15px; margin-bottom: 20px;">
-                <h3 style="margin:0; font-size: 1.3rem; font-weight: 800;">전체 배지 목록</h3>
-                <button type="button" style="background:none; border:none; font-size:24px; cursor:pointer; color: #191F28;" onclick="document.getElementById('badgeAllModal').style.display='none'"><i class="ri-close-line"></i></button>
-            </div>
-            
-            <div style="display: flex; flex-direction: column; gap: 15px;">
-                <c:forEach var="badge" items="${badgeList}">
-                    <div class="badge-item ${badge.acquired ? 'acquired' : 'locked'}" style="width: 100%; display: flex; align-items: center; gap: 14px; padding: 16px 20px; border: 1px solid rgba(0,0,0,0.06); border-radius: 20px; ${badge.acquired ? 'border-color: #3182F6; box-shadow: 0 4px 15px rgba(49,130,246,0.1);' : 'filter: grayscale(100%); opacity: 0.5;'}">
-                        <div class="badge-icon" style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; ${badge.acquired ? 'color: #3182F6; background: #E8F3FF;' : 'color: #191F28; background: #F4F6F8;'}">
-                            <i class="${badge.iconImage}"></i>
-                        </div>
-                        <div class="badge-info" style="flex: 1;">
-                            <h4 style="margin: 0 0 4px 0; font-size: 1rem; font-weight: 800; color: #191F28;">${badge.badgeName}</h4>
-                            <p style="margin: 0; font-size: 0.8rem; color: #8B95A1; font-weight: 500;">${badge.description}</p>
-                            <div class="badge-progress-wrap" style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
-                                <div class="badge-progress-bar" style="flex: 1; height: 6px; background: #E5E8EB; border-radius: 4px; overflow: hidden;">
-                                    <div class="badge-progress-fill" style="height: 100%; width: ${badge.progressPercent}%; ${badge.acquired ? 'background:#00B98D;' : 'background:#3182F6;'}"></div>
-                                </div>
-                                <span class="badge-progress-text" style="font-size: 0.75rem; color: #8B95A1; font-weight: 700; width: 35px; text-align: right;">${badge.currentCount}/${badge.targetCount}</span>
-                            </div>
-                        </div>
-                        <c:if test="${badge.acquired}">
-                            <div style="color: #00B98D; font-weight: 800; font-size: 1.5rem; transform: rotate(-15deg); margin-left: 20px;"><i class="ri-verified-badge-fill"></i></div>
-                        </c:if>
-                    </div>
-                </c:forEach>
-            </div>
-        </div>
-    </div>
+    <div id="badgeAllModal" class="premium-modal-overlay">
+	    <div class="premium-modal-content">
+	        <div class="premium-modal-header">
+	            <h3>🏆 바톤터치 전체 배지 컬렉션</h3>
+	            <button type="button" onclick="closeBadgeModal()"><i class="ri-close-line"></i></button>
+	        </div>
+	        
+	        <div class="premium-modal-body">
+	            <div class="premium-badge-grid">
+	                <c:forEach var="badge" items="${badgeList}">
+	                    <div class="p-badge-card ${badge.acquired ? 'acquired' : 'locked'}">
+	                        
+	                        <div class="p-badge-icon">
+	                            <i class="${badge.iconImage}"></i>
+	                            <c:if test="${badge.acquired}">
+	                                <div class="p-badge-check"><i class="ri-checkbox-circle-fill"></i></div>
+	                            </c:if>
+	                        </div>
+	                        
+	                        <div style="flex-grow: 1;">
+	                            <div class="p-badge-title">${badge.badgeName}</div>
+	                            <div class="p-badge-desc">${badge.description}</div>
+	                        </div>
+	                        
+	                        <div class="p-progress-wrap">
+	                            <div class="p-progress-bar">
+	                                <div class="p-progress-fill" style="width: ${badge.progressPercent}%;"></div>
+	                            </div>
+	                            <div class="p-progress-text">${badge.currentCount} / ${badge.targetCount}</div>
+	                        </div>
+	                        
+	                    </div>
+	                </c:forEach>
+	            </div>
+	        </div>
+	    </div>
+	</div>
     
 	<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 	<jsp:include page="/WEB-INF/views/payment/chargeModal.jsp" />
@@ -870,6 +813,8 @@
 	<script src="${pageContext.request.contextPath}/dist/js/util/timeAgo.js"></script>
 	<script>const CONTEXT_PATH = '${pageContext.request.contextPath}';</script>
 	<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_history.js"></script>
+	
+	<script src="${pageContext.request.contextPath}/dist/js/mypage/mypage_badge.js"></script>
 	
 </body>
 </html>

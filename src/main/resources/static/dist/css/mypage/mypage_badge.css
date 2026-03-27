@@ -1,0 +1,48 @@
+@charset "UTF-8";
+.badge-grid { display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; }
+.badge-item { background: #fff; border: 1px solid rgba(0,0,0,0.06); border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; gap: 14px; transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); width: calc(33.333% - 11px); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+.badge-item.locked { filter: grayscale(100%); opacity: 0.5; }
+.badge-item.acquired { border-color: #3182F6; box-shadow: 0 4px 15px rgba(49,130,246,0.1); }
+.badge-item:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-color: #3182F6; }
+.badge-icon { width: 48px; height: 48px; border-radius: 50%; background: #F4F6F8; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #191F28; }
+.badge-info { flex: 1; }
+.badge-info h4 { margin: 0 0 4px 0; font-size: 1rem; font-weight: 800; color: #191F28; letter-spacing: -0.3px; }
+.badge-info p { margin: 0; font-size: 0.8rem; color: #8B95A1; font-weight: 500; }
+.badge-progress-wrap { margin-top: 8px; display: flex; align-items: center; gap: 8px; }
+.badge-progress-bar { flex: 1; height: 6px; background: #E5E8EB; border-radius: 4px; overflow: hidden; }
+.badge-progress-fill { height: 100%; background: #3182F6; border-radius: 4px; transition: width 0.5s ease; }
+.badge-progress-text { font-size: 0.75rem; color: #8B95A1; font-weight: 700; width: 35px; text-align: right; }
+.badge-empty-box { width: 100%; padding: 30px; text-align: center; background: #F9FAFB; border-radius: 16px; border: 1px dashed #E5E8EB; margin-bottom: 15px; }
+.badge-empty-box p { margin: 0; color: #6B7684; font-weight: 600; font-size: 0.95rem; }
+.badge-empty-box span { display: block; font-size: 0.8rem; color: #8B95A1; margin-top: 4px; }
+.badge-empty { width: 100%; text-align: center; padding: 40px 0; background: #F9FAFB; border-radius: 16px; color: #8B95A1; font-size: 0.95rem; font-weight: 500; }
+
+.premium-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 9999; }
+.premium-modal-content { background: #fff; width: 1050px; max-width: 95%; max-height: 85vh; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: popUp 0.3s ease-out; }
+
+@keyframes popUp { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+.premium-modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; background: #f8f9fa; border-bottom: 1px solid #eee; }
+.premium-modal-header h3 { margin: 0; font-size: 20px; font-weight: 700; color: #222; }
+.premium-modal-header button { background: none; border: none; font-size: 24px; color: #888; cursor: pointer; transition: 0.2s; }
+.premium-modal-header button:hover { color: #ff5e00; transform: rotate(90deg); }
+.premium-modal-body { padding: 30px; overflow-y: auto; }
+
+.premium-badge-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
+
+.p-badge-card { background: #fff; border: 1px solid #eaeaea; border-radius: 16px; padding: 20px 15px; text-align: center; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: space-between; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+.p-badge-card.acquired { border-color: #ffaa00; box-shadow: 0 8px 20px rgba(255, 170, 0, 0.15); transform: translateY(-5px); }
+.p-badge-card.acquired .p-badge-icon { background: linear-gradient(135deg, #ffaa00, #ff5e00); color: #fff; }
+.p-badge-card.acquired .p-badge-title { color: #ff5e00; }
+.p-badge-card.locked { filter: grayscale(100%); opacity: 0.6; }
+.p-badge-card.locked .p-badge-icon { background: #f0f0f0; color: #aaa; }
+
+.p-badge-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 28px; margin-bottom: 15px; position: relative; }
+.p-badge-check { position: absolute; bottom: -5px; right: -5px; background: #fff; color: #ff5e00; border-radius: 50%; font-size: 20px; padding: 2px; line-height: 1; }
+.p-badge-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #333; }
+.p-badge-desc { font-size: 12px; color: #666; margin-bottom: 15px; line-height: 1.4; word-break: keep-all; }
+
+.p-progress-wrap { width: 100%; }
+.p-progress-bar { width: 100%; height: 8px; background: #eee; border-radius: 10px; overflow: hidden; margin-bottom: 5px; }
+.p-progress-fill { height: 100%; background: linear-gradient(90deg, #ffaa00, #ff5e00); border-radius: 10px; transition: width 0.5s ease-in-out; }
+.p-progress-text { font-size: 11px; font-weight: 600; color: #888; }
