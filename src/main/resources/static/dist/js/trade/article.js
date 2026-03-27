@@ -180,6 +180,27 @@ function useTradeArticle(shared) {
 			showBatonToast('상태가 변경되었습니다.');
 		}
     }
+	
+	const confirmModal = reactive({
+		show: false,
+		title: '',
+		message: '',
+		type: 'info',
+		isConfirm: false,
+	    onConfirm: null
+	});
+
+	const openConfirm = (options) => {
+		confirmModal.title = options.title || '알림';
+	    confirmModal.message = options.message || '';
+	    confirmModal.type = options.type || 'info';
+	    confirmModal.isConfirm = options.isConfirm || false;
+	    confirmModal.onConfirm = () => {
+	    	if (options.onConfirm) options.onConfirm();
+	        confirmModal.show = false;
+		};
+	    confirmModal.show = true;
+	};
 
     async function pullUp() {
         if (article.value?.tradeStatus === '판매완료') { 
@@ -188,48 +209,45 @@ function useTradeArticle(shared) {
 				return;
 			}
 		}
-        if (!confirm('이 게시글을 목록 맨 위로 올리시겠습니까?')) return;
-		
-        const res = await fetch('/api/trade/pullUp', { 
-			method: 'POST', 
-			headers: csrfHeaders(), 
-			body: new URLSearchParams({ productIdx: article.value.productIdx }) 
+		openConfirm({
+			title: '게시글 끌어올리기',
+			message: '이 게시글을 목록 맨 위로 올리시겠습니까?',
+			isConfirm: true,
+			onConfirm: async () => {
+				const res = await fetch('/api/trade/pullUp', { 
+					method: 'POST', 
+		            headers: csrfHeaders(), 
+		            body: new URLSearchParams({ productIdx: article.value.productIdx }) 
+		        });
+		        const data = await res.json();
+		        showBatonToast(data.status === 'success' ? '게시글이 맨 위로 올라갔습니다!' : (data.message||'실패'));
+			}
 		});
-		
-        const data = await res.json();
-        if (typeof showBatonToast === 'function') {
-			showBatonToast(data.status === 'success' ? '게시글이 맨 위로 올라갔습니다!' : (data.message||'끌어올리기 실패'));
-		}
     }
 
 	async function doDelete() {
-		if (!confirm('정말 삭제하시겠습니까?\n삭제된 게시글은 복구할 수 없습니다.')) return;
-
-		try {
-			const res = await fetch('/api/trade/delete', {
-				method: 'POST',
-				headers: csrfHeaders(),
-				body: new URLSearchParams({ productIdx: article.value.productIdx })
-	        });
-
-	        const data = await res.json();
-
-	        if (data.status === 'success') {
-	            if (typeof showBatonToast === 'function') {
-					showBatonToast('게시글이 삭제되었습니다.');
-	            }
-	            if (shared.router) {
-	                shared.router.push('/');
-	            } else {
-	                location.href = '/trade/main';
-	            }
-	        } else {
-	            showBatonToast('삭제에 실패했습니다: ' + (data.message || '알 수 없는 오류'));
-	        }
-		} catch (e) {
-			console.error('삭제 오류:', e);
-			showBatonToast('삭제 중 오류가 발생했습니다.');
-		}
+		openConfirm({
+			title: '게시글 삭제',
+			message: '정말 삭제하시겠습니까?<br><span style="color:#ff4d4f">삭제된 게시글은 복구할 수 없습니다.</span>',
+			type: 'danger',
+			isConfirm: true,
+			onConfirm: async () => {
+				try {
+					const res = await fetch('/api/trade/delete', {
+						method: 'POST',
+						headers: csrfHeaders(),
+						body: new URLSearchParams({ productIdx: article.value.productIdx })
+		            });
+					const data = await res.json();
+					if (data.status === 'success') {
+						showBatonToast('게시글이 삭제되었습니다.');
+		                shared.router ? shared.router.push('/') : location.href = '/trade/main';
+					} else {
+		                showBatonToast('삭제 실패: ' + (data.message || '오류'));
+		            }
+				} catch (e) { showBatonToast('삭제 중 오류 발생'); }
+			}
+		});
 	}
 	
     function openChatList() { window.open('/chat/tradeList?tradeIdx=' + article.value.productIdx, 'chatList', 'width=450,height=850,left=200,top=100,scrollbars=no,resizable=yes'); }
@@ -254,7 +272,7 @@ function useTradeArticle(shared) {
 
     async function submitShipping() {
         if (!shipping.trackingNumber.trim()) { 
-			alert('운송장 번호를 입력해주세요.'); 
+			showBatonToast('운송장 번호를 입력해주세요.'); 
 			return; 
 		}
         const res  = await fetch('/escrow/shipping', { 
@@ -263,60 +281,65 @@ function useTradeArticle(shared) {
 			body: new URLSearchParams({ productIdx: article.value.productIdx, deliveryCompany: shipping.company, trackingNumber: shipping.trackingNumber }) 
 		});
         const data = await res.json();
-        alert(data.message);
+        showBatonToast(data.message);
         if (data.state === 'true') location.reload();
     }
 
     async function cancelTrade() {
-        if (!confirm('정말 거래를 취소하시겠습니까?')) return;
-		
-        const res  = await fetch('/escrow/cancel', { 
-			method: 'POST', 
-			headers: csrfHeaders(), 
-			body: new URLSearchParams({ productIdx: article.value.productIdx }) 
+		openConfirm({
+			title: '거래 취소',
+		    message: '정말 거래를 취소하시겠습니까?',
+		    type: 'danger',
+		    isConfirm: true,
+		    onConfirm: async () => {
+		    	const res = await fetch('/escrow/cancel', { 
+					method: 'POST', 
+					headers: csrfHeaders(), 
+					body: new URLSearchParams({ productIdx: article.value.productIdx }) 
+				});
+				
+		        const data = await res.json();
+				showBatonToast(data.message);
+				if (data.state === 'true') location.reload();
+			}
 		});
-		
-        const data = await res.json();
-        alert(data.message);
-        if (data.state === 'true') location.reload();
     }
 
     async function confirmPurchase() {
-        if (!confirm('물건을 무사히 받으셨나요? 구매 확정 시 환불이 불가능합니다.')) return;
-        const res  = await fetch('/escrow/confirm', { 
-			method: 'POST', 
-			headers: csrfHeaders(), 
-			body: new URLSearchParams({ productIdx: article.value.productIdx }) 
+		openConfirm({
+			title: '구매 확정',
+		    message: '물건을 무사히 받으셨나요?<br>구매 확정 시 환불이 불가능합니다.',
+		    type: 'success',
+		    isConfirm: true,
+		    onConfirm: async () => {
+		    	const res = await fetch('/escrow/confirm', { 
+					method: 'POST', 
+					headers: csrfHeaders(), 
+					body: new URLSearchParams({ productIdx: article.value.productIdx }) 
+				});
+		        const data = await res.json();
+				showBatonToast(data.message);
+				if (data.state === 'true') location.href = '/review/write?productIdx=' + article.value.productIdx + '&role=BUYER';
+			}
 		});
-        const data = await res.json();
-        alert(data.message);
-        if (data.state === 'true') location.href = '/review/write?productIdx=' + article.value.productIdx + '&role=BUYER';
     }
 
-    function requestRefund() {
-        if (confirm('반품 및 환불은 판매자와의 채팅을 통해 협의해야 합니다. 채팅을 시작하시겠습니까?'))
-            openChatRoom();
-    }
-
-    async function submitReport() {
-        if (!report.type) { alert('신고 사유를 선택해주세요.'); return; }
-        await fetch('/report/submit', { 
-			method: 'POST', 
-			headers: csrfHeaders(), 
-			body: new URLSearchParams({ 
-				domainType: 'TRADE', 
-				targetIdx: article.value.productIdx, 
-				reportedUserIdx: article.value.userIdx, 
-				reportType: report.type, 
-				content: report.content 
-			}) 
+	function requestRefund() {
+		openConfirm({
+	    	title: '반품/환불 안내',
+	        message: '반품 및 환불은 판매자와의 채팅을 통해 협의해야 합니다.<br>채팅을 시작하시겠습니까?',
+	        isConfirm: true,
+	        onConfirm: () => openChatRoom()
 		});
-		
-        alert('신고가 접수되었습니다.');
-        reportOpen.value = false; 
-		report.type = ''; 
-		report.content = '';
-    }
+	}
+	
+	function submitReport() {
+		if (typeof window.openReportModal === 'function') {
+			window.openReportModal('TRADE', article.value.productIdx, article.value.userIdx);
+		} else {
+			showBatonToast('신고 사유를 선택해주세요.');
+		}
+	}
 
     return {
         article, articleImages, articleTags, escrowInfo,
@@ -324,7 +347,7 @@ function useTradeArticle(shared) {
         currentImg, mainImgSrc, lightboxOpen, lightboxIdx, lightboxSrc,
         statusOpen, shippingOpen, reportOpen, shipping, report, articleStatusLabel,
         loadArticle, openLightbox, prevImg, nextImg, lightboxPrev, lightboxNext,
-        toggleWishArticle, updateStatus, pullUp, doDelete,
+        toggleWishArticle, updateStatus, confirmModal, openConfirm, pullUp, doDelete,
         openChatList, openChatRoom, shareArticle, goToCheckout, goToMyPage, goToTradePage,
         submitShipping, cancelTrade, confirmPurchase, requestRefund, submitReport,
         formatTimeAgo

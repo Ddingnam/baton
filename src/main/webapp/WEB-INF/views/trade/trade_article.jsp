@@ -111,7 +111,7 @@
                             </template>
                             <template v-else>
                                 <button class="ta-seller-btn" @click="goToTradePage(article.userIdx)">프로필 보기</button>
-                                <button type="button" class="ta-report-btn" @click="reportOpen = true">
+                                <button type="button" class="ta-report-btn" @click="submitReport">
                                     <i class="ri-alarm-warning-line"></i><span>신고</span>
                                 </button>
                             </template>
@@ -244,35 +244,25 @@
                 </div>
             </div>
 
-            <!-- 신고 모달 -->
-            <div id="reportModal" class="report-modal-overlay" v-show="reportOpen" @click.self="reportOpen = false">
-                <div class="report-modal-sheet">
-                    <div class="report-modal-head">
-                        <span class="report-modal-title"><i class="ri-alarm-warning-line"></i> 신고하기</span>
-                        <button type="button" class="report-modal-close" @click="reportOpen = false"><i class="ri-close-line"></i></button>
-                    </div>
-                    <div class="report-modal-body">
-                        <p class="report-modal-desc">신고 사유를 선택해주세요. 허위 신고는 제재를 받을 수 있습니다.</p>
-                        <div class="report-type-list">
-                            <label class="report-type-item"><input type="radio" name="reportType" value="스팸" v-model="report.type"><span class="report-type-label"><i class="ri-spam-line"></i> 스팸 / 광고</span></label>
-                            <label class="report-type-item"><input type="radio" name="reportType" value="욕설/비방" v-model="report.type"><span class="report-type-label"><i class="ri-emotion-unhappy-line"></i> 욕설 / 비방</span></label>
-                            <label class="report-type-item"><input type="radio" name="reportType" value="음란물" v-model="report.type"><span class="report-type-label"><i class="ri-eye-off-line"></i> 음란물 / 불건전</span></label>
-                            <label class="report-type-item"><input type="radio" name="reportType" value="사기" v-model="report.type"><span class="report-type-label"><i class="ri-error-warning-line"></i> 사기 / 허위 정보</span></label>
-                            <label class="report-type-item"><input type="radio" name="reportType" value="개인정보침해" v-model="report.type"><span class="report-type-label"><i class="ri-user-forbid-line"></i> 개인정보 침해</span></label>
-                            <label class="report-type-item"><input type="radio" name="reportType" value="기타" v-model="report.type"><span class="report-type-label"><i class="ri-more-line"></i> 기타</span></label>
-                        </div>
-                        <div class="report-content-wrap">
-                            <textarea class="report-content-input" v-model="report.content"
-                                      placeholder="추가로 전달할 내용이 있으면 입력해주세요. (선택)" maxlength="300"></textarea>
-                            <span class="report-content-count">{{ report.content.length }}/300</span>
-                        </div>
-                    </div>
-                    <div class="report-modal-foot">
-                        <button type="button" class="report-btn-cancel" @click="reportOpen = false">취소</button>
-                        <button type="button" class="report-btn-submit" @click="submitReport">신고 접수</button>
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </div>
+    
+    <div v-if="confirmModal.show" class="custom-modal-overlay" @click.self="confirmModal.show = false">
+	    <div class="custom-modal-content">
+	        <div class="modal-body">
+	            <div class="modal-icon-circle" :class="confirmModal.type">
+	                <i v-if="confirmModal.type === 'danger'" class="ri-error-warning-line"></i>
+	                <i v-else-if="confirmModal.type === 'success'" class="ri-check-line"></i>
+	                <i v-else class="ri-information-line"></i>
+	            </div>
+	            <h3 class="modal-title">{{ confirmModal.title }}</h3>
+	            <p class="modal-message" v-html="confirmModal.message"></p>
+	        </div>
+	        <div class="modal-footer">
+	            <button v-if="confirmModal.isConfirm" class="btn-modal-secondary" @click="confirmModal.show = false">취소</button>
+	            <button class="btn-modal-primary" :class="confirmModal.type" @click="confirmModal.onConfirm">확인</button>
+	        </div>
+	    </div>
+	</div>
 </template>

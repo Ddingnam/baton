@@ -21,6 +21,7 @@
 <jsp:include page="/WEB-INF/views/trade/trade_list.jsp"/>
 <jsp:include page="/WEB-INF/views/trade/trade_write.jsp"/>
 <jsp:include page="/WEB-INF/views/trade/trade_article.jsp"/>
+<jsp:include page="/WEB-INF/views/report/report-modal.jsp"/>
 
 <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue-router@4"></script>
@@ -28,6 +29,7 @@
 <script src="${pageContext.request.contextPath}/dist/js/trade/list.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/trade/article.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/trade/write.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/report/report-modal.js"></script>
 
 <script src="${pageContext.request.contextPath}/dist/js/trade/trade_app.js"></script>
 </body>

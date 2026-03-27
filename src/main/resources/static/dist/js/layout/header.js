@@ -189,9 +189,21 @@ function showBatonToast(text) {
     const toast = document.createElement('div');
     toast.className = 'baton-toast-item';
     
-    // 아이콘 로직 생략 (기존과 동일)
-    let iconClass = text.includes('💬') ? 'ri-chat-3-line' : (text.includes('🔔') ? 'ri-notification-3-line' : 'ri-information-line');
-    let cleanText = text.replace(/[💬🔔]/g, '').trim();
+    let iconClass = 'ri-information-line';
+    let cleanText = text;
+
+    if (text.startsWith("CHAT_TYPE:") || text.includes('💬')) {
+        iconClass = 'ri-chat-3-line';
+        cleanText = text.replace("CHAT_TYPE:", "").replace('💬', '').trim();
+    } else if (text.startsWith("NOTIF_TYPE:") || text.includes('🔔')) {
+        iconClass = 'ri-notification-3-line';
+        if(text.startsWith("NOTIF_TYPE:")) {
+            const parts = text.split(':');
+            cleanText = "[" + parts[1] + "] " + parts.slice(2).join(':');
+        } else {
+            cleanText = text.replace('🔔', '').trim();
+        }
+    }
 
     toast.innerHTML = `
         <div class="toast-icon"><i class="${iconClass}"></i></div>

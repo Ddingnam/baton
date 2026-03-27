@@ -460,10 +460,6 @@ html {
     box-sizing: content-box !important;
 }
 
-
-
-
-/* 토스트 컨테이너 */
 #baton-toast-container {
     position: fixed;
     top: 50px;
@@ -477,33 +473,29 @@ html {
     pointer-events: none;
 }
 
-/* 선 없이도 빛나는 '진짜' 유리알 디자인 */
 .baton-toast-item {
     display: flex;
     align-items: center;
     gap: 16px;
     padding: 18px 32px;
-    border-radius: 30px; /* 더 둥글게 해서 구슬 같은 느낌 */
+    border-radius: 30px;
     min-width: 360px;
-    border: none !important; /* 구린 선은 확실히 제거 */
-    
-    /* 1. 배경: 도메인 색상을 머금은 아주 맑은 유리 */
+    border: none !important;
+
     background: linear-gradient(135deg, 
         rgba(255, 255, 255, 0.4) 0%, 
         var(--header-domain-bg) 60%,
         rgba(255, 255, 255, 0.2) 100%
     );
     
-    /* 2. 유리알 광택의 핵심: 극한의 블러와 채도 */
     backdrop-filter: blur(25px) saturate(220%) brightness(1.05);
     -webkit-backdrop-filter: blur(25px) saturate(220%) brightness(1.05);
     
-    /* 3. 필살기: 이중 안쪽 광택 (이게 없으면 그냥 색종이입니다) */
     box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.12), /* 바닥으로 떨어지는 깊은 그림자 */
-        inset 0 2px 4px rgba(255, 255, 255, 0.8), /* 상단 하이라이트 (빛 맺힘) */
-        inset 0 -2px 10px rgba(255, 255, 255, 0.3), /* 하단 반사광 */
-        inset 0 0 20px var(--header-domain-bg); /* 유리 내부로 스며든 도메인 컬러 */
+        0 20px 40px rgba(0, 0, 0, 0.12),
+        inset 0 2px 4px rgba(255, 255, 255, 0.8),
+        inset 0 -2px 10px rgba(255, 255, 255, 0.3),
+        inset 0 0 20px var(--header-domain-bg);
 
     color: #191F28;
     animation: glassOrbitIn 0.6s cubic-bezier(0.15, 1.15, 0.6, 1) forwards;
@@ -513,7 +505,6 @@ html {
     animation: glassOrbitOut 0.4s ease-in forwards !important;
 }
 
-/* 아이콘 박스: 유리구슬 안에 떠있는 느낌 */
 .toast-icon {
     width: 40px;
     height: 40px;
@@ -535,7 +526,6 @@ html {
     letter-spacing: -0.5px;
 }
 
-/* 나타날 때 살짝 커지면서 퐁! 하고 등장 */
 @keyframes glassOrbitIn {
     0% { opacity: 0; transform: translateY(-40px) scale(0.8); filter: blur(10px); }
     100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
@@ -545,8 +535,6 @@ html {
     0% { opacity: 1; transform: translateY(0) scale(1); }
     100% { opacity: 0; transform: translateY(-15px) scale(0.95); }
 }
-
-
 
 .bt-overlay {
     position: fixed;
