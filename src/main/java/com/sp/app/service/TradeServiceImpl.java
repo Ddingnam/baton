@@ -84,7 +84,6 @@ public class TradeServiceImpl implements TradeService {
 	@Transactional(rollbackFor = Exception.class)
 	public void updateTradePost(Trade dto, String uploadPath) throws Exception {
 		try {
-			
 			if (dto.getDeleteImgOrders() != null && !dto.getDeleteImgOrders().isEmpty()) {
 	            for (Integer order : dto.getDeleteImgOrders()) {
 	                String saveName = mapper.findSaveName(dto.getProductIdx(), order);
@@ -92,27 +91,22 @@ public class TradeServiceImpl implements TradeService {
 	            }
 	        }
 
-	        // 2. [번호 재정렬 준비] 일단 DB에 남아있는 현재 게시글의 이미지 정보를 싹 가져옵니다.
 	        List<TradeImg> currentImgs = mapper.findImagesByIdx(dto.getProductIdx());
 	        
-	        // 사용자가 지우겠다고 한 번호는 리스트에서 제외시킴
+
 	        if (dto.getDeleteImgOrders() != null) {
 	            currentImgs.removeIf(img -> dto.getDeleteImgOrders().contains(img.getImgOrder()));
 	        }
 
-	        // 3. [DB 밀어버리기] 해당 게시글의 이미지 레코드만 일단 다 지웁니다.
 	        mapper.deleteTradePostImgAll(dto.getProductIdx());
 
-	        // 4. [번호 새로 매겨서 다시 넣기]
 	        int newOrder = 1;
 
-	        // (A) 기존 유지할 이미지들 1번부터 순서대로 재등록
 	        for (TradeImg oldImg : currentImgs) {
 	            oldImg.setImgOrder(newOrder++);
 	            mapper.insertTradePostImg(oldImg);
 	        }
 
-	        // (B) 새로 추가할 파일들 그다음 번호부터 등록 (최대 5장까지만)
 	        if (dto.getNewFiles() != null) {
 	            for (MultipartFile mf : dto.getNewFiles()) {
 	                if (mf == null || mf.isEmpty() || newOrder > 5) continue;
@@ -120,7 +114,7 @@ public class TradeServiceImpl implements TradeService {
 	                String saveFilename = storageService.uploadFileToServer(mf, uploadPath);
 	                TradeImg newImg = new TradeImg();
 	                newImg.setProductIdx(dto.getProductIdx());
-	                newImg.setImgOrder(newOrder++); // 1번부터 차례대로 들어감
+	                newImg.setImgOrder(newOrder++);
 	                newImg.setOriginalName(mf.getOriginalFilename());
 	                newImg.setSaveName(saveFilename);
 	                newImg.setImgUrl("/uploads/trade/" + saveFilename);
