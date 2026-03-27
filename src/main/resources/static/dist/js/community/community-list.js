@@ -18,6 +18,9 @@ function filterByCategory(category) {
     const f = document.searchForm;
     f.category.value = category;
     f.page.value = '1';
+
+    f.schType.value = 'all';
+    f.kwd.value = '';
     f.submit();
 }
 
@@ -30,8 +33,35 @@ function filterBySort(sortValue) {
 
 function submitSearch() {
     const f = document.searchForm;
+    f.schType.value = 'all';
     f.page.value = '1';
     f.submit();
+}
+
+function submitHashtagSearch() {
+    const input = document.getElementById('hashtagInput');
+    if (!input) return;
+    const tag = input.value.trim().replace(/^#/, ''); // 앞에 # 붙여도 처리
+    if (!tag) return;
+    const f = document.searchForm;
+    f.schType.value = 'tag';
+    f.kwd.value = tag;
+    f.page.value = '1';
+    f.submit();
+}
+
+function clearHashtagSearch() {
+    const f = document.searchForm;
+    f.schType.value = 'all';
+    f.kwd.value = '';
+    f.page.value = '1';
+    f.submit();
+}
+
+function scrollCategoryTags(dir) {
+    const container = document.getElementById('categoryCarousel');
+    if (!container) return;
+    container.scrollBy({ left: dir === 'left' ? -220 : 220, behavior: 'smooth' });
 }
 
 function cmSwitchView(mode) {
