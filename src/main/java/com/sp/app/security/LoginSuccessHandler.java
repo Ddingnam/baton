@@ -74,7 +74,13 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 			return;
 		}
 		
-		request.getSession().setAttribute("msg", authentication.getName() + "님, 환영합니다!");
+		Object principal = authentication.getPrincipal();
+		if (principal instanceof CustomUserDetails) {
+		    String nickname = ((CustomUserDetails) principal).getMember().getNickname();
+		    request.getSession().setAttribute("msg", nickname + "님, 환영합니다!");
+		} else {
+		    request.getSession().setAttribute("msg", authentication.getName() + "님, 환영합니다!");
+		}
 		request.getSession().setAttribute("isFirstLogin", true);
 		
 		try {
