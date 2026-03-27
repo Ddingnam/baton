@@ -622,23 +622,66 @@ document.addEventListener("DOMContentLoaded", () => {
     let calMonth = new Date().getMonth();
     const today  = new Date();
     const calMemos       = {};
+    const calEvents      = {};
     let   selectedCalKey = null;
-    function calPad(n) { return String(n).padStart(2, '0'); }
-    function loadCalMonth() {
-        const ym = calYear + '-' + calPad(calMonth + 1);
-        apiGet(BASE + '/admin/util/memo/month?yearMonth=' + ym)
-            .then(list => {
-                Object.keys(calMemos).forEach(k => { if (k.startsWith(ym)) delete calMemos[k]; });
-                if (Array.isArray(list)) list.forEach(m => { calMemos[m.memoDate] = m.content; });
-                renderCal();
-                const badge = document.getElementById('calMemoBadge');
-                if (badge) {
-                    const cnt = Object.keys(calMemos).filter(k => k.startsWith(ym)).length;
-                    badge.textContent = cnt > 0 ? '이번 달 ' + cnt + '개' : '';
-                }
-            }).catch(() => { renderCal(); });
-    }
-    function renderCal() {
+function calPad(n) { return String(n).padStart(2, '0'); }
+function getMonthRange(year, month) {
+    const from = year + '-' + calPad(month + 1) + '-01';
+    const to   = year + '-' + calPad(month + 1) + '-' + calPad(new Date(year, month + 1, 0).getDate());
+    return { from, to };
+}
+function groupEventsByDate(list) {
+    const map = {};
+    (Array.isArray(list) ? list : []).forEach(ev => {
+        if (!ev || !ev.date) return;
+        if (!map[ev.date]) map[ev.date] = [];
+        map[ev.date].push(ev);
+    });
+    Object.keys(map).forEach(key => {
+        map[key].sort((a, b) => {
+            const aa = (a.startTime || '') + (a.endTime || '');
+            const bb = (b.startTime || '') + (b.endTime || '');
+            return aa < bb ? -1 : aa > bb ? 1 : 0;
+        });
+    });
+    return map;
+}
+function eventTimeText(ev) {
+    if (!ev) return '';
+    if (Number(ev.allDay) === 1 || ev.allDay === true) return '종일';
+    const start = ev.startTime || '';
+    const end   = ev.endTime || '';
+    if (start && end) return start + ' - ' + end;
+    return start || end || '';
+}
+function loadCalMonth() {
+    const ym = calYear + '-' + calPad(calMonth + 1);
+    const range = getMonthRange(calYear, calMonth);
+
+    Promise.all([
+        apiGet(BASE + '/admin/util/memo/month?yearMonth=' + ym).catch(() => []),
+        apiGet(BASE + '/admin/calendar/events?from=' + range.from + '&to=' + range.to).catch(() => [])
+    ]).then(([memoList, eventList]) => {
+        Object.keys(calMemos).forEach(k => { if (k.startsWith(ym)) delete calMemos[k]; });
+        Object.keys(calEvents).forEach(k => { if (k.startsWith(ym)) delete calEvents[k]; });
+
+        if (Array.isArray(memoList)) memoList.forEach(m => { calMemos[m.memoDate] = m.content; });
+
+        const grouped = groupEventsByDate(eventList);
+        Object.keys(grouped).forEach(key => { calEvents[key] = grouped[key]; });
+
+        renderCal();
+
+        const badge = document.getElementById('calMemoBadge');
+        if (badge) {
+            const memoCnt  = Object.keys(calMemos).filter(k => k.startsWith(ym)).length;
+            const eventCnt = Object.keys(calEvents).filter(k => k.startsWith(ym)).reduce((sum, key) => sum + calEvents[key].length, 0);
+            const total = memoCnt + eventCnt;
+            badge.textContent = total > 0 ? '이번 달 ' + total + '개' : '';
+        }
+    }).catch(() => { renderCal(); });
+}
+function renderCal() {
         const cGrid = document.getElementById('miniCalGrid');
         if (!cGrid) return;
         const monthLabel = document.getElementById('modalMonth');
@@ -652,7 +695,7 @@ document.addEventListener("DOMContentLoaded", () => {
         for (let i = 1; i <= tDays; i++) {
             const key     = calYear + '-' + calPad(calMonth + 1) + '-' + calPad(i);
             const cls     = (isCurMonth && i === today.getDate() ? ' on' : '') +
-                            (calMemos[key] ? ' has-memo' : '') +
+                            ((calMemos[key] || (calEvents[key] && calEvents[key].length)) ? ' has-memo' : '') +
                             (key === selectedCalKey ? ' selected' : '');
             h += '<div class="c-dt' + cls + '" data-key="' + key + '">' + i + '</div>';
         }
@@ -670,27 +713,60 @@ document.addEventListener("DOMContentLoaded", () => {
         const p = key.split('-');
         label.textContent = p[0] + '년 ' + p[1] + '월 ' + p[2] + '일';
         input.value = calMemos[key] || '';
-        updateCalMemoPreview(key, calMemos[key] || '');
+        updateCalMemoPreview(key, calMemos[key] || '', calEvents[key] || []);
         panel.classList.add('active');
         renderCal();
         setTimeout(() => input.focus(), 60);
     }
-    function updateCalMemoPreview(key, val) {
+    function updateCalMemoPreview(key, val, events) {
         const preview = document.getElementById('calMemoPreview');
         if (!preview) return;
-        if (val) {
-            const count = Object.keys(calMemos).length;
-            preview.innerHTML =
-                '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">' +
-                '<i class="ri-checkbox-circle-line" style="color:#7C3AED;font-size:13px;"></i>' +
-                '<span style="font-size:11px;font-weight:700;color:#7C3AED;">저장됨</span>' +
-                '<span style="font-size:11px;color:#CBD5E1;margin-left:auto;">이번 달 메모 ' + count + '개</span>' +
-                '</div>' +
-                '<p style="font-size:12px;color:#64748B;line-height:1.6;margin:0;white-space:pre-wrap;word-break:break-word;">' + todoEsc(val) + '</p>';
-            preview.style.display = 'block';
-        } else {
+
+        const items = Array.isArray(events) ? events : [];
+        const count = Object.keys(calMemos).length + Object.keys(calEvents).reduce((sum, k) => sum + (calEvents[k] || []).length, 0);
+
+        if (!val && !items.length) {
             preview.style.display = 'none';
+            return;
         }
+
+        let html = '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">' +
+            '<i class="ri-checkbox-circle-line" style="color:#7C3AED;font-size:13px;"></i>' +
+            '<span style="font-size:11px;font-weight:700;color:#7C3AED;">연동됨</span>' +
+            '<span style="font-size:11px;color:#CBD5E1;margin-left:auto;">이번 달 항목 ' + count + '개</span>' +
+            '</div>';
+
+        if (items.length) {
+            html += '<div style="margin-bottom:' + (val ? '10px' : '0') + ';">' +
+                '<div style="font-size:11px;font-weight:800;color:#64748B;margin-bottom:6px;">캘린더 일정</div>' +
+                items.map(ev => {
+                    let dot = '#7C3AED';
+                    if (ev.color === 'pink') dot = '#DB2777';
+                    else if (ev.color === 'blue') dot = '#2563EB';
+                    else if (ev.color === 'teal') dot = '#0891B2';
+                    else if (ev.color === 'green') dot = '#059669';
+                    else if (ev.color === 'orange') dot = '#D97706';
+                    else if (ev.color === 'red') dot = '#DC2626';
+                    else if (ev.color === 'slate') dot = '#475569';
+                    return '<div style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid #E9D5FF;border-radius:10px;background:#FAF5FF;margin-bottom:6px;">' +
+                        '<span style="width:8px;height:8px;border-radius:999px;background:' + dot + ';margin-top:6px;flex:0 0 8px;"></span>' +
+                        '<div style="min-width:0;flex:1;">' +
+                        '<div style="font-size:12px;font-weight:700;color:#0F172A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + todoEsc(ev.title || '(제목 없음)') + '</div>' +
+                        '<div style="font-size:11px;color:#64748B;margin-top:2px;">' + todoEsc(eventTimeText(ev) || '종일') + '</div>' +
+                        '</div></div>';
+                }).join('') +
+                '</div>';
+        }
+
+        if (val) {
+            html += '<div>' +
+                '<div style="font-size:11px;font-weight:800;color:#64748B;margin-bottom:6px;">헤더 메모</div>' +
+                '<p style="font-size:12px;color:#64748B;line-height:1.6;margin:0;white-space:pre-wrap;word-break:break-word;">' + todoEsc(val) + '</p>' +
+                '</div>';
+        }
+
+        preview.innerHTML = html;
+        preview.style.display = 'block';
     }
 	const calPrevBtn  = document.getElementById('calPrev');
 	const calNextBtn  = document.getElementById('calNext');
@@ -741,7 +817,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         if (d && d.success) {
                             calMemos[selectedCalKey] = val;
                             renderCal();
-                            updateCalMemoPreview(selectedCalKey, val);
+                            updateCalMemoPreview(selectedCalKey, val, calEvents[selectedCalKey] || []);
                             loadNotiList();
                             if (typeof showToast === 'function') {
                                 showToast(isNew ? '메모가 등록되었습니다.' : '메모가 수정되었습니다.', 'success');
@@ -762,6 +838,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         if (panel) panel.classList.remove('active');
                         selectedCalKey = null;
                         renderCal();
+                        updateCalMemoPreview(selectedCalKey, '', calEvents[selectedCalKey] || []);
                         if (typeof showToast === 'function') showToast('메모가 삭제되었습니다.', 'success');
                     }).catch(() => {
                         if (typeof showToast === 'function') showToast('삭제 중 오류가 발생했습니다.', 'error');
@@ -794,6 +871,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let fcMonth = today.getMonth();
     let fcSelectedKey  = null;
     const fcMemos = {};
+    const fcEvents = {};
 
     function openCalendarFull() {
         const overlay = document.getElementById('calendarFullOverlay');
@@ -806,18 +884,27 @@ document.addEventListener("DOMContentLoaded", () => {
         fcLoadMonth();
     }
 
-    function fcLoadMonth() {
-        const ym = fcYear + '-' + calPad(fcMonth + 1);
-        apiGet(BASE + '/admin/util/memo/month?yearMonth=' + ym)
-            .then(list => {
-                Object.keys(fcMemos).forEach(k => { if (k.startsWith(ym)) delete fcMemos[k]; });
-                if (Array.isArray(list)) list.forEach(m => { fcMemos[m.memoDate] = m.content; });
-                fcRenderGrid();
-                fcRenderSideList();
-            }).catch(() => { fcRenderGrid(); fcRenderSideList(); });
-    }
+function fcLoadMonth() {
+    const ym = fcYear + '-' + calPad(fcMonth + 1);
+    const range = getMonthRange(fcYear, fcMonth);
+    Promise.all([
+        apiGet(BASE + '/admin/util/memo/month?yearMonth=' + ym).catch(() => []),
+        apiGet(BASE + '/admin/calendar/events?from=' + range.from + '&to=' + range.to).catch(() => [])
+    ]).then(([memoList, eventList]) => {
+        Object.keys(fcMemos).forEach(k => { if (k.startsWith(ym)) delete fcMemos[k]; });
+        Object.keys(fcEvents).forEach(k => { if (k.startsWith(ym)) delete fcEvents[k]; });
 
-    function fcRenderGrid() {
+        if (Array.isArray(memoList)) memoList.forEach(m => { fcMemos[m.memoDate] = m.content; });
+
+        const grouped = groupEventsByDate(eventList);
+        Object.keys(grouped).forEach(key => { fcEvents[key] = grouped[key]; });
+
+        fcRenderGrid();
+        fcRenderSideList();
+    }).catch(() => { fcRenderGrid(); fcRenderSideList(); });
+}
+
+function fcRenderGrid() {
         const grid  = document.getElementById('calFullGrid');
         const label = document.getElementById('calFullMonthLabel');
         if (!grid) return;
@@ -836,13 +923,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const isSun = dow === 0, isSat = dow === 6;
             h += '<div class="cal-full-cell' +
                 (isToday ? ' today' : '') +
-                (hasMemo ? ' has-memo' : '') +
+                ((hasMemo || (fcEvents[key] && fcEvents[key].length)) ? ' has-memo' : '') +
                 (isSelected ? ' selected' : '') +
                 (isSun ? ' sun' : '') +
                 (isSat ? ' sat' : '') +
                 '" data-key="' + key + '">' +
                 '<span class="cal-full-day-num">' + i + '</span>' +
-                (hasMemo ? '<div class="cal-full-memo-preview">' + todoEsc(fcMemos[key].substring(0, 30)) + (fcMemos[key].length > 30 ? '…' : '') + '</div>' : '') +
+                (hasMemo ? '<div class="cal-full-memo-preview">' + todoEsc(fcMemos[key].substring(0, 24)) + (fcMemos[key].length > 24 ? '…' : '') + '</div>' : '') +
+                ((fcEvents[key] && fcEvents[key].length) ? '<div class="cal-full-memo-preview" style="margin-top:4px;color:var(--color-purple);">' + fcEvents[key].length + '개 일정</div>' : '') +
                 '</div>';
         }
         grid.innerHTML = h;
@@ -851,28 +939,39 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function fcRenderSideList() {
-        const listEl = document.getElementById('calFullMemoList');
-        if (!listEl) return;
-        const ym = fcYear + '-' + calPad(fcMonth + 1);
-        const keys = Object.keys(fcMemos).filter(k => k.startsWith(ym)).sort();
-        if (!keys.length) {
-            listEl.innerHTML = '<div style="font-size:12px;color:#CBD5E1;text-align:center;padding:12px 0;">메모 없음</div>';
-            return;
-        }
-        listEl.innerHTML = keys.map(k => {
-            const p = k.split('-');
-            return '<div class="cal-full-side-item' + (k === fcSelectedKey ? ' active' : '') + '" data-key="' + k + '">' +
-                '<div style="font-size:11px;font-weight:800;color:var(--color-purple);">' + p[1] + '.' + p[2] + '</div>' +
-                '<div style="font-size:11px;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + todoEsc(fcMemos[k].substring(0, 18)) + '</div>' +
-                '</div>';
-        }).join('');
-        listEl.querySelectorAll('.cal-full-side-item[data-key]').forEach(el => {
-            el.addEventListener('click', () => fcSelectDate(el.dataset.key));
-        });
+function fcRenderSideList() {
+    const listEl = document.getElementById('calFullMemoList');
+    if (!listEl) return;
+    const ym = fcYear + '-' + calPad(fcMonth + 1);
+    const keys = Array.from(new Set(
+        Object.keys(fcMemos).filter(k => k.startsWith(ym)).concat(
+            Object.keys(fcEvents).filter(k => k.startsWith(ym))
+        )
+    )).sort();
+
+    if (!keys.length) {
+        listEl.innerHTML = '<div style="font-size:12px;color:#CBD5E1;text-align:center;padding:12px 0;">일정 없음</div>';
+        return;
     }
 
-    function fcSelectDate(key) {
+    listEl.innerHTML = keys.map(k => {
+        const p = k.split('-');
+        const memo = fcMemos[k];
+        const events = fcEvents[k] || [];
+        const sub = memo
+            ? todoEsc(memo.substring(0, 18)) + (memo.length > 18 ? '…' : '')
+            : (events.length ? '일정 ' + events.length + '개' : '');
+        return '<div class="cal-full-side-item' + (k === fcSelectedKey ? ' active' : '') + '" data-key="' + k + '">' +
+            '<div style="font-size:11px;font-weight:800;color:var(--color-purple);">' + p[1] + '.' + p[2] + '</div>' +
+            '<div style="font-size:11px;color:var(--text-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + sub + '</div>' +
+            '</div>';
+    }).join('');
+    listEl.querySelectorAll('.cal-full-side-item[data-key]').forEach(el => {
+        el.addEventListener('click', () => fcSelectDate(el.dataset.key));
+    });
+}
+
+function fcSelectDate(key) {
         fcSelectedKey = key;
         const panel = document.getElementById('calFullEditPanel');
         const label = document.getElementById('calFullEditDateLabel');

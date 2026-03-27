@@ -62,16 +62,18 @@ window.CTX='${pageContext.request.contextPath}';
         <div class="cp-toolbar">
             <div class="cp-toolbar-left">
                 <button class="cp-nav-btn" onclick="location.href='${pageContext.request.contextPath}/admin'" title="어드민 메인으로"><i class="ri-home-5-line"></i></button>
-                <button class="cp-nav-btn" id="mainPrev" title="이전"><i class="ri-arrow-left-s-line"></i></button>
-                <button class="cp-nav-btn" id="mainNext" title="다음"><i class="ri-arrow-right-s-line"></i></button>
-                <span class="cp-toolbar-title" id="mainLabel"></span>
+                <div class="cp-toolbar-center">
+                    <button class="cp-nav-btn" id="mainPrev" title="이전"><i class="ri-arrow-left-s-line"></i></button>
+                    <span class="cp-toolbar-title" id="mainLabel"></span>
+                    <button class="cp-nav-btn" id="mainNext" title="다음"><i class="ri-arrow-right-s-line"></i></button>
+                </div>
                 <button class="cp-today-pill" id="btnToday">오늘</button>
             </div>
             <div class="cp-toolbar-right">
                 <div class="cp-view-tabs">
                     <button class="cp-view-tab" data-view="month">월</button>
                     <button class="cp-view-tab active" data-view="week">주</button>
-                    <button class="cp-view-tab" data-view="day">일</button>
+                    <button class="cp-view-tab" data-view="day">기록</button>
                 </div>
                 <div class="cp-header-theme-wrap">
                     <button class="cp-header-theme-btn" id="headerThemeBtn" title="테마 변경">
@@ -115,12 +117,36 @@ window.CTX='${pageContext.request.contextPath}';
         </div>
 
         <div class="cp-day-view hidden" id="dayView">
-            <div class="cp-day-header">
-                <div class="cp-day-header-date" id="dayHeaderDate"></div>
-                <div class="cp-day-header-dow" id="dayHeaderDow"></div>
-            </div>
-            <div class="cp-day-body" id="dayBody">
-                <div class="cp-day-grid" id="dayGrid"></div>
+            <div class="cp-desk-wrap">
+                <div class="cp-desk-hero">
+                    <div>
+                        <div class="cp-desk-date" id="todoDeskDate"></div>
+                        <div class="cp-desk-sub" id="todoDeskSub"></div>
+                    </div>
+                    <span class="cp-desk-chip">오늘 할 일 <strong id="todoDeskCount">0</strong></span>
+                </div>
+                <div class="cp-desk-grid">
+                    <section class="cp-desk-card">
+                        <div class="cp-desk-card-head">
+                            <h3>다이어리 메모</h3>
+                            <div class="cp-desk-card-actions">
+                                <button type="button" class="cp-btn-secondary" id="todoMemoDeleteBtn">지우기</button>
+                                <button type="button" class="cp-btn-primary" id="todoMemoSaveBtn">저장</button>
+                            </div>
+                        </div>
+                        <textarea class="cp-desk-memo" id="todoMemoInput" placeholder="오늘의 일정, 회의 메모, 떠오른 아이디어를 정리해보세요."></textarea>
+                    </section>
+                    <section class="cp-desk-card">
+                        <div class="cp-desk-card-head">
+                            <h3>오늘 할 일</h3>
+                        </div>
+                        <div class="cp-desk-add-row">
+                            <input type="text" class="cp-input" id="todoDeskInput" placeholder="새 할 일을 입력하세요">
+                            <button type="button" class="cp-btn-primary" id="todoDeskAddBtn">추가</button>
+                        </div>
+                        <div class="cp-todo-list" id="todoDeskList"></div>
+                    </section>
+                </div>
             </div>
         </div>
     </div>
@@ -177,17 +203,17 @@ window.CTX='${pageContext.request.contextPath}';
                 </div>
                 <div class="cp-field">
                     <label class="cp-field-label">날짜</label>
-                    <input type="text" class="cp-input cp-picker-input cp-date-input" id="evDate" readonly placeholder="날짜 선택">
+                    <select class="cp-input cp-native-select" id="evDate"></select>
                 </div>
                 <div class="cp-time-row" id="timeFieldsRow">
                     <div class="cp-field half">
                         <label class="cp-field-label">시작</label>
-                        <input type="text" class="cp-input cp-picker-input cp-time-input" id="evStart" readonly placeholder="시작 시간">
+                        <select class="cp-input cp-native-select" id="evStart"></select>
                     </div>
                     <span class="cp-time-arrow"><i class="ri-arrow-right-line"></i></span>
                     <div class="cp-field half">
                         <label class="cp-field-label">종료</label>
-                        <input type="text" class="cp-input cp-picker-input cp-time-input" id="evEnd" readonly placeholder="종료 시간">
+                        <select class="cp-input cp-native-select" id="evEnd"></select>
                     </div>
                 </div>
             </div>
