@@ -302,7 +302,7 @@ public class AdminUtilController {
             SessionInfo sessionInfo = (SessionInfo) session.getAttribute("member");
             if (sessionInfo != null && updatedUser != null) {
                 sessionInfo.setName(updatedUser.getName());
-                sessionInfo.setNickname(updatedUser.getNickname());
+                sessionInfo.setNickname(updatedUser.getNickname());   
                 sessionInfo.setEmail(updatedUser.getEmail());
                 sessionInfo.setAvatar(updatedUser.getProfile_photo());
                 session.setAttribute("member", sessionInfo);

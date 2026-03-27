@@ -26,4 +26,6 @@ public interface AdminChatService {
 	
 	public void setOnlineStatus(Long userIdx, int isOnline);
 	public int  getOnlineStatus(Long userIdx);
+
+	public int  getAdminUnreadTotalCount(Long myUserIdx);
 }

@@ -139,4 +139,9 @@ public class AdminChatServiceImpl implements AdminChatService {
 	public int getOnlineStatus(Long userIdx) {
 		return mapper.getOnlineStatus(userIdx);
 	}
+
+	@Override
+	public int getAdminUnreadTotalCount(Long myUserIdx) {
+		return mapper.getAdminUnreadTotalCount(myUserIdx);
+	}
 }

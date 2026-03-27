@@ -39,4 +39,6 @@ public interface AdminChatMapper {
 	
 	public void setOnlineStatus(@Param("userIdx") Long userIdx, @Param("isOnline") int isOnline);
 	public int  getOnlineStatus(@Param("userIdx") Long userIdx);
+
+	public int getAdminUnreadTotalCount(@Param("myUserIdx") Long myUserIdx);
 }
