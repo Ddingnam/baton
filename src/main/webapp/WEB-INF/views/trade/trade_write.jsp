@@ -146,9 +146,13 @@
                                 <div class="price-wrap">
                                     <span class="won-sign">₩</span>
                                     <input type="text" name="shippingFee" id="shippingFeeInput" placeholder="0"
-                                           :value="wForm.shippingFee ? Number(wForm.shippingFee).toLocaleString('ko-KR') : ''"
+                                           v-model="shippingDisplay" :readonly="isShippingFree"
                                            @keydown="onlyNumberKey" @input="validateNumber">
                                 </div>
+                                <div class="free-check-wrapper">
+							        <input type="checkbox" id="shippingFreeCheck" v-model="isShippingFree">
+							        <label for="shippingFreeCheck">배송비 포함 (무료배송)</label>
+							    </div>
                             </div>
                             <div class="field" id="locationField" v-show="wForm.tradeType === '직거래' || wForm.tradeType === '둘다가능'">
                                 <label>거래 희망 장소</label>

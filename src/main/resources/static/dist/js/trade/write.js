@@ -24,14 +24,6 @@ function useTradeWrite(shared) {
         tradeStatus: '판매중'
     });
 
-    const isFree = ref(false);
-    const priceDisplay = computed({
-        get: () => isFree.value ? '0' : (wForm.price ? Number(String(wForm.price).replace(/,/g,'')).toLocaleString('ko-KR') : ''),
-        set: v  => { wForm.price = v.replace(/,/g, ''); }
-    });
-	
-    watch(isFree, v => { if (v) wForm.price = 0; });
-
     const totalImgCount   = computed(() => existingFiles.value.length + newFiles.value.length);
     const selectedCatName = computed(() => {
         const c = categories.value.find(c => c.CATEGORYIDX == wForm.categoryIdx);
@@ -157,6 +149,7 @@ function useTradeWrite(shared) {
 		});
 		
         isFree.value = false;
+		isShippingFree.value = false;
         existingFiles.value = [];
 		newFiles.value = []; 
 		newFilePreviews.value = []; 
@@ -182,6 +175,7 @@ function useTradeWrite(shared) {
         wForm.longitude = t.longitude || '';
         wForm.tradeStatus = t.tradeStatus || '판매중';
         isFree.value = t.price === 0;
+		isShippingFree.value = (t.tradeType !== '직거래' && Number(t.shippingFee) === 0);
 		
         if (data.imageList) data.imageList.forEach(img => existingFiles.value.push({ url: img.imgUrl, imgOrder: img.imgOrder }));
         if (data.tagList) tags.value = [...data.tagList];
@@ -220,6 +214,22 @@ function useTradeWrite(shared) {
 	    nextTick(() => setTimeout(initMapWrite, 50));
 	}
 	
+	const isFree = ref(false);
+	const priceDisplay = computed({
+		get: () => isFree.value ? '0' : (wForm.price ? Number(String(wForm.price).replace(/,/g,'')).toLocaleString('ko-KR') : ''),
+		set: v  => { wForm.price = v.replace(/,/g, ''); }
+	});
+		
+	watch(isFree, v => { if (v) wForm.price = 0; });
+	
+	const isShippingFree = ref(false);
+	const shippingDisplay = computed({
+	    get: () => isShippingFree.value ? '0' : (wForm.shippingFee ? Number(String(wForm.shippingFee).replace(/,/g,'')).toLocaleString('ko-KR') : ''),
+	    set: v => { wForm.shippingFee = v.replace(/,/g, ''); }
+	});
+
+	watch(isShippingFree, (v) => { if (v) wForm.shippingFee = 0; });
+	
 	function onlyNumberKey(e) {
 	    const allowedKeys = ['Backspace', 'Tab', 'Enter', 'Escape', 'ArrowLeft', 'ArrowRight', 'Delete'];
 	    if (allowedKeys.includes(e.key)) return;
@@ -249,9 +259,6 @@ function useTradeWrite(shared) {
 	    const f = document.getElementById('tradeForm');
 	    if (!f) return;
 
-	    const rawPrice = String(wForm.price || '0').replace(/[^0-9]/g, '');
-	    const rawShipping = String(wForm.shippingFee || '0').replace(/[^0-9]/g, '');
-
 	    if (existingFiles.value.length === 0 && newFiles.value.length === 0) {
 	        showBatonToast('상품 사진을 최소 1장 이상 등록해주세요.');
 	        return;
@@ -273,7 +280,15 @@ function useTradeWrite(shared) {
 	        document.getElementById('contentInput')?.focus();
 	        return;
 	    }
-
+		
+		const MAX_PRICE = 100000000;
+	    const rawPrice = String(wForm.price || '0').replace(/[^0-9]/g, '');
+		
+		if (Number(rawPrice) > MAX_PRICE) {
+		        showBatonToast('판매 가격은 1억 원을 초과할 수 없습니다.');
+		        return;
+		}
+			
 	    if (!isFree.value && (rawPrice === '0' || rawPrice === '')) {
 	        showBatonToast('판매 가격을 입력하거나 무료나눔을 선택해주세요.');
 	        document.getElementById('priceInput')?.focus();
@@ -281,6 +296,7 @@ function useTradeWrite(shared) {
 	    }
 	    
 	    const type = wForm.tradeType;
+	    const rawShipping = String(wForm.shippingFee || '0').replace(/[^0-9]/g, '');
 
 	    if (type === '직거래' || type === '둘다가능') {
 	        if (!wForm.tradePlace.trim()) {
@@ -295,22 +311,22 @@ function useTradeWrite(shared) {
 	    }
 
 	    if (type === '택배' || type === '둘다가능') {
-	        if (!rawShipping || rawShipping === '') {
-	            showBatonToast('택배 거래 시 배송비를 입력해주세요.');
-	            document.getElementById('shippingFeeInput')?.focus();
-	            return;
-	        }
+			if (!isShippingFree.value && (rawShipping === '0' || rawShipping === '')) {
+				showBatonToast('배송비를 입력하거나 배송비 포함을 선택해주세요.');
+				document.getElementById('shippingFeeInput')?.focus();
+				return;
+			}
 	    }
 
 	    f.querySelector('[name="price"]').value = isFree.value ? '0' : rawPrice;
-	    f.querySelector('[name="shippingFee"]').value = (type === '직거래') ? '0' : rawShipping;
+	    f.querySelector('[name="shippingFee"]').value = (type === '직거래' || isShippingFree.value) ? '0' : rawShipping;
 	    f.querySelector('[name="tradeStatus"]').value = status;
 
 	    const latInput = f.querySelector('[name="latitude"]');
 	    const lngInput = f.querySelector('[name="longitude"]');
 
 	    if (type === '택배' || !wForm.latitude) {
-			latInput.disabled = false; // 전송 가능하게 유지
+			latInput.disabled = false;
 			lngInput.disabled = false;
 			latInput.value = ""; 
 			lngInput.value = "";
@@ -327,6 +343,16 @@ function useTradeWrite(shared) {
 	    const finalTags = document.getElementById('finalTags');
 	    if (finalTags) finalTags.value = tags.value.join(',');
 		
+		f.querySelectorAll('input[name="deleteImgOrders"]').forEach(el => el.remove());
+
+		deletedImgOrders.value.forEach(order => {
+			const input = document.createElement('input');
+			input.type = 'hidden';
+			input.name = 'deleteImgOrders';
+			input.value = order;
+		    f.appendChild(input);
+		});
+
 		const url = currentProductIdx.value ? '/api/trade/update' : '/api/trade/write';
 		const formData = new FormData(f);
 		
@@ -355,8 +381,8 @@ function useTradeWrite(shared) {
     return {
         writeMode, currentProductIdx, tempProductIdx,
         catOpen, aiLoading, existingFiles, newFiles, newFilePreviews, deletedImgOrders,
-        tags, tagInput, wForm, isFree, priceDisplay, totalImgCount, selectedCatName,
-        initWrite, onlyNumberKey, validateNumber, validatePrice, selectCat, onFileChange, removeExisting, removeNew, 
+        tags, tagInput, wForm, totalImgCount, selectedCatName, initWrite, 
+		isFree, priceDisplay, isShippingFree, shippingDisplay, onlyNumberKey, validateNumber, validatePrice, selectCat, onFileChange, removeExisting, removeNew, 
         addTag, removeTag, onTagBackspace, aiGenerate, submitForm
     };
 }
