@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <%@ include file="/WEB-INF/views/layout/headerResources.jsp"%>
 <!DOCTYPE html>
@@ -13,7 +14,6 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/main/main.css" />
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/alba/alba-list.css" />
 <style>
-/* 💡 그리드 뷰 CSS 추가! */
 .list-layout {
   display: flex;
   flex-direction: column;
@@ -72,34 +72,34 @@
             <button class="filter-btn chip" type="button">기타</button>
           </div>
 
-			<div class="toolbar-top-actions">
-			  <div class="resume-dashboard">
-			    <a href="${pageContext.request.contextPath}/resume/myList"
-			       class="resume-dashboard__count">
-			      나의 이력서 <span class="resume-dashboard__number">${resumeCount}</span>개
-			    </a>
-			
-			    <c:choose>
-			      <c:when test="${resumeCount > 0}">
-			        <a href="${pageContext.request.contextPath}/resume/myList"
-			           class="resume-dashboard__state open">
-			          이력서 관리하기
-			        </a>
-			      </c:when>
-			      <c:otherwise>
-			        <a href="${pageContext.request.contextPath}/resume/write"
-			           class="resume-dashboard__state">
-			          이력서 등록하기
-			        </a>
-			      </c:otherwise>
-			    </c:choose>
-			  </div>
-			
-			  <button class="btn-create-alba"
-			          onclick="location.href='${pageContext.request.contextPath}/alba/write'">
-			    <i class="ri-add-line"></i> 공고 등록하기
-			  </button>
-			</div>
+          <div class="toolbar-top-actions">
+            <div class="resume-dashboard">
+              <a href="${pageContext.request.contextPath}/resume/myList"
+                 class="resume-dashboard__count">
+                나의 이력서 <span class="resume-dashboard__number">${resumeCount}</span>개
+              </a>
+
+              <c:choose>
+                <c:when test="${resumeCount > 0}">
+                  <a href="${pageContext.request.contextPath}/resume/myList"
+                     class="resume-dashboard__state open">
+                    이력서 관리하기
+                  </a>
+                </c:when>
+                <c:otherwise>
+                  <a href="${pageContext.request.contextPath}/resume/write"
+                     class="resume-dashboard__state">
+                    이력서 등록하기
+                  </a>
+                </c:otherwise>
+              </c:choose>
+            </div>
+
+            <button class="btn-create-alba"
+                    onclick="location.href='${pageContext.request.contextPath}/alba/write'">
+              <i class="ri-add-line"></i> 공고 등록하기
+            </button>
+          </div>
         </div>
 
         <div class="advanced-filter-wrap">
@@ -166,7 +166,7 @@
               </button>
             </div>
           </div>
-        </div>   
+        </div>
       </div>
 
       <div id="alba-layout-container">
@@ -233,7 +233,7 @@
             <div class="sidebar-stat-box">
               <div class="stat-row">
                 <span>모집 중</span>
-				<strong><span id="sidebarResultCount">0</span>건</strong>
+                <strong><span id="sidebarResultCount">0</span>건</strong>
               </div>
             </div>
 
@@ -241,41 +241,41 @@
 
           <div class="content">
             <div class="content-header">
-			  <div class="result-count">
-			    총 <span id="resultCount">555</span>건
-			  </div>
-  
-			  <div class="list-controls">
+              <div class="result-count">
+                총 <span id="resultCount">0</span>건
+              </div>
+
+              <div class="list-controls">
                 <select class="control-select" id="periodSelect" onchange="applyFilters()">
-			      <option value="ALL">등록일 전체</option>
-			      <option value="TODAY">오늘 등록</option>
-			      <option value="WITHIN_THREE_DAYS">3일 이내</option>
-			      <option value="WITHIN_SEVEN_DAYS">7일 이내</option>
-			    </select>
-			
-			    <select class="control-select" id="sortSelect" onchange="applyFilters()">
-			      <option value="latest" selected>최신등록순</option>
-			      <option value="pay_high">시급높은순</option>
-			      <option value="distance">거리순</option>
-			    </select>
-			
-			    <select class="control-select" id="sizeSelect" onchange="applyFilters()">
-			      <option value="20">20개씩</option>
-			      <option value="30">30개씩</option>
-			      <option value="40">40개씩</option>
-			      <option value="50">50개씩</option>
-			    </select>
-			
-			    <div class="view-toggle">
-			      <button type="button" class="view-btn active" title="리스트 보기">
-			        <i class="ri-list-unordered"></i>
-			      </button>
-			      <button type="button" class="view-btn" title="그리드 보기">
-			        <i class="ri-grid-fill"></i>
-			      </button>
-			    </div>
-			  </div>
-		</div>
+                  <option value="ALL">등록일 전체</option>
+                  <option value="TODAY">오늘 등록</option>
+                  <option value="WITHIN_THREE_DAYS">3일 이내</option>
+                  <option value="WITHIN_SEVEN_DAYS">7일 이내</option>
+                </select>
+
+                <select class="control-select" id="sortSelect" onchange="applyFilters()">
+                  <option value="latest" selected>최신등록순</option>
+                  <option value="pay_high">시급높은순</option>
+                  <option value="distance">거리순</option>
+                </select>
+
+                <select class="control-select" id="sizeSelect" onchange="applyFilters()">
+                  <option value="20">20개씩</option>
+                  <option value="30">30개씩</option>
+                  <option value="40">40개씩</option>
+                  <option value="50">50개씩</option>
+                </select>
+
+                <div class="view-toggle">
+                  <button type="button" class="view-btn active" title="리스트 보기">
+                    <i class="ri-list-unordered"></i>
+                  </button>
+                  <button type="button" class="view-btn" title="그리드 보기">
+                    <i class="ri-grid-fill"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
 
             <div id="listView" class="list-layout"></div>
             <div class="pagination" id="pagination"></div>
@@ -291,46 +291,44 @@
 
   <script>
     const myRegion = {
-      sido:  "${loginMember.userRegionInfo.activeRegion.sido}",
-      gugun: "${loginMember.userRegionInfo.activeRegion.sigungu}",
-      dong:  "${loginMember.userRegionInfo.activeRegion.dong}"
+      sido:  "${not empty loginMember.userRegionInfo.activeRegion.sido ? loginMember.userRegionInfo.activeRegion.sido : loginMember.userRegionInfo.mainRegion.sido}",
+      gugun: "${not empty loginMember.userRegionInfo.activeRegion.sigungu ? loginMember.userRegionInfo.activeRegion.sigungu : loginMember.userRegionInfo.mainRegion.sigungu}",
+      dong:  "${not empty loginMember.userRegionInfo.activeRegion.dong ? loginMember.userRegionInfo.activeRegion.dong : loginMember.userRegionInfo.mainRegion.dong}"
     };
   </script>
 
   <script>
     const CONTEXT_PATH = "${pageContext.request.contextPath}";
-    
+
     let myScrapIds = [
-        <c:forEach var="scrapId" items="${userScrapList}" varStatus="st">
-          ${scrapId}${!st.last ? ',' : ''}
-        </c:forEach>
-      ];
-    
+      <c:forEach var="scrapId" items="${userScrapList}" varStatus="st">
+        ${scrapId}${!st.last ? ',' : ''}
+      </c:forEach>
+    ];
+
     const serverData = [
       <c:forEach var="dto" items="${list}" varStatus="status">
       {
-        postingIdx:  "${dto.postingIdx}",
-        title:       `${dto.title}`,
-        employer:    `${empty dto.employer ? '업체명' : dto.employer}`,
-        payType:     `${dto.payType}`,
-        pay:         ${empty dto.pay ? 0 : dto.pay},
-        location:    `${dto.location}`,
-        createdDate: `${dto.createdDate}`, 
-        workPeriod:  `${dto.workPeriod}`,
-        category:    `${dto.category}`,
-        startTime:   `${dto.startTime}`,
-        endTime:     `${dto.endTime}`,
-        
-        recruitStatus: `${dto.recruitStatus}`, 
+        postingIdx: "${dto.postingIdx}",
+        title: `${dto.title}`,
+        employer: `${empty dto.employer ? '업체명' : dto.employer}`,
+        payType: `${dto.payType}`,
+        pay: ${empty dto.pay ? 0 : dto.pay},
+        location: `${dto.location}`,
+        createdDate: `${dto.createdDate}`,
+        workPeriod: `${dto.workPeriod}`,
+        category: `${dto.category}`,
+        startTime: `${dto.startTime}`,
+        endTime: `${dto.endTime}`,
+        recruitStatus: `${dto.recruitStatus}`,
         recruitStatusKor: `${dto.recruitStatusKor}`,
-        
-        isScrapped:  ${userScrapList != null && userScrapList.contains(dto.postingIdx) ? 1 : 0}        
+        isScrapped: ${userScrapList != null && userScrapList.contains(dto.postingIdx) ? 1 : 0}
       }${!status.last ? ',' : ''}
       </c:forEach>
     ];
   </script>
 
   <script src="${pageContext.request.contextPath}/dist/js/alba/alba-list.js"></script>
-  
+
 </body>
 </html>
