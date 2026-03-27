@@ -460,9 +460,13 @@ html {
     box-sizing: content-box !important;
 }
 
-.baton-toast-container {
+
+
+
+/* 토스트 컨테이너 */
+#baton-toast-container {
     position: fixed;
-    top: 100px;
+    top: 50px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000000;
@@ -473,49 +477,76 @@ html {
     pointer-events: none;
 }
 
+/* 선 없이도 빛나는 '진짜' 유리알 디자인 */
 .baton-toast-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 16px 32px;
-    background: rgba(25, 31, 40, 0.95);
-    backdrop-filter: blur(10px);
-    color: #FFFFFF;
-    border-radius: 100px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    min-width: 320px;
-    justify-content: center;
-    animation: batonFadeInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    gap: 16px;
+    padding: 18px 32px;
+    border-radius: 30px; /* 더 둥글게 해서 구슬 같은 느낌 */
+    min-width: 360px;
+    border: none !important; /* 구린 선은 확실히 제거 */
+    
+    /* 1. 배경: 도메인 색상을 머금은 아주 맑은 유리 */
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.4) 0%, 
+        var(--header-domain-bg) 60%,
+        rgba(255, 255, 255, 0.2) 100%
+    );
+    
+    /* 2. 유리알 광택의 핵심: 극한의 블러와 채도 */
+    backdrop-filter: blur(25px) saturate(220%) brightness(1.05);
+    -webkit-backdrop-filter: blur(25px) saturate(220%) brightness(1.05);
+    
+    /* 3. 필살기: 이중 안쪽 광택 (이게 없으면 그냥 색종이입니다) */
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.12), /* 바닥으로 떨어지는 깊은 그림자 */
+        inset 0 2px 4px rgba(255, 255, 255, 0.8), /* 상단 하이라이트 (빛 맺힘) */
+        inset 0 -2px 10px rgba(255, 255, 255, 0.3), /* 하단 반사광 */
+        inset 0 0 20px var(--header-domain-bg); /* 유리 내부로 스며든 도메인 컬러 */
+
+    color: #191F28;
+    animation: glassOrbitIn 0.6s cubic-bezier(0.15, 1.15, 0.6, 1) forwards;
 }
 
+.baton-toast-item.hide {
+    animation: glassOrbitOut 0.4s ease-in forwards !important;
+}
+
+/* 아이콘 박스: 유리구슬 안에 떠있는 느낌 */
 .toast-icon {
-    font-size: 20px;
-    color: #3182F6;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: var(--header-domain-color);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    flex-shrink: 0;
 }
 
 .toast-text {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
+    color: #191F28;
     letter-spacing: -0.5px;
 }
 
-.baton-toast-item.hide {
-    animation: batonFadeOutDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+/* 나타날 때 살짝 커지면서 퐁! 하고 등장 */
+@keyframes glassOrbitIn {
+    0% { opacity: 0; transform: translateY(-40px) scale(0.8); filter: blur(10px); }
+    100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 }
 
-.btn-baton-login:focus { background: var(--baton-primary); outline: none; transform: translateY(-4px); }
-.social-orb:focus, .footer-links a:focus { border-color: var(--baton-primary); color: var(--baton-primary); outline: none; }
-
-@keyframes batonFadeInDown {
-    0% { opacity: 0; transform: translateY(-40px); }
-    100% { opacity: 1; transform: translateY(0); }
+@keyframes glassOrbitOut {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-15px) scale(0.95); }
 }
 
-@keyframes batonFadeOutDown {
-    0% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(20px); }
-}
+
 
 .bt-overlay {
     position: fixed;

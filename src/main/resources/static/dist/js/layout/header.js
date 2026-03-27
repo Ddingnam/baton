@@ -188,22 +188,27 @@ function showBatonToast(text) {
 
     const toast = document.createElement('div');
     toast.className = 'baton-toast-item';
+    
+    // 아이콘 로직 생략 (기존과 동일)
+    let iconClass = text.includes('💬') ? 'ri-chat-3-line' : (text.includes('🔔') ? 'ri-notification-3-line' : 'ri-information-line');
+    let cleanText = text.replace(/[💬🔔]/g, '').trim();
+
     toast.innerHTML = `
-        <i class="ri-information-line toast-icon"></i>
-        <span class="toast-text">${text}</span>
+        <div class="toast-icon"><i class="${iconClass}"></i></div>
+        <span class="toast-text">${cleanText}</span>
     `;
     
     container.appendChild(toast);
 
     setTimeout(() => {
         toast.classList.add('hide');
-        
-        setTimeout(() => {
-            if (toast && toast.parentNode) {
-                toast.remove();
-            }
-        }, 700); 
-    }, 2000);
+    }, 2800);
+
+    toast.addEventListener('animationend', (e) => {
+        if (e.animationName === 'glassOrbitOut') {
+            toast.remove();
+        }
+    });
 }
 
 function closeBatonAuthLayer() {
