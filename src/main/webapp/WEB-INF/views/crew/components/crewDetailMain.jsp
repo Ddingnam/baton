@@ -88,7 +88,8 @@
                         <transition name="cd-fade" mode="out-in">
                             <component 
                                 :is="Component" 
-                                :crew="crew" />
+                                :crew="crew"
+                                :myStatus="myStatus" />
                         </transition>
                     </router-view>
                 </main>

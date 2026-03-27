@@ -1,6 +1,6 @@
 const CrewBoard = {
     template: '#crew-board-template',
-    props: ['crew'],
+    props: ['crew', 'myStatus'],
     data() {
 		const targetIdx = this.$route.query.targetBoardIdx;
 		
@@ -75,6 +75,15 @@ const CrewBoard = {
 	        handler(to) {
 	            const boardIdx = to.params.boardIdx;
 	            const path = to.path;
+				
+				const isRestrictedAction = path.includes('/edit/') || path.endsWith('/write') || boardIdx;
+
+                if (isRestrictedAction) {
+                    if (!this.myStatus || this.myStatus.status !== 'ACTIVE') {
+                        alert('모임의 정식 멤버만 이용할 수 있는 기능입니다.');
+                        this.$router.push(`/article/${this.crew.crewIdx}`);
+                    }
+                }
 
 	            if (path.includes('/edit/')) {
 	                this.viewMode = 'edit';
