@@ -3,16 +3,16 @@
 <mapper namespace="com.sp.app.admin.mapper.AdminCalendarMapper">
 
     <resultMap id="calendarEventMap" type="com.sp.app.admin.model.AdminCalendarEvent">
-        <id property="id" column="CALENDAR_IDX"/>
-        <result property="adminIdx" column="ADMIN_IDX"/>
-        <result property="title" column="TITLE"/>
-        <result property="date" column="EVENT_DATE"/>
+        <id property="id"        column="CALENDAR_IDX"/>
+        <result property="adminIdx"  column="ADMIN_IDX"/>
+        <result property="title"     column="TITLE"/>
+        <result property="date"      column="EVENT_DATE"/>
         <result property="startTime" column="START_TIME"/>
-        <result property="endTime" column="END_TIME"/>
-        <result property="allDay" column="ALL_DAY"/>
-        <result property="color" column="COLOR"/>
-        <result property="memo" column="MEMO"/>
-        <result property="type" column="EVENT_TYPE"/>
+        <result property="endTime"   column="END_TIME"/>
+        <result property="allDay"    column="ALL_DAY"     javaType="java.lang.Integer" jdbcType="INTEGER"/>
+        <result property="color"     column="COLOR"/>
+        <result property="memo"      column="MEMO"/>
+        <result property="type"      column="EVENT_TYPE"/>
         <result property="createdAt" column="CREATED_AT"/>
         <result property="updatedAt" column="UPDATED_AT"/>
     </resultMap>
@@ -31,14 +31,14 @@
                TO_CHAR(CREATED_AT, 'YYYY-MM-DD HH24:MI') AS CREATED_AT,
                TO_CHAR(UPDATED_AT, 'YYYY-MM-DD HH24:MI') AS UPDATED_AT
         FROM ADMIN_CALENDAR_EVENT
-        WHERE ADMIN_IDX = #{adminIdx}
+        WHERE ADMIN_IDX  = #{adminIdx}
           AND EVENT_DATE BETWEEN #{from} AND #{to}
         ORDER BY EVENT_DATE ASC,
                  NVL(START_TIME, '00:00') ASC,
                  CALENDAR_IDX ASC
     </select>
 
-    <select id="getEvent" parameterType="long" resultMap="calendarEventMap">
+    <select id="findById" parameterType="map" resultMap="calendarEventMap">
         SELECT CALENDAR_IDX,
                ADMIN_IDX,
                TITLE,
@@ -53,9 +53,13 @@
                TO_CHAR(UPDATED_AT, 'YYYY-MM-DD HH24:MI') AS UPDATED_AT
         FROM ADMIN_CALENDAR_EVENT
         WHERE CALENDAR_IDX = #{id}
+          AND ADMIN_IDX    = #{adminIdx}
     </select>
 
     <insert id="insertEvent" parameterType="com.sp.app.admin.model.AdminCalendarEvent">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            SELECT ADMIN_CALENDAR_EVENT_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
         INSERT INTO ADMIN_CALENDAR_EVENT (
             CALENDAR_IDX,
             ADMIN_IDX,
@@ -70,16 +74,16 @@
             CREATED_AT,
             UPDATED_AT
         ) VALUES (
-            ADMIN_CALENDAR_EVENT_SEQ.NEXTVAL,
+            #{id},
             #{adminIdx},
-            #{title},
-            #{date},
-            #{startTime},
-            #{endTime},
-            #{allDay},
-            #{color},
-            #{memo},
-            #{type},
+            #{title,         jdbcType=VARCHAR},
+            #{date,          jdbcType=VARCHAR},
+            #{startTime,     jdbcType=VARCHAR},
+            #{endTime,       jdbcType=VARCHAR},
+            #{allDay,        jdbcType=INTEGER},
+            #{color,         jdbcType=VARCHAR},
+            #{memo,          jdbcType=VARCHAR},
+            #{type,          jdbcType=VARCHAR},
             SYSTIMESTAMP,
             SYSTIMESTAMP
         )
@@ -87,23 +91,23 @@
 
     <update id="updateEvent" parameterType="com.sp.app.admin.model.AdminCalendarEvent">
         UPDATE ADMIN_CALENDAR_EVENT
-        SET TITLE = #{title},
-            EVENT_DATE = #{date},
-            START_TIME = #{startTime},
-            END_TIME = #{endTime},
-            ALL_DAY = #{allDay},
-            COLOR = #{color},
-            MEMO = #{memo},
-            EVENT_TYPE = #{type},
+        SET TITLE      = #{title,     jdbcType=VARCHAR},
+            EVENT_DATE = #{date,      jdbcType=VARCHAR},
+            START_TIME = #{startTime, jdbcType=VARCHAR},
+            END_TIME   = #{endTime,   jdbcType=VARCHAR},
+            ALL_DAY    = #{allDay,    jdbcType=INTEGER},
+            COLOR      = #{color,     jdbcType=VARCHAR},
+            MEMO       = #{memo,      jdbcType=VARCHAR},
+            EVENT_TYPE = #{type,      jdbcType=VARCHAR},
             UPDATED_AT = SYSTIMESTAMP
         WHERE CALENDAR_IDX = #{id}
-          AND ADMIN_IDX = #{adminIdx}
+          AND ADMIN_IDX    = #{adminIdx}
     </update>
 
     <delete id="deleteEvent" parameterType="map">
         DELETE FROM ADMIN_CALENDAR_EVENT
         WHERE CALENDAR_IDX = #{id}
-          AND ADMIN_IDX = #{adminIdx}
+          AND ADMIN_IDX    = #{adminIdx}
     </delete>
 
 </mapper>

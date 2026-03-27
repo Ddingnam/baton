@@ -12,7 +12,7 @@ public class AdminCalendarEvent {
     private String date;
     private String startTime;
     private String endTime;
-    private Boolean allDay;
+    private Integer allDay;
     private String color;
     private String memo;
     private String type;

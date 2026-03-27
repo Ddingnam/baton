@@ -104,9 +104,13 @@ function apiGet(url) {
         .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
 }
 function apiPost(url, body) {
+    const token  = document.querySelector('meta[name="_csrf"]')?.content;
+    const header = document.querySelector('meta[name="_csrf_header"]')?.content;
+    const headers = { 'Content-Type': 'application/json' };
+    if (token && header) headers[header] = token;
     return fetch(url, {
         method:'POST', credentials:'same-origin',
-        headers:{'Content-Type':'application/json'},
+        headers,
         body:JSON.stringify(body)
     }).then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
 }

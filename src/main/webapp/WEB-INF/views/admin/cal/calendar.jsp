@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="c"   uri="jakarta.tags.core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -13,6 +14,9 @@
 <script>
 window.CTX='${pageContext.request.contextPath}';
 </script>
+<!-- CSRF -->
+<meta name="_csrf"        content="${_csrf.token}"/>
+<meta name="_csrf_header" content="${_csrf.headerName}"/>
 </head>
 <body>
 <div class="cp-shell">

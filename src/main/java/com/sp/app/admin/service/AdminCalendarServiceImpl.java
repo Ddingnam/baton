@@ -25,10 +25,10 @@ public class AdminCalendarServiceImpl implements AdminCalendarService {
         event.setAdminIdx(adminIdx);
 
         if (event.getAllDay() == null) {
-            event.setAllDay(Boolean.FALSE);
+            event.setAllDay(0);
         }
 
-        if (Boolean.TRUE.equals(event.getAllDay())) {
+        if (event.getAllDay() == 1) {
             event.setStartTime(null);
             event.setEndTime(null);
         }
@@ -52,9 +52,7 @@ public class AdminCalendarServiceImpl implements AdminCalendarService {
     @Override
     @Transactional
     public void deleteEvent(Long adminIdx, Long id) {
-        if (id == null) {
-            return;
-        }
+        if (id == null) return;
         calendarMapper.deleteEvent(id, adminIdx);
     }
 }
