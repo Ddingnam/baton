@@ -195,45 +195,57 @@
 								<a href="#" class="theme-link">전체보기 <i class="ri-arrow-right-s-line"></i></a>
 							</div>
 							<div class="lc-list">
-								<div class="lc-item">
-									<div class="item-icon theme-icon-bg"><i class="ri-shopping-bag-3-fill"></i></div>
-									<div class="item-info">
-										<h4>아이폰 15 프로 미개봉 급매</h4>
-										<p class="info-metrics">중고구매 · 1시간 전</p>
-									</div>
-									<div class="item-right"><span class="theme-badge">거래완료</span></div>
-								</div>
-								<div class="lc-item">
-									<div class="item-icon theme-icon-bg"><i class="ri-team-fill"></i></div>
-									<div class="item-info">
-										<h4>주말 아침 한강 러닝크루</h4>
-										<p class="info-metrics">동네모임 · 2일 전</p>
-									</div>
-									<div class="item-right"><span class="theme-badge">참여중</span></div>
-								</div>
-								<div class="lc-item">
-									<div class="item-icon theme-icon-bg"><i class="ri-briefcase-fill"></i></div>
-									<div class="item-info">
-										<h4>스타벅스 강남역점 주말 파트타임</h4>
-										<p class="info-metrics">알바지원 · 3일 전</p>
-									</div>
-									<div class="item-right"><span class="theme-badge-outline">열람대기</span></div>
-								</div>
-								
+							
+							    <c:if test="${not empty tradeList}">
+							        <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/trade/main#/article/${tradeList[0].productIdx}'">
+							            <div class="item-icon theme-icon-bg">
+							                <i class="ri-shopping-bag-3-fill"></i>
+							            </div>
+							            <div class="item-info">
+							                <h4>${tradeList[0].title}</h4>
+							                <p class="info-metrics">중고거래 · ${tradeList[0].lastUpDate}</p>
+							            </div>
+							            <div class="item-right">
+							                <span class="theme-badge">${tradeList[0].tradeStatus}</span>
+							            </div>
+							        </div>
+							    </c:if>
+							
 								<c:if test="${not empty myPosts}">
-									<div class="lc-item" style="cursor:pointer" onclick="location.href='${pageContext.request.contextPath}/community/article/${myPosts[0].id}'">
-										<div class="item-icon theme-icon-bg"><i class="ri-chat-3-fill"></i></div>
-										<div class="item-info">
-											<h4>${myPosts[0].subject}</h4>
-											<p class="info-metrics">커뮤니티 · <c:out value="${fn:substring(myPosts[0].regDate.toString(), 5, 10)}"/></p>
-										</div>
-										<div class="item-right">
-											<c:if test="${not empty myPosts[0].category}">
-												<span class="theme-badge">${myPosts[0].category}</span>
-											</c:if>
-										</div>
-									</div>
+								    <div class="lc-item" onclick="location.href='${pageContext.request.contextPath}/community/article/${myPosts[0].id}'">
+								        <div class="item-icon theme-icon-bg" style="background: #E8F3FF; color: #3182F6;">
+								            <i class="ri-chat-3-fill"></i>
+								        </div>
+								        <div class="item-info">
+								            <h4>${myPosts[0].subject}</h4>
+								            <p class="info-metrics">커뮤니티 · <fmt:parseDate value="${myPosts[0].regDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedRegDate" type="both" /><fmt:formatDate value="${parsedRegDate}" pattern="MM월 dd일"/></p>
+								        </div>
+								        <div class="item-right">
+								            <span class="theme-badge" style="background: #E8F3FF; color: #3182F6;">작성완료</span>
+								        </div>
+								    </div>
 								</c:if>
+							
+							    <c:if test="${not empty albaApplyList}">
+							        <div class="lc-item">
+							            <div class="item-icon theme-icon-bg" style="background: #FFF4E6; color: #FF922B;">
+							                <i class="ri-briefcase-fill"></i>
+							            </div>
+							            <div class="item-info">
+							                <h4>${albaApplyList[0].title}</h4>
+							                <p class="info-metrics">알바지원 · ${albaApplyList[0].applyDate}</p>
+							            </div>
+							            <div class="item-right">
+							                <span class="theme-badge" style="background: #FFF4E6; color: #FF922B;">지원완료</span>
+							            </div>
+							        </div>
+							    </c:if>
+							
+							    <c:if test="${empty tradeList && empty myPosts && empty albaApplyList}">
+							        <div class="lc-empty">
+							            <p>최근 활동 내역이 없습니다.</p>
+							        </div>
+							    </c:if>
 							</div>
 						</div>
 
