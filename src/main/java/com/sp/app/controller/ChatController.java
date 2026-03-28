@@ -44,6 +44,13 @@ public class ChatController {
         String dbProfilePhoto = chatService.getSenderProfilePhoto(message.getUserIdx());
         if (dbProfilePhoto != null) message.setProfilePhoto(dbProfilePhoto);
 
+        String dbTheme = chatService.getSenderTheme(message.getUserIdx());
+        if (dbTheme != null && dbTheme.trim().length() != 0) {
+            message.setTheme(dbTheme);
+        } else if (message.getTheme() == null || message.getTheme().trim().length() == 0) {
+            message.setTheme("purple");
+        }
+
         chatService.insertMessage(message);
         chatService.updateLastReadDate(message.getRoomIdx(), message.getUserIdx());
         messagingTemplate.convertAndSend("/topic/room/" + message.getRoomIdx(), message);

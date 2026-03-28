@@ -21,4 +21,5 @@ public interface ChatService {
 	public List<ChatRoom> listAlbaChatRoom(Long albaIdx, Long myUserIdx);
 	public String getSenderNickname(Long userIdx);
 	public String getSenderProfilePhoto(Long userIdx);
+	public String getSenderTheme(Long userIdx);
 }

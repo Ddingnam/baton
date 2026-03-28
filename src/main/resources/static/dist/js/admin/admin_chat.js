@@ -22,7 +22,6 @@
     const emojiPicker     = document.getElementById('emojiPicker');
     function formatBadgeCount(count) { return count > 99 ? '99+' : String(count); }
     function updateStudioUnreadBadge() {
-        return; // ✅ [수정] 뱃지 제거 - 더 이상 badge를 업데이트하지 않음
         var badge = document.getElementById('studioChatBadge');
         if (!badge) return;
         fetch(CHAT_CTX + '/admin/chat/unread', { credentials: 'same-origin' })
@@ -97,12 +96,14 @@
                             }
                         }
                     }
+                    updateStudioUnreadBadge();
                 } catch(e) {}
             });
         }
         clearUnreadBadges();
         sendReadEvent();
         scrollToBottom();
+        normalizeExistingTheme();
         setTimeout(function() {
             fetch(CHAT_CTX + '/api/presence/all', { credentials: 'same-origin' })
                 .then(function(r) { return r.json(); })
@@ -163,8 +164,10 @@
     }
 	
 	function getCurrentTheme() {
-	    return document.documentElement.getAttribute('data-theme') || 'purple';
-	}
+        return document.documentElement.getAttribute('data-theme')
+            || window.CHAT_MY_THEME
+            || 'purple';
+    }
 
 	function doSend(content) {
 	    content = content.trim();
@@ -219,6 +222,7 @@
             method: 'POST',
             credentials: 'same-origin'
         }).catch(function() {});
+        updateStudioUnreadBadge();
     }
     const avatarClasses = ['jy','hn','mn','hs','op','cs'];
     const avatarMap     = {};
@@ -237,6 +241,42 @@
             avatarMap[userIdx] = avatarClasses[avatarIdx++ % avatarClasses.length];
         }
         return avatarMap[userIdx];
+    }
+
+    var themeNames = ['purple','blue','emerald','sunset','rose','slate'];
+
+    function clearThemeClasses(el) {
+        if (!el) return;
+        themeNames.forEach(function(theme) {
+            el.classList.remove('theme-' + theme);
+            el.classList.remove('theme-recv-' + theme);
+        });
+    }
+
+    function applyCurrentThemeToElement(el, prefix) {
+        if (!el) return;
+        clearThemeClasses(el);
+        el.classList.add((prefix || 'theme-') + getCurrentTheme());
+    }
+
+    function normalizeExistingTheme() {
+        var currentTheme = getCurrentTheme();
+
+        document.querySelectorAll('.chat-msg-group .chat-avt[data-uid]').forEach(function(el) {
+            avatarClasses.forEach(function(cls) { el.classList.remove(cls); });
+            clearThemeClasses(el);
+            el.classList.add('theme-recv-' + currentTheme);
+        });
+
+        document.querySelectorAll('.chat-msg-group .chat-bubble').forEach(function(el) {
+            clearThemeClasses(el);
+            el.classList.add('theme-' + currentTheme);
+        });
+
+        document.querySelectorAll('.chat-head-dm-avt, .chat-welcome-dm-avt').forEach(function(el) {
+            clearThemeClasses(el);
+            el.classList.add('theme-recv-' + currentTheme);
+        });
     }
     function buildAvtHtml(photo, initial, cls) {
         if (photo) {
@@ -272,6 +312,7 @@
         } else {
             safe = escHtml(rawContent).replace(/\n/g, '<br>');
         }
+        const currentTheme = getCurrentTheme();
         const avatarCls = getAvatarClass(Number(msg.userIdx));
         const wrapper = document.createElement('div');
         wrapper.className = 'chat-msg-group' + (isMe ? ' mine' : '');
@@ -282,18 +323,18 @@
               +     '<span class="chat-msg-time">' + timeStr + '</span>'
               +     '<span class="chat-msg-name">' + escHtml(name) + '</span>'
               +   '</div>'
-              +   '<div class="chat-bubble mine theme-' + (msg.theme || 'purple') + '">' + safe + '</div>'
+              +   '<div class="chat-bubble mine theme-' + currentTheme + '">' + safe + '</div>'
               + '</div>'
               + buildAvtHtml(photo, initial, 'me ' + avatarCls);
         } else {
             wrapper.innerHTML =
-                buildAvtHtml(photo, initial, 'theme-recv-' + (msg.theme || 'purple'))
+                buildAvtHtml(photo, initial, 'theme-recv-' + currentTheme)
               + '<div class="chat-msg-body">'
               +   '<div class="chat-msg-meta">'
               +     '<span class="chat-msg-name">' + escHtml(name) + '</span>'
               +     '<span class="chat-msg-time">' + timeStr + '</span>'
               +   '</div>'
-              +   '<div class="chat-bubble theme-' + (msg.theme || 'purple') + '">' + safe + '</div>'
+              +   '<div class="chat-bubble theme-' + currentTheme + '">' + safe + '</div>'
               + '</div>';
         }
         chatArea.insertBefore(wrapper, typingIndicator);
@@ -645,6 +686,7 @@
         }
         connect();
         scrollToBottom();
+        updateStudioUnreadBadge();
     });
 })();
 (function() {
@@ -999,12 +1041,18 @@
         if (e.target === this) closeManageModal();
     });
 	
-    document.querySelectorAll('.chat-avt[data-uid]').forEach(function(el) {
-        var uid = Number(el.dataset.uid);
-        if (uid && uid !== CHAT_MY_IDX) {
-            el.classList.add(getAvatarClass(uid));
-        }
+    normalizeExistingTheme();
+
+    var rootObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+                normalizeExistingTheme();
+            }
+        });
     });
+    rootObserver.observe(document.documentElement, { attributes: true });
+
+    window.addEventListener('load', normalizeExistingTheme);
 })();
 
 function leaveDM(roomIdx) {

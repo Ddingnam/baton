@@ -28,4 +28,5 @@ public interface ChatMapper {
 	public List<ChatRoom> listAlbaChatRoom(Map<String, Object> map);
 	public String getSenderNickname(@Param("userIdx") Long userIdx);
 	public String getSenderProfilePhoto(@Param("userIdx") Long userIdx);
+	public String getSenderTheme(@Param("userIdx") Long userIdx);
 }

@@ -139,4 +139,9 @@ public class ChatServiceImpl implements ChatService {
 	public String getSenderProfilePhoto(Long userIdx) {
 		return mapper.getSenderProfilePhoto(userIdx);
 	}
+
+	@Override
+	public String getSenderTheme(Long userIdx) {
+		return mapper.getSenderTheme(userIdx);
+	}
 }

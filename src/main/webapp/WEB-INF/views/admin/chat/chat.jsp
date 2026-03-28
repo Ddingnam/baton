@@ -22,7 +22,7 @@
     <main class="agency-main chat-main-wrap">
         <div class="chat-layout">
 
-            
+
             <div class="chat-rooms-panel" id="chatRoomsPanel">
 
                 <div class="chat-panel-head">
@@ -40,7 +40,7 @@
                     <input type="text" class="chat-search" id="roomSearch" placeholder="채널 · 멤버 검색">
                 </div>
 
-                
+
                 <div class="chat-section-header" id="channelSectionHeader">
                     <button class="chat-section-toggle" id="channelToggle">
                         <i class="ri-arrow-down-s-line"></i>
@@ -56,9 +56,6 @@
                              data-roomidx="${room.roomIdx}" data-roomname="${room.roomName}" data-type="channel">
                             <span class="chat-room-hash"><i class="ri-hashtag"></i></span>
                             <span class="chat-room-name">${room.roomName}</span>
-                            <c:if test="${room.unreadCount > 0}">
-                                <span class="chat-room-badge" id="badge-${room.roomIdx}">${room.unreadCount}</span>
-                            </c:if>
                             <div class="channel-item-actions">
                                 <button class="channel-mute-btn" data-roomidx="${room.roomIdx}" title="알림 끄기/켜기"
                                         onclick="event.stopPropagation(); toggleMuteInline(${room.roomIdx}, this)">
@@ -74,7 +71,7 @@
                     </c:forEach>
                 </div>
 
-                
+
                 <div class="chat-section-header" id="dmSectionHeader">
                     <button class="chat-section-toggle" id="dmToggle">
                         <i class="ri-arrow-down-s-line"></i>
@@ -107,9 +104,6 @@
                                     <span class="chat-room-preview" id="preview-${dm.roomIdx}">${fn:substring(dm.recentMessage,0,20)}</span>
                                 </c:if>
                             </div>
-                            <c:if test="${dm.unreadCount > 0}">
-                                <span class="chat-room-badge" id="badge-${dm.roomIdx}">${dm.unreadCount}</span>
-                            </c:if>
                             <button class="dm-leave-btn" onclick="event.stopPropagation(); leaveDM(${dm.roomIdx})" title="나가기">×</button>
                         </div>
                     </c:forEach>
@@ -125,7 +119,7 @@
                     <span class="conn-label" id="connLabel">연결 중...</span>
                 </div>
 
-                
+
                 <div class="chat-my-profile">
                     <div class="chat-my-avt">
                         <c:choose>
@@ -145,7 +139,7 @@
                 </div>
             </div>
 
-            
+
             <div class="chat-main" id="chatMain">
 
                 <div class="chat-main-head">
@@ -153,10 +147,9 @@
                         <button class="chat-sidebar-toggle" id="chatSidebarToggle">
                             <i class="ri-menu-4-fill"></i>
                         </button>
-                        <%-- ✅ [수정] DM 헤더 아바타: 상대방 프로필 사진 + userIdx로 온라인 상태 연동 --%>
                         <c:choose>
                             <c:when test="${currentRoomType == 'dm'}">
-                                <div class="chat-head-dm-avt" id="avt-dm-${counterpartUserIdx}"
+                                <div class="chat-head-dm-avt theme-recv-${myTheme}" id="avt-dm-${counterpartUserIdx}"
                                      <c:if test="${not empty counterpartPhoto}">style="background-image:url('${pageContext.request.contextPath}/uploads/profile/${counterpartPhoto}');background-size:cover;background-position:center;color:transparent;font-size:0;"</c:if>>
                                     ${fn:substring(currentRoomName, 0, 2)}
                                 </div>
@@ -192,7 +185,7 @@
                 </div>
 
                 <div class="chat-messages" id="chatArea">
-                    
+
                     <c:if test="${not empty currentRoomName and currentRoomType == 'channel'}">
                         <div class="chat-welcome-banner">
                             <div class="chat-welcome-icon"><i class="ri-hashtag"></i></div>
@@ -202,7 +195,7 @@
                     </c:if>
                     <c:if test="${not empty currentRoomName and currentRoomType == 'dm'}">
                         <div class="chat-welcome-banner dm-banner">
-                            <div class="chat-welcome-dm-avt">
+                            <div class="chat-welcome-dm-avt theme-recv-${myTheme}">
                                 <c:forEach var="dm" items="${dmList}">
                                     <c:if test="${dm.roomIdx == currentRoomIdx}">
                                         <c:choose>
@@ -237,8 +230,7 @@
                                             <span class="chat-msg-time">${msgTime}</span>
                                             <span class="chat-msg-name">${myNickname}</span>
                                         </div>
-                                        <%-- ✅ [수정] 저장된 theme 사용 (없으면 myTheme fallback) --%>
-                                        <div class="chat-bubble mine theme-${empty chat.theme ? myTheme : chat.theme}">
+                                        <div class="chat-bubble mine theme-${myTheme}">
                                             <c:choose>
                                                 <c:when test="${fn:startsWith(chat.content, '__IMG__')}">
                                                     <c:set var="imgSrc" value="${fn:substring(chat.content, 7, fn:length(chat.content))}"/>
@@ -272,8 +264,7 @@
                             </c:when>
                             <c:otherwise>
                                 <div class="chat-msg-group">
-                                    <%-- ✅ [수정] 상대방 아바타에 theme-recv-{theme} 클래스 추가 --%>
-                                    <div class="chat-avt theme-recv-${empty chat.theme ? 'purple' : chat.theme}" data-uid="${chat.userIdx}">
+                                    <div class="chat-avt theme-recv-${myTheme}" data-uid="${chat.userIdx}">
                                         <c:choose>
                                             <c:when test="${not empty chat.profilePhoto}">
                                                 <img src="${pageContext.request.contextPath}/uploads/profile/${chat.profilePhoto}"
@@ -288,8 +279,7 @@
                                             <span class="chat-msg-name">${chat.nickname}</span>
                                             <span class="chat-msg-time">${msgTime}</span>
                                         </div>
-                                        <%-- ✅ [수정] 상대방 버블에 theme-{theme} 클래스 추가 --%>
-                                        <div class="chat-bubble theme-${empty chat.theme ? 'purple' : chat.theme}">
+                                        <div class="chat-bubble theme-${myTheme}">
                                             <c:choose>
                                                 <c:when test="${fn:startsWith(chat.content, '__IMG__')}">
                                                     <c:set var="imgSrc" value="${fn:substring(chat.content, 7, fn:length(chat.content))}"/>
@@ -358,7 +348,7 @@
                 </div>
             </div>
 
-            
+
             <div class="chat-member-panel" id="memberPanel">
                 <div class="chat-member-head">
                     멤버 <span class="member-count-badge">${fn:length(memberList)}</span>
@@ -408,19 +398,19 @@
             <button class="chat-modal-close" id="channelManageClose"><i class="ri-close-line"></i></button>
         </div>
         <div class="chat-modal-body" style="padding:0;">
-            
+
             <div style="display:flex;border-bottom:1px solid var(--border-color);">
                 <button class="channel-manage-tab active" data-tab="members" style="flex:1;padding:12px;border:none;background:none;font-size:13px;font-weight:700;color:var(--color-purple);border-bottom:2px solid var(--color-purple);cursor:pointer;">멤버 관리</button>
                 <button class="channel-manage-tab" data-tab="settings" style="flex:1;padding:12px;border:none;background:none;font-size:13px;font-weight:600;color:var(--text-sub);cursor:pointer;">채널 설정</button>
             </div>
-            
+
             <div id="manageTabMembers" style="padding:16px 20px;">
                 <p style="font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-sub);margin-bottom:10px;">현재 멤버</p>
                 <div id="currentMemberList" style="display:flex;flex-direction:column;gap:4px;max-height:180px;overflow-y:auto;margin-bottom:16px;"></div>
                 <p style="font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-sub);margin-bottom:10px;">멤버 추가</p>
                 <div id="nonMemberList" style="display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;"></div>
             </div>
-            
+
             <div id="manageTabSettings" style="padding:20px;display:none;">
 
                 <p style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light);margin-bottom:12px;">채널 이름 변경</p>
