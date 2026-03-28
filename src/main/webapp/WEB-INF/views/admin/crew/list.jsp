@@ -11,6 +11,8 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_main.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_member.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_ui.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_crew.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_report.css">
 </head>
@@ -28,24 +30,36 @@
                 </div>
             </div>
 
-            <div class="member-toolbar block-card" style="border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+            <div class="member-toolbar block-card">
                 <form class="toolbar-form" method="get" action="${pageContext.request.contextPath}/admin/crew/list">
                     <div class="status-tabs">
-                        <a href="?joinType=all&schType=${schType}&kwd=${kwd}" class="status-tab ${joinType == 'all' || empty joinType ? 'active' : ''}">전체</a>
-                        <a href="?joinType=free&schType=${schType}&kwd=${kwd}" class="status-tab ${joinType == 'free' ? 'active' : ''}">자유가입</a>
-                        <a href="?joinType=approval&schType=${schType}&kwd=${kwd}" class="status-tab ${joinType == 'approval' ? 'active' : ''}">승인가입</a>
+                        <a href="?joinType=all&schType=${schType}&kwd=${kwd}"
+                           class="status-tab ${joinType == 'all' || empty joinType ? 'active' : ''}">전체</a>
+                        <a href="?joinType=free&schType=${schType}&kwd=${kwd}"
+                           class="status-tab ${joinType == 'free' ? 'active' : ''}">자유가입</a>
+                        <a href="?joinType=approval&schType=${schType}&kwd=${kwd}"
+                           class="status-tab ${joinType == 'approval' ? 'active' : ''}">승인가입</a>
                     </div>
                     <div class="search-group">
-                        <select name="schType" class="fm-select" style="width: 130px; border-radius: 12px; border: 1px solid #E2E8F0; padding: 0 14px; font-weight: 600; color: #475569; outline: none; background: #fff;">
-                            <option value="name" ${schType == 'name' ? 'selected' : ''}>모임 이름</option>
-                            <option value="hostNickname" ${schType == 'hostNickname' ? 'selected' : ''}>호스트명</option>
-                        </select>
+                        <input type="hidden" name="schType" id="crewSchTypeInput" value="${schType}">
+                        <div class="adm-dropdown" id="crewSchType">
+                            <button type="button" class="adm-dropdown-btn" onclick="admToggle('crewSchType')">
+                                <span id="crewSchTypeLabel">통합검색</span>
+                                <i class="ri-arrow-down-s-line adm-dropdown-arrow"></i>
+                            </button>
+                            <div class="adm-dropdown-menu">
+                                <div class="adm-dropdown-item ${empty schType || schType == 'all' ? 'active' : ''}" data-value="all" onclick="admSelect(this,'crewSchType')">통합검색</div>
+                                <div class="adm-dropdown-item ${schType == 'name' ? 'active' : ''}" data-value="name" onclick="admSelect(this,'crewSchType')">모임 이름</div>
+                                <div class="adm-dropdown-item ${schType == 'hostNickname' ? 'active' : ''}" data-value="hostNickname" onclick="admSelect(this,'crewSchType')">호스트명</div>
+                            </div>
+                        </div>
                         <div class="search-input-wrap">
                             <i class="ri-search-2-line"></i>
-                            <input type="text" name="kwd" class="fm-input" value="${kwd}" placeholder="검색어 입력...">
+                            <input type="text" name="kwd" class="fm-input"
+                                   value="${kwd}" placeholder="모임 검색...">
                         </div>
                         <input type="hidden" name="joinType" value="${joinType}">
-                        <button type="submit" class="btn-pill btn-gradient" style="border-radius: 12px;">검색</button>
+                        <button type="submit" class="btn-pill btn-gradient">검색</button>
                     </div>
                 </form>
             </div>
@@ -228,12 +242,37 @@
     </div>
 </div>
 
+<script>var CTX = '${pageContext.request.contextPath}';</script>
+<script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/admin/admin_ui.js"></script>
+<script>
+function admToggle(id) {
+    var dd = document.getElementById(id);
+    var isOpen = dd.classList.contains('open');
+    document.querySelectorAll('.adm-dropdown.open').forEach(function(d) { d.classList.remove('open'); });
+    if (!isOpen) dd.classList.add('open');
+}
+function admSelect(el, ddId) {
+    document.getElementById(ddId + 'Input').value = el.dataset.value;
+    document.getElementById(ddId + 'Label').textContent = el.textContent.trim();
+    document.querySelectorAll('#' + ddId + ' .adm-dropdown-item').forEach(function(i) { i.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById(ddId).classList.remove('open');
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var map = { all: '통합검색', name: '모임 이름', hostNickname: '호스트명' };
+    var inp = document.getElementById('crewSchTypeInput');
+    if (inp && map[inp.value]) document.getElementById('crewSchTypeLabel').textContent = map[inp.value];
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.adm-dropdown.open').forEach(function(dd) {
+            if (!dd.contains(e.target)) dd.classList.remove('open');
+        });
+    });
+});
+</script>
 <script>
     var CTX = '${pageContext.request.contextPath}';
 
-    // ==========================================
-    // 1. 모임 상세(글보기) 모달 스크립트
-    // ==========================================
     var cdOverlay = document.getElementById('crewDetailOverlay');
     var cdBox = document.getElementById('cwModalBox');
 
@@ -246,8 +285,6 @@
             cdBox.style.opacity = '1';
             cdBox.style.transform = 'translateY(0) scale(1)';
         });
-
-        // 실제 모임 데이터 연동
         fetch(CTX + '/admin/crew/detail?crewIdx=' + crewIdx)
             .then(r => r.json())
             .then(d => {
@@ -298,9 +335,6 @@
     }
     cdOverlay.addEventListener('click', e => { if (e.target === cdOverlay) closeCrewDetail(); });
 
-    // ==========================================
-    // 2. 상태관리(눈/점검) 모달 스크립트
-    // ==========================================
     var caOverlay = document.getElementById('crewAdminOverlay');
     var currentCrewIdx = null;
 
@@ -342,7 +376,6 @@
     function closeAdminPanel() { caOverlay.classList.remove('show'); }
     caOverlay.addEventListener('click', e => { if (e.target === caOverlay) closeAdminPanel(); });
 
-    // 강제 해산(삭제) 로직
     document.getElementById('caDeleteBtn').addEventListener('click', function() {
         if(!currentCrewIdx) return;
         if(confirm('해당 동네모임을 강제 해산(삭제)하시겠습니까? 관련 데이터가 모두 지워집니다.')) {

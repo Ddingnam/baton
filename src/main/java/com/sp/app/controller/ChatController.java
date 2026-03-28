@@ -22,13 +22,13 @@ import com.sp.app.service.ChatService;
 
 @Controller
 public class ChatController {
-    
+
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatService chatService;
     private final StorageService storageService;
 
     @Value("${file.upload-root}")
-    private String uploadRoot; 
+    private String uploadRoot;
 
     public ChatController(SimpMessagingTemplate messagingTemplate, ChatService chatService, StorageService storageService) {
         this.messagingTemplate = messagingTemplate;
@@ -40,16 +40,20 @@ public class ChatController {
     public void sendMessage(ChatMessage message) {
         String dbNickname = chatService.getSenderNickname(message.getUserIdx());
         if (dbNickname != null) message.setNickname(dbNickname);
+
+        String dbProfilePhoto = chatService.getSenderProfilePhoto(message.getUserIdx());
+        if (dbProfilePhoto != null) message.setProfilePhoto(dbProfilePhoto);
+
         chatService.insertMessage(message);
         chatService.updateLastReadDate(message.getRoomIdx(), message.getUserIdx());
         messagingTemplate.convertAndSend("/topic/room/" + message.getRoomIdx(), message);
-        
+
         String senderName = chatService.getCounterpartNickname(message.getRoomIdx(), message.getUserIdx());
         Map<String, Object> alarmData = new HashMap<>();
         alarmData.put("type", "CHAT");
         alarmData.put("roomIdx", message.getRoomIdx());
         alarmData.put("sender", senderName);
-        
+
         if (message.getMsgType() != null && message.getMsgType() == 5) {
             alarmData.put("content", "(사진)");
         } else {
@@ -91,7 +95,7 @@ public class ChatController {
     public void typingSignal(ChatMessage message) {
         messagingTemplate.convertAndSend("/topic/typing/" + message.getRoomIdx(), message);
     }
-    
+
     @PostMapping("/chat/imageUpload")
     @ResponseBody
     public Map<String, Object> imageUpload(@RequestParam("file") MultipartFile file) {
@@ -99,7 +103,6 @@ public class ChatController {
         try {
             String pathname = uploadRoot + File.separator + "chat";
             String saveFilename = storageService.uploadFileToServer(file, pathname);
-            
             model.put("state", "true");
             model.put("saveFilename", saveFilename);
         } catch (Exception e) {

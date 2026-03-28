@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.ChatMapper">
-    
+
     <insert id="insertMessage" parameterType="com.sp.app.model.ChatMessage">
         INSERT INTO chatMessage (msgIdx, roomIdx, userIdx, content, msgType, sendDate)
         VALUES (chatMsgSeq.NEXTVAL, #{roomIdx}, #{userIdx}, #{content}, #{msgType}, SYSTIMESTAMP)
     </insert>
 
     <select id="listChatMessage" parameterType="Long" resultType="com.sp.app.model.ChatMessage">
-        SELECT 
+        SELECT
             m.msgIdx, m.roomIdx, m.userIdx, m.content, m.msgType,
             TO_CHAR(m.sendDate, 'YYYY-MM-DD HH24:MI') AS sendDate,
             u.nickname, u.profile_photo AS profilePhoto,
-            (SELECT COUNT(*) FROM chatMember cm 
+            (SELECT COUNT(*) FROM chatMember cm
              WHERE cm.roomIdx = m.roomIdx AND <![CDATA[ cm.lastReadDate < m.sendDate ]]>) AS unreadCount
         FROM chatMessage m
         JOIN users u ON m.userIdx = u.userIdx
@@ -56,12 +56,12 @@
     </select>
 
     <select id="listTradeChatRoom" parameterType="map" resultType="com.sp.app.model.ChatRoom">
-        SELECT 
+        SELECT
             c.roomIdx, c.tradeIdx, u.userIdx, u.nickname, u.profile_photo AS profilePhoto,
             (SELECT content FROM (SELECT content FROM chatMessage WHERE roomIdx = c.roomIdx ORDER BY msgIdx DESC) WHERE ROWNUM = 1) AS recentMessage,
             (SELECT TO_CHAR(sendDate, 'MM-DD HH24:MI') FROM (SELECT sendDate FROM chatMessage WHERE roomIdx = c.roomIdx ORDER BY msgIdx DESC) WHERE ROWNUM = 1) AS recentDate,
-            (SELECT COUNT(*) FROM chatMessage m 
-             WHERE m.roomIdx = c.roomIdx AND m.userIdx != #{myUserIdx} 
+            (SELECT COUNT(*) FROM chatMessage m
+             WHERE m.roomIdx = c.roomIdx AND m.userIdx != #{myUserIdx}
              AND <![CDATA[ m.sendDate > (SELECT lastReadDate FROM chatMember WHERE roomIdx = c.roomIdx AND userIdx = #{myUserIdx}) ]]>) AS unreadCount
         FROM chatRoom c
         JOIN chatMember m ON c.roomIdx = m.roomIdx AND m.userIdx != #{myUserIdx}
@@ -70,28 +70,28 @@
         AND EXISTS (SELECT 1 FROM chatMember WHERE roomIdx = c.roomIdx AND userIdx = #{myUserIdx} AND visible = 1)
         ORDER BY recentDate DESC NULLS LAST
     </select>
-    
+
     <select id="getTradeInfo" parameterType="Long" resultType="map">
-        SELECT 
-            p.productIdx, 
-            p.title, 
+        SELECT
+            p.productIdx,
+            p.title,
             p.price,
             p.tradeStatus, p.userIdx as sellerIdx, TO_CHAR(p.createdDate, 'YYYY-MM-DD') AS createdDate,
             (SELECT saveName FROM productImages WHERE productIdx = p.productIdx AND imgOrder = 1) AS saveName
         FROM product p
         WHERE p.productIdx = #{tradeIdx}
     </select>
-    
+
     <select id="listAllChatRoom" parameterType="Long" resultType="com.sp.app.model.ChatRoom">
-        SELECT 
+        SELECT
             c.roomIdx, c.tradeIdx,
             u.userIdx, u.nickname, u.profile_photo AS profilePhoto,
             t.title AS tradeTitle,
             (SELECT saveName FROM productImages WHERE productIdx = c.tradeIdx AND imgOrder = 1) AS tradeSaveName,
             (SELECT content FROM (SELECT content FROM chatMessage WHERE roomIdx = c.roomIdx ORDER BY msgIdx DESC) WHERE ROWNUM = 1) AS recentMessage,
             (SELECT TO_CHAR(sendDate, 'MM-DD HH24:MI') FROM (SELECT sendDate FROM chatMessage WHERE roomIdx = c.roomIdx ORDER BY msgIdx DESC) WHERE ROWNUM = 1) AS recentDate,
-            (SELECT COUNT(*) FROM chatMessage m 
-             WHERE m.roomIdx = c.roomIdx AND m.userIdx != #{myUserIdx} 
+            (SELECT COUNT(*) FROM chatMessage m
+             WHERE m.roomIdx = c.roomIdx AND m.userIdx != #{myUserIdx}
              AND <![CDATA[ m.sendDate > (SELECT lastReadDate FROM chatMember WHERE roomIdx = c.roomIdx AND userIdx = #{myUserIdx}) ]]>) AS unreadCount
         FROM chatRoom c
         JOIN chatMember my_m ON c.roomIdx = my_m.roomIdx AND my_m.userIdx = #{myUserIdx} AND my_m.visible = 1
@@ -100,7 +100,7 @@
         LEFT JOIN product t ON c.tradeIdx = t.productIdx
         ORDER BY recentDate DESC NULLS LAST
     </select>
-    
+
     <select id="getUnreadTotalCount" parameterType="Long" resultType="int">
         SELECT COUNT(*)
         FROM chatMessage m
@@ -114,11 +114,11 @@
         )
         AND <![CDATA[ m.sendDate > NVL(cm.lastReadDate, TO_TIMESTAMP('2000-01-01', 'YYYY-MM-DD')) ]]>
     </select>
-    
+
     <select id="getRoomMembers" parameterType="Long" resultType="Long">
         SELECT userIdx FROM chatMember WHERE roomIdx = #{roomIdx}
     </select>
-    
+
     <update id="hideChatRoom" parameterType="map">
         UPDATE chatMember SET visible = 0 WHERE roomIdx = #{roomIdx} AND userIdx = #{userIdx}
     </update>
@@ -126,14 +126,13 @@
     <update id="updateRoomVisibleTrue" parameterType="Long">
         UPDATE chatMember SET visible = 1 WHERE roomIdx = #{roomIdx}
     </update>
-    
-    
-    <!-- alba  -->
+
     <select id="findAlbaChatRoom" parameterType="map" resultType="Long">
         SELECT c.roomIdx FROM chatRoom c
         JOIN chatMember m1 ON c.roomIdx = m1.roomIdx AND m1.userIdx = #{buyerIdx}
         JOIN chatMember m2 ON c.roomIdx = m2.roomIdx AND m2.userIdx = #{sellerIdx}
-        WHERE c.tradeIdx = #{albaIdx} AND c.roomType = 3 </select>
+        WHERE c.tradeIdx = #{albaIdx} AND c.roomType = 3
+    </select>
 
     <insert id="insertAlbaChatRoom" parameterType="map">
         <selectKey keyProperty="roomIdx" resultType="Long" order="BEFORE">
@@ -143,9 +142,9 @@
     </insert>
 
     <select id="getAlbaInfo" parameterType="Long" resultType="map">
-        SELECT 
-            posting_idx AS postingIdx, 
-            title, 
+        SELECT
+            posting_idx AS postingIdx,
+            title,
             pay,
             TO_CHAR(created_date, 'YYYY-MM-DD') AS createdDate
         FROM job_posting
@@ -153,23 +152,27 @@
     </select>
 
     <select id="listAlbaChatRoom" parameterType="map" resultType="com.sp.app.model.ChatRoom">
-        SELECT 
+        SELECT
             c.roomIdx, c.tradeIdx AS tradeIdx, u.userIdx, u.nickname, u.profile_photo AS profilePhoto,
             (SELECT content FROM (SELECT content FROM chatMessage WHERE roomIdx = c.roomIdx ORDER BY msgIdx DESC) WHERE ROWNUM = 1) AS recentMessage,
             (SELECT TO_CHAR(sendDate, 'MM-DD HH24:MI') FROM (SELECT sendDate FROM chatMessage WHERE roomIdx = c.roomIdx ORDER BY msgIdx DESC) WHERE ROWNUM = 1) AS recentDate,
-            (SELECT COUNT(*) FROM chatMessage m 
-             WHERE m.roomIdx = c.roomIdx AND m.userIdx != #{myUserIdx} 
+            (SELECT COUNT(*) FROM chatMessage m
+             WHERE m.roomIdx = c.roomIdx AND m.userIdx != #{myUserIdx}
              AND <![CDATA[ m.sendDate > (SELECT lastReadDate FROM chatMember WHERE roomIdx = c.roomIdx AND userIdx = #{myUserIdx}) ]]>) AS unreadCount
         FROM chatRoom c
         JOIN chatMember m ON c.roomIdx = m.roomIdx AND m.userIdx != #{myUserIdx}
         JOIN users u ON m.userIdx = u.userIdx
-        WHERE c.tradeIdx = #{albaIdx} AND c.roomType = 3 AND EXISTS (SELECT 1 FROM chatMember WHERE roomIdx = c.roomIdx AND userIdx = #{myUserIdx} AND visible = 1)
+        WHERE c.tradeIdx = #{albaIdx} AND c.roomType = 3
+        AND EXISTS (SELECT 1 FROM chatMember WHERE roomIdx = c.roomIdx AND userIdx = #{myUserIdx} AND visible = 1)
         ORDER BY recentDate DESC NULLS LAST
     </select>
-        
 
     <select id="getSenderNickname" parameterType="Long" resultType="String">
         SELECT nickname FROM users WHERE userIdx = #{userIdx}
+    </select>
+
+    <select id="getSenderProfilePhoto" parameterType="Long" resultType="String">
+        SELECT profile_photo FROM users WHERE userIdx = #{userIdx}
     </select>
 
 </mapper>

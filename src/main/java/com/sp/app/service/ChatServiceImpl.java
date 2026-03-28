@@ -134,4 +134,9 @@ public class ChatServiceImpl implements ChatService {
 	public String getSenderNickname(Long userIdx) {
 		return mapper.getSenderNickname(userIdx);
 	}
+
+	@Override
+	public String getSenderProfilePhoto(Long userIdx) {
+		return mapper.getSenderProfilePhoto(userIdx);
+	}
 }

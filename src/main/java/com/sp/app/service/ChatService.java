@@ -20,4 +20,5 @@ public interface ChatService {
 	public Map<String, Object> getAlbaInfo(Long albaIdx);
 	public List<ChatRoom> listAlbaChatRoom(Long albaIdx, Long myUserIdx);
 	public String getSenderNickname(Long userIdx);
+	public String getSenderProfilePhoto(Long userIdx);
 }

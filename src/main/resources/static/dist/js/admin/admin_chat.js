@@ -239,6 +239,12 @@
         }
         return avatarMap[userIdx];
     }
+    function buildAvtHtml(photo, initial, cls) {
+        if (photo) {
+            return '<div class="chat-avt ' + cls + '"><img src="' + CHAT_CTX + '/uploads/profile/' + escHtml(photo) + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentNode.textContent=\''+initial+'\'"></div>';
+        }
+        return '<div class="chat-avt ' + cls + '">' + initial + '</div>';
+    }
     function appendMessage(msg) {
         const now     = new Date();
         const dateStr = toDateStr(now);
@@ -253,6 +259,7 @@
         const isMe    = (Number(msg.userIdx) === Number(CHAT_MY_IDX));
         const name    = msg.nickname || (isMe ? CHAT_MY_NAME : '?');
         const initial = name.substring(0, 2);
+        const photo   = msg.profilePhoto || null;
         var rawContent = String(msg.content || '');
         var safe;
         if (rawContent.indexOf('__IMG__') === 0) {
@@ -278,10 +285,10 @@
               +   '</div>'
               +   '<div class="chat-bubble mine theme-' + (msg.theme || 'purple') + '">' + safe + '</div>'
               + '</div>'
-              + '<div class="chat-avt me ' + avatarCls + '">' + initial + '</div>';
+              + buildAvtHtml(photo, initial, 'me ' + avatarCls);
         } else {
             wrapper.innerHTML =
-                '<div class="chat-avt theme-recv-' + (msg.theme || 'purple') + '">' + initial + '</div>'
+                buildAvtHtml(photo, initial, 'theme-recv-' + (msg.theme || 'purple'))
               + '<div class="chat-msg-body">'
               +   '<div class="chat-msg-meta">'
               +     '<span class="chat-msg-name">' + escHtml(name) + '</span>'
