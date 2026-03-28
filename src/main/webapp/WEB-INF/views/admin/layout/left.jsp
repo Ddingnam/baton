@@ -85,7 +85,6 @@
         <button class="chat-entry-btn" id="studioChatBtn" onclick="location.href='${pageContext.request.contextPath}/admin/chat'">
             <i class="ri-message-3-fill"></i>
             <span>스튜디오 채팅</span>
-            <div class="chat-unread-badge" id="studioChatBadge" style="display:none;"></div>
         </button>
         <div class="user-badge">
             <div class="avt-circle" id="sidebarAvatarText" <c:if test="${not empty adminAvatarUrl}">style="background-image:url('${adminAvatarUrl}');background-size:cover;background-position:center;color:transparent;font-size:0;"</c:if>>${adminAvatarText}</div>
@@ -148,20 +147,5 @@
         window.ADMIN_USER_IDX = '<sec:authentication property="principal.userIdx"/>';
         </sec:authorize>
 
-        (function loadChatUnread() {
-            fetch(window.CTX + '/admin/chat/unread', { credentials: 'same-origin' })
-                .then(function(r) { return r.json(); })
-                .then(function(d) {
-                    var badge = document.getElementById('studioChatBadge');
-                    if (!badge) return;
-                    if (d.count > 0) {
-                        badge.textContent = d.count > 99 ? '99+' : d.count;
-                        badge.style.display = '';
-                    } else {
-                        badge.style.display = 'none';
-                    }
-                }).catch(function() {});
-            setTimeout(loadChatUnread, 30000);
-        })();
     </script>
 </aside>

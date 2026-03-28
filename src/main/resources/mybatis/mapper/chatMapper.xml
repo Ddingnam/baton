@@ -2,14 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.ChatMapper">
 
+    <!-- ✅ [수정] theme 컬럼 추가 (DB에 ALTER TABLE chatMessage ADD theme VARCHAR2(20) DEFAULT 'purple'; 먼저 실행 필요) -->
     <insert id="insertMessage" parameterType="com.sp.app.model.ChatMessage">
-        INSERT INTO chatMessage (msgIdx, roomIdx, userIdx, content, msgType, sendDate)
-        VALUES (chatMsgSeq.NEXTVAL, #{roomIdx}, #{userIdx}, #{content}, #{msgType}, SYSTIMESTAMP)
+        INSERT INTO chatMessage (msgIdx, roomIdx, userIdx, content, msgType, sendDate, theme)
+        VALUES (chatMsgSeq.NEXTVAL, #{roomIdx}, #{userIdx}, #{content}, #{msgType}, SYSTIMESTAMP,
+                NVL(#{theme}, 'purple'))
     </insert>
 
+    <!-- ✅ [수정] SELECT에 theme 컬럼 추가 -->
     <select id="listChatMessage" parameterType="Long" resultType="com.sp.app.model.ChatMessage">
         SELECT
             m.msgIdx, m.roomIdx, m.userIdx, m.content, m.msgType,
+            NVL(m.theme, 'purple') AS theme,
             TO_CHAR(m.sendDate, 'YYYY-MM-DD HH24:MI') AS sendDate,
             u.nickname, u.profile_photo AS profilePhoto,
             (SELECT COUNT(*) FROM chatMember cm

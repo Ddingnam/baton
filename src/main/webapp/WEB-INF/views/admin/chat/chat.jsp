@@ -153,9 +153,13 @@
                         <button class="chat-sidebar-toggle" id="chatSidebarToggle">
                             <i class="ri-menu-4-fill"></i>
                         </button>
+                        <%-- ✅ [수정] DM 헤더 아바타: 상대방 프로필 사진 + userIdx로 온라인 상태 연동 --%>
                         <c:choose>
                             <c:when test="${currentRoomType == 'dm'}">
-                                <div class="chat-head-dm-avt">${fn:substring(currentRoomName, 0, 2)}</div>
+                                <div class="chat-head-dm-avt" id="avt-dm-${counterpartUserIdx}"
+                                     <c:if test="${not empty counterpartPhoto}">style="background-image:url('${pageContext.request.contextPath}/uploads/profile/${counterpartPhoto}');background-size:cover;background-position:center;color:transparent;font-size:0;"</c:if>>
+                                    ${fn:substring(currentRoomName, 0, 2)}
+                                </div>
                             </c:when>
                             <c:otherwise>
                                 <div class="chat-head-icon"><i class="ri-hashtag"></i></div>
@@ -233,7 +237,8 @@
                                             <span class="chat-msg-time">${msgTime}</span>
                                             <span class="chat-msg-name">${myNickname}</span>
                                         </div>
-                                        <div class="chat-bubble mine theme-${myTheme}">
+                                        <%-- ✅ [수정] 저장된 theme 사용 (없으면 myTheme fallback) --%>
+                                        <div class="chat-bubble mine theme-${empty chat.theme ? myTheme : chat.theme}">
                                             <c:choose>
                                                 <c:when test="${fn:startsWith(chat.content, '__IMG__')}">
                                                     <c:set var="imgSrc" value="${fn:substring(chat.content, 7, fn:length(chat.content))}"/>
@@ -267,7 +272,8 @@
                             </c:when>
                             <c:otherwise>
                                 <div class="chat-msg-group">
-                                <div class="chat-avt" data-uid="${chat.userIdx}">
+                                    <%-- ✅ [수정] 상대방 아바타에 theme-recv-{theme} 클래스 추가 --%>
+                                    <div class="chat-avt theme-recv-${empty chat.theme ? 'purple' : chat.theme}" data-uid="${chat.userIdx}">
                                         <c:choose>
                                             <c:when test="${not empty chat.profilePhoto}">
                                                 <img src="${pageContext.request.contextPath}/uploads/profile/${chat.profilePhoto}"
@@ -282,7 +288,8 @@
                                             <span class="chat-msg-name">${chat.nickname}</span>
                                             <span class="chat-msg-time">${msgTime}</span>
                                         </div>
-                                        <div class="chat-bubble">
+                                        <%-- ✅ [수정] 상대방 버블에 theme-{theme} 클래스 추가 --%>
+                                        <div class="chat-bubble theme-${empty chat.theme ? 'purple' : chat.theme}">
                                             <c:choose>
                                                 <c:when test="${fn:startsWith(chat.content, '__IMG__')}">
                                                     <c:set var="imgSrc" value="${fn:substring(chat.content, 7, fn:length(chat.content))}"/>

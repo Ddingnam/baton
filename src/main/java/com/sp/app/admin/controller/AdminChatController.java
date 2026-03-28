@@ -41,6 +41,7 @@ public class AdminChatController {
 		Long myUserIdx = member != null ? member.getUserIdx() : userDetails.getUserIdx();
 		String myNickname = member != null ? member.getNickname() : userDetails.getNickname();
 		int myUserLevel = member != null ? member.getUserLevel() : userDetails.getUserLevel();
+		// ✅ [수정] SessionInfo의 프로필 필드는 avatar → getAvatar() 사용 (CustomUserDetails.getProfilePhoto()도 내부적으로 member.getAvatar() 호출)
 		String myProfilePhoto = member != null ? member.getAvatar() : userDetails.getProfilePhoto();
 
 		if (roomIdx != null)
@@ -76,6 +77,19 @@ public class AdminChatController {
 			}
 		}
 
+		// ✅ [추가] DM 채팅방일 때 상대방 프로필/userIdx를 헤더에 표시하기 위해 model에 추가
+		String counterpartPhoto = null;
+		Long counterpartUserIdx = null;
+		if ("dm".equals(currentRoomType) && roomIdx != null) {
+			for (ChatRoom r : dmList) {
+				if (r.getRoomIdx().equals(roomIdx)) {
+					counterpartPhoto    = r.getProfilePhoto();
+					counterpartUserIdx  = r.getUserIdx();
+					break;
+				}
+			}
+		}
+
 		List<ChatMessage> chatList = currentRoomIdx > 0 ? chatService.listChatMessage(currentRoomIdx) : List.of();
 
 		String myTheme = (String) session.getAttribute("adminTheme");
@@ -94,6 +108,9 @@ public class AdminChatController {
 		model.addAttribute("currentRoomType", currentRoomType);
 		model.addAttribute("memberList", memberList);
 		model.addAttribute("myTheme", myTheme);
+		// ✅ [추가] DM 상대방 정보
+		model.addAttribute("counterpartPhoto", counterpartPhoto);
+		model.addAttribute("counterpartUserIdx", counterpartUserIdx);
 
 		return "admin/chat/chat";
 	}
@@ -219,7 +236,6 @@ public class AdminChatController {
 				return result;
 			}
 		} catch (Exception ignored) {
-			// creatorIdx 컬럼 없는 경우 — SUPER 이면 강퇴 허용
 		}
 		try {
 			adminChatService.removeMemberFromChannel(roomIdx, userIdx);

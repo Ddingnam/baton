@@ -22,6 +22,7 @@
     const emojiPicker     = document.getElementById('emojiPicker');
     function formatBadgeCount(count) { return count > 99 ? '99+' : String(count); }
     function updateStudioUnreadBadge() {
+        return; // ✅ [수정] 뱃지 제거 - 더 이상 badge를 업데이트하지 않음
         var badge = document.getElementById('studioChatBadge');
         if (!badge) return;
         fetch(CHAT_CTX + '/admin/chat/unread', { credentials: 'same-origin' })
@@ -96,7 +97,6 @@
                             }
                         }
                     }
-                    updateStudioUnreadBadge();
                 } catch(e) {}
             });
         }
@@ -219,7 +219,6 @@
             method: 'POST',
             credentials: 'same-origin'
         }).catch(function() {});
-        updateStudioUnreadBadge();
     }
     const avatarClasses = ['jy','hn','mn','hs','op','cs'];
     const avatarMap     = {};
@@ -646,7 +645,6 @@
         }
         connect();
         scrollToBottom();
-        updateStudioUnreadBadge();
     });
 })();
 (function() {
