@@ -131,6 +131,14 @@ function useTradeList(shared) {
         await fetchList(currentPage.value + 1, true);
     }
 
+    const tagCarousel = ref(null);
+    function scrollTags(direction) {
+        const container = tagCarousel.value;
+        if (!container) return;
+        const scrollAmount = 300;
+        container.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    }
+
     async function toggleWish(e, product) {
         e.preventDefault(); e.stopPropagation();
         const res = await fetch('/api/trade/toggleLike', {
@@ -184,6 +192,7 @@ function useTradeList(shared) {
         fetchList, navigate,
         setCategory, setSort, setKm, applyFilter, removeChip, resetFilters,
         loadMore, toggleWish, getTradePlace,
-        formatTimeAgo, formatPrice, debounce
+        formatTimeAgo, formatPrice, debounce,
+        tagCarousel, scrollTags
     };
 }

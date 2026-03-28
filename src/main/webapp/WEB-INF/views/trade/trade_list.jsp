@@ -21,66 +21,106 @@
             </div>
         </section>
 
-        <div class="content-wrapper">
-            <div class="trade-toolbar">
-                <div class="toolbar-top">
-                    <div class="filter-group tl-filter-list">
-                        <button class="filter-btn" :class="{ active: categoryIdx === '' }" @click="setCategory('')">전체</button>
-                        <button v-for="cat in categories" :key="cat.CATEGORYIDX"
-                                class="filter-btn" :class="{ active: categoryIdx === String(cat.CATEGORYIDX) }"
-                                @click="setCategory(String(cat.CATEGORYIDX))">{{ cat.CATEGORYNAME }}</button>
-                    </div>
-                    <button class="btn-create-trade" @click="$router.push('/write')">
+        <div class="tl-content-wrapper">
+
+            <div class="tl-welcome-card">
+                <div class="tl-welcome-content">
+                    <span class="tl-welcome-sub">함께하면 더 즐거운 중고거래</span>
+                    <h2 class="tl-welcome-title">원하는 물건을 <span class="tl-highlight">지금 바로</span> 찾아보세요!</h2>
+                    <p class="tl-welcome-desc">원하는 물건이 없나요? 직접 판매자가 되어 새로운 인연을 만들어보세요.</p>
+                </div>
+                <div class="tl-welcome-actions">
+                    <button class="tl-guide-btn primary" @click="$router.push('/write')">
                         <i class="ri-add-line"></i> 판매하기
                     </button>
                 </div>
-                <div class="toolbar-bottom">
-                    <div class="price-select-group">
-                        <input type="number" class="tl-price-input" placeholder="최소 금액" v-model="priceMin" min="0" @keydown.enter="applyFilter">
-                        <span class="tl-price-sep">~</span>
-                        <input type="number" class="tl-price-input" placeholder="최대 금액" v-model="priceMax" min="0" @keydown.enter="applyFilter">
-                        <button class="tl-price-apply" @click="applyFilter">적용</button>
-                        <span class="tl-divider-thin"></span>
-                        <div class="tl-radius-btns">
-                            <button class="tl-radius-btn" :class="{ active: km === '1' }" @click="setKm('1')">내 동네만</button>
-                            <button class="tl-radius-btn" :class="{ active: km === '3' }" @click="setKm('3')">가까운 동네</button>
-                            <button class="tl-radius-btn" :class="{ active: km === '5' }" @click="setKm('5')">먼 동네까지</button>
-                        </div>
-                        <button class="tl-reset-btn" @click="resetFilters"><i class="ri-refresh-line"></i> 초기화</button>
-                    </div>
-                    <div class="action-group">
-                        <label class="toggle-switch-wrap">
-                            <input type="checkbox" class="green-switch" v-model="availableOnly" @change="applyFilter">
-                            <span class="toggle-label">거래 가능만 보기</span>
-                        </label>
-                        <span class="divider">|</span>
-                        <div class="custom-dropdown sort-dropdown" style="width:140px;"
-                             :class="{ active: sortDropdownOpen }"
-                             @click.stop="sortDropdownOpen = !sortDropdownOpen">
-                            <div class="dropdown-selected">
-                                <span>{{ sortLabel }}</span>
-                                <i class="ri-arrow-down-s-line"></i>
+            </div>
+
+            <div class="tl-glass-toolbar">
+
+                <div class="tl-filter-row">
+                    <div class="tl-filter-label">카테고리</div>
+                    <div class="tl-filter-content">
+                        <div class="tl-carousel-wrapper">
+                            <button class="tl-carousel-nav left" @click="scrollTags('left')"><i class="ri-arrow-left-s-line"></i></button>
+                            <div class="tl-filter-container" ref="tagCarousel">
+                                <div class="tl-filter-group">
+                                    <button class="tl-filter-btn" :class="{ active: categoryIdx === '' }" @click="setCategory('')">전체</button>
+                                    <button v-for="cat in categories" :key="cat.CATEGORYIDX"
+                                            class="tl-filter-btn" :class="{ active: categoryIdx === String(cat.CATEGORYIDX) }"
+                                            @click="setCategory(String(cat.CATEGORYIDX))">
+                                            {{ cat.CATEGORYNAME }}
+                                    </button>
+                                </div>
                             </div>
-                            <ul class="dropdown-menu">
-                                <li :class="{ active: sort === 'newest' || sort === 'latest' }" @click.stop="setSort('newest')">최신순</li>
-                                <li :class="{ active: sort === 'lowPrice' }" @click.stop="setSort('lowPrice')">낮은 가격순</li>
-                                <li :class="{ active: sort === 'highPrice' }" @click.stop="setSort('highPrice')">높은 가격순</li>
-                                <li :class="{ active: sort === 'hitCount' }" @click.stop="setSort('hitCount')">인기순</li>
-                            </ul>
+                            <button class="tl-carousel-nav right" @click="scrollTags('right')"><i class="ri-arrow-right-s-line"></i></button>
                         </div>
                     </div>
                 </div>
+
+                <div class="tl-filter-row">
+                    <div class="tl-filter-label">상세 조건</div>
+                    <div class="tl-filter-content">
+                        <div class="tl-split-row">
+                            <div class="tl-filter-col">
+                                <div class="tl-price-group">
+                                    <input type="number" class="tl-price-input" placeholder="최소 금액" v-model="priceMin" min="0" @keydown.enter="applyFilter">
+                                    <span class="tl-price-sep">~</span>
+                                    <input type="number" class="tl-price-input" placeholder="최대 금액" v-model="priceMax" min="0" @keydown.enter="applyFilter">
+                                    <button class="tl-price-apply" @click="applyFilter">적용</button>
+                                </div>
+                            </div>
+                            <div class="tl-filter-col tl-distance-col">
+                                <div class="tl-distance-filter">
+                                    <button class="tl-filter-btn" :class="{ active: km === '1' }" @click="setKm('1')">내 동네만</button>
+                                    <button class="tl-filter-btn" :class="{ active: km === '3' }" @click="setKm('3')">가까운 동네</button>
+                                    <button class="tl-filter-btn" :class="{ active: km === '5' }" @click="setKm('5')">먼 동네까지</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tl-filter-row">
+                    <div class="tl-filter-label">적용옵션</div>
+                    <div class="tl-filter-content tl-flex-between">
+                        <div class="tl-active-filters-inline">
+                            <span v-if="activeChips.length === 0" class="tl-no-filter-text">선택된 추가 필터가 없습니다.</span>
+                            <span v-for="chip in activeChips" :key="chip.label" class="tl-active-badge" @click="removeChip(chip)">
+                                <button class="tl-badge-remove"><i class="ri-close-line"></i></button>
+                                {{ chip.label }}
+                            </span>
+                        </div>
+                        <div class="tl-filter-controls">
+                            <label class="tl-toggle-switch-wrap">
+                                <input type="checkbox" class="tl-green-switch" v-model="availableOnly" @change="applyFilter">
+                                <span class="tl-toggle-label">거래 가능만 보기</span>
+                            </label>
+                            <span class="tl-divider">|</span>
+                            <div class="tl-custom-dropdown" :class="{ active: sortDropdownOpen }"
+                                 @click.stop="sortDropdownOpen = !sortDropdownOpen">
+                                <div class="tl-dropdown-selected">
+                                    <span>{{ sortLabel }}</span>
+                                    <i class="ri-arrow-down-s-line"></i>
+                                </div>
+                                <ul class="tl-dropdown-menu">
+                                    <li :class="{ active: sort === 'newest' || sort === 'latest' }" @click.stop="setSort('newest')">최신순</li>
+                                    <li :class="{ active: sort === 'lowPrice' }" @click.stop="setSort('lowPrice')">낮은 가격순</li>
+                                    <li :class="{ active: sort === 'highPrice' }" @click.stop="setSort('highPrice')">높은 가격순</li>
+                                    <li :class="{ active: sort === 'hitCount' }" @click.stop="setSort('hitCount')">인기순</li>
+                                </ul>
+                            </div>
+                            <span class="tl-divider">|</span>
+                            <button class="tl-reset-inline-btn" @click="resetFilters">
+                                <i class="ri-refresh-line"></i> 초기화
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="tl-active-filters">
-                <span v-for="chip in activeChips" :key="chip.label" class="tl-filter-chip" @click="removeChip(chip)">
-                    {{ chip.label }}
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                        <path d="M18 6 6 18M6 6l12 12"/>
-                    </svg>
-                </span>
-            </div>
-
+            <div class="tl-grid-area">
             <div v-if="isLoading" class="tl-loading"><i class="ri-loader-4-line"></i></div>
             <div v-else class="trade-grid tl-product-grid">
                 <div v-if="products.length === 0" class="tl-empty-state">
@@ -136,8 +176,10 @@
                     <span v-else>더보기 <i class="ri-arrow-down-s-line"></i></span>
                 </button>
             </div>
+            </div>
         </div>
 
         <button class="tl-fab" @click="$router.push('/write')"><i class="ri-pencil-line"></i></button>
     </div>
+
 </template>
