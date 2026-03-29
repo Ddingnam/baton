@@ -137,7 +137,7 @@
 <c:if test="${fn:contains(currentUri, '/crew')}">
     <div id="crew-chat-trigger" title="크루 채팅 열기/닫기">
         <div class="chat-icon-wrapper">
-            <i class="ri-team-fill"></i>
+            <i class="ri-chat-smile-2-fill"></i>
             <span class="crew-notification-dot" style="display: none;"></span>
         </div>
     </div>

@@ -169,8 +169,91 @@
 	            container.innerHTML = `<div class="lc-empty"><p>불러오는 중 오류가 발생했습니다.</p></div>`;
 	        });
 	}
+	
+	function loadCrewData() {
+		const joinedContainer = document.getElementById("joined-list-container");
+		const hostedContainer = document.getElementById("hosted-list-container");
+	    
+	    if(!joinedContainer || !hostedContainer) return;
 
-    document.addEventListener('DOMContentLoaded', loadAlbaApply);
+	    fetch(`${CONTEXT_PATH}/api/crew/myCrew`)
+	        .then(res => res.json())
+	        .then(data => {
+	            const crew_j = data.myCrewListJoined || [];
+	            const crew_h = data.myCrewListCreated || [];
+	            
+	            joinedContainer.innerHTML = '';
+	            hostedContainer.innerHTML = '';
+
+                const emptyHtml = `<div class="lc-item"><p style="padding:20px; color:#999; text-align:center; width:100%;">참여 중인 모임이 없습니다.</p></div>`;
+				
+	            if (crew_j.length === 0) {
+	                joinedContainer.innerHTML = emptyHtml;
+	            } else {
+					crew_j.forEach(crew => {
+		                const dateStr = crew.joinedDate.substring(0, 10);
+						
+						let badgeStyle = '';
+					    let statusText = crew.status;
+
+						if (crew.status === 'ACTIVE') {
+					        badgeStyle = 'background: #E8F5E9; color: #2E7D32;';
+					        statusText = '활동중';
+					    } else if (crew.status === 'WAIT') {
+					        badgeStyle = 'background: #FFF4E5; color: #FF9800;';
+					        statusText = '승인대기';
+					    } else if (crew.status === 'BANNED') {
+					        badgeStyle = 'background: #FFE9E9; color: #F86D7D;';
+					        statusText = '강퇴';
+					    } else {
+					        badgeStyle = 'background: #F2F4F6; color: #8B95A1;';
+					        statusText = crew.status;
+					    }
+		                
+		                const html = `
+		                    <div class="lc-item">
+		                        <div class="item-icon theme-icon-bg"><i class="ri-run-line"></i></div>
+		                        <div class="item-info">
+		                            <h4>${crew.name}</h4>
+		                            <p class="info-metrics">참여멤버 ${crew.currentMember}명 · ${dateStr} 가입</p>
+		                        </div>
+								<div class="item-right">
+					                <span class="theme-badge" style="${badgeStyle}">${statusText}</span>
+					            </div>
+		                    </div>
+		                `;
+		                
+		                joinedContainer.innerHTML += html;
+		            });
+				}
+				
+	            if (crew_h.length === 0) {
+	                hostedContainer.innerHTML = emptyHtml;
+	            } else {
+					crew_h.forEach(crew => {
+		                const dateStr = crew.createdDate.substring(0, 10);
+		                
+		                const html = `
+		                    <div class="lc-item">
+		                        <div class="item-icon theme-icon-bg"><i class="ri-run-line"></i></div>
+		                        <div class="item-info">
+		                            <h4>${crew.name}</h4>
+		                            <p class="info-metrics">참여멤버 ${crew.currentMember}명 · ${dateStr} 생성</p>
+		                        </div>
+		                    </div>
+		                `;
+		                
+		                hostedContainer.innerHTML += html;
+		            });
+				}
+	        })
+	        .catch(err => console.error("모임 데이터 로딩 실패:", err));
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+	    loadAlbaApply();
+	    loadCrewData();
+	});
 
 })();
 

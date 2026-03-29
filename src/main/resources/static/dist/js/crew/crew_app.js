@@ -75,16 +75,39 @@ const router = VueRouter.createRouter({
 const app = Vue.createApp({
     data() {
         return {
-            isChatOpen: false
+            isChatOpen: false,
+			myCrewList: []
         }
     },
-    mounted() {
+    async mounted() {
         window.toggleCrewChat = () => {
             this.isChatOpen = !this.isChatOpen;
         };
         window.closeCrewChat = () => {
             this.isChatOpen = false;
         };
+		
+		await this.fetchMyCrews();
+    },
+	methods: {
+        async fetchMyCrews() {
+            try {
+                const response = await fetch('/api/crew/myCrew');
+                
+                if (response.status === 401) {
+                    this.myCrewList = [];
+                    return;
+                }
+
+                if (!response.ok) throw new Error("크루 목록 조회 실패");
+
+                const data = await response.json();
+                this.myCrewList = data.myCrewList;
+
+            } catch (error) {
+                console.error("❌ fetchMyCrews Error:", error);
+            }
+        }
     }
 });
 

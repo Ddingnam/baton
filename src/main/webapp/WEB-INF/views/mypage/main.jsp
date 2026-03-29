@@ -433,51 +433,25 @@
 					</section>
 
 					<section id="sec-club" class="mp-section">
-						<div class="list-card">
-							<div class="lc-header">
-								<h3>나의 모임 현황</h3>
-								<a href="${pageContext.request.contextPath}/mypage/club/joined" class="theme-link">내 모임 관리 <i class="ri-arrow-right-s-line"></i></a>
-							</div>
-							<div class="inner-tabs">
-								<button class="inner-tab active" data-inner="club-joined">참여중</button>
-								<button class="inner-tab"        data-inner="club-hosted">내가 만든</button>
-							</div>
+					    <div class="list-card">
+					        <div class="lc-header">
+					            <h3>나의 모임 현황</h3>
+					        </div>
+					        <div class="inner-tabs">
+					            <button class="inner-tab active" data-inner="club-joined">참여중</button>
+					            <button class="inner-tab"        data-inner="club-hosted">내가 만든</button>
+					        </div>
+					        
 							<div class="inner-section active" id="club-joined">
-								<div class="lc-list">
-									<div class="lc-item">
-										<div class="item-icon theme-icon-bg"><i class="ri-run-line"></i></div>
-										<div class="item-info">
-											<h4>주말 아침 한강 러닝크루</h4>
-											<p class="info-metrics">참여멤버 12명 · 토요일 07:00 여의도 한강공원</p>
-										</div>
-										<div class="item-right"><span class="theme-badge">D-3</span></div>
-									</div>
-									<div class="lc-item">
-										<div class="item-icon theme-icon-bg"><i class="ri-camera-line"></i></div>
-										<div class="item-info">
-											<h4>필름 카메라 산책 모임</h4>
-											<p class="info-metrics">참여멤버 6명 · 다음주 일요일 14:00</p>
-										</div>
-										<div class="item-right"><span class="theme-badge">D-10</span></div>
-									</div>
-								</div>
-							</div>
-							<div class="inner-section" id="club-hosted">
-								<div class="lc-list">
-									<div class="lc-item">
-										<div class="item-icon theme-icon-bg"><i class="ri-book-open-line"></i></div>
-										<div class="item-info">
-											<h4>강남역 직장인 독서모임</h4>
-											<p class="info-metrics">참여멤버 8명 · 매주 수요일 19:30</p>
-										</div>
-										<div class="item-right">
-											<span class="theme-badge">주최자</span>
-											<button class="btn-sm">관리</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
+					            <div class="lc-list" id="joined-list-container">
+					            </div>
+					        </div>
+
+					        <div class="inner-section" id="club-hosted">
+					            <div class="lc-list" id="hosted-list-container">
+					            </div>
+					        </div>
+					    </div>
 					</section>
 
 					<section id="sec-alba" class="mp-section">

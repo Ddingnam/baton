@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.sp.app.domain.dto.CrewDto;
 import com.sp.app.domain.dto.CrewMemberDto;
+import com.sp.app.domain.dto.MyCrewListDto;
 
 public interface CrewService {
 	public void insertCrew(CrewDto dto, String uploadPath) throws Exception;
@@ -15,6 +16,9 @@ public interface CrewService {
 	
 	public int getCrewCount(Map<String, Object> map);
 	public List<CrewDto> listCrew(Map<String, Object> map);
+	
+	public List<MyCrewListDto> listMyCrewJoined(Long userIdx);
+	public List<MyCrewListDto> listMyCrewCreated(Long userIdx);
 	
 	public CrewMemberDto getCrewMemberInfo(Long crewIdx, Long userIdx);
 	public CrewMemberDto joinCrew(Long crewIdx, Long userIdx, String reason);

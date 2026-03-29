@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sp.app.domain.dto.CrewDto;
 import com.sp.app.domain.dto.CrewMemberDto;
 import com.sp.app.domain.dto.CrewRequestDto;
+import com.sp.app.domain.dto.MyCrewListDto;
 import com.sp.app.domain.dto.RegionDto;
 import com.sp.app.domain.dto.SessionInfo;
 import com.sp.app.security.CustomUserDetails;
@@ -140,6 +141,31 @@ public class CrewRestController {
             
             response.put("crew", crew);
             response.put("myStatus", myStatus);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+        	log.error("getCrewDetail Error : ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+        }
+    }
+	
+	@GetMapping("myCrew")
+    public ResponseEntity<?> getMyCrew( @AuthenticationPrincipal CustomUserDetails userDetails ) {
+		Map<String, Object> response = new HashMap<>();
+		
+		if (userDetails == null || userDetails.getMember() == null) {
+			response.put("state", "login_required");
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+	    }
+		
+        try {
+        	Long loginUserIdx = userDetails.getMember().getUserIdx();
+        	
+            List<MyCrewListDto> myCrewListJoined = service.listMyCrewJoined(loginUserIdx);
+            List<MyCrewListDto> myCrewListCreated = service.listMyCrewCreated(loginUserIdx);
+            
+            response.put("myCrewListJoined", myCrewListJoined);
+            response.put("myCrewListCreated", myCrewListCreated);
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {

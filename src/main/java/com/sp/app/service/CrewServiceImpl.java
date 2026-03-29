@@ -3,6 +3,7 @@ package com.sp.app.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sp.app.common.StorageService;
 import com.sp.app.domain.dto.CrewDto;
 import com.sp.app.domain.dto.CrewMemberDto;
+import com.sp.app.domain.dto.MyCrewListDto;
 import com.sp.app.domain.entity.Crew;
 import com.sp.app.domain.entity.CrewMember;
 import com.sp.app.domain.entity.CrewMemberHistory;
@@ -204,6 +206,38 @@ public class CrewServiceImpl implements CrewService {
 			throw e;
 		}
 		return crewList;
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<MyCrewListDto> listMyCrewJoined(Long userIdx) {
+	    return memberRepository.findByUser_UserIdxAndStatus(userIdx, "ACTIVE")
+	            .stream()
+	            .<MyCrewListDto>map(crewMember -> MyCrewListDto.builder()
+	                    .crewIdx(crewMember.getCrew().getCrewIdx())
+	                    .name(crewMember.getCrew().getName())
+	                    .currentMember(crewMember.getCrew().getCurrentMember())
+	                    .logoImage(crewMember.getCrew().getLogoImage())
+	                    .status(crewMember.getStatus())
+	                    .joinedDate(crewMember.getJoinedDate())
+	                    .build())
+	            .collect(Collectors.toList());
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<MyCrewListDto> listMyCrewCreated(Long userIdx) {
+	    return crewRepository.findByLeader_UserIdxAndStatus(userIdx, "1")
+	            .stream()
+	            .<MyCrewListDto>map(crewMember -> MyCrewListDto.builder()
+	                    .crewIdx(crewMember.getCrewIdx())
+	                    .name(crewMember.getName())
+	                    .currentMember(crewMember.getCurrentMember())
+	                    .logoImage(crewMember.getLogoImage())
+	                    .status(crewMember.getStatus())
+	                    .createdDate(crewMember.getCreatedDate())
+	                    .build())
+	            .collect(Collectors.toList());
 	}
 
 	@Override
