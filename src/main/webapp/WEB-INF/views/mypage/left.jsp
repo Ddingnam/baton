@@ -30,8 +30,8 @@
 
 		<div class="sb-group">
 			<span class="sb-label">내 정보 관리</span> 
-			<a href="${pageContext.request.contextPath}/member/pwd" class="sb-link"><i class="ri-settings-4-line"></i> 회원정보 수정</a> 
-			<a href="#" class="sb-link"><i class="ri-map-pin-line"></i> 동네 인증 설정</a>
+			<a href="${pageContext.request.contextPath}/mypage/userInfo" class="sb-link"><i class="ri-settings-4-line"></i> 회원정보 수정</a> 
+			<a href="${pageContext.request.contextPath}/member/regionAuth/main" class="sb-link"><i class="ri-map-pin-line"></i> 동네 인증 설정</a>
 			<a href="${pageContext.request.contextPath}/mypage/withdraw" class="sb-link">탈퇴 요청하기</a>
 		</div>
 	</nav>

@@ -99,6 +99,32 @@ public class MemberServiceImpl implements MemberService {
 		}
 	}
 	
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public void updateUser(UserDto dto, String uploadPath) throws Exception {
+		try {
+			UserDto before = mapper.findById(dto.getUserIdx());
+			if (dto.getSelectFile() != null && !dto.getSelectFile().isEmpty()) {
+				String saveFilename = storageService.uploadFileToServer(dto.getSelectFile(), uploadPath);
+				dto.setProfile_photo(saveFilename);
+				if (before.getProfile_photo() != null) {
+		            storageService.deleteFile(uploadPath, before.getProfile_photo());
+		        }
+			} else if ("true".equals(dto.getDeletedPhoto())) {
+		        dto.setProfile_photo(null);
+		        if (before.getProfile_photo() != null) {
+		            storageService.deleteFile(uploadPath, before.getProfile_photo());
+		        }
+		    } else {
+		        dto.setProfile_photo(before.getProfile_photo());
+		    }
+			mapper.updateUser(dto);
+		} catch (Exception e) {
+			log.info("updateMember : ", e);
+			throw e;
+		} 
+	}
+	
 
 	@Override
 	public void insertSnsUser(SnsUserDto snsUserDto) {
@@ -139,8 +165,6 @@ public class MemberServiceImpl implements MemberService {
 		try {
 			UserDto before = mapper.findById(dto.getUserIdx());
 			
-			mapper.updateMember1(dto);
-
 			if (dto.getSelectFile() != null && !dto.getSelectFile().isEmpty()) {
 				String saveFilename = storageService.uploadFileToServer(dto.getSelectFile(), uploadPath);
 				if (saveFilename != null) {
@@ -152,6 +176,8 @@ public class MemberServiceImpl implements MemberService {
 					}
 				}
 			}
+			
+			mapper.updateMember1(dto);
 		} catch (Exception e) {
 			log.info("updateMember : ", e);
 			throw e;

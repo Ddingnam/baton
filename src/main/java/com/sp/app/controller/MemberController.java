@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberController {
 	private final MemberService service;
 	
-	@Value("${file.upload-root}/trade")
+	@Value("${file.upload-root}/member")
     private String uploadPath;
 	
 	@RequestMapping(value = "login", method = {RequestMethod.GET, RequestMethod.POST})

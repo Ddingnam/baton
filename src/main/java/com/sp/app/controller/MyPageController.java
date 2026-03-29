@@ -1,10 +1,11 @@
 package com.sp.app.controller;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.sp.app.domain.dto.BadgeDto;
 import com.sp.app.domain.dto.UserDto;
@@ -24,8 +26,8 @@ import com.sp.app.model.Trade;
 import com.sp.app.model.TradeImg;
 import com.sp.app.security.CustomUserDetails;
 import com.sp.app.service.FollowService;
-import com.sp.app.service.JobPostingService;
 import com.sp.app.service.JobApplyService;
+import com.sp.app.service.JobPostingService;
 import com.sp.app.service.MemberService;
 import com.sp.app.service.MypageService;
 import com.sp.app.service.TradeService;
@@ -48,6 +50,9 @@ public class MyPageController {
     private final WishListService wishListService;
     private final JobPostingService jobPostingService;
     private final JobApplyService jobApplyService;
+    
+    @Value("${file.upload-root}/member")
+    private String uploadPath;
 
     @GetMapping({"", "/", "/main"})
     public String main(Model model, Authentication auth) {
@@ -262,6 +267,55 @@ public class MyPageController {
             result.put("msg", "오류가 발생했습니다. 다시 시도해주세요.");
         }
         return result;
+    }
+    
+    @GetMapping("/userInfo")
+    public String userInfoPage(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes rattr,
+            Model model) {
+
+    	if(userDetails == null) {
+			rattr.addFlashAttribute("msg", "비정상적인 접근입니다.");
+			return "redirect:/login";
+		}
+    	try {
+    		UserDto dto = memberService.findById(userDetails.getUserIdx());
+    		dto.setBirthDate(LocalDate.parse(dto.getBirth()));
+    		model.addAttribute("userInfo", dto);
+    		return "mypage/userInfo";
+		} catch (Exception e) {
+			log.error("userInfoPage error", e);
+			rattr.addFlashAttribute("msg", "오류가 발생했습니다.");
+			return "mypage/main";
+		}
+    }
+    
+    @PostMapping("/updateUserInfo")
+    public String updateUserInfo(
+            UserDto dto,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes rattr) {
+        if (userDetails == null) {
+            rattr.addFlashAttribute("msg", "세션이 만료되었습니다. 다시 로그인해주세요.");
+            return "redirect:/login";
+        }
+        try {
+            dto.setUserIdx(userDetails.getUserIdx());
+            memberService.updateUser(dto, uploadPath);
+            
+            if (userDetails != null) {
+                userDetails.getMember().setAvatar(dto.getProfile_photo());
+                userDetails.getMember().setNickname(dto.getNickname());
+            }
+            
+            rattr.addFlashAttribute("msg", "내 정보가 성공적으로 수정되었습니다.");
+            return "redirect:/mypage/userInfo";
+        } catch (Exception e) {
+            log.error("userInfo update error", e);
+            rattr.addFlashAttribute("msg", "정보 수정 중 오류가 발생했습니다.");
+            return "redirect:/mypage/main";
+        }
     }
     
     @GetMapping("/api/tradeHistory")

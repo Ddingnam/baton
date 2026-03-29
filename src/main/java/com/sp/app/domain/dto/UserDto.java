@@ -1,5 +1,6 @@
 package com.sp.app.domain.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -21,8 +22,12 @@ public class UserDto {
 	private String nickname;
 	private String email;
 	private String tel;
+	
 	private String birth;
+	private LocalDate birthDate;
+	
 	private String profile_photo;
+	private String deletedPhoto;
 	
 	private double score;
 	private Double batonDistance;

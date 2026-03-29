@@ -42,6 +42,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 	private UserDetails toUserDetails(UserDto member, String authority, List<String> authorities) {
 		UserRegionInfo userRegionInfo = memberService.getUserRegionInfo(member.getUserIdx());
+		
+		System.out.println("로그인 시도 유저 프로필 사진: " + member.getProfile_photo());
+		
 		SessionInfo info = SessionInfo.builder()
 				.userIdx(member.getUserIdx())
 				.userId(member.getUserId())

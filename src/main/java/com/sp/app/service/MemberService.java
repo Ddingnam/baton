@@ -18,6 +18,8 @@ public interface MemberService {
 	public void insertUser(UserDto dto, String uploadPath) throws Exception;
 	public void insertUser(UserDto userDto, SnsUserDto snsUserDto, String uploadPath) throws Exception;
 	public void insertSnsUser(SnsUserDto dto) throws Exception;
+	
+	public void updateUser(UserDto dto, String uploadPath) throws Exception;
 
 	public void insertMemberStatus(MemberDto dto) throws Exception;
 

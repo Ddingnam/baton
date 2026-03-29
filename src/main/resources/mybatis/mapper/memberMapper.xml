@@ -51,6 +51,15 @@
 	        1
 	    )
 	</insert>
+	
+	<update id="updateUser" parameterType="com.sp.app.domain.dto.UserDto">
+	    UPDATE users
+	    SET nickname = #{nickname},
+	        tel = #{tel, jdbcType=VARCHAR},
+	        birth = #{birth, jdbcType=VARCHAR},
+	        profile_photo = #{profile_photo, jdbcType=VARCHAR}
+	    WHERE userIdx = #{userIdx}
+	</update>
 
 	<insert id="insertSnsUser" parameterType="com.sp.app.domain.dto.SnsUserDto">
 		INSERT INTO sns_users (authIdx, userIdx, provider, oauthId, linkedDate)

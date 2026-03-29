@@ -43,9 +43,19 @@
 
                             
                             <button type="button" class="action-profile" id="profileDropdownBtn">
-                                <div class="profile-thumb">
-                                    <i class="ri-user-smile-fill"></i>
-                                </div>
+								<sec:authentication property="principal" var="p" />
+
+								<div class="profile-thumb">
+								    <c:choose>
+								        <c:when test="${not empty p.member.avatar}">
+								            <img src="${pageContext.request.contextPath}/uploads/member/${p.member.avatar}" 
+								                 style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+								        </c:when>
+								        <c:otherwise>
+								            <i class="ri-user-smile-fill"></i>
+								        </c:otherwise>
+								    </c:choose>
+								</div>
                                 <span class="user-name"><sec:authentication property="principal.member.nickname" />님</span>
                                 <i class="ri-arrow-down-s-line dropdown-arrow"></i>
                             </button>
@@ -90,7 +100,7 @@
                                         <div style="padding: 8px 20px 10px; font-size: 13px; color: #8B95A1;">인증된 동네가 없어요</div>
                                     </c:otherwise>
                                 </c:choose>
-                                <a href="${pageContext.request.contextPath}/member/townAuth" class="dropdown-item">
+                                <a href="${pageContext.request.contextPath}/member/regionAuth/main" class="dropdown-item">
                                     <i class="ri-map-pin-add-line"></i> 동네 설정
                                 </a>
 

@@ -21,6 +21,8 @@ public interface MemberMapper {
 	public void insertUser(UserDto dto) throws SQLException;
 	public void insertSnsUser(SnsUserDto dto) throws SQLException;
 
+	public void updateUser(UserDto dto) throws SQLException;
+	
 	public void insertMember12(MemberDto dto) throws SQLException;
 	public void insertMemberStatus(MemberDto dto) throws SQLException;
 
