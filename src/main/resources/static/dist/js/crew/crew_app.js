@@ -102,7 +102,7 @@ const app = Vue.createApp({
                 if (!response.ok) throw new Error("크루 목록 조회 실패");
 
                 const data = await response.json();
-                this.myCrewList = data.myCrewList;
+                this.myCrewList = data.myCrewListJoined;
 
             } catch (error) {
                 console.error("❌ fetchMyCrews Error:", error);
