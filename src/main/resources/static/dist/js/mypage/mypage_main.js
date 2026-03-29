@@ -211,7 +211,7 @@
 					    }
 		                
 		                const html = `
-		                    <div class="lc-item">
+		                    <div class="lc-item" onclick="window.goToCrewDashboard(${crew.crewIdx})">
 		                        <div class="item-icon theme-icon-bg"><i class="ri-run-line"></i></div>
 		                        <div class="item-info">
 		                            <h4>${crew.name}</h4>
@@ -234,7 +234,7 @@
 		                const dateStr = crew.createdDate.substring(0, 10);
 		                
 		                const html = `
-		                    <div class="lc-item">
+		                    <div class="lc-item" onclick="window.goToCrewDashboard(${crew.crewIdx})">
 		                        <div class="item-icon theme-icon-bg"><i class="ri-run-line"></i></div>
 		                        <div class="item-info">
 		                            <h4>${crew.name}</h4>
@@ -248,6 +248,11 @@
 				}
 	        })
 	        .catch(err => console.error("모임 데이터 로딩 실패:", err));
+	}
+	
+	window.goToCrewDashboard = function(crewIdx) {
+	    const targetUrl = `${CONTEXT_PATH}/crew/main#/article/${crewIdx}/dashboard`;
+	    location.href = targetUrl;
 	}
 
 	document.addEventListener('DOMContentLoaded', function() {
