@@ -226,10 +226,10 @@
                 <span id="dStatusBadge" class="detail-status-badge"></span>
                 <span style="height:14px;width:1px;background:rgba(255,255,255,0.15);"></span>
                 <span style="font-size:11px;color:rgba(255,255,255,0.45);">Lv.<span id="dLevel" style="font-weight:800;color:rgba(255,255,255,0.7);"></span></span>
-                <span style="font-size:11px;color:rgba(255,255,255,0.45);">바톤 점수 <span id="dScoreText" style="font-weight:800;color:rgba(255,255,255,0.7);"></span></span>
+                <span style="font-size:11px;color:rgba(255,255,255,0.45);">바톤 km <span id="dScoreText" style="font-weight:800;color:rgba(255,255,255,0.7);"></span><span style="font-size:10px;opacity:0.6;">km</span></span>
                 <span style="font-size:11px;color:rgba(255,255,255,0.45);">포인트 <span id="dPoint" style="font-weight:800;color:#A5B4FC;"></span></span>
                 <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
-                    <span style="font-size:10px;color:rgba(255,255,255,0.3);">매너</span>
+                    <span style="font-size:10px;color:rgba(255,255,255,0.3);">달리기</span>
                     <div style="width:80px;height:5px;background:rgba(255,255,255,0.12);border-radius:10px;overflow:hidden;">
                         <div class="manner-bar-fill" id="dScoreBar" style="height:100%;border-radius:10px;"></div>
                     </div>

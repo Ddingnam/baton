@@ -55,10 +55,10 @@
             document.getElementById('dLastLogin').textContent = fmtDate(m.lastLoginDate);
             document.getElementById('dLevel').textContent     = 'Lv.' + (m.userLevel || 1);
 
-            var score    = m.score || 0;
-            var barColor = score >= 60 ? '#6EE7B7' : score >= 36 ? '#FCD34D' : '#FCA5A5';
-            var pct      = Math.min(100, Math.max(0, (score / 100) * 100));
-            document.getElementById('dScoreText').textContent = score;
+            var dist     = m.batonDistance || 0;
+            var barColor = dist >= 40 ? '#FFB300' : dist >= 30 ? '#3182F6' : dist >= 20 ? '#00B98D' : dist >= 10 ? '#9CA3AF' : '#8B4513';
+            var pct      = Math.min(100, Math.max(0, (dist / 42.195) * 100));
+            document.getElementById('dScoreText').textContent = parseFloat(dist).toFixed(1);
             var bar = document.getElementById('dScoreBar');
             if (bar) {
                 bar.style.width      = '0%';
