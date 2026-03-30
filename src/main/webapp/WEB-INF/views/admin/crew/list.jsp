@@ -69,7 +69,20 @@
                     <c:set var="pct" value="${crew.maxMember > 0 ? (crew.currentMember * 100 / crew.maxMember) : 0}"/>
                     
                     <div class="crew-card">
-                        <div class="crew-card-cover">
+                        <c:set var="catIdx" value="${not empty crew.categories ? crew.categories[0].idx : 0}" />
+                    <c:choose>
+                        <c:when test="${catIdx == 1}"><c:set var="coverGrad" value="linear-gradient(135deg,#7C3AED,#4F46E5)"/><c:set var="coverAccent" value="#A78BFA"/></c:when>
+                        <c:when test="${catIdx == 2}"><c:set var="coverGrad" value="linear-gradient(135deg,#0EA5E9,#1D4ED8)"/><c:set var="coverAccent" value="#7DD3FC"/></c:when>
+                        <c:when test="${catIdx == 3}"><c:set var="coverGrad" value="linear-gradient(135deg,#059669,#047857)"/><c:set var="coverAccent" value="#6EE7B7"/></c:when>
+                        <c:when test="${catIdx == 4}"><c:set var="coverGrad" value="linear-gradient(135deg,#EA580C,#C2410C)"/><c:set var="coverAccent" value="#FED7AA"/></c:when>
+                        <c:when test="${catIdx == 5}"><c:set var="coverGrad" value="linear-gradient(135deg,#E11D48,#BE123C)"/><c:set var="coverAccent" value="#FDA4AF"/></c:when>
+                        <c:when test="${catIdx == 6}"><c:set var="coverGrad" value="linear-gradient(135deg,#0891B2,#0E7490)"/><c:set var="coverAccent" value="#A5F3FC"/></c:when>
+                        <c:when test="${catIdx == 7}"><c:set var="coverGrad" value="linear-gradient(135deg,#D97706,#B45309)"/><c:set var="coverAccent" value="#FDE68A"/></c:when>
+                        <c:when test="${catIdx == 8}"><c:set var="coverGrad" value="linear-gradient(135deg,#7C3AED,#DB2777)"/><c:set var="coverAccent" value="#F9A8D4"/></c:when>
+                        <c:when test="${catIdx == 9}"><c:set var="coverGrad" value="linear-gradient(135deg,#334155,#1E293B)"/><c:set var="coverAccent" value="#CBD5E1"/></c:when>
+                        <c:otherwise><c:set var="coverGrad" value="linear-gradient(135deg,#6366F1,#8B5CF6)"/><c:set var="coverAccent" value="#C4B5FD"/></c:otherwise>
+                    </c:choose>
+                    <div class="crew-card-cover" style="background:${coverGrad};">
                             <c:if test="${not empty crew.logoImage}">
                                 <img src="${pageContext.request.contextPath}/uploads/crew/${crew.logoImage}" alt="cover">
                             </c:if>
@@ -78,10 +91,10 @@
                             <c:if test="${not empty crew.categories}">
                                 <c:set var="cName" value="${not empty crew.categories[0].name ? crew.categories[0].name : (not empty crew.categories[0].categoryName ? crew.categories[0].categoryName : '일반')}" />
                             </c:if>
-                            <span class="crew-badge" style="background: rgba(124,58,237,0.15); color: #6D28D9; border: 1px solid rgba(124,58,237,0.2); backdrop-filter: blur(4px);">${cName}</span>
+                            <span class="crew-badge" style="background:rgba(255,255,255,0.18);color:#fff;border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(4px);">${cName}</span>
 
                             <div class="crew-avatar-wrap">
-                                <div class="crew-avatar">
+                                <div class="crew-avatar" style="background:${coverAccent};color:#1E293B;">
                                     ${fn:substring(crew.name, 0, 1)}
                                 </div>
                             </div>

@@ -120,19 +120,22 @@
                 </div>
 
 
+                <c:set var="sidebarMember" value="${sessionScope.member}"/>
+                <c:set var="sidebarNick" value="${not empty myNickname ? myNickname : (not empty sidebarMember.nickname ? sidebarMember.nickname : '관리자')}"/>
+                <c:set var="sidebarPhoto" value="${not empty myProfilePhoto ? myProfilePhoto : sidebarMember.avatar}"/>
                 <div class="chat-my-profile">
                     <div class="chat-my-avt">
                         <c:choose>
-                            <c:when test="${not empty myProfilePhoto}">
-                                <img src="${pageContext.request.contextPath}/uploads/profile/${myProfilePhoto}"
+                            <c:when test="${not empty sidebarPhoto}">
+                                <img src="${pageContext.request.contextPath}/uploads/profile/${sidebarPhoto}"
                                      style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
-                                     onerror="this.parentNode.textContent='${fn:substring(myNickname, 0, 2)}'">
+                                     onerror="this.style.display='none';this.parentNode.textContent='${fn:substring(sidebarNick,0,2)}'">
                             </c:when>
-                            <c:otherwise>${fn:substring(myNickname, 0, 2)}</c:otherwise>
+                            <c:otherwise>${fn:substring(sidebarNick, 0, 2)}</c:otherwise>
                         </c:choose>
                     </div>
                     <div class="chat-my-info">
-                        <span class="chat-my-name">${myNickname}</span>
+                        <span class="chat-my-name">${sidebarNick}</span>
                         <span class="chat-my-status"><span class="status-dot-green"></span>온라인</span>
                     </div>
                     <button class="chat-my-mute" title="마이크"><i class="ri-mic-line"></i></button>
@@ -595,6 +598,21 @@ window.CTX = CHAT_CTX;
 window.ADMIN_USER_IDX = CHAT_MY_IDX;
 
 var CHAT_MEMBER_ORDER = [<c:forEach var="member" items="${memberList}" varStatus="s">${member.userIdx}<c:if test="${!s.last}">,</c:if></c:forEach>];
+</script>
+<c:set var="chatAdminMember" value="${sessionScope.member}"/>
+<c:set var="chatAdminName" value="${empty chatAdminMember.name ? '관리자' : chatAdminMember.name}"/>
+<c:set var="chatAdminNick" value="${empty chatAdminMember.nickname ? chatAdminName : chatAdminMember.nickname}"/>
+<c:set var="chatAdminAvUrl" value="${empty chatAdminMember.avatar ? '' : pageContext.request.contextPath.concat('/uploads/profile/').concat(chatAdminMember.avatar)}"/>
+<c:set var="chatAdminRole" value="${chatAdminMember.userLevel >= 99 ? 'admin' : 'emp'}"/>
+<script>
+window.ADMIN_PROFILE = {
+    name:      '${fn:escapeXml(chatAdminName)}',
+    nickname:  '${fn:escapeXml(chatAdminNick)}',
+    email:     '${fn:escapeXml(chatAdminMember.email)}',
+    avatarUrl: '${fn:escapeXml(chatAdminAvUrl)}',
+    roleCode:  '${chatAdminRole}',
+    roleLabel: '${chatAdminMember.userLevel >= 99 ? "ADMIN" : "EMP"}'
+};
 </script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/admin/admin_chat.js"></script>

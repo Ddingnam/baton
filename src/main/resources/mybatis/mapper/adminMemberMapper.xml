@@ -51,6 +51,7 @@
                u.tel, u.status, u.createdDate, u.lastLoginDate, u.updatedDate,
                TO_CHAR(u.birth, 'YYYY-MM-DD') AS birth,
                u.profile_photo, u.score, u.userLevel, u.batonpoint,
+               u.baton_distance AS batonDistance,
                u.pwdFailCount, a.authority
         FROM users u
         LEFT JOIN userAuthority a ON u.userId = a.userId

@@ -60,6 +60,7 @@
                                 <div class="rpt-dropdown-item ${param.domainType == 'TRADE' ? 'active' : ''}" data-value="TRADE" onclick="selectDomain(this, '중고거래')">중고거래</div>
                                 <div class="rpt-dropdown-item ${param.domainType == 'COMMUNITY' ? 'active' : ''}" data-value="COMMUNITY" onclick="selectDomain(this, '커뮤니티 게시글')">커뮤니티 게시글</div>
                                 <div class="rpt-dropdown-item ${param.domainType == 'COMMUNITY_REPLY' ? 'active' : ''}" data-value="COMMUNITY_REPLY" onclick="selectDomain(this, '커뮤니티 댓글')">커뮤니티 댓글</div>
+                                <div class="rpt-dropdown-item ${param.domainType == 'CREW' ? 'active' : ''}" data-value="CREW" onclick="selectDomain(this, '동네모임')">동네모임</div>
                                 <div class="rpt-dropdown-item ${param.domainType == 'ALBA' ? 'active' : ''}" data-value="ALBA" onclick="selectDomain(this, '알바구인')">알바구인</div>
                                 <div class="rpt-dropdown-item ${param.domainType == 'CHAT' ? 'active' : ''}" data-value="CHAT" onclick="selectDomain(this, '채팅')">채팅</div>
                                 <div class="rpt-dropdown-item ${param.domainType == 'USER' ? 'active' : ''}" data-value="USER" onclick="selectDomain(this, '사용자')">사용자</div>
@@ -111,6 +112,9 @@
                                             </c:when>
                                             <c:when test="${r.domainType == 'COMMUNITY_REPLY'}">
                                                 <span class="tag tag-purple">커뮤니티 댓글</span>
+                                            </c:when>
+                                            <c:when test="${r.domainType == 'CREW'}">
+                                                <span class="tag tag-orange">동네모임</span>
                                             </c:when>
                                             <c:when test="${r.domainType == 'ALBA'}">
                                                 <span class="tag tag-green">알바구인</span>
@@ -283,6 +287,7 @@
         'TRADE': '중고거래',
         'COMMUNITY': '커뮤니티 게시글',
         'COMMUNITY_REPLY': '커뮤니티 댓글',
+        'CREW': '동네모임',
         'ALBA': '알바구인',
         'CHAT': '채팅',
         'USER': '사용자'
