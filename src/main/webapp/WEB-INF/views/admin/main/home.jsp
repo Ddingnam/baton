@@ -54,6 +54,21 @@
             background: rgba(148, 163, 184, 0.12);
             color: #64748b;
         }
+        .metric-card-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            border-radius: inherit;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .metric-card-link:hover .metric-card {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+            cursor: pointer;
+        }
+        .metric-card-link:hover .metric-card.card-vibrant {
+            box-shadow: 0 8px 24px rgba(120,60,200,0.25);
+        }
     </style>
 </head>
 <body>
@@ -79,6 +94,7 @@
             <div class="bento-grid">
 
                 <div class="bento-item col-3">
+                    <a class="metric-card-link" href="${pageContext.request.contextPath}/admin/member/list">
                     <div class="metric-card">
                         <div class="metric-icon wrap-purple"><i class="ri-user-smile-fill"></i></div>
                         <div class="metric-info">
@@ -89,9 +105,11 @@
                             <i class="${memberTrendUp ? 'ri-arrow-up-line' : 'ri-arrow-down-line'}"></i> ${memberTrendText}
                         </div>
                     </div>
+                    </a>
                 </div>
 
                 <div class="bento-item col-3">
+                    <a class="metric-card-link" href="${pageContext.request.contextPath}/admin/payment/list">
                     <div class="metric-card">
                         <div class="metric-icon wrap-blue"><i class="ri-wallet-3-fill"></i></div>
                         <div class="metric-info">
@@ -102,9 +120,11 @@
                             <i class="${revenueTrendUp ? 'ri-arrow-up-line' : 'ri-arrow-down-line'}"></i> ${revenueTrendText}
                         </div>
                     </div>
+                    </a>
                 </div>
 
                 <div class="bento-item col-3">
+                    <a class="metric-card-link" href="${pageContext.request.contextPath}/admin/trade/list">
                     <div class="metric-card">
                         <div class="metric-icon wrap-green"><i class="ri-shopping-bag-3-fill"></i></div>
                         <div class="metric-info">
@@ -115,9 +135,11 @@
                             <i class="${tradeTrendUp ? 'ri-arrow-up-line' : 'ri-arrow-down-line'}"></i> ${tradeTrendText}
                         </div>
                     </div>
+                    </a>
                 </div>
 
                 <div class="bento-item col-3">
+                    <a class="metric-card-link" href="${pageContext.request.contextPath}/admin/report/list">
                     <div class="metric-card card-vibrant">
                         <div class="metric-icon wrap-glass"><i class="ri-customer-service-2-fill"></i></div>
                         <div class="metric-info">
@@ -126,6 +148,7 @@
                         </div>
                         <div class="metric-trend text-glass">${pendingReportLabel}</div>
                     </div>
+                    </a>
                 </div>
 
                 <div class="bento-item col-8">
