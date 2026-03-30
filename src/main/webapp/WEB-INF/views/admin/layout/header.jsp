@@ -68,10 +68,6 @@
                 <a href="${pageContext.request.contextPath}/admin/notifications" class="noti-all-link">
                     전체 보기 <i class="ri-arrow-right-line"></i>
                 </a>
-                <button onclick="document.getElementById('profileModal').classList.remove('show');document.getElementById('setupTrigger').click();setTimeout(function(){document.querySelector('.fm-nav-item[data-tab=notifications]').click();},100);"
-                    style="border:none;background:var(--base-bg);font-size:11px;color:var(--text-light);cursor:pointer;display:flex;align-items:center;gap:4px;font-weight:700;padding:5px 10px;border-radius:20px;transition:all 0.2s;">
-                    <i class="ri-settings-3-line"></i> 알림 설정
-                </button>
             </div>
         </div>
     </div>
@@ -223,9 +219,6 @@
                 <button class="fm-nav-item" data-tab="permissions">
                     <i class="ri-shield-user-fill"></i>권한 관리
                 </button>
-                <button class="fm-nav-item" data-tab="notifications">
-                    <i class="ri-notification-4-fill"></i>알림 설정
-                </button>
             </nav>
         </div>
         <div class="fm-content">
@@ -320,170 +313,142 @@
             <div class="fm-tab" id="tab-permissions">
                 <h2 class="fm-tab-title">권한 관리</h2>
                 <p class="fm-tab-desc">관리자 등급별 접근 권한을 확인합니다.</p>
-                <div class="fm-section">
-                    <div class="perm-table-wrap">
-                        <table class="perm-table">
-                            <thead>
-                                <tr>
-                                    <th>등급</th>
-                                    <th>설명</th>
-                                    <th>현재 인원</th>
-                                    <th>상태</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><span class="perm-badge super">Super Admin</span></td>
-                                    <td>모든 권한 보유</td>
-                                    <td>1명</td>
-                                    <td><span class="tag tag-green">활성</span></td>
-                                </tr>
-                                <tr>
-                                    <td><span class="perm-badge manager">Manager</span></td>
-                                    <td>회원/거래 관리</td>
-                                    <td>3명</td>
-                                    <td><span class="tag tag-green">활성</span></td>
-                                </tr>
-                                <tr>
-                                    <td><span class="perm-badge cs">CS Staff</span></td>
-                                    <td>고객센터 담당</td>
-                                    <td>2명</td>
-                                    <td><span class="tag tag-blue">대기</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
+
+                <style>
+                /* ── 권한 관리 리뉴얼 (테마 CSS 변수 완전 연동) ── */
+                .perm-cards { display:flex; flex-direction:column; gap:12px; margin-bottom:24px; }
+                .perm-role-card {
+                    display:flex; align-items:center; gap:16px;
+                    padding:16px 18px; border-radius:16px;
+                    border:2px solid transparent;
+                    background:var(--base-bg);
+                    transition:all 0.2s;
+                    position:relative; overflow:hidden;
+                }
+                .perm-role-card.is-mine {
+                    border-color:var(--color-purple);
+                    background:var(--color-purple-light);
+                }
+                .perm-role-card.is-mine::before {
+                    content:''; position:absolute; inset:0;
+                    background:var(--grad-primary);
+                    opacity:0.06; border-radius:14px; pointer-events:none;
+                }
+                .perm-role-icon {
+                    width:46px; height:46px; border-radius:14px;
+                    display:flex; align-items:center; justify-content:center;
+                    font-size:20px; flex-shrink:0;
+                }
+                .perm-role-icon.admin { background:var(--grad-primary); color:#fff; }
+                .perm-role-icon.emp   { background:linear-gradient(135deg,#3B82F6,#06B6D4); color:#fff; }
+                .perm-role-body { flex:1; min-width:0; }
+                .perm-role-top { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+                .perm-role-name { font-size:14px; font-weight:900; color:var(--text-main); letter-spacing:0.03em; }
+                .perm-role-level {
+                    font-size:11px; font-weight:700; padding:2px 9px; border-radius:20px;
+                    background:var(--base-bg); color:var(--text-sub);
+                    border:1px solid var(--border-color);
+                }
+                .perm-role-desc { font-size:12px; font-weight:600; color:var(--text-light); line-height:1.5; }
+                .perm-mine-badge {
+                    display:inline-flex; align-items:center; gap:5px;
+                    padding:5px 12px; border-radius:20px;
+                    background:var(--grad-primary);
+                    color:#fff; font-size:11px; font-weight:800; white-space:nowrap; flex-shrink:0;
+                }
+                .perm-mine-badge i { font-size:12px; }
+                .perm-dash { width:22px; height:2px; background:var(--border-color); border-radius:2px; flex-shrink:0; }
+                .perm-section-label {
+                    font-size:11px; font-weight:800; letter-spacing:0.07em;
+                    text-transform:uppercase; color:var(--text-light);
+                    margin-bottom:10px;
+                }
+                .perm-grid { display:flex; flex-direction:column; gap:7px; }
+                .perm-item {
+                    display:flex; align-items:center; gap:11px;
+                    padding:10px 14px; border-radius:12px;
+                    background:var(--base-bg);
+                    border:1px solid var(--border-color);
+                }
+                .perm-item.granted .perm-check { background:var(--grad-primary); }
+                .perm-item.denied  { opacity:.5; }
+                .perm-item.denied  .perm-check { background:var(--border-color); }
+                .perm-check {
+                    width:22px; height:22px; border-radius:8px; flex-shrink:0;
+                    display:flex; align-items:center; justify-content:center;
+                    font-size:13px; color:#fff; transition:all 0.2s;
+                }
+                .perm-item-label { font-size:13px; font-weight:600; color:var(--text-main); }
+                .perm-item.denied .perm-item-label { color:var(--text-light); }
+                </style>
+
+                <div class="perm-cards">
+                    <%-- ADMIN 카드 --%>
+                    <div class="perm-role-card <c:if test="${adminMember.userLevel >= 99}">is-mine</c:if>">
+                        <div class="perm-role-icon admin"><i class="ri-shield-star-fill"></i></div>
+                        <div class="perm-role-body">
+                            <div class="perm-role-top">
+                                <span class="perm-role-name">ADMIN</span>
+                                <span class="perm-role-level">Lv. 99</span>
+                            </div>
+                            <div class="perm-role-desc">모든 메뉴 접근 · 설정 변경 · 권한 부여</div>
+                        </div>
+                        <c:choose>
+                            <c:when test="${adminMember.userLevel >= 99}">
+                                <span class="perm-mine-badge"><i class="ri-checkbox-circle-fill"></i>현재 등급</span>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="perm-dash"></span>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+
+                    <%-- EMP 카드 --%>
+                    <div class="perm-role-card <c:if test="${adminMember.userLevel < 99}">is-mine</c:if>">
+                        <div class="perm-role-icon emp"><i class="ri-user-settings-fill"></i></div>
+                        <div class="perm-role-body">
+                            <div class="perm-role-top">
+                                <span class="perm-role-name">EMP</span>
+                                <span class="perm-role-level">Lv. 51</span>
+                            </div>
+                            <div class="perm-role-desc">회원 · 콘텐츠 · 신고 관리 · 채팅 접근</div>
+                        </div>
+                        <c:choose>
+                            <c:when test="${adminMember.userLevel < 99}">
+                                <span class="perm-mine-badge"><i class="ri-checkbox-circle-fill"></i>현재 등급</span>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="perm-dash"></span>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </div>
+
+                <div class="perm-section-label">내 접근 권한</div>
+                <div class="perm-grid">
+                    <div class="perm-item granted">
+                        <div class="perm-check"><i class="ri-check-line"></i></div>
+                        <span class="perm-item-label">회원 관리 (조회 · 제재 · 탈퇴 처리)</span>
+                    </div>
+                    <div class="perm-item granted">
+                        <div class="perm-check"><i class="ri-check-line"></i></div>
+                        <span class="perm-item-label">동네생활 · 신고 전체 관리</span>
+                    </div>
+                    <div class="perm-item granted">
+                        <div class="perm-check"><i class="ri-check-line"></i></div>
+                        <span class="perm-item-label">결제 · 에스크로 관리</span>
+                    </div>
+                    <div class="perm-item <c:choose><c:when test="${adminMember.userLevel >= 99}">granted</c:when><c:otherwise>denied</c:otherwise></c:choose>">
+                        <div class="perm-check"><i class="<c:choose><c:when test="${adminMember.userLevel >= 99}">ri-check-line</c:when><c:otherwise>ri-close-line</c:otherwise></c:choose>"></i></div>
+                        <span class="perm-item-label">시스템 설정 변경</span>
+                    </div>
+                    <div class="perm-item <c:choose><c:when test="${adminMember.userLevel >= 99}">granted</c:when><c:otherwise>denied</c:otherwise></c:choose>">
+                        <div class="perm-check"><i class="<c:choose><c:when test="${adminMember.userLevel >= 99}">ri-check-line</c:when><c:otherwise>ri-close-line</c:otherwise></c:choose>"></i></div>
+                        <span class="perm-item-label">관리자 권한 부여 / 회수</span>
                     </div>
                 </div>
             </div>
 
-            <div class="fm-tab" id="tab-notifications">
-                <h2 class="fm-tab-title">알림 설정</h2>
-                <p class="fm-tab-desc">수신할 알림 유형과 방식을 설정합니다.</p>
-
-                <div class="fm-section">
-                    <p class="noti-set-section-label">수신 유형</p>
-                    <div class="noti-set-grid">
-
-                        <div class="noti-set-card">
-                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#F97316,#EF4444);">
-                                <i class="ri-error-warning-fill"></i>
-                            </div>
-                            <div class="noti-set-info">
-                                <span class="noti-set-name">신규 신고</span>
-                                <span class="noti-set-desc">커뮤니티·거래</span>
-                            </div>
-                            <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="REPORT" checked><span class="fm-toggle-track"></span></label>
-                        </div>
-
-                        <div class="noti-set-card">
-                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#7C3AED,#A855F7);">
-                                <i class="ri-refund-2-fill"></i>
-                            </div>
-                            <div class="noti-set-info">
-                                <span class="noti-set-name">환불 요청</span>
-                                <span class="noti-set-desc">미처리 환불</span>
-                            </div>
-                            <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="REFUND" checked><span class="fm-toggle-track"></span></label>
-                        </div>
-
-                        <div class="noti-set-card">
-                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#6366F1,#3B82F6);">
-                                <i class="ri-question-answer-fill"></i>
-                            </div>
-                            <div class="noti-set-info">
-                                <span class="noti-set-name">1:1 문의</span>
-                                <span class="noti-set-desc">미답변 문의</span>
-                            </div>
-                            <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="INQUIRY" checked><span class="fm-toggle-track"></span></label>
-                        </div>
-
-                        <div class="noti-set-card">
-                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#6366F1,#3B82F6);">
-                                <i class="ri-coin-fill"></i>
-                            </div>
-                            <div class="noti-set-info">
-                                <span class="noti-set-name">결제·충전</span>
-                                <span class="noti-set-desc">포인트·결제</span>
-                            </div>
-                            <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="PAYMENT" checked><span class="fm-toggle-track"></span></label>
-                        </div>
-
-                        <div class="noti-set-card">
-                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#7C3AED,#6366F1);">
-                                <i class="ri-chat-3-fill"></i>
-                            </div>
-                            <div class="noti-set-info">
-                                <span class="noti-set-name">채팅</span>
-                                <span class="noti-set-desc">팀·1:1 채팅</span>
-                            </div>
-                            <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="CHAT" checked><span class="fm-toggle-track"></span></label>
-                        </div>
-
-                        <div class="noti-set-card">
-                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#0EA5E9,#10B981);">
-                                <i class="ri-user-add-fill"></i>
-                            </div>
-                            <div class="noti-set-info">
-                                <span class="noti-set-name">신규 회원</span>
-                                <span class="noti-set-desc">가입자 발생</span>
-                            </div>
-                            <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="MEMBER"><span class="fm-toggle-track"></span></label>
-                        </div>
-
-                        <div class="noti-set-card">
-                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#7C3AED,#EC4899);">
-                                <i class="ri-task-fill"></i>
-                            </div>
-                            <div class="noti-set-info">
-                                <span class="noti-set-name">할 일·캘린더</span>
-                                <span class="noti-set-desc">일정·메모</span>
-                            </div>
-                            <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="TODO" checked><span class="fm-toggle-track"></span></label>
-                        </div>
-
-                        <div class="noti-set-card">
-                            <div class="noti-set-icon" style="background:linear-gradient(135deg,#F97316,#EF4444);">
-                                <i class="ri-shield-flash-fill"></i>
-                            </div>
-                            <div class="noti-set-info">
-                                <span class="noti-set-name">시스템</span>
-                                <span class="noti-set-desc">서버·점검·오류</span>
-                            </div>
-                            <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="SYSTEM" checked><span class="fm-toggle-track"></span></label>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="fm-section" style="margin-top:20px;">
-                    <p class="noti-set-section-label">알림 방식</p>
-                    <div class="noti-method-grid">
-
-                        <div class="noti-method-card">
-                            <div class="noti-method-icon" style="background:linear-gradient(135deg,#7C3AED,#A855F7);">
-                                <i class="ri-volume-up-fill"></i>
-                            </div>
-                            <span class="noti-method-name">알림음</span>
-                            <span class="noti-method-desc">새 알림 도착 시 소리</span>
-                            <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="sound"><span class="fm-toggle-track"></span></label>
-                        </div>
-
-                        <div class="noti-method-card">
-                            <div class="noti-method-icon" style="background:linear-gradient(135deg,#7C3AED,#EC4899);">
-                                <i class="ri-notification-4-fill"></i>
-                            </div>
-                            <span class="noti-method-name">브라우저 알림</span>
-                            <span class="noti-method-desc">탭 밖에서도 팝업</span>
-                            <label class="fm-toggle"><input type="checkbox" class="fm-noti-toggle" data-ntype="browser"><span class="fm-toggle-track"></span></label>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="fm-actions">
-                    <button class="btn-pill btn-gradient" id="notiSettingsSaveBtn">변경사항 저장</button>
-                </div>
-            </div>
         </div>
     </div>
 </div>

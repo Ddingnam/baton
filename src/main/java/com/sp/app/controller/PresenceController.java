@@ -53,8 +53,12 @@ public class PresenceController {
 		List<UserDto> members = adminChatService.listAdminMembers();
 		return members.stream().map(m -> {
 			Map<String, Object> item = new HashMap<>();
-			item.put("userIdx", m.getUserIdx());
-			item.put("status", m.getIsOnline());
+			item.put("userIdx",      m.getUserIdx());
+			item.put("status",       m.getIsOnline());
+			item.put("nickname",     m.getNickname());
+			item.put("name",         m.getName());
+			item.put("profilePhoto", m.getProfile_photo());
+			item.put("userLevel",    m.getUserLevel());
 			return item;
 		}).collect(Collectors.toList());
 	}

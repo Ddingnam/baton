@@ -1065,17 +1065,36 @@ function fcSelectDate(key) {
         }
         if (badge) badge.textContent = teamMembers.length + '명';
         rowsEl.innerHTML = teamMembers.map(m => {
-            const nickname = m.nickname || ('user' + m.userIdx);
-            const initials = nickname.substring(0, 2);
-            const status   = Number(m.status || 0);
-            const isOnline = status === 1;
-            const isAway   = status === 2;
-            const pillCls  = isOnline ? 'online' : isAway ? 'away' : '';
-            const pillText = isOnline ? '온라인' : isAway ? '자리비움' : '오프라인';
+            const nickname  = m.nickname || m.name || ('user' + m.userIdx);
+            const initials  = nickname.substring(0, 2);
+            const photo     = m.profilePhoto;
+            const lvl       = Number(m.userLevel || 0);
+            const isAdmin   = lvl >= 99;
+            const status    = Number(m.status || 0);
+            const isOnline  = status === 1;
+            const isAway    = status === 2;
+            const pillCls   = isOnline ? 'online' : isAway ? 'away' : '';
+            const pillText  = isOnline ? '온라인' : isAway ? '자리비움' : '오프라인';
+            const roleBadge = isAdmin
+                ? '<span style="font-size:9px;font-weight:800;letter-spacing:.03em;padding:1px 6px;border-radius:6px;background:rgba(124,58,237,.1);color:var(--color-purple);">ADMIN</span>'
+                : '<span style="font-size:9px;font-weight:800;letter-spacing:.03em;padding:1px 6px;border-radius:6px;background:#F1F5F9;color:#64748B;">EMP</span>';
+            const avtInner = photo
+                ? ''
+                : todoEsc(initials);
+            const avtStyle = photo
+                ? 'background-image:url(' + BASE + '/uploads/profile/' + photo + ');background-size:cover;background-position:center;color:transparent;font-size:0;'
+                : '';
             return '<div class="t-row" id="team-row-' + m.userIdx + '">' +
-                '<div class="t-avt" id="team-avt-' + m.userIdx + '">' + todoEsc(initials) + '</div>' +
-                '<div class="t-info' + (isAway ? ' t-away' : '') + '" id="team-info-' + m.userIdx + '">' + todoEsc(nickname) + '</div>' +
-                (pillCls ? '<div class="t-status-pill ' + pillCls + '" id="team-pill-' + m.userIdx + '"><span class="t-status-dot"></span>' + pillText + '</div>' : '<div class="t-status-pill" id="team-pill-' + m.userIdx + '" style="color:#CBD5E1;"><span class="t-status-dot" style="background:#E2E8F0;"></span>' + pillText + '</div>') +
+                '<div class="t-avt" id="team-avt-' + m.userIdx + '" style="' + avtStyle + '">' + avtInner + '</div>' +
+                '<div style="flex:1;min-width:0;">' +
+                  '<div class="t-info' + (isAway ? ' t-away' : '') + '" id="team-info-' + m.userIdx + '" style="display:flex;align-items:center;gap:5px;">' +
+                    '<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px;">' + todoEsc(nickname) + '</span>' +
+                    roleBadge +
+                  '</div>' +
+                '</div>' +
+                (pillCls
+                    ? '<div class="t-status-pill ' + pillCls + '" id="team-pill-' + m.userIdx + '"><span class="t-status-dot"></span>' + pillText + '</div>'
+                    : '<div class="t-status-pill" id="team-pill-' + m.userIdx + '" style="color:#CBD5E1;"><span class="t-status-dot" style="background:#E2E8F0;"></span>' + pillText + '</div>') +
                 '</div>';
         }).join('');
     }
@@ -1091,7 +1110,8 @@ function fcSelectDate(key) {
         const pillText = isOnline ? '온라인' : isAway ? '자리비움' : '오프라인';
         pill.className = 't-status-pill' + (pillCls ? ' ' + pillCls : '');
         pill.innerHTML = '<span class="t-status-dot"' + (pillCls ? '' : ' style="background:#E2E8F0;"') + '></span>' + pillText;
-        if (info) { info.classList.toggle('t-away', isAway); }
+        if (!pillCls) pill.style.color = '#CBD5E1'; else pill.style.color = '';
+        if (info) info.classList.toggle('t-away', isAway);
     }
     window.updateTeamPresence = updateTeamPresence;
 
@@ -1171,6 +1191,15 @@ function fcSelectDate(key) {
                         if (!raw || raw === 'read_chat' || raw.startsWith('room_deleted:')) return;
                         const n = JSON.parse(raw);
                         if (n && n.notifIdx) injectRealtimeNoti(n);
+                    } catch(e) {}
+                });
+                /* ── 실시간 Presence 구독 (채팅 모듈과 동일한 토픽 재사용) ── */
+                stompC.subscribe('/topic/presence', msg => {
+                    try {
+                        const data = JSON.parse(msg.body);
+                        if (data && data.userIdx !== undefined && data.status !== undefined) {
+                            updateTeamPresence(Number(data.userIdx), Number(data.status));
+                        }
                     } catch(e) {}
                 });
             }, () => {});
