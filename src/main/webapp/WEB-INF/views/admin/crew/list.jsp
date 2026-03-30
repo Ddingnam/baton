@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -69,20 +70,7 @@
                     <c:set var="pct" value="${crew.maxMember > 0 ? (crew.currentMember * 100 / crew.maxMember) : 0}"/>
                     
                     <div class="crew-card">
-                        <c:set var="catIdx" value="${not empty crew.categories ? crew.categories[0].idx : 0}" />
-                    <c:choose>
-                        <c:when test="${catIdx == 1}"><c:set var="coverGrad" value="linear-gradient(135deg,#7C3AED,#4F46E5)"/><c:set var="coverAccent" value="#A78BFA"/></c:when>
-                        <c:when test="${catIdx == 2}"><c:set var="coverGrad" value="linear-gradient(135deg,#0EA5E9,#1D4ED8)"/><c:set var="coverAccent" value="#7DD3FC"/></c:when>
-                        <c:when test="${catIdx == 3}"><c:set var="coverGrad" value="linear-gradient(135deg,#059669,#047857)"/><c:set var="coverAccent" value="#6EE7B7"/></c:when>
-                        <c:when test="${catIdx == 4}"><c:set var="coverGrad" value="linear-gradient(135deg,#EA580C,#C2410C)"/><c:set var="coverAccent" value="#FED7AA"/></c:when>
-                        <c:when test="${catIdx == 5}"><c:set var="coverGrad" value="linear-gradient(135deg,#E11D48,#BE123C)"/><c:set var="coverAccent" value="#FDA4AF"/></c:when>
-                        <c:when test="${catIdx == 6}"><c:set var="coverGrad" value="linear-gradient(135deg,#0891B2,#0E7490)"/><c:set var="coverAccent" value="#A5F3FC"/></c:when>
-                        <c:when test="${catIdx == 7}"><c:set var="coverGrad" value="linear-gradient(135deg,#D97706,#B45309)"/><c:set var="coverAccent" value="#FDE68A"/></c:when>
-                        <c:when test="${catIdx == 8}"><c:set var="coverGrad" value="linear-gradient(135deg,#7C3AED,#DB2777)"/><c:set var="coverAccent" value="#F9A8D4"/></c:when>
-                        <c:when test="${catIdx == 9}"><c:set var="coverGrad" value="linear-gradient(135deg,#334155,#1E293B)"/><c:set var="coverAccent" value="#CBD5E1"/></c:when>
-                        <c:otherwise><c:set var="coverGrad" value="linear-gradient(135deg,#6366F1,#8B5CF6)"/><c:set var="coverAccent" value="#C4B5FD"/></c:otherwise>
-                    </c:choose>
-                    <div class="crew-card-cover" style="background:${coverGrad};">
+                        <div class="crew-card-cover">
                             <c:if test="${not empty crew.logoImage}">
                                 <img src="${pageContext.request.contextPath}/uploads/crew/${crew.logoImage}" alt="cover">
                             </c:if>
@@ -91,10 +79,10 @@
                             <c:if test="${not empty crew.categories}">
                                 <c:set var="cName" value="${not empty crew.categories[0].name ? crew.categories[0].name : (not empty crew.categories[0].categoryName ? crew.categories[0].categoryName : '일반')}" />
                             </c:if>
-                            <span class="crew-badge" style="background:rgba(255,255,255,0.18);color:#fff;border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(4px);">${cName}</span>
+                            <span class="crew-badge" >${cName}</span>
 
                             <div class="crew-avatar-wrap">
-                                <div class="crew-avatar" style="background:${coverAccent};color:#1E293B;">
+                                <div class="crew-avatar">
                                     ${fn:substring(crew.name, 0, 1)}
                                 </div>
                             </div>
@@ -163,11 +151,11 @@
 <div class="fullscreen-overlay" id="crewDetailOverlay">
     <div id="cwModalBox" style="background:#fff;border-radius:24px;width:660px;max-width:96vw;height:82vh;max-height:820px;min-height:480px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.26);transform:translateY(20px) scale(0.97);transition:transform 0.35s cubic-bezier(0.16,1,0.3,1),opacity 0.35s;opacity:0;">
         
-        <div style="background:linear-gradient(135deg,#1E1B4B 0%,#312E81 100%);padding:20px 24px 18px;flex-shrink:0;position:relative;overflow:hidden;">
+        <div class="crew-modal-header">
             <div style="position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none;"></div>
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:relative;">
                 <div style="display:flex;align-items:center;gap:12px;min-width:0;">
-                    <div style="width:38px;height:38px;border-radius:12px;background:rgba(165,180,252,0.15);border:1px solid rgba(165,180,252,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;color:#A5B4FC;flex-shrink:0;">
+                    <div class="crew-modal-icon">
                         <i class="ri-team-line"></i>
                     </div>
                     <div style="min-width:0;">
@@ -189,7 +177,7 @@
 
         <div style="flex:1;overflow-y:auto;padding:0;" id="cwScrollBody">
             <div style="padding:16px 24px 14px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;gap:12px;">
-                <div id="cwAvatar" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,0.3);"></div>
+                <div id="cwAvatar" class="crew-modal-avatar"></div>
                 <div>
                     <div id="cwHostName" style="font-size:14px;font-weight:800;color:#1E293B;"></div>
                     <div id="cwHostSub" style="font-size:11px;color:#94A3B8;margin-top:1px;"></div>
@@ -306,8 +294,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 var crew = d.crew || {};
                 var posts = d.recentPosts || [];
 
-                document.getElementById('cwStatusChip').innerHTML = `<span style="padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(16,185,129,0.15);color:#10B981;border:1px solid rgba(16,185,129,0.3);"><i class="ri-checkbox-circle-line" style="margin-right:4px;"></i>활성</span>`;
-                document.getElementById('cwJoinTypeChip').innerHTML = `<span style="padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(139,92,246,0.15);color:#A78BFA;border:1px solid rgba(139,92,246,0.3);"><i class="ri-door-open-line" style="margin-right:4px;"></i>\${crew.joinType === 'free' ? '자유가입' : '승인가입'}</span>`;
+                document.getElementById('cwStatusChip').innerHTML = '<span class="crew-chip crew-chip-active"><i class="ri-checkbox-circle-line"></i>활성</span>';
+                document.getElementById('cwJoinTypeChip').innerHTML = '<span class="crew-chip crew-chip-theme"><i class="ri-door-open-line"></i>' + (crew.joinType === 'free' ? '자유가입' : '승인가입') + '</span>';
                 document.getElementById('cwViewStat').innerHTML = `<i class="ri-eye-line"></i> \${crew.viewCount||0}`;
 
                 var nick = crew.hostNickname || '익명';
