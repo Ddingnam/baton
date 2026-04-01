@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CrewServiceImpl implements CrewService {
 	
 	private final CrewMapper mapper;
+	private final CrewChatService chatService;
 	private final StorageService storageService;
 	
 	private final UserRepository userRepository;
@@ -85,6 +86,10 @@ public class CrewServiceImpl implements CrewService {
 	                .build();
 	        
 	        historyRepository.save(history);
+	        
+	        String defaultRoomName = crewDto.getName() + " 메인 채팅방";
+	        Long roomId = chatService.createRoom(crewDto.getCrewIdx(), defaultRoomName, 1);
+	        chatService.updateReadIndex(roomId, crewDto.getUserIdx(), 0L);
 	        
 		} catch (Exception e) {
 			log.info("insertCrew : ", e);
@@ -286,6 +291,9 @@ public class CrewServiceImpl implements CrewService {
 	    if ("ACTIVE".equals(initialStatus)) {
 	        member.setJoinedDate(LocalDateTime.now());
 	        crew.setCurrentMember(crew.getCurrentMember() + 1);
+	        
+	        Long mainRoomId = chatService.getMainChatRoomId(crewIdx);
+	        chatService.updateReadIndex(mainRoomId, userIdx, 0L);
 	    }
 	    
         memberRepository.save(member);

@@ -1,6 +1,7 @@
 package com.sp.app.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +12,8 @@ import com.sp.app.domain.entity.CrewChatRoom;
 
 @Repository
 public interface CrewChatRoomRepository extends JpaRepository<CrewChatRoom, Long> {
+	Optional<CrewChatRoom> findByCrew_CrewIdxAndRoomType(Long crewIdx, Integer roomType);
+	
     List<CrewChatRoom> findByCrew_CrewIdx(Long crewIdx); 
     
     @Query("SELECT r FROM CrewChatRoom r " +

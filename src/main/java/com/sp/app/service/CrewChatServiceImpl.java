@@ -21,9 +21,11 @@ import com.sp.app.domain.entity.User;
 import com.sp.app.repository.CrewChatMessageRepository;
 import com.sp.app.repository.CrewChatReadRepository;
 import com.sp.app.repository.CrewChatRoomRepository;
+import com.sp.app.repository.CrewMemberRepository;
 import com.sp.app.repository.CrewRepository;
 import com.sp.app.repository.UserRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,6 +40,7 @@ public class CrewChatServiceImpl implements CrewChatService {
     
     private final UserRepository userRepository; 
     private final CrewRepository crewRepository;
+    private final CrewMemberRepository memberRepository;
 
     @Override
     @Transactional
@@ -74,6 +77,41 @@ public class CrewChatServiceImpl implements CrewChatService {
         updateLastRead(room, user, savedMessage.getChatIdx());
 
         return savedMessage.getChatIdx();
+    }
+    
+    @Override
+    @Transactional
+    public CrewChatMessageDto saveAndGetMessageDto(Long roomId, Long userId, String content, Integer msgType) {
+    	CrewChatRoom room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        CrewChatMessage message = CrewChatMessage.builder()
+                .chatRoom(room)
+                .user(user)
+                .content(content)
+                .msgType(msgType)
+                .build();
+        
+        CrewChatMessage savedMessage = messageRepository.save(message);
+        
+        updateLastRead(room, user, savedMessage.getChatIdx());
+        
+        long totalMembers = memberRepository.countByCrew_CrewIdxAndStatus(room.getCrew().getCrewIdx(), "ACTIVE");
+        long unreadCount = totalMembers - 1; 
+
+        CrewChatMessageDto dto = CrewChatMessageDto.fromEntity(savedMessage);
+        dto.setUnreadCount(unreadCount);
+        
+        return dto;
+    }
+    
+    @Override
+    public Long getMainChatRoomId(Long crewIdx) {
+        return roomRepository.findByCrew_CrewIdxAndRoomType(crewIdx, 1)
+                .map(CrewChatRoom::getChatRoomId)
+                .orElseThrow(() -> new EntityNotFoundException("채팅방을 찾을 수 없습니다."));
     }
 
     @Override

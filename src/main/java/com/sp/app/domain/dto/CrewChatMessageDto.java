@@ -23,6 +23,10 @@ public class CrewChatMessageDto {
     private Integer msgType;
     private LocalDateTime createdDate;
     
+    private String userNickname;
+    private String userProfileImage;
+    private Long unreadCount;
+    
     public static CrewChatMessageDto fromEntity(CrewChatMessage entity) {
         if (entity == null) return null;
 
@@ -33,6 +37,8 @@ public class CrewChatMessageDto {
                 .content(entity.getContent())
                 .msgType(entity.getMsgType())
                 .createdDate(entity.getCreatedDate())
+                .userNickname(entity.getUser().getNickname())
+                .userProfileImage(entity.getUser().getProfilePhoto())
                 .build();
     }
 }

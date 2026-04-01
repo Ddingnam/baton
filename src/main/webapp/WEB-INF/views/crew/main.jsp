@@ -33,7 +33,10 @@
     </div>
     
     <aside class="right-chat-panel" :class="{ 'chat-closed': !isChatOpen }">
-        <crew-chat-component @close-chat="isChatOpen = false"></crew-chat-component>
+        <crew-chat-component
+			@close-chat="isChatOpen = false"
+			:current-user-idx="${sessionScope.member.userIdx}">
+		</crew-chat-component>
     </aside>
 
     <footer id="global-footer">
@@ -53,6 +56,8 @@
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_form.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_detail_dashboard.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_detail_board.js"></script>
