@@ -11,12 +11,12 @@ import com.sp.app.domain.entity.CrewChatRoom;
 
 @Repository
 public interface CrewChatRoomRepository extends JpaRepository<CrewChatRoom, Long> {
-    List<CrewChatRoom> findByCrewId(Long crewId); 
+    List<CrewChatRoom> findByCrew_CrewIdx(Long crewIdx); 
     
     @Query("SELECT r FROM CrewChatRoom r " +
     	       "JOIN CrewChatRead cr ON r.chatRoomId = cr.chatRoom.chatRoomId " +
     	       "LEFT JOIN CrewChatMessage m ON r.chatRoomId = m.chatRoom.chatRoomId " +
-    	       "WHERE cr.user.useridx = :userIdx " +
+    	       "WHERE cr.user.userIdx = :userIdx " +
     	       "GROUP BY r " +
     	       "ORDER BY MAX(m.createdDate) DESC NULLS LAST, r.createdDate DESC")
 	List<CrewChatRoom> findChatRoomsByUserIdOrderByLastMessage(@Param("userIdx") Long userIdx);
