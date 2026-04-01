@@ -32,25 +32,12 @@ public class CrewChatController {
 
     private final CrewChatService chatService;
 
-    // ==========================================
-    // 1. 채팅방 관리 (Room Management)
-    // ==========================================
-
-    /**
-     * 채팅방 생성
-     * POST /api/chat/rooms
-     */
     @PostMapping("/rooms")
     public ResponseEntity<Long> createRoom(@RequestBody CrewChatRequest.Create req) {
         Long roomId = chatService.createRoom(req.getCrewIdx(), req.getRoomName(), req.getRoomType());
         return ResponseEntity.ok(roomId);
     }
 
-    /**
-     * 내 채팅방 목록 조회
-     * GET /api/chat/rooms?userId=1
-     * (실무 팁: userId는 보안상 @RequestParam보다 세션/토큰에서 꺼내는 것이 좋습니다)
-     */
     @GetMapping("/rooms")
     public ResponseEntity<List<CrewChatRoomResponse>> getMyChatRooms(@AuthenticationPrincipal CustomUserDetails userDetails) {
     	Long userIdx = userDetails.getMember().getUserIdx();
@@ -58,20 +45,12 @@ public class CrewChatController {
         return ResponseEntity.ok(rooms);
     }
 
-    /**
-     * 채팅방 단건 상세 조회 (상단바 정보 등)
-     * GET /api/chat/rooms/{roomId}
-     */
     @GetMapping("/rooms/{roomId}")
     public ResponseEntity<CrewChatRoomDto> getChatRoomDetail(@PathVariable("roomId") Long roomId) {
         CrewChatRoomDto roomDetail = chatService.getChatRoomDetail(roomId);
         return ResponseEntity.ok(roomDetail);
     }
 
-    /**
-     * 채팅방 나가기
-     * DELETE /api/chat/rooms/{roomId}/leave?userId=1
-     */
     @DeleteMapping("/rooms/{roomId}/leave")
     public ResponseEntity<Void> leaveChatRoom(
             @PathVariable("roomId") Long roomId,
@@ -81,26 +60,12 @@ public class CrewChatController {
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * 채팅방 참여자 목록 조회
-     * GET /api/chat/rooms/{roomId}/participants
-     */
     @GetMapping("/rooms/{roomId}/participants")
     public ResponseEntity<List<CrewChatParticipantDto>> getChatParticipants(@PathVariable("roomId") Long roomId) {
         List<CrewChatParticipantDto> participants = chatService.getChatParticipants(roomId);
         return ResponseEntity.ok(participants);
     }
 
-
-    // ==========================================
-    // 2. 메시지 및 페이징 조회 (Message & Paging)
-    // ==========================================
-
-    /**
-     * 메시지 전송 (REST API 방식)
-     * POST /api/chat/rooms/{roomId}/messages
-     * (참고: 실시간 채팅에서는 보통 WebSocket/STOMP 컨트롤러(@MessageMapping)를 사용합니다)
-     */
     @PostMapping("/rooms/{roomId}/messages")
     public ResponseEntity<Long> sendMessage(
             @PathVariable("roomId") Long roomId,
@@ -109,10 +74,6 @@ public class CrewChatController {
         return ResponseEntity.ok(msgId);
     }
 
-    /**
-     * [초기 로딩] 채팅방 입장 시 메시지 내역 조회
-     * GET /api/chat/rooms/{roomId}/messages?userId=1
-     */
     @GetMapping("/rooms/{roomId}/messages")
     public ResponseEntity<List<CrewChatMessageDto>> getChatHistory(
             @PathVariable("roomId") Long roomId,
@@ -122,10 +83,6 @@ public class CrewChatController {
         return ResponseEntity.ok(messages);
     }
 
-    /**
-     * [과거 로딩] 위로 스크롤 시 이전 메시지 조회
-     * GET /api/chat/rooms/{roomId}/messages/before?userId=1&firstChatIdx=100
-     */
     @GetMapping("/rooms/{roomId}/messages/before")
     public ResponseEntity<List<CrewChatMessageDto>> getChatHistoryBefore(
             @PathVariable("roomId") Long roomId,
@@ -136,10 +93,6 @@ public class CrewChatController {
         return ResponseEntity.ok(messages);
     }
 
-    /**
-     * [최신 갱신] 새 메시지 조회 (아래로 스크롤 또는 폴링)
-     * GET /api/chat/rooms/{roomId}/messages/after?lastChatIdx=150
-     */
     @GetMapping("/rooms/{roomId}/messages/after")
     public ResponseEntity<List<CrewChatMessageDto>> getChatHistoryAfter(
             @PathVariable("roomId") Long roomId,
@@ -148,15 +101,6 @@ public class CrewChatController {
         return ResponseEntity.ok(messages);
     }
 
-
-    // ==========================================
-    // 3. 읽음 처리 (Read Index)
-    // ==========================================
-
-    /**
-     * 안 읽은 메시지 총 개수 조회
-     * GET /api/chat/rooms/{roomId}/unread?userId=1
-     */
     @GetMapping("/rooms/{roomId}/unread")
     public ResponseEntity<Map<String, Long>> getUnreadMessageCount(
             @PathVariable("roomId") Long roomId,
@@ -166,10 +110,6 @@ public class CrewChatController {
         return ResponseEntity.ok(Map.of("unreadCount", unreadCount));
     }
 
-    /**
-     * 실시간 읽음 위치(인덱스) 수동 갱신
-     * PUT /api/chat/rooms/{roomId}/read
-     */
     @PutMapping("/rooms/{roomId}/read")
     public ResponseEntity<Void> updateReadIndex(
             @PathVariable("roomId") Long roomId,

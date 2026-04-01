@@ -4,7 +4,6 @@
 
 <template id="crew-chat-template">
     <div class="chat-panel-container">
-        
         <div v-if="currentView === 'list'" class="chat-view-wrapper">
             <header class="chat-header">
                 <h2 class="chat-header-title">크루 채팅</h2>
@@ -34,9 +33,17 @@
                         <h2 class="chat-crew-name">{{ currentRoomName }}</h2>
                     </div>
                 </div>
-                <button class="btn-close-chat" @click="$emit('close-chat')">
-                    <i class="ri-close-line"></i>
-                </button>
+				<div class="chat-header-actions">
+		            <button class="chat-btn-action" @click="toggleParticipants" title="참여자 목록">
+		                <i class="ri-group-line"></i>
+		            </button>
+		            <button class="chat-btn-action chat-btn-leave" @click="leaveRoom" title="방 나가기">
+		                <i class="ri-logout-box-r-line"></i>
+		            </button>
+		            <button class="btn-close-chat" @click="$emit('close-chat')">
+		                <i class="ri-close-line"></i>
+		            </button>
+		        </div>
             </header>
 
             <div class="chat-message-area" ref="messageArea">
@@ -65,6 +72,21 @@
                 </button>
             </div>
         </div>
-
+		
+		<div v-show="currentView === 'room'" 
+             class="chat-participants-side-panel" 
+             :class="{'active': showParticipants}">
+             
+            <div class="chat-participants-header">
+                <h4 class="chat-participants-title">대화 참여자 ({{ participants.length }})</h4>
+            </div>
+            
+            <ul class="chat-participants-list">
+                <li v-for="p in participants" :key="p.userIdx" class="chat-participant-item">
+                    <div class="chat-participant-avatar">{{ p.nickname ? p.nickname.charAt(0) : '익' }}</div>
+                    <span class="chat-participant-name">{{ p.nickname }}</span>
+                </li>
+            </ul>
+        </div>
     </div>
 </template>

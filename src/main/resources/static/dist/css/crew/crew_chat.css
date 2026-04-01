@@ -229,3 +229,120 @@
     transform: scale(1.1);
     box-shadow: 0 4px 12px rgba(248, 109, 125, 0.3);
 }
+
+.chat-header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-left: auto;
+    padding-right: 8px;
+}
+
+.chat-btn-action {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-btn-action:hover {
+    color: #333;
+}
+
+.chat-btn-leave {
+    color: #ff4d4f;
+}
+
+.chat-btn-leave:hover {
+    color: #cf1322;
+}
+
+.chat-panel-container {
+    position: relative; 
+}
+
+.chat-view-wrapper {
+    position: relative;
+    z-index: 10;
+    background: var(--bg-color);
+}
+
+.chat-participants-side-panel {
+    position: absolute;
+    top: 0;
+    right: 100%;
+    width: 260px;
+    height: 100%;
+    background: #f9fafb;
+    border: 1px solid var(--border-color);
+    border-right: none;
+    border-radius: 16px 0 0 16px;
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.05);
+    
+    display: flex;
+    flex-direction: column;
+    z-index: 5;
+    
+    transform: translateX(100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s, visibility 0.3s;
+}
+
+.chat-participants-side-panel.active {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.chat-participants-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.chat-participants-title {
+    margin: 0;
+    font-size: 15px;
+    color: var(--text-main);
+    font-weight: 700;
+}
+
+.chat-participants-list {
+    flex: 1;
+    overflow-y: auto;
+    list-style: none;
+    padding: 10px 20px;
+    margin: 0;
+}
+
+.chat-participant-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.chat-participant-avatar {
+    width: 36px;
+    height: 36px;
+    background: #e5e7eb;
+    color: var(--text-sub);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.chat-participant-name {
+    font-size: 14px;
+    color: var(--text-main);
+    font-weight: 500;
+}

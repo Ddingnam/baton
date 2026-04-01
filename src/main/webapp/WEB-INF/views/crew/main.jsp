@@ -34,6 +34,7 @@
     
     <aside class="right-chat-panel" :class="{ 'chat-closed': !isChatOpen }">
         <crew-chat-component
+			:is-open="isChatOpen"
 			@close-chat="isChatOpen = false"
 			:current-user-idx="${sessionScope.member.userIdx}">
 		</crew-chat-component>

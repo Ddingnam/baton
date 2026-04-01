@@ -171,7 +171,7 @@ html, body {
     border-left: 1px solid var(--border-color); 
     box-shadow: -10px 0 30px rgba(0,0,0,0.03); 
     z-index: 900;
-    overflow-y: auto;
+    overflow-y: visible;
     transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 

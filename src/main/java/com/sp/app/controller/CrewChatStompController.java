@@ -23,10 +23,6 @@ public class CrewChatStompController {
     private final SimpMessagingTemplate messagingTemplate;
     private final CrewChatService chatService;
 
-    /**
-     * 채팅 메시지 전송 및 실시간 전파
-     * 클라이언트 전송 경로: /app/chat/rooms/{roomId}/send
-     */
     @MessageMapping("/chat/rooms/{roomId}/send")
     public void sendMessage(
             @DestinationVariable("roomId") Long roomId,
@@ -41,10 +37,6 @@ public class CrewChatStompController {
         messagingTemplate.convertAndSend("/topic/chat/rooms/" + roomId, response);
     }
 
-    /**
-     * 실시간 읽음 알림 (선택 사항)
-     * 누군가 읽었을 때 "1"을 실시간으로 지우기 위한 신호탄
-     */
     @MessageMapping("/chat/rooms/{roomId}/read")
     public void updateReadStatus(
             @DestinationVariable("roomId") Long roomId,
