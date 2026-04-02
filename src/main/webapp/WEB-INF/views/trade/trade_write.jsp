@@ -138,7 +138,7 @@
                                 <div class="trade-type-group">
                                     <input type="radio" name="tradeType" id="t1" value="직거래" v-model="wForm.tradeType"><label for="t1">직거래</label>
                                     <input type="radio" name="tradeType" id="t2" value="택배" v-model="wForm.tradeType"><label for="t2">택배</label>
-                                    <input type="radio" name="tradeType" id="t3" value="둘다가능" v-model="wForm.tradeType"><label for="t3">둘 다 가능</label>
+                                    <input type="radio" name="tradeType" id="t3" value="둘다가능" v-model="wForm.tradeType"><label for="t3">직거래/택배</label>
                                 </div>
                             </div>
                             <div class="field" id="shippingFeeField" v-show="wForm.tradeType === '택배' || wForm.tradeType === '둘다가능'">
