@@ -108,7 +108,7 @@
 					        <span class="theme-text" style="color: #3182F6;">P</span>
 					    </strong>
 					</div>
-					<button class="theme-btn" style="background:#3182F6;" onclick="openChargeModal()">충전하기</button>
+					<button class="theme-btn" id="charge-btn" style="background:#3182F6;" onclick="openChargeModal()">충전하기</button>
 				</div>
 			</div>
 
@@ -583,7 +583,7 @@
 						<div class="list-card">
 							<div class="lc-header">
 								<h3>커뮤니티 활동</h3>
-								<a href="${pageContext.request.contextPath}/mypage/community/posts" class="theme-link">전체 활동 <i class="ri-arrow-right-s-line"></i></a>
+								
 							</div>
 							<div class="inner-tabs">
 								<button class="inner-tab active" data-inner="comm-posts">작성한 글</button>

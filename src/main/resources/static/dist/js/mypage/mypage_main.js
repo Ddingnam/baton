@@ -34,6 +34,9 @@
             document.documentElement.style.setProperty('--header-domain-color', color);
             document.documentElement.style.setProperty('--header-domain-bg', bg);
 
+            var chargeBtn = document.getElementById('charge-btn');
+            if (chargeBtn) chargeBtn.style.background = color;
+
             var targetId = tab.getAttribute('data-target');
             sections.forEach(function (sec) {
                 sec.classList.remove('active');
@@ -261,4 +264,3 @@
 	});
 
 })();
-

@@ -26,15 +26,16 @@
     <div class="article-container">
         <div class="article-header">
             <div class="category-badge">
+                <c:set var="cat" value="${dto.category}"/>
                 <c:choose>
-                    <c:when test="${dto.category == 1 || dto.category == '1' || dto.category == '일상'}">일상</c:when>
-                    <c:when test="${dto.category == 2 || dto.category == '2' || dto.category == '동네질문'}">동네질문</c:when>
-                    <c:when test="${dto.category == 3 || dto.category == '3' || dto.category == '동네맛집'}">동네맛집</c:when>
-                    <c:when test="${dto.category == 4 || dto.category == '4' || dto.category == '같이해요'}">같이해요</c:when>
-                    <c:when test="${dto.category == 5 || dto.category == '5' || dto.category == '분실/실종'}">분실/실종</c:when>
-                    <c:when test="${dto.category == 6 || dto.category == '6' || dto.category == '동네사건사고'}">동네사건사고</c:when>
-                    <c:when test="${dto.category == 7 || dto.category == '7' || dto.category == '생활정보'}">생활정보</c:when>
-                    <c:when test="${dto.category == 8 || dto.category == '8' || dto.category == '취미생활'}">취미생활</c:when>
+                    <c:when test="${cat == '1' || cat == '일상'}">일상</c:when>
+                    <c:when test="${cat == '2' || cat == '동네질문'}">동네질문</c:when>
+                    <c:when test="${cat == '3' || cat == '동네맛집'}">동네맛집</c:when>
+                    <c:when test="${cat == '4' || cat == '같이해요'}">같이해요</c:when>
+                    <c:when test="${cat == '5' || cat == '분실/실종'}">분실/실종</c:when>
+                    <c:when test="${cat == '6' || cat == '동네사건사고'}">동네사건사고</c:when>
+                    <c:when test="${cat == '7' || cat == '생활정보'}">생활정보</c:when>
+                    <c:when test="${cat == '8' || cat == '취미생활'}">취미생활</c:when>
                     <c:otherwise>일상</c:otherwise>
                 </c:choose>
             </div>
