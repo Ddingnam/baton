@@ -630,15 +630,18 @@ body {
 	display: flex;
 	align-items: center;
 	gap: 7px;
-	padding: 9px 12px;
+	padding: 9px 8px;
 	border-radius: 10px;
 	border: 1.5px solid var(--border);
 	background: var(--surface-2);
-	font-size: 13px;
+	font-size: 12px;
 	font-weight: 500;
 	color: var(--text-2);
 	transition: all 0.18s ease;
 	cursor: pointer;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .sc-item span i {

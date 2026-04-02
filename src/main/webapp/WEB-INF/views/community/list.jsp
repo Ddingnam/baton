@@ -210,14 +210,13 @@
                         <span class="card-badge">
                             <c:set var="cat" value="${dto.category}"/>
                             <c:choose>
-                                <c:when test="${cat == '1' || cat == '일상'}">일상</c:when>
-								<c:when test="${cat == '2' || cat == '동네질문'}">동네질문</c:when>
-								<c:when test="${cat == '3' || cat == '동네맛집'}">동네맛집</c:when>
-								<c:when test="${cat == '4' || cat == '같이해요'}">같이해요</c:when>
-								<c:when test="${cat == '5' || cat == '분실/실종'}">분실/실종</c:when>
-								<c:when test="${cat == '6' || cat == '동네사건사고'}">동네사건사고</c:when>
-								<c:when test="${cat == '7' || cat == '생활정보'}">생활정보</c:when>
-								<c:when test="${cat == '8' || cat == '취미생활'}">취미생활</c:when>
+                                <c:when test="${cat == '동네질문'}">동네질문</c:when>
+                                <c:when test="${cat == '동네맛집'}">동네맛집</c:when>
+                                <c:when test="${cat == '같이해요'}">같이해요</c:when>
+                                <c:when test="${cat == '분실/실종'}">분실/실종</c:when>
+                                <c:when test="${cat == '동네사건사고'}">동네사건사고</c:when>
+                                <c:when test="${cat == '생활정보'}">생활정보</c:when>
+                                <c:when test="${cat == '취미생활'}">취미생활</c:when>
                                 <c:otherwise>일상</c:otherwise>
                             </c:choose>
                         </span>
@@ -230,9 +229,9 @@
                         (function(){
                             var tmp = document.createElement('div');
                             tmp.innerHTML = `<c:out value="${dto.content}" escapeXml="false"/>`;
-                            var text = (tmp.innerText || tmp.textContent || '').replace(/\s+/g,' ').trim();
+                            var text = (tmp.innerText || tmp.textContent || '').split('\n')[0].trim();
                             var el = document.getElementById('cardText_${dto.id}');
-                            if(el) el.innerText = text.length > 80 ? text.substring(0,80)+'...' : text;
+                            if(el) el.innerText = text;
                         })();
                         </script>
 

@@ -494,10 +494,9 @@ a { text-decoration: none; color: inherit; }
     color: var(--text-sub);
     line-height: 1.5;
     margin-bottom: 16px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .card-meta {

@@ -213,14 +213,14 @@
 				<p class="sidebar-section-label">카테고리 선택</p>
 				<c:set var="cat" value="${dto.category}"/>
 				<div class="sidebar-category-grid">
-					<label class="sc-item"><input type="radio" name="category" value="1" ${mode=='write' || cat == '1' || cat == '일상' ? 'checked' : ''}><span><i class="ri-sun-line"></i>일상</span></label>
-					<label class="sc-item"><input type="radio" name="category" value="2" ${cat == '2' || cat == '동네질문' ? 'checked' : ''}><span><i class="ri-question-line"></i>동네질문</span></label>
-					<label class="sc-item"><input type="radio" name="category" value="3" ${cat == '3' || cat == '동네맛집' ? 'checked' : ''}><span><i class="ri-restaurant-line"></i>동네맛집</span></label>
-					<label class="sc-item"><input type="radio" name="category" value="4" ${cat == '4' || cat == '같이해요' ? 'checked' : ''}><span><i class="ri-group-line"></i>같이해요</span></label>
-					<label class="sc-item"><input type="radio" name="category" value="5" ${cat == '5' || cat == '분실/실종' ? 'checked' : ''}><span><i class="ri-search-eye-line"></i>분실/실종</span></label>
-					<label class="sc-item"><input type="radio" name="category" value="6" ${cat == '6' || cat == '동네사건사고' ? 'checked' : ''}><span><i class="ri-alarm-warning-line"></i>동네사건사고</span></label>
-					<label class="sc-item"><input type="radio" name="category" value="7" ${cat == '7' || cat == '생활정보' ? 'checked' : ''}><span><i class="ri-information-line"></i>생활정보</span></label>
-					<label class="sc-item"><input type="radio" name="category" value="8" ${cat == '8' || cat == '취미생활' ? 'checked' : ''}><span><i class="ri-palette-line"></i>취미생활</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="일상" ${cat == '일상' || empty cat ? 'checked' : ''}><span><i class="ri-sun-line"></i>일상</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="동네질문" ${cat == '동네질문' ? 'checked' : ''}><span><i class="ri-question-line"></i>동네질문</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="동네맛집" ${cat == '동네맛집' ? 'checked' : ''}><span><i class="ri-restaurant-line"></i>동네맛집</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="같이해요" ${cat == '같이해요' ? 'checked' : ''}><span><i class="ri-group-line"></i>같이해요</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="분실/실종" ${cat == '분실/실종' ? 'checked' : ''}><span><i class="ri-search-eye-line"></i>분실/실종</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="동네사건사고" ${cat == '동네사건사고' ? 'checked' : ''}><span><i class="ri-alarm-warning-line"></i>동네사건사고</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="생활정보" ${cat == '생활정보' ? 'checked' : ''}><span><i class="ri-information-line"></i>생활정보</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="취미생활" ${cat == '취미생활' ? 'checked' : ''}><span><i class="ri-palette-line"></i>취미생활</span></label>
 				</div>
 			</div>
 

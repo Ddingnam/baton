@@ -384,6 +384,17 @@ function sendOk() {
 
 	const contextPath = document.querySelector('meta[name="contextPath"]').getAttribute('content');
 	f.action = contextPath + '/community/' + f.mode.value;
+
+	const selectedCat = document.querySelector('input[name="category"]:checked');
+	if (selectedCat) {
+		f.querySelectorAll('input[name="category"]').forEach(el => el.disabled = true);
+		const catHidden = document.createElement('input');
+		catHidden.type = 'hidden';
+		catHidden.name = 'category';
+		catHidden.value = selectedCat.value;
+		f.appendChild(catHidden);
+	}
+
 	f.submit();
 }
 
