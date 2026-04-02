@@ -38,9 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	const submitBtn = document.querySelector('.btn-submit');
-	const submitFullBtn = document.querySelector('.btn-submit-full');
 	if (submitBtn) submitBtn.addEventListener('click', sendOk);
-	if (submitFullBtn) submitFullBtn.addEventListener('click', sendOk);
 
 	const chkPoll = document.getElementById('chkPollToggle');
 	const pollForm = document.getElementById('pollForm');

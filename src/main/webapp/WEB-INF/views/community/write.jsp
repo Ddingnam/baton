@@ -22,6 +22,7 @@
 	<div class="write-layout">
 		<div class="write-main">
 			<form name="communityForm" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
 				<input type="hidden" name="mode" value="${mode}">
 				<input type="hidden" name="regionType" id="writeRegionType" value="${regionType > 0 ? regionType : 1}">
@@ -49,7 +50,7 @@
 							<span id="tempCountBadge" class="temp-badge" style="display:none;"></span>
 						</button>
 						<button type="button" class="btn-ghost-save" onclick="saveTemp()">임시저장</button>
-						<button type="button" class="btn-submit" onclick="sendOk();">${mode=='update' ? '수정' : '등록'}</button>
+						<button type="submit" class="btn-submit" onclick="sendOk();">${mode=='update' ? '수정' : '등록'}</button>
 					</div>
 				</div>
 
@@ -183,9 +184,6 @@
 					</div>
 					<div class="footer-right">
 						<span class="attach-count-label" id="attachCountLabel" style="display:none;"></span>
-						<button type="button" class="btn-submit-full" onclick="sendOk();">
-							${mode=='update' ? '수정하기' : '등록하기'}
-						</button>
 					</div>
 				</div>
 
@@ -213,15 +211,16 @@
 
 			<div class="sidebar-box sidebar-category-box">
 				<p class="sidebar-section-label">카테고리 선택</p>
+				<c:set var="cat" value="${dto.category}"/>
 				<div class="sidebar-category-grid">
-					<label class="sc-item"><input type="radio" name="category" value="1" ${mode=='write' || dto.category == 1 ? 'checked' : ''}><span><i class="ri-sun-line"></i>일상</span></label>
-					<label class="sc-item"><input type="radio" name="category" value="2" ${dto.category == 2 ? 'checked' : ''}><span><i class="ri-question-line"></i>동네질문</span></label>
-					<label class="sc-item"><input type="radio" name="category" value="3" ${dto.category == 3 ? 'checked' : ''}><span><i class="ri-restaurant-line"></i>동네맛집</span></label>
-					<label class="sc-item"><input type="radio" name="category" value="4" ${dto.category == 4 ? 'checked' : ''}><span><i class="ri-group-line"></i>같이해요</span></label>
-					<label class="sc-item"><input type="radio" name="category" value="5" ${dto.category == 5 ? 'checked' : ''}><span><i class="ri-search-eye-line"></i>분실/실종</span></label>
-					<label class="sc-item"><input type="radio" name="category" value="6" ${dto.category == 6 ? 'checked' : ''}><span><i class="ri-alarm-warning-line"></i>동네사건사고</span></label>
-					<label class="sc-item"><input type="radio" name="category" value="7" ${dto.category == 7 ? 'checked' : ''}><span><i class="ri-information-line"></i>생활정보</span></label>
-					<label class="sc-item"><input type="radio" name="category" value="8" ${dto.category == 8 ? 'checked' : ''}><span><i class="ri-palette-line"></i>취미생활</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="1" ${mode=='write' || cat == '1' || cat == '일상' ? 'checked' : ''}><span><i class="ri-sun-line"></i>일상</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="2" ${cat == '2' || cat == '동네질문' ? 'checked' : ''}><span><i class="ri-question-line"></i>동네질문</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="3" ${cat == '3' || cat == '동네맛집' ? 'checked' : ''}><span><i class="ri-restaurant-line"></i>동네맛집</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="4" ${cat == '4' || cat == '같이해요' ? 'checked' : ''}><span><i class="ri-group-line"></i>같이해요</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="5" ${cat == '5' || cat == '분실/실종' ? 'checked' : ''}><span><i class="ri-search-eye-line"></i>분실/실종</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="6" ${cat == '6' || cat == '동네사건사고' ? 'checked' : ''}><span><i class="ri-alarm-warning-line"></i>동네사건사고</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="7" ${cat == '7' || cat == '생활정보' ? 'checked' : ''}><span><i class="ri-information-line"></i>생활정보</span></label>
+					<label class="sc-item"><input type="radio" name="category" value="8" ${cat == '8' || cat == '취미생활' ? 'checked' : ''}><span><i class="ri-palette-line"></i>취미생활</span></label>
 				</div>
 			</div>
 
