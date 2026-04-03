@@ -1218,12 +1218,51 @@ function fcSelectDate(key) {
         fill.addColorStop(1, 'rgba(0,0,0,0)');
         return { stroke, fill, c1 };
     }
+    /* ── 메트릭 가데이터 주입 ── */
+    (function() {
+        const m = window.mockMetrics;
+        if (!m) return;
+        function fmt(n) { return n.toLocaleString('ko-KR'); }
+        /* 각 metric-val 요소를 label로 찾아 교체 */
+        document.querySelectorAll('.metric-card').forEach(card => {
+            const label = card.querySelector('.metric-label');
+            const val   = card.querySelector('.metric-val');
+            if (!label || !val) return;
+            const t = label.textContent.trim();
+            if (t === '전체 회원수'   && val.textContent.trim() === '0') val.textContent = fmt(m.totalMembers);
+            if (t === '오늘 충전 매출' && (val.textContent.includes('0원') || val.textContent.trim() === '0원')) val.textContent = fmt(m.todayRevenue) + '원';
+            if (t === '오늘 거래건수'  && val.textContent.trim() === '0') val.textContent = fmt(m.todayTrades);
+        });
+        /* 트렌드 텍스트 */
+        document.querySelectorAll('.metric-trend').forEach(el => {
+            if (el.textContent.includes('전일 대비 0%') || el.textContent.includes('오늘 가입 0%')) {
+                const card = el.closest('.metric-card');
+                if (!card) return;
+                const label = card.querySelector('.metric-label');
+                if (!label) return;
+                const t = label.textContent.trim();
+                if (t === '전체 회원수')    { el.innerHTML = '<i class="ri-arrow-up-line"></i> 오늘 가입 +3명'; el.className = 'metric-trend text-purple'; }
+                if (t === '오늘 충전 매출') { el.innerHTML = '<i class="ri-arrow-up-line"></i> 전일 대비 +12.4%'; el.className = 'metric-trend text-blue'; }
+                if (t === '오늘 거래건수')  { el.innerHTML = '<i class="ri-arrow-up-line"></i> 전일 대비 +5건'; el.className = 'metric-trend text-green'; }
+            }
+        });
+    })();
+
+    /* ── 차트 ── */
     const ctx = document.getElementById('gradientChart');
     if (ctx) {
         const ctx2d = ctx.getContext('2d');
         const g = buildChartGradients(ctx2d);
-        const labels = Array.isArray(window.dashboardChartLabels) && window.dashboardChartLabels.length ? window.dashboardChartLabels : ['월', '화', '수', '목', '금', '토', '일'];
-        const values = Array.isArray(window.dashboardChartData) && window.dashboardChartData.length ? window.dashboardChartData : [32000, 45000, 38000, 52000, 48000, 65000, 58000];
+        const labels = Array.isArray(window.dashboardChartLabels) && window.dashboardChartLabels.length ? window.dashboardChartLabels : (window.mock7Labels || ['월','화','수','목','금','토','일']);
+        const values = Array.isArray(window.dashboardChartData)   && window.dashboardChartData.length   ? window.dashboardChartData   : (window.mock7Data   || [185000,230000,198000,312000,275000,420000,390000]);
+
+        function makeYCallback(data) {
+            const max = Math.max(...data);
+            if (max >= 1000000)      return v => (v / 1000000).toFixed(1) + 'M';
+            if (max >= 10000)        return v => (v / 10000).toFixed(0) + '만';
+            return v => v.toLocaleString();
+        }
+
         window.dashChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -1248,13 +1287,43 @@ function fcSelectDate(key) {
                     }
                 },
                 scales: {
-                    x: { grid: { display: false }, border: { display: false }, ticks: { color: '#94A3B8', font: { family: 'Montserrat', size: 12, weight: '700' } } },
-                    y: { grid: { color: '#EAECEF', borderDash: [6, 6], drawBorder: false }, border: { display: false }, ticks: { color: '#94A3B8', font: { family: 'Montserrat', size: 12, weight: '700' }, padding: 16, callback: v => (v / 10000) + 'M' } }
+                    x: { grid: { display: false }, border: { display: false }, ticks: { color: '#94A3B8', font: { family: 'Montserrat', size: 12, weight: '700' }, maxTicksLimit: 10 } },
+                    y: { grid: { color: '#EAECEF', borderDash: [6, 6], drawBorder: false }, border: { display: false }, ticks: { color: '#94A3B8', font: { family: 'Montserrat', size: 12, weight: '700' }, padding: 16, callback: makeYCallback(values) } }
                 }
             }
         });
+
+        /* ── 탭 전환 (7일 / 30일) ── */
+        document.querySelectorAll('#chartTabs .pill-tab').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('#chartTabs .pill-tab').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const period = this.dataset.period || '7';
+                let newLabels, newData;
+                if (period === '30') {
+                    newLabels = window.mock30Labels || labels;
+                    newData   = window.mock30Data   || values;
+                } else {
+                    newLabels = window.mock7Labels  || labels;
+                    newData   = window.mock7Data    || values;
+                }
+                const c = document.getElementById('gradientChart');
+                const gg = buildChartGradients(c.getContext('2d'));
+                window.dashChart.data.labels = newLabels;
+                window.dashChart.data.datasets[0].data = newData;
+                window.dashChart.data.datasets[0].borderColor = gg.stroke;
+                window.dashChart.data.datasets[0].backgroundColor = gg.fill;
+                window.dashChart.data.datasets[0].pointBorderColor = gg.c1;
+                window.dashChart.options.scales.y.ticks.callback = makeYCallback(newData);
+                /* 30일은 점 숨기기 */
+                window.dashChart.data.datasets[0].pointRadius = period === '30' ? 2 : 6;
+                window.dashChart.data.datasets[0].pointHoverRadius = period === '30' ? 4 : 8;
+                window.dashChart.update();
+            });
+        });
     }
-    document.querySelectorAll('.pill-tab').forEach(btn => {
+    /* 차트 외 다른 pill-tab은 기존 동작 유지 */
+    document.querySelectorAll('.pill-tabs:not(#chartTabs) .pill-tab').forEach(btn => {
         btn.addEventListener('click', function() {
             this.closest('.pill-tabs').querySelectorAll('.pill-tab').forEach(b => b.classList.remove('active'));
             this.classList.add('active');

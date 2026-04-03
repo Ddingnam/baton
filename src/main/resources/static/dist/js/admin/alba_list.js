@@ -1,6 +1,3 @@
-/* ================================================================
-   alba_list.js - 알바구인 관리 상세보기 & 삭제
-   ================================================================ */
 (function () {
     'use strict';
 
@@ -9,7 +6,6 @@
     var adClose  = document.getElementById('adClose');
     var adCancel = document.getElementById('adCancel');
 
-    /* 현재 열린 공고 추적 */
     var currentDetailId    = null;
     var currentDetailTitle = '';
 
@@ -33,7 +29,6 @@
         if (e.key === 'Escape' && overlay.classList.contains('show')) closeDetail();
     });
 
-    /* 모달 내 삭제 버튼 */
     var adDeleteBtn = document.getElementById('adDeleteBtn');
     if (adDeleteBtn) {
         adDeleteBtn.addEventListener('click', function () {
@@ -93,7 +88,6 @@
         setHTML('adDeadlineChip', chip(dlLabel, p.deadline ? '#EF4444' : '#10B981', 'ri-calendar-event-line'));
         setHTML('adViewStat', '<i class="ri-eye-line" style="font-size:13px;"></i><span>' + (p.hitCount || 0) + '</span>');
 
-        /* 근무조건 - 퍼플 */
         var ci = [];
         if (p.workPeriod) ci.push({ icon:'ri-calendar-check-line', label:'\uadfc\ubb34\uae30\uac04', val:p.workPeriod });
         if (p.workDays)   ci.push({ icon:'ri-calendar-2-line',     label:'\uadfc\ubb34\uc694\uc77c', val:p.workDays });
@@ -121,18 +115,7 @@
             setHTML('adDescription', '<span style="color:#94A3B8;font-style:italic;font-size:13px;">\ub0b4\uc6a9\uc774 \uc5c6\uc2b5\ub2c8\ub2e4.</span>');
         }
 
-        if (images.length > 0) {
-            setHTML('adImages', images.map(function(imgUrl) {
-                var url = imgUrl.startsWith('/') ? CTX + imgUrl : CTX + '/uploads/job/' + imgUrl;
-                return '<div style="display:inline-block;"><img src="' + url + '" '
-                    + 'style="width:110px;height:82px;object-fit:cover;border-radius:10px;border:1px solid #E2E8F0;cursor:pointer;transition:all .2s;display:block;" '
-                    + 'onclick="window.open(this.src,\'_blank\')" '
-                    + 'onmouseover="this.style.transform=\'scale(1.04)\';this.style.boxShadow=\'0 6px 20px rgba(0,0,0,.14)\'" '
-                    + 'onmouseout="this.style.transform=\'scale(1)\';this.style.boxShadow=\'none\'" '
-                    + 'onerror="this.closest(\'div\').remove()"></div>';
-            }).join(''));
-            show('adImageWrap');
-        }
+        hide('adImageWrap');
 
         if (p.location) {
             setText('adLocation',       p.location);
@@ -153,9 +136,6 @@
     function esc(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 })();
 
-/* ================================================================
-   삭제 확인 모달
-   ================================================================ */
 (function () {
     'use strict';
     var pendingId     = null;

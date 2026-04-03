@@ -106,18 +106,8 @@
             setHTML('cdContent', '<div style="font-size:13px;color:#94A3B8;font-style:italic;">\ubcf8\ubb38 \ub0b4\uc6a9\uc774 \uc5c6\uc2b5\ub2c8\ub2e4.</div>');
         }
         if (post.pollTitle) { renderPoll(post, pollTotalVotes, optionStats); show('cdPollWrap'); }
-        if (post.imageFiles && post.imageFiles.length > 0) {
-            setHTML('cdImages', post.imageFiles.map(function (f) {
-                return '<div style="position:relative;display:inline-block;">'
-                    + '<img src="' + CTX + '/uploads/community/' + f + '" '
-                    + 'style="width:110px;height:82px;object-fit:cover;border-radius:10px;border:1px solid #E2E8F0;cursor:pointer;transition:all 0.2s;display:block;" '
-                    + 'onclick="window.open(this.src,\'_blank\')" '
-                    + 'onmouseover="this.style.transform=\'scale(1.04)\';this.style.boxShadow=\'0 6px 20px rgba(0,0,0,0.14)\'" '
-                    + 'onmouseout="this.style.transform=\'scale(1)\';this.style.boxShadow=\'none\'" '
-                    + 'onerror="this.closest(\'div\').remove()"></div>';
-            }).join(''));
-            show('cdImageWrap');
-        }
+        /* 이미지 비활성화 - 서버 파일 미존재 */
+        hide('cdImageWrap');
         if (post.attachFileInfos && post.attachFileInfos.length > 0) {
             setHTML('cdAttaches', post.attachFileInfos.map(function (af) {
                 var sizeKB = af.fileSize ? Math.round(af.fileSize / 1024) + ' KB' : '';
@@ -340,6 +330,12 @@
         setHTML('caContent', plain
             ? '<span style="white-space:pre-wrap;word-break:break-word;font-size:13px;color:#475569;line-height:1.8;">' + esc(plain) + '</span>'
             : '<span style="color:#CBD5E1;font-size:13px;font-style:italic;">본문 내용이 없습니다.</span>');
+
+        /* 이미지 비활성화 - 서버 파일 미존재 */
+        var caImageWrap = document.getElementById('caImageWrap');
+        var caImageDivider = document.getElementById('caImageDivider');
+        if (caImageWrap) caImageWrap.style.display = 'none';
+        if (caImageDivider) caImageDivider.style.display = 'none';
 
         if (replies.length > 0) {
             setText('caReplyCount', replies.length);

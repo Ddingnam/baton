@@ -319,6 +319,11 @@
                 <div style="padding:20px 0;text-align:center;color:#94A3B8;font-size:13px;">로딩 중...</div>
             </div>
             <div class="rpt-divider"></div>
+            <div class="rpt-field" id="taImageWrap" style="display:none;">
+                <p class="rpt-field-label"><i class="ri-image-line" style="margin-right:4px;"></i>상품 이미지</p>
+                <div id="taImages" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;"></div>
+            </div>
+            <div class="rpt-divider" id="taImageDivider" style="display:none;"></div>
             <div class="rpt-field">
                 <p class="rpt-field-label">본문 내용</p>
                 <div class="rpt-field-box" id="taContent">-</div>

@@ -1,6 +1,3 @@
-/* ================================================================
-   trade_list.js - 중고거래 관리 상세보기 & 삭제
-   ================================================================ */
 (function () {
     'use strict';
 
@@ -9,7 +6,6 @@
     var tdClose  = document.getElementById('tdClose');
     var tdCancel = document.getElementById('tdCancel');
 
-    /* 현재 열린 게시글 추적 */
     var currentDetailId    = null;
     var currentDetailTitle = '';
 
@@ -33,7 +29,6 @@
         if (e.key === 'Escape' && overlay.classList.contains('show')) closeDetail();
     });
 
-    /* 모달 내 삭제 버튼 */
     var tdDeleteBtn = document.getElementById('tdDeleteBtn');
     if (tdDeleteBtn) {
         tdDeleteBtn.addEventListener('click', function () {
@@ -124,18 +119,7 @@
             setHTML('tdContent', '<div style="font-size:13px;color:#94A3B8;font-style:italic;">\ubcf8\ubb38 \ub0b4\uc6a9\uc774 \uc5c6\uc2b5\ub2c8\ub2e4.</div>');
         }
 
-        if (images.length > 0) {
-            setHTML('tdImages', images.map(function(img) {
-                var url = CTX + (img.imgUrl || '');
-                return '<div style="display:inline-block;"><img src="' + url + '" '
-                    + 'style="width:110px;height:82px;object-fit:cover;border-radius:10px;border:1px solid #E2E8F0;cursor:pointer;transition:all .2s;display:block;" '
-                    + 'onclick="window.open(this.src,\'_blank\')" '
-                    + 'onmouseover="this.style.transform=\'scale(1.04)\';this.style.boxShadow=\'0 6px 20px rgba(0,0,0,.14)\'" '
-                    + 'onmouseout="this.style.transform=\'scale(1)\';this.style.boxShadow=\'none\'" '
-                    + 'onerror="this.closest(\'div\').remove()"></div>';
-            }).join(''));
-            show('tdImageWrap');
-        }
+        hide('tdImageWrap');
 
         if (tags.length > 0) {
             setHTML('tdTags', tags.map(function(tag) {
@@ -183,9 +167,6 @@
     }
 })();
 
-/* ================================================================
-   삭제 확인 모달
-   ================================================================ */
 (function () {
     'use strict';
     var pendingId     = null;
@@ -253,7 +234,7 @@
             .then(function (d) {
                 if (!d.success) { setText('taTitle', '불러오기 실패'); return; }
                 currentTitle = d.trade ? (d.trade.title || '') : '';
-                renderPanel(d.trade, d.tags || []);
+                renderPanel(d.trade, d.tags || [], d.images || []);
             })
             .catch(function () {
                 setText('taTitle', '오류 발생');
@@ -282,7 +263,7 @@
 
     var STATUS_COLOR = { '판매중': '#10B981', '예약중': '#3B82F6', '판매완료': '#94A3B8', '숨기기': '#EF4444' };
 
-    function renderPanel(t, tags) {
+    function renderPanel(t, tags, images) {
         setText('taTitle', t.title || '(제목 없음)');
         var sc      = STATUS_COLOR[t.tradeStatus] || '#94A3B8';
         var dateStr = t.createdDate ? String(t.createdDate).substring(0, 10) : '-';
@@ -318,6 +299,11 @@
         setHTML('taContent', plain
             ? '<span style="white-space:pre-wrap;word-break:break-word;font-size:13px;color:#475569;line-height:1.8;">' + esc(plain) + '</span>'
             : '<span style="color:#CBD5E1;font-size:13px;font-style:italic;">본문 내용이 없습니다.</span>');
+
+        var taImageWrap    = document.getElementById('taImageWrap');
+        var taImageDivider = document.getElementById('taImageDivider');
+        if (taImageWrap)    taImageWrap.style.display    = 'none';
+        if (taImageDivider) taImageDivider.style.display = 'none';
     }
 
     function numFormat(n) { return String(n || 0).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }

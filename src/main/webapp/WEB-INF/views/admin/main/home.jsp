@@ -22,6 +22,50 @@
         window.dashboardChartData = [
             <c:forEach var="value" items="${chartValues}" varStatus="status">${value}<c:if test="${!status.last}">,</c:if></c:forEach>
         ];
+
+        /* ── 가데이터: 7일 / 30일 ── */
+        (function() {
+            var today = new Date();
+            function fmtLabel(d) {
+                return (d.getMonth()+1) + '/' + String(d.getDate()).padStart(2,'0');
+            }
+            /* 7일 가데이터 */
+            var mock7Labels = [], mock7Data = [];
+            var base7 = [185000, 230000, 198000, 312000, 275000, 420000, 390000];
+            for (var i = 6; i >= 0; i--) {
+                var d = new Date(today); d.setDate(today.getDate() - i);
+                mock7Labels.push(fmtLabel(d));
+                mock7Data.push(base7[6 - i] + Math.floor(Math.random() * 30000));
+            }
+            /* 30일 가데이터 */
+            var mock30Labels = [], mock30Data = [];
+            var trend = [120000,145000,130000,160000,175000,190000,210000,185000,230000,205000,
+                         260000,245000,280000,295000,310000,285000,330000,315000,355000,340000,
+                         370000,395000,360000,410000,390000,420000,445000,430000,475000,460000];
+            for (var j = 29; j >= 0; j--) {
+                var d2 = new Date(today); d2.setDate(today.getDate() - j);
+                mock30Labels.push(fmtLabel(d2));
+                mock30Data.push(trend[29 - j] + Math.floor(Math.random() * 40000));
+            }
+            /* 실제 서버데이터가 비어있으면 가데이터 주입 */
+            var serverHasData = window.dashboardChartData && window.dashboardChartData.some(function(v){ return v > 0; });
+            if (!serverHasData) {
+                window.dashboardChartLabels = mock7Labels;
+                window.dashboardChartData   = mock7Data;
+            }
+            window.mock7Labels  = mock7Labels;
+            window.mock7Data    = mock7Data;
+            window.mock30Labels = mock30Labels;
+            window.mock30Data   = mock30Data;
+
+            /* 메트릭 가데이터 */
+            window.mockMetrics = {
+                totalMembers : 1247,
+                todayRevenue : 460000,
+                todayTrades  : 38,
+                pendingReports: 5
+            };
+        })();
     </script>
     <script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>
 
@@ -159,7 +203,8 @@
                                 <p>최근 7일 포인트 충전 매출</p>
                             </div>
                             <div class="pill-tabs" id="chartTabs">
-                                <button class="pill-tab active" type="button">7일</button>
+                                <button class="pill-tab active" type="button" data-period="7">7일</button>
+                                <button class="pill-tab" type="button" data-period="30">30일</button>
                             </div>
                         </div>
                         <div class="canvas-wrap">

@@ -3,6 +3,8 @@ package com.sp.app.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -41,10 +43,12 @@ public class JobPosting {
     private Double locationLng;
     
     //private String deadline;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate deadline;
     private String contact;
     private String benefits;
     
+    @JsonIgnore
     private List<MultipartFile> images; 
     
     private int hitCount;       

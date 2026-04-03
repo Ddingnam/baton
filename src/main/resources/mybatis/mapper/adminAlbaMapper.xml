@@ -76,8 +76,6 @@
             time_negotiable   AS timeNegotiable,
             location,
             location_detail   AS locationDetail,
-            location_lat      AS locationLat,
-            location_lng      AS locationLng,
             subway_info       AS subwayInfo,
             contact, benefits, deadline,
             hit_count         AS hitCount,

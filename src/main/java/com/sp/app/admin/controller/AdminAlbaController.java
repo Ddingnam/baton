@@ -60,11 +60,11 @@ public class AdminAlbaController {
 
     @GetMapping("/detail")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> detail(@RequestParam("id") long id) {
+    public ResponseEntity<Map<String, Object>> detail(@RequestParam("id") long postingIdx) {
         Map<String, Object> result = new LinkedHashMap<>();
         try {
-            JobPosting   posting = adminAlbaMapper.findById(id);
-            List<String> images  = adminAlbaMapper.findImages(id);
+            JobPosting   posting = adminAlbaMapper.findById(postingIdx);
+            List<String> images  = adminAlbaMapper.findImages(postingIdx);
 
             result.put("success", true);
             result.put("posting", posting);
