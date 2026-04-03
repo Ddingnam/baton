@@ -89,7 +89,8 @@
                             <component 
                                 :is="Component" 
                                 :crew="crew"
-                                :myStatus="myStatus" />
+                                :myStatus="myStatus"
+								:current-user-idx="${sessionScope.member.userIdx}">/>
                         </transition>
                     </router-view>
                 </main>

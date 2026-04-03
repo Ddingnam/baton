@@ -17,20 +17,42 @@ const CrewDashboard = {
 		async fetchDashboardData(idx) {
             this.isLoading = true;
             try {
-                const response = await fetch(`/api/crew/board/list/${idx}?page=1&size=3`);
-                
-                if (!response.ok) throw new Error("게시글 로드 실패");
-                
-                const data = await response.json();
-                
-                if (data.status === "success") {
-                    this.recentPosts = data.posts;
-                }
+				const [boardResponse, scheduleResponse] = await Promise.all([
+		            fetch(`/api/crew/board/list/${idx}?page=1&size=3`),
+		            fetch(`/api/crew/schedule/${idx}/upcoming`)
+		        ]);
+				
+				if (boardResponse.ok) {
+		            const boardData = await boardResponse.json();
+		            if (boardData.status === "success") {
+		                this.recentPosts = boardData.posts;
+		            }
+		        } else {
+					throw new Error("게시글 로드 실패");
+				}
 
-                this.schedules = [
-                    { id: 1, day: '23', month: 'MAR', title: '반포대교 달빛 러닝', time: '오후 8:00', location: '잠수교 남단' },
-                    { id: 2, day: '25', month: 'MAR', title: '여의도 모닝 하프', time: '오전 7:00', location: '여의도 한강공원' }
-                ];
+				if (scheduleResponse.ok) {
+		            const scheduleData = await scheduleResponse.json();
+		            
+		            this.schedules = scheduleData.map(sch => {
+		                const dateObj = new Date(sch.startDate);
+		                const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+		                
+		                let hours = dateObj.getHours();
+		                const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+		                const ampm = hours >= 12 ? '오후' : '오전';
+		                hours = hours % 12 || 12;
+
+		                return {
+		                    id: sch.scheduleIdx,
+		                    day: String(dateObj.getDate()).padStart(2, '0'),
+		                    month: monthNames[dateObj.getMonth()],
+		                    title: sch.title,
+		                    time: `${ampm} ${hours}:${minutes}`,
+		                    location: sch.locationName || '장소 미정'
+		                };
+		            }).slice(0, 2);
+		        }
 
             } catch (error) {
                 console.error("❌ 대시보드 데이터 로드 실패:", error);
@@ -45,6 +67,16 @@ const CrewDashboard = {
 	            params: { 
 	                crewIdx: this.crew.crewIdx, 
 	                boardIdx: boardIdx 
+	            } 
+	        }).catch(() => {});
+	    },
+		goToSchedule() {
+	        window.scrollTo({ top: 0, behavior: 'smooth' });
+	        
+	        this.$router.push({ 
+	            name: 'crew-schedule', 
+	            params: { 
+	                crewIdx: this.crew.crewIdx 
 	            } 
 	        }).catch(() => {});
 	    }

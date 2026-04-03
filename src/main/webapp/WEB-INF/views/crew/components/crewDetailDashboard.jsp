@@ -50,7 +50,7 @@
         <div class="cd-widget cd-glass-card cd-full-width">
             <div class="cd-widget-header">
                 <h4><i class="ri-calendar-check-line"></i> 이번 주 일정</h4>
-                <button class="cd-icon-btn"><i class="ri-add-line"></i></button>
+                <button class="cd-icon-btn"  @click="goToSchedule()"><i class="ri-add-line"></i></button>
             </div>
             <ul class="cd-schedule-list" v-if="schedules && schedules.length > 0">
                 <li v-for="sch in schedules" :key="sch.id" class="cd-schedule-item">

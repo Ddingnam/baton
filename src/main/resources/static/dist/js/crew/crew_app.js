@@ -55,7 +55,7 @@ const router = VueRouter.createRouter({
                 {
                     path: 'schedule',
                     name: 'crew-schedule',
-                    component: CrewCalendar,
+                    component: CrewSchedule,
 					props: true
                 },
                 {
