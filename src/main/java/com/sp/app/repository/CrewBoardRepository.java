@@ -21,6 +21,11 @@ public interface CrewBoardRepository extends JpaRepository<CrewBoard, Long> {
     	       "WHERE b.crewIdx = :crewIdx AND b.status = 'ACTIVE' " +
     	       "ORDER BY b.isNotice DESC, b.createdDate DESC")
     List<CrewBoard> findActiveBoardsWithUser(@Param("crewIdx") Long crewIdx, Pageable pageable);
+    
+    @Query("SELECT b FROM CrewBoard b JOIN FETCH b.user " +
+	       "WHERE b.crewIdx = :crewIdx AND b.isNotice = :isNotice AND b.status = 'ACTIVE' " +
+	       "ORDER BY b.crewBoardIdx DESC")
+	List<CrewBoard> findTopBoardsByNoticeFlag(@Param("crewIdx") Long crewIdx, @Param("isNotice") String isNotice, Pageable pageable);
 		
     long countByCrewIdx(Long crewIdx);
 	

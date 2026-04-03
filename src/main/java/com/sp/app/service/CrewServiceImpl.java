@@ -1,6 +1,8 @@
 package com.sp.app.service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sp.app.common.StorageService;
 import com.sp.app.domain.dto.CrewDto;
 import com.sp.app.domain.dto.CrewMemberDto;
+import com.sp.app.domain.dto.CrewMemberPointDto;
 import com.sp.app.domain.dto.MyCrewListDto;
 import com.sp.app.domain.entity.Crew;
 import com.sp.app.domain.entity.CrewMember;
@@ -390,5 +393,48 @@ public class CrewServiceImpl implements CrewService {
 	    if (!crew.getLeader().getUserIdx().equals(userIdx)) {
 	        throw new IllegalStateException("모임장만 접근 가능한 메뉴입니다.");
 	    }
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public Map<String, Object> getCrewDashboardStats(Long crewIdx) {
+	    Map<String, Object> result = new HashMap<>();
+
+	    try {
+	    	long boardPoints = memberRepository.countActiveBoards(crewIdx) * 10;
+	        long commentPoints = memberRepository.countActiveComments(crewIdx) * 5;
+	        long schedulePoints = (memberRepository.countSchedules(crewIdx) + memberRepository.countVotes(crewIdx)) * 20;
+	        long likePoints = memberRepository.countLikes(crewIdx) * 1;
+	        
+	        long totalScore = boardPoints + commentPoints + schedulePoints + likePoints;
+
+	        Crew crew = crewRepository.findById(crewIdx)
+	                .orElseThrow(() -> new EntityNotFoundException("모임을 찾을 수 없습니다."));
+	        int memberCount = crew.getCurrentMember();
+	        
+	        int vitalityTemperature = 0;
+	        if (memberCount > 0) {
+	            double targetScore = memberCount * 100.0; 
+	            vitalityTemperature = (int) Math.min(100, (totalScore / targetScore) * 100);
+	        }
+	        result.put("vitality", vitalityTemperature);
+
+	        List<CrewMemberPointDto> memberPoints = memberRepository.findAllMemberActivityPoints(crewIdx);
+	        
+	        memberPoints.forEach(CrewMemberPointDto::calculateTotalPoint);
+
+	        List<CrewMemberPointDto> topRankers = memberPoints.stream()
+	                .filter(m -> m.getTotalPoint() > 0)
+	                .sorted(Comparator.comparingInt(CrewMemberPointDto::getTotalPoint).reversed())
+	                .limit(3)
+	                .collect(Collectors.toList());
+
+	        result.put("topRankers", topRankers);
+
+	    } catch (Exception e) {
+	        log.error("getCrewDashboardStats error: ", e);
+	        throw e;
+	    }
+	    return result;
 	}
 }

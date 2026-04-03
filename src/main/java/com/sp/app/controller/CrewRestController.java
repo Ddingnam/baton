@@ -216,4 +216,31 @@ public class CrewRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
         }
     }
+    
+    @GetMapping("dashboard/{crewIdx}/stats")
+    public ResponseEntity<?> getDashboardStats(
+            @PathVariable("crewIdx") Long crewIdx,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Map<String, Object> model = new HashMap<>();
+        
+        if (userDetails == null || userDetails.getMember() == null) {
+            model.put("state", "login_required");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(model);
+        }
+        
+        try {
+            Map<String, Object> stats = service.getCrewDashboardStats(crewIdx);
+            
+            model.put("state", "success");
+            model.put("data", stats);
+            
+            return ResponseEntity.ok(model);
+            
+        } catch (Exception e) {
+            log.error("getDashboardStats error : ", e);
+            model.put("state", "error");
+            model.put("message", "대시보드 통계를 불러오는 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
+        }
+    }
 }

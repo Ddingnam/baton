@@ -12,6 +12,7 @@ public interface CrewBoardService {
     
     CrewBoardDto getPostDetail(Long boardIdx, Long userIdx);
     Map<String, Object> getPostList(Long crewIdx, Long userIdx, int page, int size);
+    Map<String, Object> getDashboardBoardData(Long crewIdx, Long userIdx);
     
     Long saveComment(CrewCommentDto dto);
     void updateComment(CrewCommentDto dto);

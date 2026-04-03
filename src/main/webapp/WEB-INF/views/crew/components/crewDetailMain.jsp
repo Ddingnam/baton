@@ -84,12 +84,12 @@
                 </aside>
     
                 <main class="cd-main-content">
-                    <router-view v-slot="{ Component }">
+                    <router-view v-slot="{ Component }" v-if="!isLoading && crew && myStatus">
                         <transition name="cd-fade" mode="out-in">
                             <component 
                                 :is="Component" 
                                 :crew="crew"
-                                :myStatus="myStatus"
+                                :my-status="myStatus"
 								:current-user-idx="${sessionScope.member.userIdx}">/>
                         </transition>
                     </router-view>

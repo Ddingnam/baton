@@ -5,16 +5,43 @@
 <template id="crew-dashboard-template">
     <div class="cd-dashboard-grid" v-if="crew">
         
-        <div class="cd-widget cd-glass-card cd-full-width">
-            <div class="cd-widget-header">
-                <h4><i class="ri-notification-3-line"></i> 필독 공지사항</h4>
-                <button class="cd-icon-btn"><i class="ri-arrow-right-s-line"></i></button>
-            </div>
-            <div class="cd-notice-body">
-                <p class="cd-notice-title">이번 주 모임 장소가 변경되었습니다. 꼭 확인해 주세요!</p>
-                <span class="cd-notice-date">2026.03.22</span>
-            </div>
-        </div>
+		<div class="cd-widget cd-glass-card cd-full-width">
+		    <div class="cd-widget-header">
+		        <h4><i class="ri-notification-3-line"></i> 필독 공지사항</h4>
+		    </div>
+		    
+		    <div class="cd-notice-body">
+		        <div v-if="noticePosts && noticePosts.length > 0" class="cd-notice-slot-container">
+		            <div class="cd-notice-slot-wrapper" :class="'items-' + noticePosts.length">
+		                
+		                <div v-for="notice in noticePosts" :key="notice.crewBoardIdx" 
+		                     class="cd-notice-slot-item" 
+		                     @click="goToBoardDetail(notice.crewBoardIdx)">
+		                    <div class="cd-notice-content">
+		                        <span class="cd-notice-badge">공지</span>
+		                        <p class="cd-notice-title">{{ notice.title }}</p>
+		                    </div>
+		                    <span class="cd-notice-date">{{ notice.formattedDate || '최근' }}</span>
+		                </div>
+
+		                <div v-if="noticePosts.length > 1" 
+		                     class="cd-notice-slot-item" 
+		                     @click="goToBoardDetail(noticePosts[0].crewBoardIdx)">
+		                    <div class="cd-notice-content">
+		                        <span class="cd-notice-badge">공지</span>
+		                        <p class="cd-notice-title">{{ noticePosts[0].title }}</p>
+		                    </div>
+		                    <span class="cd-notice-date">{{ noticePosts[0].formattedDate || '최근' }}</span>
+		                </div>
+		                
+		            </div>
+		        </div>
+
+		        <div v-else class="cd-no-notice">
+		            <p>등록된 공지사항이 없습니다.</p>
+		        </div>
+		    </div>
+		</div>
 
         <div class="cd-widget cd-glass-card cd-span-7">
 		    <div class="cd-widget-header">
@@ -29,19 +56,19 @@
 		    </div>
 		</div>
 
-        <div class="cd-widget cd-glass-card cd-span-3">
+		<div class="cd-widget cd-glass-card cd-span-3">
 		    <div class="cd-widget-header">
 		        <h4><i class="ri-fire-line"></i> 활력 지수</h4>
 		    </div>
 		    <div class="cd-vitality-body">
 		        <div class="cd-vitality-main">
-		            <div class="cd-vitality-score">85<span style="font-size:20px;">℃</span></div>
-		            <span class="cd-vitality-status">매우 활발 🔥</span>
+		            <div class="cd-vitality-score">{{ vitalityScore }}<span style="font-size:20px;">℃</span></div>
+		            <span class="cd-vitality-status">{{ vitalityStatus }}</span>
 		        </div>
-		
+
 		        <div class="cd-vitality-gauge-wrapper">
 		            <div class="cd-vitality-gauge">
-		                <div class="cd-vitality-fill" style="width: 85%;"></div>
+		                <div class="cd-vitality-fill" :style="{ width: vitalityScore + '%' }"></div>
 		            </div>
 		        </div>
 		    </div>
@@ -77,7 +104,7 @@
 		    </div>
 		
 		    <div class="cd-post-list-vertical" v-if="recentPosts && recentPosts.length > 0">
-		        <div v-for="post in recentPosts.slice(0, 3)" :key="post.id" class="cd-post-item"
+		        <div v-for="post in recentPosts" :key="post.crewBoardIdx" class="cd-post-item"
 		        @click="goToBoardDetail(post.crewBoardIdx)" style="cursor: pointer;">
 		            <div class="cd-post-header">
 		                <span class="cd-post-author">{{ post.authorNickname }}</span>
@@ -108,18 +135,33 @@
             </div>
         </div>
 
-        <div class="cd-widget cd-glass-card cd-span-4" style="padding: 20px;">
-            <div class="cd-widget-header" style="margin-bottom: 10px;">
-                <h4><i class="ri-vip-crown-line"></i> 활동왕</h4>
-            </div>
-            <div class="cd-slot-container">
-                <div class="cd-slot-wrapper">
-                    <div class="cd-slot-item"><span>🥇</span> <strong>김자바</strong> <small>(15개)</small></div>
-                    <div class="cd-slot-item"><span>🥈</span> <strong>데브옵스꿈나무</strong> <small>(12개)</small></div>
-                    <div class="cd-slot-item"><span>🥉</span> <strong>쿼리마스터</strong> <small>(9개)</small></div>
-                </div>
-            </div>
-        </div>
+		<div class="cd-widget cd-glass-card cd-span-4" style="padding: 20px;">
+		    <div class="cd-widget-header" style="margin-bottom: 10px;">
+		        <h4><i class="ri-vip-crown-line"></i> 활동왕</h4>
+		    </div>
+		    
+		    <div class="cd-slot-container">
+		        <div class="cd-slot-wrapper" :class="'items-' + topRankers.length" v-if="topRankers && topRankers.length > 0">
+		            
+		            <div class="cd-slot-item" v-for="(ranker, index) in topRankers" :key="ranker.userIdx">
+		                <span>{{ getMedal(index) }}</span> 
+		                <strong>{{ ranker.nickname }}</strong> 
+		                <small>({{ ranker.totalPoint }}P)</small>
+		            </div>
+
+		            <div class="cd-slot-item" v-if="topRankers.length > 1">
+		                <span>{{ getMedal(0) }}</span> 
+		                <strong>{{ topRankers[0].nickname }}</strong> 
+		                <small>({{ topRankers[0].totalPoint }}P)</small>
+		            </div>
+		            
+		        </div>
+		        
+		        <div v-else class="cd-slot-item">
+		            <p style="margin: 0; font-size: 13px; color: #8B95A1;">아직 활동 내역이 없습니다.</p>
+		        </div>
+		    </div>
+		</div>
         
     </div>
 </template>

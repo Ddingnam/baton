@@ -77,6 +77,8 @@ const CrewBoard = {
 	            const path = to.path;
 				
 				const isRestrictedAction = path.includes('/edit/') || path.endsWith('/write') || boardIdx;
+				
+				console.log(this.myStatus) // undefined!
 
                 if (isRestrictedAction) {
                     if (!this.myStatus || this.myStatus.status !== 'ACTIVE') {
@@ -87,7 +89,6 @@ const CrewBoard = {
 
 	            if (path.includes('/edit/')) {
 	                this.viewMode = 'edit';
-	                // 새로고침 대비: 상세 데이터가 없으면 먼저 불러온 후 폼 채우기
 	                if (!this.currentPost || this.currentPost.crewBoardIdx != boardIdx) {
 	                    this.fetchDetail(boardIdx).then(() => this.prepareEditForm());
 	                } else {
@@ -440,8 +441,8 @@ const CrewBoard = {
                 });
                 const result = await response.json();
                 if (result.status === 'success') {
-                    this.editingCommentId = null; // 수정 모드 종료
-                    this.fetchComments(this.currentPost.crewBoardIdx); // 리스트 갱신
+                    this.editingCommentId = null;
+                    this.fetchComments(this.currentPost.crewBoardIdx);
                 } else {
                     alert('수정 실패: ' + result.message);
                 }

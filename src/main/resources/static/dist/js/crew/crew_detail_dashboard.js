@@ -4,9 +4,20 @@ const CrewDashboard = {
     data() {
         return {
             schedules: [],
-            recentPosts: [],
+			recentPosts: [],
+            noticePosts: [],
+			vitalityScore: 0,
+            topRankers: [],
             isLoading: false
         };
+    },
+	computed: {
+        vitalityStatus() {
+            if (this.vitalityScore >= 80) return '열정 폭발 ☀️';
+            if (this.vitalityScore >= 50) return '매우 활발 🔥';
+            if (this.vitalityScore >= 25) return '적당함 😊';
+            return '시작 단계 🌱';
+        }
     },
     async mounted() {
         if (this.crewIdx) {
@@ -17,16 +28,18 @@ const CrewDashboard = {
 		async fetchDashboardData(idx) {
             this.isLoading = true;
             try {
-				const [boardResponse, scheduleResponse] = await Promise.all([
-		            fetch(`/api/crew/board/list/${idx}?page=1&size=3`),
-		            fetch(`/api/crew/schedule/${idx}/upcoming`)
-		        ]);
+				const [boardResponse, scheduleResponse, statsResponse] = await Promise.all([
+                    fetch(`/api/crew/board/dashboard/${idx}`),
+                    fetch(`/api/crew/schedule/${idx}/upcoming`),
+                    fetch(`/api/crew/dashboard/${idx}/stats`)
+                ]);
 				
 				if (boardResponse.ok) {
 		            const boardData = await boardResponse.json();
-		            if (boardData.status === "success") {
-		                this.recentPosts = boardData.posts;
-		            }
+					if (boardData.status === "success") {
+                        this.noticePosts = boardData.data.notices || [];
+                        this.recentPosts = boardData.data.posts || [];
+                    }
 		        } else {
 					throw new Error("게시글 로드 실패");
 				}
@@ -53,6 +66,14 @@ const CrewDashboard = {
 		                };
 		            }).slice(0, 2);
 		        }
+				
+				if (statsResponse.ok) {
+                    const statsData = await statsResponse.json();
+                    if (statsData.state === "success" && statsData.data) {
+                        this.vitalityScore = statsData.data.vitality || 0;
+                        this.topRankers = statsData.data.topRankers || [];
+                    }
+                }
 
             } catch (error) {
                 console.error("❌ 대시보드 데이터 로드 실패:", error);
@@ -60,6 +81,12 @@ const CrewDashboard = {
                 this.isLoading = false;
             }
         },
+		
+		getMedal(index) {
+            const medals = ['🥇', '🥈', '🥉'];
+            return medals[index] || '🏅';
+        },
+		
 		goToBoardDetail(boardIdx) {
 			window.scrollTo({ top: 0, behavior: 'smooth' });
 	        this.$router.push({ 

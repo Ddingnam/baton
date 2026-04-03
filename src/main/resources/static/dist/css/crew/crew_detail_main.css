@@ -219,48 +219,140 @@
 .cd-view-more { font-size: 13px; font-weight: 600; color: var(--text-light); cursor: pointer; transition: 0.2s; display: flex; align-items: center; }
 .cd-view-more:hover { color: var(--crew-pink); }
 
+/* =========================================
+   [대시보드 공지사항 롤링 슬롯 스타일]
+   ========================================= */
+
+/* 1. 공지사항 전체 감싸는 박스 (기존 디자인 유지 + 슬롯 규격) */
 .cd-notice-body {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    background: linear-gradient(
-        90deg, 
-        rgba(248, 109, 125, 0.12) 0%, 
-        rgba(248, 109, 125, 0.06) 100%
-    );
-    padding: 18px 22px; 
+    background: linear-gradient(90deg, rgba(248, 109, 125, 0.12) 0%, rgba(248, 109, 125, 0.06) 100%);
     border-radius: 18px; 
     border: 1px solid rgba(248, 109, 125, 0.15);
-    box-shadow: 
-        0 4px 12px rgba(248, 109, 125, 0.04), 
-        0 1px 3px rgba(0, 0, 0, 0.02);
-    
-    cursor: pointer; 
+    box-shadow: 0 4px 12px rgba(248, 109, 125, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+    padding: 10px 22px; /* 슬롯 높이(32px)에 맞게 위아래 여백 최적화 */
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    display: flex;
+    align-items: center;
+    min-height: 52px; /* padding 20px + slot 32px */
 }
 
+/* 박스 Hover 시 양각 느낌 (기존 설정 유지) */
 .cd-notice-body:hover { 
     background: #ffffff;
-    border-color: var(--crew-pink);
-    transform: translateY(-2px); /* 양각 느낌을 위해 위로도 살짝 띄움 */
+    border-color: var(--crew-pink, #F86D7D);
+    transform: translateY(-2px); 
     box-shadow: 0 8px 20px rgba(248, 109, 125, 0.1); 
+}
+
+/* 2. 슬롯머신 창문 (넘치는 건 숨김) */
+.cd-notice-slot-container {
+    height: 32px; 
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+/* 3. 움직이는 필름 (세로 정렬) */
+.cd-notice-slot-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 마우스 오버 시 롤링 멈춤 (읽기 편하도록) */
+.cd-notice-slot-container:hover .cd-notice-slot-wrapper {
+    animation-play-state: paused !important;
+}
+
+/* 4. 애니메이션 클래스 (JSP에서 아이템 개수에 따라 동적 부여됨) */
+.cd-notice-slot-wrapper.items-2 { animation: rolling-2 6s infinite; }
+.cd-notice-slot-wrapper.items-3 { animation: rolling-3 9s infinite; }
+
+/* 5. 개별 공지사항 아이템 (높이를 창문과 동일한 32px로 고정) */
+.cd-notice-slot-item {
+    height: 32px; 
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 0 4px;
+    box-sizing: border-box;
+}
+
+/* 제목 및 배지 감싸는 영역 */
+.cd-notice-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* 6. 내부 요소 디자인 (김자바님 기존 폰트/색상 설정 유지) */
+.cd-notice-badge {
+    background: var(--crew-pink, #F86D7D);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 6px;
+    flex-shrink: 0;
 }
 
 .cd-notice-title { 
     font-size: 15px; 
-    font-weight: 800; /* 소개글처럼 좀 더 뚜렷하게 강조 */
-    color: var(--text-main); 
+    font-weight: 800; 
+    color: #191F28; /* var(--text-main) */
     margin: 0; 
     letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* 말줄임표 처리 */
+    transition: color 0.2s;
+}
+
+/* 아이템에 마우스 올렸을 때 제목만 하이라이트 */
+.cd-notice-slot-item:hover .cd-notice-title {
+    color: var(--crew-pink, #F86D7D);
 }
 
 .cd-notice-date { 
     font-size: 13px; 
     font-weight: 700; 
-    color: var(--crew-pink); 
-    background: rgba(248, 109, 125, 0.05); /* 날짜 부분에 미세한 배경 추가로 가독성 확보 */
+    color: var(--crew-pink, #F86D7D); 
+    background: rgba(248, 109, 125, 0.05); 
     padding: 4px 10px;
     border-radius: 8px;
+    flex-shrink: 0;
+}
+
+/* 데이터가 없을 때 */
+.cd-no-notice {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    color: #8B95A1;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* =========================================
+   [롤링 애니메이션 Keyframes]
+   ========================================= */
+/* 개별 아이템 높이가 32px이므로, 위로 32px씩 이동시킵니다. */
+
+/* 공지가 2개일 때 (원본 2개 + 복제 1개 = 총 3칸) */
+@keyframes rolling-2 {
+    0%, 40%   { transform: translateY(0); }
+    50%, 90%  { transform: translateY(-32px); }
+    100%      { transform: translateY(-64px); } /* 복제본 위치로 이동 완료 (루프) */
+}
+
+/* 공지가 3개일 때 (원본 3개 + 복제 1개 = 총 4칸) */
+@keyframes rolling-3 {
+    0%, 25%   { transform: translateY(0); }
+    33%, 58%  { transform: translateY(-32px); }
+    66%, 91%  { transform: translateY(-64px); }
+    100%      { transform: translateY(-96px); } /* 복제본 위치로 이동 완료 (루프) */
 }
 
 /* 날씨 위젯 */

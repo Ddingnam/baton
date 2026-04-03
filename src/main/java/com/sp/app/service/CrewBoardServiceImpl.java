@@ -119,6 +119,35 @@ public class CrewBoardServiceImpl implements CrewBoardService{
 	}
 	
 	@Override
+	public Map<String, Object> getDashboardBoardData(Long crewIdx, Long userIdx) {
+	    Pageable topThree = PageRequest.of(0, 3);
+	    
+	    List<CrewBoard> noticeEntities = boardRepository.findTopBoardsByNoticeFlag(crewIdx, "Y", topThree);
+	    List<CrewBoardDto> notices = noticeEntities.stream()
+	            .map(post -> mapToBoardDtoWithCounts(post, userIdx))
+	            .collect(Collectors.toList());
+
+	    List<CrewBoard> regularEntities = boardRepository.findTopBoardsByNoticeFlag(crewIdx, "N", topThree);
+	    List<CrewBoardDto> regularPosts = regularEntities.stream()
+	            .map(post -> mapToBoardDtoWithCounts(post, userIdx))
+	            .collect(Collectors.toList());
+
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("notices", notices);
+	    result.put("posts", regularPosts);
+	    
+	    return result;
+	}
+	
+	private CrewBoardDto mapToBoardDtoWithCounts(CrewBoard post, Long userIdx) {
+	    CrewBoardDto dto = CrewBoardDto.fromEntity(post);
+	    dto.setCommentCount(commentRepository.countByCrewBoardIdxAndIsDeleted(post.getCrewBoardIdx(), "N"));
+	    dto.setLikeCount(likeRepository.countByCrewBoardIdx(post.getCrewBoardIdx()));
+	    dto.setLiked(likeRepository.existsByCrewBoardIdxAndUserIdx(post.getCrewBoardIdx(), userIdx));
+	    return dto;
+	}
+	
+	@Override
 	public Long saveComment(CrewCommentDto dto) {
 		User user = userRepository.findById(dto.getUserIdx())
 	            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다. ID: " + dto.getUserIdx()));

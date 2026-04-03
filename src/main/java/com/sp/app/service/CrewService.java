@@ -25,4 +25,6 @@ public interface CrewService {
 	public void exitCrew(Long crewIdx, Long userIdx, String reason);
 	
 	public void banMember(Long loginUserIdx, Long crewIdx, Long userIdx, String reason);
+	
+	Map<String, Object> getCrewDashboardStats(Long crewIdx);
 }

@@ -115,6 +115,31 @@ public class CrewBoardRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
         }
     }
+	
+	@GetMapping("dashboard/{crewIdx}")
+	public ResponseEntity<?> getDashboardBoards(
+	        @PathVariable("crewIdx") Long crewIdx,
+	        @AuthenticationPrincipal CustomUserDetails userDetails) {
+	    Map<String, Object> model = new HashMap<>();
+	    
+	    try {
+	        SessionInfo info = userDetails.getMember();
+	        Long userIdx = info.getUserIdx();
+	        
+	        Map<String, Object> dashboardData = service.getDashboardBoardData(crewIdx, userIdx);
+	        
+	        model.put("status", "success");
+	        model.put("data", dashboardData);
+	        
+	        return ResponseEntity.ok(model);
+	        
+	    } catch (Exception e) {
+	        log.error("getDashboardBoards error : ", e);
+	        model.put("status", "error");
+	        model.put("message", "대시보드 게시글을 불러오는 중 오류가 발생했습니다.");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
+	    }
+	}
 
     @GetMapping("detail/{boardIdx}")
     public ResponseEntity<CrewBoardDto> getPostDetail(
