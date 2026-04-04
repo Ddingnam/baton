@@ -8,6 +8,7 @@ const CrewDashboard = {
             noticePosts: [],
 			vitalityScore: 0,
             topRankers: [],
+			weeklyWeather: [],
             isLoading: false
         };
     },
@@ -22,6 +23,7 @@ const CrewDashboard = {
     async mounted() {
         if (this.crewIdx) {
             await this.fetchDashboardData(this.crewIdx);
+			this.fetchWeatherData();
         }
     },
     methods: {
@@ -80,6 +82,46 @@ const CrewDashboard = {
             } finally {
                 this.isLoading = false;
             }
+        },
+		
+		async fetchWeatherData() {
+            try {
+                const response = await fetch('/api/crew/dashboard/weather?city=Seoul');
+                
+                if (!response.ok) throw new Error("날씨 데이터 로드 실패");
+                
+                const data = await response.json();
+                
+                const dailyData = data.list.filter(item => item.dt_txt.includes('12:00:00'));
+                
+                this.weeklyWeather = dailyData.map(day => {
+                    const dateObj = new Date(day.dt * 1000);
+                    const days = ['일', '월', '화', '수', '목', '금', '토'];
+                    
+                    return {
+                        dayName: days[dateObj.getDay()],
+                        temp: Math.round(day.main.temp),
+                        iconClass: this.getWeatherIcon(day.weather[0].main)
+                    };
+                }).slice(0, 5);
+
+            } catch (error) {
+                console.error("❌ 날씨 연동 에러:", error);
+            }
+        },
+
+        getWeatherIcon(condition) {
+            const iconMap = {
+                'Clear': 'ri-sun-fill',
+                'Clouds': 'ri-cloudy-fill',
+                'Rain': 'ri-showers-fill',
+                'Drizzle': 'ri-drizzle-fill',
+                'Thunderstorm': 'ri-thunderstorms-fill',
+                'Snow': 'ri-snowy-fill',
+                'Mist': 'ri-mist-fill',
+                'Haze': 'ri-haze-fill'
+            };
+            return iconMap[condition] || 'ri-sun-cloudy-fill';
         },
 		
 		getMedal(index) {

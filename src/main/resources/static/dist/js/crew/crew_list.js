@@ -109,7 +109,7 @@ const CrewList = {
                     this.params.page++;
                     this.fetchCrews(true);
                 }
-            }, { rootMargin: '0px 0px 200px 0px', threshold: 0 }); // 바닥 닿기 200px 전 로드
+            }, { rootMargin: '0px 0px 200px 0px', threshold: 0 });
 
             const trigger = this.$refs.loadTrigger;
             if (trigger) this.observer.observe(trigger);

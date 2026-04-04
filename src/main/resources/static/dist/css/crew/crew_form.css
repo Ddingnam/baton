@@ -4,7 +4,6 @@
     --crew-pink: #F86D7D;
 }
 
-/* --- [추가] 초기 로드 시 떠오르는 애니메이션 --- */
 @keyframes cfFadeInUp {
     0% { opacity: 0; transform: translateY(30px); }
     100% { opacity: 1; transform: translateY(0); }
@@ -27,7 +26,6 @@
     margin-top: 25px;
     border: 1px solid rgba(255, 255, 255, 0.5);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.03);
-    /* [추가] 헤더 등장 애니메이션 */
     animation: cfFadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 
@@ -61,7 +59,6 @@
     padding: 45px;
     border: 1px solid #F2F4F6;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
-    /* [추가] 폼 카드 등장 애니메이션 (헤더보다 0.1초 늦게) */
     animation: cfFadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) 0.1s forwards;
     opacity: 0;
 }
@@ -424,7 +421,6 @@
     padding: 35px;
     box-shadow: 0 10px 50px rgba(0, 0, 0, 0.1);
     border: 1px solid #F2F4F6;
-    /* [추가] 모달 뜰 때도 부드럽게 나타나도록 추가 */
     animation: cfFadeInUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 

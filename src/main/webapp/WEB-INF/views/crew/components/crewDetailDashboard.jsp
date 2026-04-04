@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/crew/crew_detail_main.css">
 
 <template id="crew-dashboard-template">
-    <div class="cd-dashboard-grid" v-if="crew">
+    <div class="cd-dashboard-grid">
         
 		<div class="cd-widget cd-glass-card cd-full-width">
 		    <div class="cd-widget-header">
@@ -38,7 +38,7 @@
 		        </div>
 
 		        <div v-else class="cd-no-notice">
-		            <p>등록된 공지사항이 없습니다.</p>
+		            <p style="margin-bottom: 0">등록된 공지사항이 없습니다.</p>
 		        </div>
 		    </div>
 		</div>
@@ -122,18 +122,23 @@
 		    <div v-else class="cd-no-data">새로운 이야기가 없습니다.</div>
 		</div>
 
-        <div class="cd-widget cd-glass-card cd-span-4" style="padding: 20px;">
-            <div class="cd-widget-header" style="margin-bottom: 10px;">
-                <h4><i class="ri-sun-cloudy-line"></i> 주간 날씨</h4>
-            </div>
-            <div class="cd-weather-carousel">
-                <div class="cd-weather-mini-card" v-for="n in 6" :key="n">
-                    <div>화</div>
-                    <i class="ri-sun-fill"></i>
-                    <div>20°</div>
-                </div>
-            </div>
-        </div>
+		<div class="cd-widget cd-glass-card cd-span-4" style="padding: 20px;">
+		    <div class="cd-widget-header" style="margin-bottom: 10px;">
+		        <h4><i class="ri-sun-cloudy-line"></i> 주간 날씨</h4>
+		    </div>
+
+		    <div class="cd-weather-carousel" v-if="weeklyWeather && weeklyWeather.length > 0">
+		        <div class="cd-weather-mini-card" v-for="(weather, index) in weeklyWeather" :key="index">
+		            <div>{{ weather.dayName }}</div>
+		            <i :class="weather.iconClass" style="font-size: 24px; margin: 8px 0; color: #5B657A;"></i>
+		            <div>{{ weather.temp }}°</div>
+		        </div>
+		    </div>
+		    
+		    <div v-else class="cd-no-data" style="min-height: 80px;">
+		        <p style="margin: 0; font-size: 13px; color: #8B95A1;">날씨 정보를 불러오는 중입니다.</p>
+		    </div>
+		</div>
 
 		<div class="cd-widget cd-glass-card cd-span-4" style="padding: 20px;">
 		    <div class="cd-widget-header" style="margin-bottom: 10px;">

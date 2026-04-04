@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.sp.app.domain.dto.CrewDto;
+import com.sp.app.domain.dto.CrewHistoryDto;
 import com.sp.app.domain.dto.CrewMemberDto;
 import com.sp.app.domain.dto.MyCrewListDto;
 
@@ -27,4 +28,10 @@ public interface CrewService {
 	public void banMember(Long loginUserIdx, Long crewIdx, Long userIdx, String reason);
 	
 	Map<String, Object> getCrewDashboardStats(Long crewIdx);
+	
+	List<CrewMemberDto> getCrewMembers(Long crewIdx, String status);
+	void updateMemberRole(Long loginUserIdx, Long crewIdx, Long targetUserIdx, String role);
+	void handleApplication(Long loginUserIdx, Long crewIdx, Long targetUserIdx, String action);
+	
+	List<CrewHistoryDto> getCrewHistory(Long crewIdx);
 }

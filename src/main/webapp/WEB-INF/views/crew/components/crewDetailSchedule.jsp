@@ -15,11 +15,12 @@
                     <h2 class="cs-header-title">크루 일정</h2>
                 </div>
                 
-                <div class="cs-header-right">
-                    <button class="cs-btn-primary" @click="openAddModal">
-                        <i class="ri-add-line"></i> <span>일정 추가</span>
-                    </button>
-                </div>
+				<div class="cs-header-right">
+				    <button v-if="myStatus && ['LEADER', 'SUB_LEADER'].includes(myStatus.role)"
+				            class="cs-btn-primary" @click="openAddModal">
+				        <i class="ri-add-line"></i> <span>일정 추가</span>
+				    </button>
+				</div>
             </header>
         </div>
 

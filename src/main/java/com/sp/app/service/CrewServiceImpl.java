@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sp.app.common.StorageService;
 import com.sp.app.domain.dto.CrewDto;
+import com.sp.app.domain.dto.CrewHistoryDto;
 import com.sp.app.domain.dto.CrewMemberDto;
 import com.sp.app.domain.dto.CrewMemberPointDto;
 import com.sp.app.domain.dto.MyCrewListDto;
@@ -135,49 +136,19 @@ public class CrewServiceImpl implements CrewService {
 	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public void deleteCrew(long crewIdx, String uploadPath) throws Exception {
-		try {
-			Crew crew = crewRepository.findById(crewIdx).orElseThrow();
-		    crew.setStatus("DELETED");
-		    
-		    CrewMember leader = memberRepository.findByCrew_CrewIdxAndUser_UserIdx(crew.getCrewIdx(), crew.getLeader().getUserIdx())
-		    		.orElseThrow(() -> new EntityNotFoundException("유저 정보를 찾을 수 없습니다."));
-		    
-		    List<CrewMember> activeMembers = memberRepository.findByCrew_CrewIdxAndStatus(crewIdx, "ACTIVE");
-		    for (CrewMember member : activeMembers) {
-		    	if (!member.getCrewMemberIdx().equals(leader.getCrewMemberIdx())) {
-			    	member.setStatus("EXITED");
-			        historyRepository.save(CrewMemberHistory.builder()
-				    		.crewMember(member)
-				    		.changedStatus("EXITED")
-				    		.reason("모임 해체로 인한 자동 탈퇴")
-				    		.actor(leader.getUser())
-				    		.build());
-		    	}
-		    }
+	    try {
+	        Crew crew = crewRepository.findById(crewIdx)
+	                .orElseThrow(() -> new EntityNotFoundException("삭제할 모임을 찾을 수 없습니다."));
 
-		    List<CrewMember> waitingMembers = memberRepository.findByCrew_CrewIdxAndStatus(crewIdx, "WAIT");
-		    for (CrewMember member : waitingMembers) {
-		    	member.setStatus("REJECTED");
-		        historyRepository.save(CrewMemberHistory.builder()
-			    		.crewMember(member)
-			    		.changedStatus("REJECTED")
-			    		.reason("모임 삭제로 인한 신청 반려")
-			    		.actor(leader.getUser())
-			    		.build());
-		    }
-		    
-		    leader.setStatus("EXITED");
-		    historyRepository.save(CrewMemberHistory.builder()
-		    		.crewMember(leader)
-		    		.changedStatus("CLOSED")
-		    		.reason("모임장이 모임을 폐쇄하였습니다.")
-		    		.actor(leader.getUser())
-		    		.build());
-		    
-		} catch (Exception e) {
-			log.info("deleteCrew : ", e);
-			throw e;
-		}
+	        crewRepository.delete(crew);
+	        
+	        if (crew.getLogoImage() != null && !crew.getLogoImage().isBlank()) {
+	            storageService.deleteFile(uploadPath, crew.getLogoImage());
+	        }
+	    } catch (Exception e) {
+	        log.error("deleteCrew Error : ", e);
+	        throw e;
+	    }
 	}
 
 	@Transactional(rollbackFor = Exception.class)
@@ -276,18 +247,25 @@ public class CrewServiceImpl implements CrewService {
 	    User user = userRepository.findById(userIdx)
 	            .orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
 
+	    CrewMember member = memberRepository.findByCrew_CrewIdxAndUser_UserIdx(crewIdx, userIdx).orElse(null);
+	    
+	    if (member != null) {
+	        if ("ACTIVE".equals(member.getStatus())) throw new IllegalStateException("이미 가입된 멤버입니다.");
+	        if ("WAIT".equals(member.getStatus())) throw new IllegalStateException("이미 가입 승인을 기다리고 있습니다.");
+	        if ("BANNED".equals(member.getStatus())) throw new IllegalStateException("해당 모임에서 활동이 제한된 유저입니다.");
+	    } else {
+	        member = CrewMember.builder()
+	                .crew(crew)
+	                .user(user)
+	                .build();
+	    }
+	    
 	    if (crew.getCurrentMember() >= crew.getMaxMember()) {
 	        throw new IllegalStateException("모임 정원이 가입 신청이 불가능합니다.");
 	    }
-
+	    
 	    String initialStatus = "F".equals(crew.getJoinType()) ? "ACTIVE" : "WAIT";
 	    String historyStatus = "F".equals(crew.getJoinType()) ? "JOINED" : "APPLIED";
-
-	    CrewMember member = memberRepository.findByCrew_CrewIdxAndUser_UserIdx(crewIdx, userIdx)
-	            .orElseGet(() -> CrewMember.builder()
-	                    .crew(crew)
-	                    .user(user)
-	                    .build());
 
 	    member.setStatus(initialStatus);
 	    member.setApplicationReason(reason);
@@ -436,5 +414,80 @@ public class CrewServiceImpl implements CrewService {
 	        throw e;
 	    }
 	    return result;
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<CrewMemberDto> getCrewMembers(Long crewIdx, String status) {
+	    return memberRepository.findByCrew_CrewIdxAndStatus(crewIdx, status)
+	            .stream()
+	            .map(CrewMemberDto::fromEntity)
+	            .collect(Collectors.toList());
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public void updateMemberRole(Long loginUserIdx, Long crewIdx, Long targetUserIdx, String role) {
+	    validateLeader(crewIdx, loginUserIdx);
+	    
+	    CrewMember member = memberRepository.findByCrew_CrewIdxAndUser_UserIdx(crewIdx, targetUserIdx)
+	            .orElseThrow(() -> new EntityNotFoundException("유저 정보를 찾을 수 없습니다."));
+	            
+	    member.setRole(role);
+	    memberRepository.save(member);
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public void handleApplication(Long loginUserIdx, Long crewIdx, Long targetUserIdx, String action) {
+	    validateLeader(crewIdx, loginUserIdx);
+	    
+	    CrewMember member = memberRepository.findByCrew_CrewIdxAndUser_UserIdx(crewIdx, targetUserIdx)
+	            .orElseThrow(() -> new EntityNotFoundException("신청 정보를 찾을 수 없습니다."));
+
+	    Crew crew = crewRepository.findById(crewIdx).orElseThrow();
+
+	    String changedStatus = "";
+	    String historyReason = "";
+
+	    if ("APPROVE".equals(action)) {
+	        if (crew.getCurrentMember() >= crew.getMaxMember()) {
+	            throw new IllegalStateException("정원이 초과되어 승인할 수 없습니다.");
+	        }
+	        member.setStatus("ACTIVE");
+	        member.setJoinedDate(LocalDateTime.now());
+	        crew.setCurrentMember(crew.getCurrentMember() + 1);
+	        
+	        Long mainRoomId = chatService.getMainChatRoomId(crewIdx);
+	        chatService.updateReadIndex(mainRoomId, targetUserIdx, 0L);
+	        
+	        changedStatus = "JOINED";
+	        historyReason = "가입 승인";
+	        
+	    } else if ("REJECT".equals(action)) {
+	        member.setStatus("REJECTED");
+	        changedStatus = "REJECTED";
+	        historyReason = "가입 거절";
+	    }
+
+	    memberRepository.save(member);
+
+	    CrewMemberHistory history = CrewMemberHistory.builder()
+	            .crewMember(member)
+	            .changedStatus(changedStatus)
+	            .reason(historyReason)
+	            .actor(crew.getLeader())
+	            .build();
+	            
+	    historyRepository.save(history);
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<CrewHistoryDto> getCrewHistory(Long crewIdx) {
+	    return historyRepository.findByCrewMember_Crew_CrewIdxOrderByLogDateDesc(crewIdx)
+	            .stream()
+	            .map(CrewHistoryDto::fromEntity)
+	            .collect(Collectors.toList());
 	}
 }

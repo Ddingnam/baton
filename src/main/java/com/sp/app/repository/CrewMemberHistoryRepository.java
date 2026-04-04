@@ -10,4 +10,5 @@ import com.sp.app.domain.entity.CrewMemberHistory;
 @Repository
 public interface CrewMemberHistoryRepository extends JpaRepository<CrewMemberHistory, Long> {
 	List<CrewMemberHistory> findByCrewMember_CrewMemberIdxOrderByLogDateDesc(Long crewMemberIdx);
+	List<CrewMemberHistory> findByCrewMember_Crew_CrewIdxOrderByLogDateDesc(Long crewIdx);
 }

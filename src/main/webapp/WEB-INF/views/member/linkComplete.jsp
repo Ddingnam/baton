@@ -26,7 +26,6 @@ body {
     padding: 0;
 }
 
-/* 배경 그라데이션 - 더 넓게 퍼지도록 수정 */
 body::before {
     content: '';
     position: absolute;
@@ -38,7 +37,6 @@ body::before {
 }
 
 .complete-wrapper {
-    /* 위아래 간격을 더 넓게 확보 */
     padding: 50px 24px;
     display: flex;
     justify-content: center;
@@ -53,7 +51,6 @@ body::before {
     text-align: center;
 }
 
-/* 아이콘 섹션 */
 .link-icon-wrap {
     width: 110px;
     height: 110px;
@@ -114,7 +111,6 @@ body::before {
     margin-bottom: 56px;
 }
 
-/* 연동 정보 카드 - 깔끔한 리스트 스타일 */
 .link-info-card {
     background: var(--gray-bg);
     border-radius: 32px;
@@ -159,7 +155,6 @@ body::before {
     border-radius: 50%;
 }
 
-/* 버튼 섹션 */
 .btn-group {
     display: flex;
     flex-direction: column;

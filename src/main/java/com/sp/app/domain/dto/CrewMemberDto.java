@@ -1,6 +1,7 @@
 package com.sp.app.domain.dto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import com.sp.app.domain.entity.CrewMember;
 
@@ -23,9 +24,14 @@ public class CrewMemberDto {
     private String status;
     private LocalDateTime joinedDate;
     private String applicationReason;
+    
+    private String profileImg;
+    private String nickname;
+    private String formattedDate;
 
     public static CrewMemberDto fromEntity(CrewMember entity) {
         if (entity == null) return null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
 
         return CrewMemberDto.builder()
                 .crewMemberIdx(entity.getCrewMemberIdx())
@@ -35,6 +41,9 @@ public class CrewMemberDto {
                 .status(entity.getStatus())
                 .joinedDate(entity.getJoinedDate())
                 .applicationReason(entity.getApplicationReason())
+                .profileImg(entity.getUser().getProfilePhoto())
+                .nickname(entity.getUser().getNickname())
+                .formattedDate(entity.getJoinedDate() != null ? entity.getJoinedDate().format(formatter) : "미정")
                 .build();
     }
 }

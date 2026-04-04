@@ -27,6 +27,7 @@ const router = VueRouter.createRouter({
                     name: 'crew-board',
                     component: CrewBoard,
 					props: true,
+					meta: { requiresMember: true },
 					children: [
 				        {
 				            path: '',
@@ -56,12 +57,15 @@ const router = VueRouter.createRouter({
                     path: 'schedule',
                     name: 'crew-schedule',
                     component: CrewSchedule,
+					meta: { requiresMember: true },
 					props: true
                 },
-                {
-                    path: 'chat',
-                    name: 'crew-chat-tab',
-                    component: { template: '<div class="cd-glass-card" style="padding:20px;">채팅 준비 중입니다.</div>' }
+				{
+                    path: 'admin',
+                    name: 'crew-admin',
+                    component: CrewAdmin,
+					meta: { requiresMember: true },
+					props: true
                 }
             ]
         },
@@ -70,6 +74,48 @@ const router = VueRouter.createRouter({
             component: CrewForm
         }
     ]
+});
+
+router.beforeEach(async (to, from, next) => {
+    const requiresMember = to.matched.some(record => record.meta.requiresMember);
+    const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
+	
+	if (!requiresMember && !requiresAdmin) {
+        return next(); 
+    }
+
+    if (requiresMember || requiresAdmin) {
+        const crewIdx = to.params.crewIdx;
+        
+        try {
+            const response = await fetch(`/api/crew/article/${crewIdx}`);
+            if (!response.ok) throw new Error();
+            
+            const data = await response.json();
+            const myStatus = data.myStatus;
+			
+			const userRole = myStatus?.role; 
+            const userStatus = myStatus?.status;
+
+			const isActiveMember = myStatus && userStatus === 'ACTIVE';
+
+            if (requiresAdmin && userRole !== 'LEADER') {
+                alert("매니저(방장) 전용 메뉴입니다.");
+                return next({ name: 'crew-dashboard', params: { crewIdx } });
+            }
+
+            if (requiresMember && !isActiveMember) {
+                alert("모임 회원만 이용할 수 있는 메뉴입니다.");
+                return next({ name: 'crew-dashboard', params: { crewIdx } });
+            }
+            
+        } catch (error) {
+            alert("권한 확인 중 오류가 발생했습니다.");
+            return next('/');
+        }
+    }
+
+    next();
 });
 
 const app = Vue.createApp({

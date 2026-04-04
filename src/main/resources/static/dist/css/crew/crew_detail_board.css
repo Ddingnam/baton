@@ -1,484 +1,714 @@
 @charset "UTF-8";
 
-/* ==============================================
-   Crew Board (cdb-) 전용 스타일
-   ============================================== */
-.cdb-container { padding: 32px; min-height: 600px; }
+.cdb-container {
+	padding: 32px;
+	min-height: 600px;
+}
 
-/* --- 1. 통합 메인 헤더 --- */
-/* 1. 헤더 카드: 하단 여백을 주어 본문과 분리 */
 .cdb-header-card {
-    padding: 24px 32px;
-    margin-bottom: 20px; /* 💡 두 카드 사이의 간격 */
-    border-radius: 24px;
+	padding: 24px 32px;
+	margin-bottom: 20px;
+	border-radius: 24px;
 }
 
-/* 2. 본문 카드: 헤더와 독립된 느낌 강조 */
 .cdb-content-card {
-    padding: 32px;
-    min-height: 500px;
-    border-radius: 24px;
+	padding: 32px;
+	min-height: 500px;
+	border-radius: 24px;
 }
 
-/* 3. 헤더 내부 스타일 미세 조정 (카드가 분리되었으므로 보더 제거) */
 .cdb-main-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    border-bottom: none; /* 💡 카드가 나뉘었으므로 구분선 제거 */
-    margin-bottom: 0;
-    padding-bottom: 0;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
+	border-bottom: none;
+	margin-bottom: 0;
+	padding-bottom: 0;
 }
 
-/* 4. 브레드크럼 위치 조정 */
 .cdb-breadcrumb {
-    display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700;
-    color: var(--text-sub); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--text-sub);
+	margin-bottom: 4px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
 }
-.cdb-breadcrumb i { font-size: 14px; }
-.cdb-breadcrumb strong { color: var(--crew-pink); }
-.cdb-header-title { font-size: 26px; font-weight: 900; color: #191F28; margin: 0; }
-.cdb-header-right { display: flex; align-items: center; gap: 12px; }
 
-/* 검색바 및 공통 버튼 */
-.cdb-search-wrapper {
-    position: relative; background: rgba(0, 0, 0, 0.03); border-radius: 14px;
-    padding: 10px 16px; display: flex; align-items: center; gap: 8px; border: 1px solid transparent; transition: 0.3s;
+.cdb-breadcrumb i {
+	font-size: 14px;
 }
-.cdb-search-wrapper:focus-within { background: #fff; border-color: var(--crew-pink); box-shadow: 0 8px 20px rgba(248, 109, 125, 0.1); }
-.cdb-search-wrapper i { color: var(--text-sub); font-size: 18px; }
-.cdb-search-wrapper input { border: none; background: transparent; outline: none; font-size: 14px; font-weight: 600; width: 180px; }
+
+.cdb-breadcrumb strong {
+	color: var(--crew-pink);
+}
+
+.cdb-header-title {
+	font-size: 26px;
+	font-weight: 900;
+	color: #191F28;
+	margin: 0;
+}
+
+.cdb-header-right {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.cdb-search-wrapper {
+	position: relative;
+	background: rgba(0, 0, 0, 0.03);
+	border-radius: 14px;
+	padding: 10px 16px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	border: 1px solid transparent;
+	transition: 0.3s;
+}
+
+.cdb-search-wrapper:focus-within {
+	background: #fff;
+	border-color: var(--crew-pink);
+	box-shadow: 0 8px 20px rgba(248, 109, 125, 0.1);
+}
+
+.cdb-search-wrapper i {
+	color: var(--text-sub);
+	font-size: 18px;
+}
+
+.cdb-search-wrapper input {
+	border: none;
+	background: transparent;
+	outline: none;
+	font-size: 14px;
+	font-weight: 600;
+	width: 180px;
+}
 
 .cdb-btn-primary {
-    background: #191F28; color: #fff; padding: 12px 20px; border-radius: 14px;
-    font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer;
-    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: none;
+	background: #191F28;
+	color: #fff;
+	padding: 12px 20px;
+	border-radius: 14px;
+	font-weight: 800;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	cursor: pointer;
+	transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+	border: none;
 }
-.cdb-btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); background: var(--crew-pink); }
+
+.cdb-btn-primary:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+	background: var(--crew-pink);
+}
 
 .cdb-btn-outline {
-    background: #fff; color: #4E5968; border: 1px solid rgba(0,0,0,0.08);
-    padding: 12px 20px; border-radius: 14px; font-weight: 700; display: flex;
-    align-items: center; gap: 6px; cursor: pointer; transition: 0.2s;
+	background: #fff;
+	color: #4E5968;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	padding: 12px 20px;
+	border-radius: 14px;
+	font-weight: 700;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	cursor: pointer;
+	transition: 0.2s;
 }
-.cdb-btn-outline:hover { background: #f8f9fa; color: #191F28; }
 
-/* --- 2. 리스트 뷰 --- */
-.cdb-list { display: flex; flex-direction: column; gap: 8px; }
-.cdb-list-header { 
-    display: flex; padding: 14px 20px; background: rgba(0,0,0,0.03); 
-    border-radius: 14px; font-size: 13px; font-weight: 700; color: var(--text-sub); 
+.cdb-btn-outline:hover {
+	background: #f8f9fa;
+	color: #191F28;
 }
-.cdb-list-item { 
-    display: flex; align-items: center; padding: 18px 20px; 
-    background: rgba(255, 255, 255, 0.5); border-radius: 18px; 
-    border: 1px solid rgba(255, 255, 255, 0.8); cursor: pointer; 
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-}
-.cdb-list-item:hover { 
-    background: #ffffff; border-color: var(--crew-pink); 
-    transform: translateY(-4px); box-shadow: 0 12px 25px rgba(0,0,0,0.05); 
-}
-.col-id { flex: 0 0 55px; text-align: center; color: var(--text-sub); font-size: 13px; }
-.col-title { flex: 1; font-weight: 700; color: #191F28; padding: 0 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; }
-.col-author { flex: 0 0 100px; text-align: center; font-size: 14px; color: #4E5968; font-weight: 600; }
-.col-date { flex: 0 0 90px; text-align: center; font-size: 13px; color: var(--text-sub); }
-.col-view { flex: 0 0 50px; text-align: center; font-size: 13px; color: var(--text-sub); }
-.col-like { flex: 0 0 50px; text-align: center; font-size: 13px; color: var(--text-sub); }
-.col-comment { flex: 0 0 50px; text-align: center; font-size: 13px; color: var(--text-sub); }
 
-.cdb-badge-notice { background: var(--crew-pink); color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 6px; margin-right: 8px; font-weight: 800; }
-.cdb-comment-count { color: var(--crew-pink); font-size: 13px; font-weight: 800; margin-left: 5px; }
-.cd-no-data { padding: 60px 0; text-align: center; color: var(--text-sub); font-weight: 600; background: rgba(255,255,255,0.4); border-radius: 16px; border: 1px dashed rgba(0,0,0,0.1); }
+.cdb-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
 
-/* --- 3. 상세 뷰 --- */
+.cdb-list-header {
+	display: flex;
+	padding: 14px 20px;
+	background: rgba(0, 0, 0, 0.03);
+	border-radius: 14px;
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--text-sub);
+}
+
+.cdb-list-item {
+	display: flex;
+	align-items: center;
+	padding: 18px 20px;
+	background: rgba(255, 255, 255, 0.5);
+	border-radius: 18px;
+	border: 1px solid rgba(255, 255, 255, 0.8);
+	cursor: pointer;
+	transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.cdb-list-item:hover {
+	background: #ffffff;
+	border-color: var(--crew-pink);
+	transform: translateY(-4px);
+	box-shadow: 0 12px 25px rgba(0, 0, 0, 0.05);
+}
+
+.col-id {
+	flex: 0 0 55px;
+	text-align: center;
+	color: var(--text-sub);
+	font-size: 13px;
+}
+
+.col-title {
+	flex: 1;
+	font-weight: 700;
+	color: #191F28;
+	padding: 0 15px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	display: flex;
+	align-items: center;
+}
+
+.col-author {
+	flex: 0 0 100px;
+	text-align: center;
+	font-size: 14px;
+	color: #4E5968;
+	font-weight: 600;
+}
+
+.col-date {
+	flex: 0 0 90px;
+	text-align: center;
+	font-size: 13px;
+	color: var(--text-sub);
+}
+
+.col-view {
+	flex: 0 0 50px;
+	text-align: center;
+	font-size: 13px;
+	color: var(--text-sub);
+}
+
+.col-like {
+	flex: 0 0 50px;
+	text-align: center;
+	font-size: 13px;
+	color: var(--text-sub);
+}
+
+.col-comment {
+	flex: 0 0 50px;
+	text-align: center;
+	font-size: 13px;
+	color: var(--text-sub);
+}
+
+.cdb-badge-notice {
+	background: var(--crew-pink);
+	color: #fff;
+	font-size: 11px;
+	padding: 2px 8px;
+	border-radius: 6px;
+	margin-right: 8px;
+	font-weight: 800;
+}
+
+.cdb-comment-count {
+	color: var(--crew-pink);
+	font-size: 13px;
+	font-weight: 800;
+	margin-left: 5px;
+}
+
+.cd-no-data {
+	padding: 60px 0;
+	text-align: center;
+	color: var(--text-sub);
+	font-weight: 600;
+	background: rgba(255, 255, 255, 0.4);
+	border-radius: 16px;
+	border: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
 .cdb-post-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end; /* 제목 하단 라인에 버튼 맞춤 */
-    padding-bottom: 25px;
-    margin-bottom: 30px;
-    border-bottom: 2px solid #f1f3f5;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
+	padding-bottom: 25px;
+	margin-bottom: 30px;
+	border-bottom: 2px solid #f1f3f5;
 }
 
-/* 왼쪽 정보 그룹 */
 .cdb-post-info {
-    flex: 1;
+	flex: 1;
 }
 
 .cdb-post-title {
-    font-size: 28px;
-    font-weight: 700;
-    color: #212529;
-    margin-bottom: 12px;
-    line-height: 1.4;
+	font-size: 28px;
+	font-weight: 700;
+	color: #212529;
+	margin-bottom: 12px;
+	line-height: 1.4;
 }
 
-/* 메타 정보 (작성자, 날짜, 조회수) */
 .cdb-post-meta {
-    display: flex;
-    align-items: center;
-    color: #868e96;
-    font-size: 14px;
+	display: flex;
+	align-items: center;
+	color: #868e96;
+	font-size: 14px;
 }
 
 .meta-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
+	display: flex;
+	align-items: center;
+	gap: 5px;
 }
 
 .meta-divider {
-    width: 1px;
-    height: 12px;
-    background-color: #dee2e6;
-    margin: 0 12px;
+	width: 1px;
+	height: 12px;
+	background-color: #dee2e6;
+	margin: 0 12px;
 }
 
-/* 오른쪽 버튼 그룹 */
 .cdb-post-side {
-    margin-left: 20px;
+	margin-left: 20px;
 }
 
 .cdb-detail-actions {
-    display: flex;
-    gap: 8px;
+	display: flex;
+	gap: 8px;
 }
 
-/* 세련된 버튼 스타일 */
 .cdb-action-btn {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid #dee2e6;
-    background: #fff;
-    color: #495057;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 8px 16px;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s;
+	border: 1px solid #dee2e6;
+	background: #fff;
+	color: #495057;
 }
 
 .cdb-action-btn.edit:hover {
-    background: #f8f9fa;
-    border-color: #adb5bd;
+	background: #f8f9fa;
+	border-color: #adb5bd;
 }
 
 .cdb-action-btn.delete {
-    color: #fa5252;
-    border-color: #ffc9c9;
+	color: #fa5252;
+	border-color: #ffc9c9;
 }
 
 .cdb-action-btn.delete:hover {
-    background: #fff5f5;
-    border-color: #fa5252;
+	background: #fff5f5;
+	border-color: #fa5252;
 }
 
-.cdb-post-body { font-size: 16px; line-height: 1.8; color: #191F28; min-height: 300px; margin-bottom: 40px; }
+.cdb-post-body {
+	font-size: 16px;
+	line-height: 1.8;
+	color: #191F28;
+	min-height: 300px;
+	margin-bottom: 40px;
+}
 
-/* =========================================
-   [댓글 영역 전체 CSS - Glassmorphism]
-   ========================================= */
-
-/* 1. 컨테이너 기본 간격 */
 .cdb-comment-container {
-    padding: 24px;
+	padding: 24px;
 }
 
-/* 2. 상단 헤더 (댓글 N개) */
 .cdb-comment-header {
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+	margin-bottom: 20px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
+
 .cdb-comment-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #333;
-    margin: 0;
+	font-size: 18px;
+	font-weight: 600;
+	color: #333;
+	margin: 0;
 }
+
 .cdb-highlight {
-    color: #4a90e2; /* 포인트 컬러 */
-    font-weight: bold;
+	color: #4a90e2;
+	font-weight: bold;
 }
 
-/* 3. 글래시모피즘 내부 카드 (댓글 작성폼, 개별 댓글 공통) */
 .cdb-glass-inner {
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+	background: rgba(255, 255, 255, 0.4);
+	backdrop-filter: blur(8px);
+	border: 1px solid rgba(255, 255, 255, 0.5);
+	border-radius: 12px;
+	padding: 16px;
+	margin-bottom: 16px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-/* 4. 메인 댓글 작성 폼 & 답글 폼 간격 */
 .cdb-comment-write {
-    margin-bottom: 24px;
+	margin-bottom: 24px;
 }
+
 .cdb-reply-form {
-    margin-top: 15px;
-    margin-bottom: 0; 
+	margin-top: 15px;
+	margin-bottom: 0;
 }
 
-/* 5. 입력 폼 (Textarea) 공통 스타일 */
 .cdb-glass-input {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 8px;
-    padding: 12px;
-    resize: none;
-    outline: none;
-    transition: background 0.3s;
-    font-family: inherit;
-    box-sizing: border-box;
+	width: 100%;
+	background: rgba(255, 255, 255, 0.6);
+	border: 1px solid rgba(255, 255, 255, 0.8);
+	border-radius: 8px;
+	padding: 12px;
+	resize: none;
+	outline: none;
+	transition: background 0.3s;
+	font-family: inherit;
+	box-sizing: border-box;
 }
+
 .cdb-glass-input:focus {
-    background: rgba(255, 255, 255, 0.9);
+	background: rgba(255, 255, 255, 0.9);
 }
 
-/* 6. 버튼 우측 정렬 컨테이너 */
 .cdb-comment-actions-right {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    margin-top: 10px;
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 10px;
 }
 
-/* 7. 댓글 리스트 초기화 */
 .cdb-comment-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+	list-style: none;
+	padding: 0;
+	margin: 0;
 }
 
-/* 8. 댓글 상단 (프로필, 닉네임, 우측 버튼) */
 .cdb-comment-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 8px;
 }
+
 .cdb-user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
+
 .cdb-profile-img {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid rgba(255,255,255,0.8);
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 1px solid rgba(255, 255, 255, 0.8);
 }
+
 .cdb-nickname {
-    font-size: 14px;
-    color: #333;
-    font-weight: 600;
+	font-size: 14px;
+	color: #333;
+	font-weight: 600;
 }
 
-/* 9. 액션 버튼 (수정, 삭제, 답글) */
 .cdb-action-btns {
-    display: flex;
-    gap: 5px;
+	display: flex;
+	gap: 5px;
 }
-.cdb-btn-text, .cdb-btn-reply-toggle {
-    background: none;
-    border: none;
-    font-size: 13px;
-    color: #666;
-    cursor: pointer;
-    padding: 4px 8px;
-    transition: color 0.2s;
-}
-.cdb-btn-text:hover, .cdb-btn-reply-toggle:hover { color: #333; }
-.cdb-btn-text.cdb-danger:hover { color: #e74c3c; }
 
-/* 10. 댓글 본문 텍스트 영역 */
+.cdb-btn-text,
+.cdb-btn-reply-toggle {
+	background: none;
+	border: none;
+	font-size: 13px;
+	color: #666;
+	cursor: pointer;
+	padding: 4px 8px;
+	transition: color 0.2s;
+}
+
+.cdb-btn-text:hover,
+.cdb-btn-reply-toggle:hover {
+	color: #333;
+}
+
+.cdb-btn-text.cdb-danger:hover {
+	color: #e74c3c;
+}
+
 .cdb-comment-body {
-    margin: 12px 0;
-    font-size: 15px;
-    color: #444;
-    line-height: 1.6;
+	margin: 12px 0;
+	font-size: 15px;
+	color: #444;
+	line-height: 1.6;
 }
+
 .cdb-comment-body p {
-    margin: 0;
-    white-space: pre-wrap; /* 줄바꿈 유지 */
+	margin: 0;
+	white-space: pre-wrap;
 }
 
-/* 11. 하단 영역 (답글 버튼) */
 .cdb-comment-bottom {
-    display: flex;
-    justify-content: flex-start;
-    margin-top: 8px;
+	display: flex;
+	justify-content: flex-start;
+	margin-top: 8px;
 }
 
-/* =========================================
-   [대댓글(답글) 전용 스타일]
-   ========================================= */
 .cdb-reply-item {
-    display: flex;
-    gap: 12px;
-    margin-left: 40px; /* 안쪽으로 들여쓰기 */
-    background: rgba(255, 255, 255, 0.2); /* 부모보다 조금 더 투명하게 */
-}
-.cdb-reply-icon {
-    font-size: 18px;
-    color: #888;
-    margin-top: 4px;
-}
-.cdb-reply-content-wrap {
-    flex: 1;
+	display: flex;
+	gap: 12px;
+	margin-left: 40px;
+	background: rgba(255, 255, 255, 0.2);
 }
 
-/* =========================================
-   [Vue 트랜지션 애니메이션]
-   ========================================= */
-.cdb-slide-fade-enter-active { transition: all 0.3s ease; }
-.cdb-slide-fade-leave-active { transition: all 0.2s cubic-bezier(1.0, 0.5, 0.8, 1.0); }
-.cdb-slide-fade-enter, .cdb-slide-fade-leave-to {
-    transform: translateY(-10px);
-    opacity: 0;
+.cdb-reply-icon {
+	font-size: 18px;
+	color: #888;
+	margin-top: 4px;
 }
-/* --- 4. 작성 뷰 --- */
-.cdb-form { display: flex; flex-direction: column; gap: 20px; }
+
+.cdb-reply-content-wrap {
+	flex: 1;
+}
+
+.cdb-slide-fade-enter-active {
+	transition: all 0.3s ease;
+}
+
+.cdb-slide-fade-leave-active {
+	transition: all 0.2s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+
+.cdb-slide-fade-enter,
+.cdb-slide-fade-leave-to {
+	transform: translateY(-10px);
+	opacity: 0;
+}
+
+.cdb-form {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
 
 .cdb-checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 700;
-    color: #4E5968;
-    user-select: none;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: 700;
+	color: #4E5968;
+	user-select: none;
 }
-.cdb-checkbox-label input { display: none; }
-.cdb-check-custom { width: 20px; height: 20px; border: 2px solid rgba(0,0,0,0.1); border-radius: 6px; position: relative; transition: 0.2s; background: #fff; }
-.cdb-checkbox-label input:checked + .cdb-check-custom { background: var(--crew-pink); border-color: var(--crew-pink); }
-.cdb-checkbox-label input:checked + .cdb-check-custom::after { content: '✔'; color: #fff; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-.cdb-select-wrapper { position: relative; width: 140px; }
-.cdb-select { width: 100%; padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08); background: rgba(255,255,255,0.8); font-size: 13px; font-weight: 700; color: #191F28; cursor: pointer; appearance: none; -webkit-appearance: none; }
-.cdb-select-wrapper i { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-sub); }
+.cdb-checkbox-label input {
+	display: none;
+}
 
-.cdb-input, .cdb-textarea { width: 100%; border-radius: 16px; border: 1px solid rgba(0,0,0,0.08); background: rgba(255,255,255,0.8); padding: 16px 20px; font-size: 15px; outline: none; transition: 0.3s; font-family: inherit; }
-.cdb-input:focus, .cdb-textarea:focus { border-color: var(--crew-pink); background: #fff; box-shadow: 0 0 0 4px rgba(248, 109, 125, 0.1); }
-.cdb-textarea { height: 350px; resize: vertical; line-height: 1.6; }
+.cdb-check-custom {
+	width: 20px;
+	height: 20px;
+	border: 2px solid rgba(0, 0, 0, 0.1);
+	border-radius: 6px;
+	position: relative;
+	transition: 0.2s;
+	background: #fff;
+}
+
+.cdb-checkbox-label input:checked+.cdb-check-custom {
+	background: var(--crew-pink);
+	border-color: var(--crew-pink);
+}
+
+.cdb-checkbox-label input:checked+.cdb-check-custom::after {
+	content: '✔';
+	color: #fff;
+	font-size: 12px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.cdb-select-wrapper {
+	position: relative;
+	width: 140px;
+}
+
+.cdb-select {
+	width: 100%;
+	padding: 10px 15px;
+	border-radius: 12px;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	background: rgba(255, 255, 255, 0.8);
+	font-size: 13px;
+	font-weight: 700;
+	color: #191F28;
+	cursor: pointer;
+	appearance: none;
+	-webkit-appearance: none;
+}
+
+.cdb-select-wrapper i {
+	position: absolute;
+	right: 12px;
+	top: 50%;
+	transform: translateY(-50%);
+	pointer-events: none;
+	color: var(--text-sub);
+}
+
+.cdb-input,
+.cdb-textarea {
+	width: 100%;
+	border-radius: 16px;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	background: rgba(255, 255, 255, 0.8);
+	padding: 16px 20px;
+	font-size: 15px;
+	outline: none;
+	transition: 0.3s;
+	font-family: inherit;
+}
+
+.cdb-input:focus,
+.cdb-textarea:focus {
+	border-color: var(--crew-pink);
+	background: #fff;
+	box-shadow: 0 0 0 4px rgba(248, 109, 125, 0.1);
+}
+
+.cdb-textarea {
+	height: 350px;
+	resize: vertical;
+	line-height: 1.6;
+}
+
 .cdb-form-btns {
-    display: flex;
-    align-items: center; /* 💡 체크박스와 버튼들의 수평 정렬을 맞춤 */
-    justify-content: flex-end;
-    gap: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 12px;
 }
 
-/* --- 5. 화면 전환 애니메이션 (0.15s) --- */
-.cdb-fade-enter-active, .cdb-fade-leave-active { transition: all 0.15s ease-out; }
-.cdb-fade-enter-from { opacity: 0; transform: translateY(10px); }
-.cdb-fade-leave-to { opacity: 0; transform: translateY(-10px); }
+.cdb-fade-enter-active,
+.cdb-fade-leave-active {
+	transition: all 0.15s ease-out;
+}
 
-/* ==============================================
-   Quill Editor Custom Design (cdb-quill)
-   ============================================== */
+.cdb-fade-enter-from {
+	opacity: 0;
+	transform: translateY(10px);
+}
 
-/* 1. 에디터 전체 컨테이너 (툴바 + 편집영역) */
+.cdb-fade-leave-to {
+	opacity: 0;
+	transform: translateY(-10px);
+}
+
 .cdb-form-item .quill-editor {
-    border: none !important;
+	border: none !important;
 }
 
-/* 2. 상단 툴바 디자인 */
 .ql-toolbar.ql-snow {
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    border-radius: 16px 16px 0 0; /* 상단만 둥글게 */
-    padding: 10px 15px !important;
-    transition: all 0.3s ease;
+	background: rgba(255, 255, 255, 0.9);
+	border: 1px solid rgba(0, 0, 0, 0.08) !important;
+	border-radius: 16px 16px 0 0;
+	padding: 10px 15px !important;
+	transition: all 0.3s ease;
 }
 
-/* 3. 편집 영역 디자인 (Glassmorphism 적용) */
 .ql-container.ql-snow {
-    background: rgba(255, 255, 255, 0.6) !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    border-top: none !important; /* 툴바와 자연스럽게 연결 */
-    border-radius: 0 0 16px 16px; /* 하단만 둥글게 */
-    min-height: 400px;
-    font-family: inherit;
-    font-size: 15px;
+	background: rgba(255, 255, 255, 0.6) !important;
+	border: 1px solid rgba(0, 0, 0, 0.08) !important;
+	border-top: none !important;
+	border-radius: 0 0 16px 16px;
+	min-height: 400px;
+	font-family: inherit;
+	font-size: 15px;
 }
 
-/* --- 6. 페이징 요소 (Crew Board 테마 통합) --- */
 .cdb-pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px; /* 요소 간 간격 최적화 */
-    margin-top: 40px;
-    padding-bottom: 20px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 8px;
+	margin-top: 40px;
+	padding-bottom: 20px;
 }
 
-/* 숫자 및 화살표 버튼 공통 */
-.cdb-pagination button, 
+.cdb-pagination button,
 .cdb-pagination .page-number {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    min-width: 38px;
-    height: 38px;
-    padding: 0 10px;
-    
-    /* 기존 리스트 아이템과 통일감 부여 (Glassmorphism) */
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 12px; /* cdb-btn-primary 보다는 약간 작은 라운딩 */
-    
-    color: #4E5968; /* var(--text-main) 급 */
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    user-select: none;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	min-width: 38px;
+	height: 38px;
+	padding: 0 10px;
+	background: rgba(255, 255, 255, 0.6);
+	border: 1px solid rgba(0, 0, 0, 0.05);
+	border-radius: 12px;
+	color: #4E5968;
+	font-size: 14px;
+	font-weight: 700;
+	cursor: pointer;
+	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	user-select: none;
 }
 
-/* 호버 시: 리스트 아이템 호버와 동일한 피드백 */
 .cdb-pagination button:hover:not(:disabled),
 .cdb-pagination .page-number:hover {
-    background: #ffffff;
-    border-color: var(--crew-pink);
-    color: var(--crew-pink);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+	background: #ffffff;
+	border-color: var(--crew-pink);
+	color: var(--crew-pink);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
 }
 
-/* 💡 현재 선택된 페이지: Crew Pink 그라데이션 적용 */
 .cdb-pagination .page-number.active {
-    background: var(--crew-pink);
-    color: #fff;
-    border-color: var(--crew-pink);
-    font-weight: 800;
-    box-shadow: 0 6px 15px rgba(248, 109, 125, 0.3); /* 핑크빛 그림자 */
+	background: var(--crew-pink);
+	color: #fff;
+	border-color: var(--crew-pink);
+	font-weight: 800;
+	box-shadow: 0 6px 15px rgba(248, 109, 125, 0.3);
 }
 
-/* 이전/다음 화살표 전용 (아이콘 강조) */
 .cdb-pagination button i {
-    font-size: 16px;
-    font-weight: 900;
+	font-size: 16px;
+	font-weight: 900;
 }
 
-/* 비활성화 상태: 토스 스타일의 연한 회색 처리 */
 .cdb-pagination button:disabled {
-    background: rgba(0, 0, 0, 0.02);
-    color: rgba(0, 0, 0, 0.15);
-    border-color: transparent;
-    cursor: not-allowed;
-    transform: none !important;
-    box-shadow: none;
+	background: rgba(0, 0, 0, 0.02);
+	color: rgba(0, 0, 0, 0.15);
+	border-color: transparent;
+	cursor: not-allowed;
+	transform: none !important;
+	box-shadow: none;
 }
 
-/* 5. 툴바 버튼 호버 및 활성화 색상 */
 .ql-snow.ql-toolbar button:hover,
 .ql-snow .ql-toolbar button:hover,
 .ql-snow.ql-toolbar button.ql-active,
@@ -487,123 +717,128 @@
 .ql-snow .ql-toolbar .ql-picker-label:hover,
 .ql-snow.ql-toolbar .ql-picker-label.ql-active,
 .ql-snow .ql-toolbar .ql-picker-label.ql-active {
-    color: var(--crew-pink) !important;
+	color: var(--crew-pink) !important;
 }
 
 .ql-snow.ql-toolbar button:hover .ql-stroke,
 .ql-snow .ql-toolbar button:hover .ql-stroke,
 .ql-snow.ql-toolbar button.ql-active .ql-stroke,
 .ql-snow .ql-toolbar button.ql-active .ql-stroke {
-    stroke: var(--crew-pink) !important;
+	stroke: var(--crew-pink) !important;
 }
 
 .ql-snow.ql-toolbar button:hover .ql-fill,
 .ql-snow .ql-toolbar button:hover .ql-fill,
 .ql-snow.ql-toolbar button.ql-active .ql-fill,
 .ql-snow .ql-toolbar button.ql-active .ql-fill {
-    fill: var(--crew-pink) !important;
+	fill: var(--crew-pink) !important;
 }
 
-/* 6. 플레이스홀더 색상 */
 .ql-editor.ql-blank::before {
-    color: var(--text-sub) !important; /* #8B95A1 */
-    font-style: normal;
-    font-weight: 500;
+	color: var(--text-sub) !important;
+	font-style: normal;
+	font-weight: 500;
 }
 
-/* 7. 에디터 내부 스크롤바 커스텀 */
 .ql-editor::-webkit-scrollbar {
-    width: 6px;
-}
-.ql-editor::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+	width: 6px;
 }
 
-/* 게시판 전용 고유 로딩 스타일 */
+.ql-editor::-webkit-scrollbar-thumb {
+	background-color: rgba(0, 0, 0, 0.1);
+	border-radius: 10px;
+}
+
 .fade-in-list {
-    animation: fadeIn 0.4s ease-in-out;
+	animation: fadeIn 0.4s ease-in-out;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); } /* 살짝 아래에서 위로 */
-    to { opacity: 1; transform: translateY(0); }
+	from {
+		opacity: 0;
+		transform: translateY(5px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
-/* 좋아요 섹션 중앙 정렬 및 여백 */
 .cdb-like-section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 1rem 0; /* 본문과 댓글 사이 넉넉한 여백 */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 1rem 0;
 }
 
-/* 좋아요 버튼 기본 스타일 (글래스모피즘 느낌) */
 .cdb-like-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 28px;
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 50px;
-    font-size: 1rem;
-    color: #555;
-    cursor: pointer;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 28px;
+	background: rgba(255, 255, 255, 0.7);
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	border-radius: 50px;
+	font-size: 1rem;
+	color: #555;
+	cursor: pointer;
+	backdrop-filter: blur(10px);
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
 }
 
 .cdb-like-btn:hover {
-    background: rgba(255, 255, 255, 0.9);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+	background: rgba(255, 255, 255, 0.9);
+	transform: translateY(-2px);
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* 💡 좋아요가 눌렸을 때 (Active 상태) */
 .cdb-like-btn.active {
-    background: #fff0f0; /* 아주 연한 붉은색 배경 */
-    border-color: #ff6b81; /* 포인트 레드 테두리 */
-    color: #ff6b81;
+	background: #fff0f0;
+	border-color: #ff6b81;
+	color: #ff6b81;
 }
 
 .cdb-like-btn.active i {
-    color: #ff4757; /* 꽉 찬 하트의 강렬한 레드 */
-    animation: heartBeat 0.3s ease-in-out;
+	color: #ff4757;
+	animation: heartBeat 0.3s ease-in-out;
 }
 
 .cdb-like-count {
-    font-weight: 600;
-    margin-left: 2px;
+	font-weight: 600;
+	margin-left: 2px;
 }
 
-/* 하트 클릭 시 심장 뛰는 애니메이션 */
 @keyframes heartBeat {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.3); }
-    100% { transform: scale(1); }
+	0% {
+		transform: scale(1);
+	}
+
+	50% {
+		transform: scale(1.3);
+	}
+
+	100% {
+		transform: scale(1);
+	}
 }
 
-/* 전체 페이지가 아래에서 위로 떠오르는 효과 */
 .cdb-fade-up-enter-active,
 .cdb-fade-up-leave-active {
-    transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
+	transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-/* 나갈 때: 제자리에서 서서히 사라짐 */
 .cdb-fade-up-leave-to {
-    opacity: 0;
-    transform: translateY(-3px);
+	opacity: 0;
+	transform: translateY(-3px);
 }
 
-/* 들어올 때: 아래에서 위로 슥~ */
 .cdb-fade-up-enter-from {
-    opacity: 0;
-    transform: translateY(10px);
+	opacity: 0;
+	transform: translateY(10px);
 }
 
-/* 💡 트랜지션 도중 레이아웃 깨짐 방지 */
 .cdb-board-wrapper {
-    will-change: transform, opacity;
+	will-change: transform, opacity;
 }

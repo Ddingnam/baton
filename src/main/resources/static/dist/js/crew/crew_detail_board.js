@@ -77,8 +77,6 @@ const CrewBoard = {
 	            const path = to.path;
 				
 				const isRestrictedAction = path.includes('/edit/') || path.endsWith('/write') || boardIdx;
-				
-				console.log(this.myStatus) // undefined!
 
                 if (isRestrictedAction) {
                     if (!this.myStatus || this.myStatus.status !== 'ACTIVE') {

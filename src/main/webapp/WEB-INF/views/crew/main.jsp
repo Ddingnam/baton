@@ -52,6 +52,7 @@
 <jsp:include page="/WEB-INF/views/crew/components/crewDetailDashboard.jsp" />
 <jsp:include page="/WEB-INF/views/crew/components/crewDetailBoard.jsp" />
 <jsp:include page="/WEB-INF/views/crew/components/crewDetailSchedule.jsp" />
+<jsp:include page="/WEB-INF/views/crew/components/crewDetailAdmin.jsp" />
 <jsp:include page="/WEB-INF/views/crew/components/crewChat.jsp" />
 <jsp:include page="/WEB-INF/views/crew/components/crewForm.jsp" />
 
@@ -63,6 +64,7 @@
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_detail_dashboard.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_detail_board.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_detail_schedule.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/crew/crew_detail_admin.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_detail_main.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_hero.js"></script>
 <script src="${pageContext.request.contextPath}/dist/js/crew/crew_list.js"></script>

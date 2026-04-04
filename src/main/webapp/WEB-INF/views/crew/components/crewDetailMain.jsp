@@ -67,12 +67,15 @@
                             <i class="ri-calendar-event-fill"></i> 일정
                         </router-link>
                         
-                        <router-link :to="'/article/' + crew.crewIdx + '/chat'" class="cd-tab-btn" active-class="active">
-                            <i class="ri-chat-smile-3-fill"></i> 채팅
-                        </router-link>
+						<router-link v-if="myStatus && myStatus.role === 'LEADER'" 
+					                 :to="'/article/' + crew.crewIdx + '/admin'" 
+					                 class="cd-tab-btn" active-class="active">
+					        <i class="ri-settings-3-fill"></i> 관리
+					    </router-link>
                     </nav>
     
-                    <div class="cd-action-card cd-glass-card cd-sidebar-footer">
+                    <div class="cd-action-card cd-glass-card cd-sidebar-footer"
+						v-if="!myStatus || (myStatus && myStatus.role !== 'LEADER')">
                         <button class="cd-action-btn" 
 						        :class="buttonClass"
 						        :disabled="isJoinDisabled"
@@ -84,7 +87,7 @@
                 </aside>
     
                 <main class="cd-main-content">
-                    <router-view v-slot="{ Component }" v-if="!isLoading && crew && myStatus">
+                    <router-view v-slot="{ Component }" v-if="!isLoading && crew">
                         <transition name="cd-fade" mode="out-in">
                             <component 
                                 :is="Component" 
@@ -101,5 +104,34 @@
             <i class="ri-loader-4-line cd-spin"></i>
             <p>데이터를 불러오고 있습니다...</p>
         </div>
+		
+		<transition name="cd-fade">
+		    <div class="cm-cd-overlay" v-if="isJoinModalOpen" @click.self="closeJoinModal">
+		        <div class="cm-cd-container cd-glass-card">
+		            
+		            <header class="cm-cd-header">
+		                <h3 class="cm-cd-title">
+		                    <i class="ri-mail-send-line"></i> 가입 신청하기
+		                </h3>
+		                <button class="cm-cd-close" @click="closeJoinModal">
+		                    <i class="ri-close-line"></i>
+		                </button>
+		            </header>
+		            
+		            <div class="cm-cd-body">
+		                <label class="cm-cd-label">가입 사유 및 인사말</label>
+		                <textarea v-model="joinReason" 
+		                          class="cm-cd-textarea" 
+		                          placeholder="가입 사유와 간단한 인사말을 적어주세요."></textarea>
+		            </div>
+		            
+		            <footer class="cm-cd-footer">
+		                <button class="cm-cd-btn cm-cd-btn-cancel" @click="closeJoinModal">취소</button>
+		                <button class="cm-cd-btn cm-cd-btn-submit" @click="submitJoinApplication">신청 보내기</button>
+		            </footer>
+		            
+		        </div>
+		    </div>
+		</transition>
     </div>
 </template>

@@ -44,7 +44,6 @@ body {
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.04);
 }
 
-/* --- 애니메이션 엔진 (로그인 페이지와 동일) --- */
 .reveal-item { 
     opacity: 0; 
     transform: translateY(20px); 
@@ -61,7 +60,6 @@ body {
 .delay-5 { animation-delay: 0.5s; }
 .delay-6 { animation-delay: 0.6s; }
 
-/* 헤더 섹션 */
 .auth-header { margin-bottom: 32px; text-align: center; }
 .link-icon-visual {
     width: 64px; height: 64px; background: #E8F3FF;
@@ -78,7 +76,6 @@ body {
 .auth-title { font-size: 26px; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; margin-bottom: 12px; }
 .auth-subtitle { font-size: 15px; line-height: 1.6; color: var(--text-gray); }
 
-/* 안내 카드 */
 .info-summary-card {
     background: #F9FAFB; border-radius: 20px;
     padding: 24px; margin-bottom: 32px;
@@ -89,7 +86,6 @@ body {
 .summary-label { font-size: 14px; color: var(--text-muted); }
 .summary-value { font-size: 14px; color: var(--text-dark); font-weight: 600; }
 
-/* 입력 폼 */
 .input-sequence { margin-bottom: 24px; }
 .input-label { display: block; font-size: 13px; font-weight: 700; color: var(--text-gray); margin-bottom: 8px; }
 .input-glow-wrap input {
@@ -102,14 +98,12 @@ body {
     box-shadow: 0 0 0 4px rgba(49, 130, 246, 0.1);
 }
 
-/* 알림 텍스트 */
 .policy-notice {
     font-size: 13px; color: var(--text-muted);
     line-height: 1.6; text-align: center;
     margin-bottom: 32px; padding: 0 10px;
 }
 
-/* 버튼 */
 .btn-baton-link {
     width: 100%; height: 60px; background: var(--text-dark); color: white;
     border: none; border-radius: 16px; font-size: 17px; font-weight: 700;
@@ -123,7 +117,6 @@ body {
     text-decoration: none; font-weight: 500;
 }
 
-/* 에러 쉐이크 */
 .input-glow-wrap.error-shake input {
     border-color: #F04452 !important;
     background-color: #FFF1F0 !important;

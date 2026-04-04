@@ -7,7 +7,10 @@ const CrewDetail = {
         return {
             isLoading: false,
             crew: null,
-            myStatus: null
+            myStatus: null,
+			
+			isJoinModalOpen: false,
+            joinReason: ''
         }
     },
     
@@ -19,33 +22,38 @@ const CrewDetail = {
         }
     },
 	computed: {
-        joinButtonText() {
-            if (this.myStatus) {
-                if (this.myStatus.status === 'ACTIVE') return '모임 탈퇴하기';
-                if (this.myStatus.status === 'WAIT') return '가입 승인 대기 중';
-                if (this.myStatus.status === 'BANNED') return '가입이 제한된 모임';
-            }
+		joinButtonText() {
+	        if (!this.myStatus) {
+	            if (this.crew && this.crew.currentMember >= this.crew.maxMember) {
+	                return '모집 정원 초과';
+	            }
+	            return this.crew?.joinType === 'A' ? '가입 신청하기' : '모임 가입하기';
+	        }
 
-            if (this.crew && this.crew.currentMember >= this.crew.maxMember) {
-                return '모집 정원 초과';
-            }
+	        const status = this.myStatus.status;
+	        
+	        if (status === 'ACTIVE') return '모임 탈퇴하기';
+	        if (status === 'WAIT') return '가입 승인 대기 중';
+	        if (status === 'BANNED') return '가입이 제한된 모임';
 
-            return this.crew.joinType === 'A' ? '가입 신청하기' : '모임 가입하기';
-        },
+	        if (this.crew && this.crew.currentMember >= this.crew.maxMember) {
+	            return '모집 정원 초과';
+	        }
+	        return this.crew?.joinType === 'A' ? '가입 신청하기' : '모임 가입하기';
+	    },
 
         isJoinDisabled() {
-            if (this.myStatus && ['WAIT', 'BANNED'].includes(this.myStatus.status)) {
-                return true;
-            }
-			
-            if (this.crew && this.crew.currentMember >= this.crew.maxMember) {
-                return true;
-            }
-            return false;
+			if (!this.myStatus) {
+	            return this.crew ? this.crew.currentMember >= this.crew.maxMember : false;
+	        }
+	        
+	        return ['WAIT', 'BANNED'].includes(this.myStatus.status) || 
+	               (this.crew && this.crew.currentMember >= this.crew.maxMember);
         },
 		
 		buttonClass() {
-	        if (this.myStatus && this.myStatus.status === 'ACTIVE') return 'btn-danger';
+			if (!this.myStatus) return 'primary';
+	        if (this.myStatus.status === 'ACTIVE') return 'btn-danger';
 	        if (this.isJoinDisabled) return 'btn-disabled';
 	        return 'primary';
 	    }
@@ -96,13 +104,29 @@ const CrewDetail = {
 	        }
 
 	        if (this.crew.joinType === 'F') {
-	            await this.handleJoinCrew();
-	        } else {
-	            alert("승인제 모임입니다. 가입 사유 입력 모달을 준비 중입니다!");
-	        }
+				if (!confirm("이 모임에 바로 참여하시겠습니까?")) return;
+                await this.handleJoinCrew("자유 가입");
+			} else {
+                this.joinReason = '';
+                this.isJoinModalOpen = true;
+            }
 	    },
 		
-		async handleJoinCrew() {
+		closeJoinModal() {
+            this.isJoinModalOpen = false;
+            this.joinReason = '';
+        },
+
+        async submitJoinApplication() {
+            if (!this.joinReason.trim()) {
+                alert("가입 사유를 입력해주세요.");
+                return;
+            }
+            await this.handleJoinCrew(this.joinReason);
+            this.closeJoinModal();
+        },
+		
+		async handleJoinCrew(reasonText) {
 			if (!confirm("이 모임에 바로 참여하시겠습니까?")) return;
             try {
                 this.isLoading = true;
@@ -114,7 +138,7 @@ const CrewDetail = {
                     },
                     body: JSON.stringify({
                         crewIdx: this.crew.crewIdx,
-                        reason: "모임 가입"
+                        reason: reasonText
                     })
                 });
 
@@ -128,7 +152,11 @@ const CrewDetail = {
                     throw new Error(errorMsg || "가입 처리 중 오류가 발생했습니다.");
                 }
 
-                alert("🎉 모임 가입이 완료되었습니다!");
+				if (this.crew.joinType === 'F') {
+                    alert("🎉 모임 가입이 완료되었습니다!");
+                } else {
+                    alert("✅ 가입 신청이 완료되었습니다. 방장의 승인을 기다려주세요.");
+                }
                 
                 await this.fetchCrewDetail(this.crew.crewIdx);
             } catch (error) {

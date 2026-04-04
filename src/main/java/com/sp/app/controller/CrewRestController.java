@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import com.sp.app.domain.dto.CrewDto;
+import com.sp.app.domain.dto.CrewHistoryDto;
 import com.sp.app.domain.dto.CrewMemberDto;
 import com.sp.app.domain.dto.CrewRequestDto;
 import com.sp.app.domain.dto.MyCrewListDto;
@@ -41,6 +43,12 @@ public class CrewRestController {
 	
 	@Value("${file.upload-root}/crew")
     private String uploadPath;
+	
+	@Value("${weather.api.key}")
+	private String weatherApiKey;
+
+	@Value("${weather.api.url}")
+	private String weatherApiUrl;
 	
 	@PostMapping("register")
     public ResponseEntity<?> register(
@@ -243,4 +251,113 @@ public class CrewRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(model);
         }
     }
+    
+    @SuppressWarnings("unchecked")
+    @GetMapping("dashboard/weather")
+    public ResponseEntity<?> getCrewWeather(@RequestParam(name = "city", defaultValue = "Seoul") String city) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            
+            String url = String.format("%s?q=%s&units=metric&lang=kr&appid=%s", 
+                                        weatherApiUrl, city, weatherApiKey);
+            
+            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Weather API Error: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("날씨 정보를 가져올 수 없습니다.");
+        }
+    }
+    
+    @GetMapping("manage/{crewIdx}/members")
+	public ResponseEntity<?> getActiveMembers(
+	        @PathVariable("crewIdx") Long crewIdx,
+	        @AuthenticationPrincipal CustomUserDetails userDetails) {
+	    try {
+	        List<CrewMemberDto> list = service.getCrewMembers(crewIdx, "ACTIVE");
+	        return ResponseEntity.ok(list);
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("멤버 목록 조회 실패");
+	    }
+	}
+
+	@GetMapping("manage/{crewIdx}/applications")
+	public ResponseEntity<?> getPendingApplications(
+	        @PathVariable("crewIdx") Long crewIdx,
+	        @AuthenticationPrincipal CustomUserDetails userDetails) {
+	    try {
+	        List<CrewMemberDto> list = service.getCrewMembers(crewIdx, "WAIT");
+	        return ResponseEntity.ok(list);
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("신청 목록 조회 실패");
+	    }
+	}
+
+	@PostMapping("manage/{crewIdx}/applications/{userIdx}")
+	public ResponseEntity<?> handleApplication(
+	        @PathVariable("crewIdx") Long crewIdx,
+	        @PathVariable("userIdx") Long targetUserIdx,
+	        @RequestParam("action") String action,
+	        @AuthenticationPrincipal CustomUserDetails userDetails) {
+	    try {
+	        Long loginUserIdx = userDetails.getMember().getUserIdx();
+	        service.handleApplication(loginUserIdx, crewIdx, targetUserIdx, action);
+	        return ResponseEntity.ok("처리되었습니다.");
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+	    }
+	}
+
+	@PostMapping("manage/{crewIdx}/members/{userIdx}/kick")
+	public ResponseEntity<?> kickMember(
+	        @PathVariable("crewIdx") Long crewIdx,
+	        @PathVariable("userIdx") Long targetUserIdx,
+	        @AuthenticationPrincipal CustomUserDetails userDetails) {
+	    try {
+	        Long loginUserIdx = userDetails.getMember().getUserIdx();
+	        service.banMember(loginUserIdx, crewIdx, targetUserIdx, "관리자에 의한 강퇴");
+	        return ResponseEntity.ok("강퇴 처리되었습니다.");
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+	    }
+	}
+
+	@PostMapping("manage/{crewIdx}/close")
+	public ResponseEntity<?> closeCrew(
+	        @PathVariable("crewIdx") Long crewIdx,
+	        @AuthenticationPrincipal CustomUserDetails userDetails) {
+	    try {
+	        service.deleteCrew(crewIdx, uploadPath);
+	        return ResponseEntity.ok("모임이 폐쇄되었습니다.");
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("모임 폐쇄 실패");
+	    }
+	}
+	
+	@PostMapping("manage/{crewIdx}/members/{userIdx}/role")
+	public ResponseEntity<?> updateMemberRole(
+	        @PathVariable("crewIdx") Long crewIdx,
+	        @PathVariable("userIdx") Long targetUserIdx,
+	        @RequestParam("role") String role,
+	        @AuthenticationPrincipal CustomUserDetails userDetails) {
+	    try {
+	        Long loginUserIdx = userDetails.getMember().getUserIdx();
+	        service.updateMemberRole(loginUserIdx, crewIdx, targetUserIdx, role);
+	        return ResponseEntity.ok("권한이 변경되었습니다.");
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+	    }
+	}
+	
+	@GetMapping("manage/{crewIdx}/history")
+	public ResponseEntity<?> getCrewHistory(
+	        @PathVariable("crewIdx") Long crewIdx,
+	        @AuthenticationPrincipal CustomUserDetails userDetails) {
+	    try {
+	        List<CrewHistoryDto> history = service.getCrewHistory(crewIdx);
+	        return ResponseEntity.ok(history);
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이력 조회 실패");
+	    }
+	}
 }

@@ -217,7 +217,7 @@
 				        </div>
 	
 				        <div class="cdb-form-btns">
-				            <label class="cdb-checkbox-label" style="margin-right: auto;">
+				            <label class="cdb-checkbox-label" style="margin-right: auto;" v-if="myStatus && ['LEADER', 'SUB_LEADER'].includes(myStatus.role)">
 				                <input type="checkbox" v-model="writeForm.isNotice" true-value="Y" false-value="N">
 				                <span class="cdb-check-custom"></span>
 				                <span class="label-text">공지사항으로 등록</span>
