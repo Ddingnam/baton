@@ -1,5 +1,7 @@
 package com.sp.app.admin.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,5 +26,7 @@ public class ReportDto {
     private String reporterName;
     private String reportedUserId;
     private String reportedUserName;
+    @JsonProperty("isDeleted")
+    private boolean isDeleted;
     
 }

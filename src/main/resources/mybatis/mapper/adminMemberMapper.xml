@@ -241,4 +241,9 @@
         AND r.processStatus = 0
         ORDER BY r.reportDate DESC
     </select>
+
+    <select id="getUserBatonPoint" parameterType="Long" resultType="Long">
+        SELECT batonpoint FROM users WHERE userIdx = #{userIdx}
+    </select>
+
 </mapper>

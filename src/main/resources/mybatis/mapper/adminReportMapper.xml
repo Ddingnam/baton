@@ -20,7 +20,14 @@
                 r.processStatus = #{processStatus}
             </if>
             <if test="domainType != null and domainType != ''">
-                AND r.domainType = #{domainType}
+                <choose>
+                    <when test="domainType == 'COMMUNITY'">
+                        AND r.domainType IN ('COMMUNITY', 'COMMUNITY_REPLY')
+                    </when>
+                    <otherwise>
+                        AND r.domainType = #{domainType}
+                    </otherwise>
+                </choose>
             </if>
             <if test="kwd != null and kwd != ''">
                 AND (u1.userId LIKE '%' || #{kwd} || '%'
@@ -43,7 +50,14 @@
                 r.processStatus = #{processStatus}
             </if>
             <if test="domainType != null and domainType != ''">
-                AND r.domainType = #{domainType}
+                <choose>
+                    <when test="domainType == 'COMMUNITY'">
+                        AND r.domainType IN ('COMMUNITY', 'COMMUNITY_REPLY')
+                    </when>
+                    <otherwise>
+                        AND r.domainType = #{domainType}
+                    </otherwise>
+                </choose>
             </if>
             <if test="kwd != null and kwd != ''">
                 AND (u1.userId LIKE '%' || #{kwd} || '%'
@@ -76,5 +90,13 @@
             adminMemo     = #{adminMemo, jdbcType=VARCHAR}
         WHERE reportIdx = #{reportIdx, jdbcType=NUMERIC}
     </update>
+
+    <select id="getReportedUserIdx" parameterType="long" resultType="Long">
+        SELECT reportedUserIdx FROM adminReport WHERE reportIdx = #{reportIdx}
+    </select>
+
+    <select id="getReporterIdx" parameterType="long" resultType="Long">
+        SELECT reporterIdx FROM adminReport WHERE reportIdx = #{reportIdx}
+    </select>
 
 </mapper>

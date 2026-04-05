@@ -880,3 +880,180 @@
     box-shadow: 0 3px 12px rgba(124,58,237,0.22);
 }
 .rpt-btn-approve:hover { opacity: 0.88; transform: translateY(-1px); }
+/* ── 제재 옵션 섹션 ─────────────────────────────────────────────── */
+.rpt-sanction-toggle-row {
+    padding: 12px 0 4px;
+    border-top: 1px solid var(--border-color);
+}
+
+.rpt-sanction-chk-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* 실제 checkbox 숨김 */
+.rpt-sanction-chk {
+    display: none;
+}
+
+/* 토글 텍스트 */
+.rpt-sanction-chk-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #EF4444;
+}
+
+.rpt-sanction-chk-text i {
+    font-size: 15px;
+}
+
+/* 토글 스위치 트랙 */
+.rpt-toggle-track {
+    width: 42px;
+    height: 24px;
+    border-radius: 999px;
+    background: #E2E8F0;
+    position: relative;
+    transition: background 0.25s ease;
+    flex-shrink: 0;
+}
+
+/* 토글 스위치 썸 */
+.rpt-toggle-track::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* 체크됐을 때 */
+.rpt-sanction-chk:checked + .rpt-sanction-chk-text + .rpt-toggle-track,
+.rpt-toggle-track.on {
+    background: #EF4444;
+}
+
+.rpt-sanction-chk:checked + .rpt-sanction-chk-text + .rpt-toggle-track::after,
+.rpt-toggle-track.on::after {
+    transform: translateX(18px);
+}
+
+.rpt-sanction-section {
+    padding: 4px 0 8px;
+    animation: fadeIn 0.2s ease;
+}
+
+.rpt-sanction-inner {
+    background: #FFF5F5;
+    border: 1.5px solid #FECACA;
+    border-radius: 12px;
+    padding: 16px 18px 14px;
+}
+
+.rpt-sanction-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #DC2626;
+    margin-bottom: 14px;
+}
+
+.rpt-sanction-title i {
+    font-size: 14px;
+}
+
+.rpt-sanction-fields {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.rpt-sanction-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 120px;
+}
+
+.rpt-sanction-select {
+    height: 38px;
+    padding: 0 12px;
+    border: 1.5px solid #FECACA;
+    border-radius: 9px;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1E293B;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.rpt-sanction-select:focus {
+    border-color: #EF4444;
+    box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
+}
+
+.rpt-days-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rpt-days-input {
+    width: 80px;
+    height: 38px;
+    padding: 0 12px;
+    border: 1.5px solid #FECACA;
+    border-radius: 9px;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1E293B;
+    font-family: inherit;
+    outline: none;
+    text-align: center;
+    transition: border-color 0.15s;
+}
+
+.rpt-days-input:focus {
+    border-color: #EF4444;
+    box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
+}
+
+.rpt-days-unit {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748B;
+}
+
+.rpt-sanction-warn {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+    margin-top: 12px;
+    font-size: 11px;
+    color: #94A3B8;
+    line-height: 1.5;
+}
+
+.rpt-sanction-warn i {
+    font-size: 13px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}

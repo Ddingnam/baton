@@ -13,4 +13,6 @@ public interface AdminReportMapper {
     public List<ReportDto> listReport(Map<String, Object> map);
     public ReportDto getReport(@Param("reportIdx") Long reportIdx);
     public void updateProcessStatus(Map<String, Object> map);
+    public Long getReportedUserIdx(@Param("reportIdx") Long reportIdx);
+    public Long getReporterIdx(@Param("reportIdx") Long reportIdx);
 }

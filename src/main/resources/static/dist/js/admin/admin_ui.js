@@ -95,7 +95,7 @@
         iconWrap.className = 'admin-confirm-icon-wrap ' + t.cls;
         icon.className     = t.icon;
         title.textContent  = opts.title || '';
-        desc.textContent   = opts.desc  || '';
+        desc.innerHTML     = opts.desc  || '';
         desc.style.display = opts.desc  ? '' : 'none';
         okBtn.textContent  = opts.okText || '확인';
 

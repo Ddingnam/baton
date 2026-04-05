@@ -11,6 +11,21 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/main/main.css?v=final">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/mypage/mypage_left.css?v=final">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/mypage/mypage_withdraw.css?v=final">
+<style>
+.wd-info-point {
+    background: #FFF7ED;
+    border: 1.5px solid #FED7AA;
+    color: #92400E;
+}
+.wd-info-point i {
+    color: #F59E0B;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+.wd-info-point strong {
+    color: #C2410C;
+}
+</style>
 </head>
 <body>
 
@@ -50,6 +65,16 @@
                 </c:if>
 
                 <c:if test="${not blockedByRole and not alreadyRequested}">
+
+                    <c:if test="${userDto.batonpoint > 0}">
+                        <div class="wd-info wd-info-point">
+                            <i class="ri-coins-line"></i>
+                            <div class="wd-info-text">
+                                <strong>잔여 바톤 포인트 ${userDto.batonpoint}P 가 있습니다.</strong>
+                                탈퇴 요청은 가능하지만, 포인트를 모두 사용하거나 환불 처리 후 관리자가 최종 승인합니다.
+                            </div>
+                        </div>
+                    </c:if>
 
                     <c:if test="${activeTrades > 0}">
                         <div class="wd-info">

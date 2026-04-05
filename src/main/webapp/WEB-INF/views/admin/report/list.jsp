@@ -58,8 +58,8 @@
                             <div class="rpt-dropdown-menu" id="domainMenu">
                                 <div class="rpt-dropdown-item ${empty param.domainType ? 'active' : ''}" data-value="" onclick="selectDomain(this, '전체 유형')">전체 유형</div>
                                 <div class="rpt-dropdown-item ${param.domainType == 'TRADE' ? 'active' : ''}" data-value="TRADE" onclick="selectDomain(this, '중고거래')">중고거래</div>
-                                <div class="rpt-dropdown-item ${param.domainType == 'COMMUNITY' ? 'active' : ''}" data-value="COMMUNITY" onclick="selectDomain(this, '커뮤니티 게시글')">커뮤니티 게시글</div>
-                                <div class="rpt-dropdown-item ${param.domainType == 'COMMUNITY_REPLY' ? 'active' : ''}" data-value="COMMUNITY_REPLY" onclick="selectDomain(this, '커뮤니티 댓글')">커뮤니티 댓글</div>
+                                <div class="rpt-dropdown-item ${param.domainType == 'COMMUNITY' ? 'active' : ''}" data-value="COMMUNITY" onclick="selectDomain(this, '커뮤니티 (게시글+댓글)')">커뮤니티 (게시글+댓글)</div>
+                                <div class="rpt-dropdown-item ${param.domainType == 'COMMUNITY_REPLY' ? 'active' : ''}" data-value="COMMUNITY_REPLY" onclick="selectDomain(this, '커뮤니티 댓글만')">커뮤니티 댓글만</div>
                                 <div class="rpt-dropdown-item ${param.domainType == 'CREW' ? 'active' : ''}" data-value="CREW" onclick="selectDomain(this, '동네모임')">동네모임</div>
                                 <div class="rpt-dropdown-item ${param.domainType == 'ALBA' ? 'active' : ''}" data-value="ALBA" onclick="selectDomain(this, '알바구인')">알바구인</div>
                                 <div class="rpt-dropdown-item ${param.domainType == 'CHAT' ? 'active' : ''}" data-value="CHAT" onclick="selectDomain(this, '채팅')">채팅</div>
@@ -260,6 +260,44 @@
                 <p class="rpt-field-label">관리자 메모</p>
                 <textarea class="rpt-textarea" id="dAdminMemo" rows="3" placeholder="처리 메모를 입력하세요"></textarea>
             </div>
+
+            <!-- ── 제재 옵션 (처리 완료 시에만 사용) ── -->
+            <div class="rpt-field rpt-sanction-toggle-row" id="sanctionToggleRow">
+                <label class="rpt-sanction-chk-label">
+                    <span class="rpt-sanction-chk-text">
+                        <i class="ri-shield-cross-line"></i> 처리 완료 시 제재 추가
+                    </span>
+                    <input type="checkbox" id="chkSanction" class="rpt-sanction-chk">
+                    <span class="rpt-toggle-track" id="sanctionToggleTrack"></span>
+                </label>
+            </div>
+
+            <div class="rpt-sanction-section" id="sanctionSection" style="display:none;">
+                <div class="rpt-sanction-inner">
+                    <p class="rpt-sanction-title"><i class="ri-alert-fill"></i> 제재 설정</p>
+                    <div class="rpt-sanction-fields">
+                        <div class="rpt-sanction-field">
+                            <label class="rpt-field-label">제재 유형</label>
+                            <select id="sanctionTypeSelect" class="rpt-sanction-select">
+                                <option value="TEMPORARY">기간 정지</option>
+                                <option value="PERMANENT">영구 정지</option>
+                            </select>
+                        </div>
+                        <div class="rpt-sanction-field" id="daysField">
+                            <label class="rpt-field-label">정지 기간</label>
+                            <div class="rpt-days-wrap">
+                                <input type="number" id="sanctionDays" class="rpt-days-input"
+                                       value="7" min="1" max="365">
+                                <span class="rpt-days-unit">일</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="rpt-sanction-warn">
+                        <i class="ri-information-line"></i>
+                        처리 완료 버튼을 눌러야 제재가 적용됩니다. 반려 시에는 무시됩니다.
+                    </p>
+                </div>
+            </div>
         </div>
 
         
@@ -285,8 +323,8 @@
     var labelMap = {
         '': '전체 유형',
         'TRADE': '중고거래',
-        'COMMUNITY': '커뮤니티 게시글',
-        'COMMUNITY_REPLY': '커뮤니티 댓글',
+        'COMMUNITY': '커뮤니티 (게시글+댓글)',
+        'COMMUNITY_REPLY': '커뮤니티 댓글만',
         'CREW': '동네모임',
         'ALBA': '알바구인',
         'CHAT': '채팅',
