@@ -6,7 +6,7 @@
     <div class="chat-panel-container">
         <div v-if="currentView === 'list'" class="chat-view-wrapper">
             <header class="chat-header">
-                <h2 class="chat-header-title">크루 채팅</h2>
+                <h2 class="chat-header-title">모임 채팅</h2>
                 <button class="btn-close-chat" @click="$emit('close-chat')">
                     <i class="ri-close-line"></i>
                 </button>

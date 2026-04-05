@@ -12,7 +12,7 @@
                         <i class="ri-arrow-right-s-line"></i>
                         <strong>Schedule</strong>
                     </div>
-                    <h2 class="cs-header-title">크루 일정</h2>
+                    <h2 class="cs-header-title">모임 일정</h2>
                 </div>
                 
 				<div class="cs-header-right">
@@ -151,7 +151,7 @@
 						<div class="cs-side-card cs-glass-card">
 			                <div class="cs-side-header">
 			                    <h4>
-			                        <i class="ri-group-fill"></i> 참석 크루원 
+			                        <i class="ri-group-fill"></i> 참석 멤버 
 			                        <span class="cs-side-count">{{ selectedSchedule.currentCount || 0 }}</span>
 			                    </h4>
 			                </div>

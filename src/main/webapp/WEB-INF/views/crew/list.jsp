@@ -24,7 +24,7 @@
         <div class="container hero-inner">
             <div class="hero-text-box">
                 <span class="sub-title">BATON CREW</span>
-                <h1 class="main-title">우리 동네 <span class="highlight">크루</span>와 함께</h1>
+                <h1 class="main-title">우리 동네 <span class="highlight">모임</span>와 함께</h1>
                 <p class="desc">가까운 이웃들과 관심사를 공유하고 새로운 즐거움을 찾아보세요.</p>
             </div>
             <div class="hero-search-box">

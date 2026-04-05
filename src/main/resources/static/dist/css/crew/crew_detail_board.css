@@ -419,11 +419,26 @@
 }
 
 .cdb-profile-img {
-	width: 36px;
-	height: 36px;
-	border-radius: 50%;
-	object-fit: cover;
-	border: 1px solid rgba(255, 255, 255, 0.8);
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    display: block !important;
+    border: 1px solid #f0f0f0 !important;
+    transition: all 0.3s !important;
+}
+
+.profile-thumb {
+    width: 32px !important;
+    height: 32px !important;
+    background: #E5E8EB !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #8B95A1 !important;
+    font-size: 18px !important;
+    transition: all 0.3s !important;
 }
 
 .cdb-nickname {

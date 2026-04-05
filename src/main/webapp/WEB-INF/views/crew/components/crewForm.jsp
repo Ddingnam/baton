@@ -7,7 +7,7 @@
         <div class="cf-header">
             <div class="cf-header-content">
                 <span class="cf-header-tag">Step 01. 정보 입력</span>
-                <h2 class="cf-header-title">새로운 <span class="cf-highlight">크루</span>를 개설하세요</h2>
+                <h2 class="cf-header-title">새로운 <span class="cf-highlight">모임</span>를 개설하세요</h2>
                 <p class="cf-header-desc">상세한 정보를 입력할수록 멋진 이웃들이 더 많이 모여요.</p>
             </div>
         </div>

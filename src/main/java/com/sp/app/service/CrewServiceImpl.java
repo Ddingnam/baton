@@ -315,6 +315,9 @@ public class CrewServiceImpl implements CrewService {
 	    crew.setCurrentMember(crew.getCurrentMember() - 1);
 	    
         memberRepository.save(member);
+        
+        Long mainRoomId = chatService.getMainChatRoomId(crewIdx);
+        chatService.leaveChatRoom(mainRoomId, userIdx);
 
 	    CrewMemberHistory history = CrewMemberHistory.builder()
 	            .crewMember(member)
@@ -353,6 +356,9 @@ public class CrewServiceImpl implements CrewService {
 	    crew.setCurrentMember(crew.getCurrentMember() - 1);
 	    
         memberRepository.save(member);
+        
+        Long mainRoomId = chatService.getMainChatRoomId(crewIdx);
+        chatService.leaveChatRoom(mainRoomId, userIdx);
 
 	    CrewMemberHistory history = CrewMemberHistory.builder()
 	            .crewMember(member)

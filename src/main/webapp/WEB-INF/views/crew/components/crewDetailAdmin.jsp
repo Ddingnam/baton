@@ -174,7 +174,7 @@
 		                </div>
 		                
 		                <div class="cam-info-group">
-		                    <label>크루 역할 부여</label>
+		                    <label>모임 역할 부여</label>
 		                    <select v-model="selectedMember.role" class="cam-select" :disabled="selectedMember.role === 'LEADER'">
 		                        <option value="MEMBER">일반 멤버 (MEMBER)</option>
 		                        <option value="SUB_LEADER">부방장 (SUB_LEADER)</option>

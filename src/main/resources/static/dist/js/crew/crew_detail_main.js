@@ -104,7 +104,6 @@ const CrewDetail = {
 	        }
 
 	        if (this.crew.joinType === 'F') {
-				if (!confirm("이 모임에 바로 참여하시겠습니까?")) return;
                 await this.handleJoinCrew("자유 가입");
 			} else {
                 this.joinReason = '';

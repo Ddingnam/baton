@@ -13,10 +13,9 @@
                 <div class="cl-welcome-content">
                     <span class="cl-welcome-sub">함께하면 더 즐거운 커뮤니티</span>
                     <h2 class="cl-welcome-title">취향이 맞는 사람들과 <span class="cl-highlight">오늘 바로</span> 모여보세요!</h2>
-                    <p class="cl-welcome-desc">원하는 모임이 없나요? 직접 크루장이 되어 새로운 인연을 만들어보세요.</p>
+                    <p class="cl-welcome-desc">원하는 모임이 없나요? 직접 리더가 되어 새로운 인연을 만들어보세요.</p>
                 </div>
                 <div class="cl-welcome-actions">
-                    <button class="cl-guide-btn secondary" @click="openGuide">이용 가이드</button>
                     <button class="cl-guide-btn primary" @click="$router.push('/write')">모임 개설하기</button>
                 </div>
             </div>
@@ -104,7 +103,6 @@
 			                <select class="cl-detail-select cl-sort-select" v-model="params.sortType" @change="resetAndFetch">
 			                    <option value="latest">최신순</option>
 			                    <option value="popular">인기순</option>
-			                    <option value="imminent">마감임박순</option>
 			                </select>
 			            </div>
 			        </div>
@@ -155,10 +153,7 @@
                             </div>
                         </div>
                         <div class="cl-footer">
-                            <span class="cl-host-name">{{ crew.hostNickname || '크루장' }}</span>
-                            <div class="cl-activity">
-                                <i class="ri-flashlight-line"></i> 방금 전 활동
-                            </div>
+                            <span class="cl-host-name">{{ crew.hostNickname || '리더' }}</span>
                         </div>
                     </div>
                 </div>

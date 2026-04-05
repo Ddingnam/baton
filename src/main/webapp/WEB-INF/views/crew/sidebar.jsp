@@ -19,7 +19,7 @@
             <template v-if="item.logoImage">
                 <img :src="'/uploads/crew/' + item.logoImage" 
                      class="crew-logo-img" 
-                     alt="크루 로고">
+                     alt="모임 로고">
             </template>
             
             <template v-else>
@@ -28,7 +28,7 @@
         </div>
 
         <div class="crew-icon add-crew-btn" 
-             title="크루 추가" 
+             title="모임 추가" 
              @click="$router.push('/write')">
             <i class="ri-add-line"></i>
         </div>

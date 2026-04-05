@@ -21,7 +21,7 @@
 							<strong v-else-if="viewMode === 'edit'">Update Post</strong>
 		                </div>
 		                <h2 class="cdb-header-title">
-		                    <template v-if="viewMode === 'list'">크루 게시판</template>
+		                    <template v-if="viewMode === 'list'">모임 게시판</template>
 		                    <template v-else-if="viewMode === 'detail'">게시글 상세보기</template>
 		                    <template v-else-if="viewMode === 'write'">새 글 작성하기</template>
 		                    <template v-else-if="viewMode === 'edit'">글 수정하기</template>
@@ -145,8 +145,17 @@
 					                
 					                <div class="cdb-comment-top">
 					                    <div class="cdb-user-info">
-					                        <img :src="comment.authorProfilePhoto || '${pageContext.request.contextPath}/images/default-profile.png'" alt="프로필" class="cdb-profile-img">
-					                        <strong class="cdb-nickname">{{ comment.authorNickname || '알 수 없음' }}</strong>
+											<div class="cdb-user-info">
+											    <template v-if="comment.authorProfilePhoto">
+											        <img :src="'/uploads/member/' + comment.authorProfilePhoto" 
+											             class="cdb-profile-img"
+											             alt="프로필">
+											    </template>
+											    <div v-else class="profile-thumb">
+											        <i class="ri-user-smile-fill"></i>
+											    </div>
+											    <strong class="cdb-nickname">{{ comment.authorNickname || '알 수 없음' }}</strong>
+											</div>
 					                    </div>
 					                    <div class="cdb-action-btns" v-if="comment.userIdx === ${sessionScope.member.userIdx}">
 					                        <button class="cdb-btn-text" @click="editComment(comment)">수정</button>
@@ -188,7 +197,14 @@
 					                <div class="cdb-reply-content-wrap">
 					                    <div class="cdb-comment-top">
 					                        <div class="cdb-user-info">
-					                            <img :src="child.authorProfilePhoto || '${pageContext.request.contextPath}/images/default-profile.png'" alt="프로필" class="cdb-profile-img">
+												<template v-if="comment.authorProfilePhoto">
+											        <img :src="'/uploads/member/' + comment.authorProfilePhoto" 
+											             class="cdb-profile-img"
+											             alt="프로필">
+											    </template>
+											    <div v-else class="profile-thumb">
+											        <i class="ri-user-smile-fill"></i>
+											    </div>
 					                            <strong class="cdb-nickname">{{ child.authorNickname || '알 수 없음' }}</strong>
 					                        </div>
 					                        <div class="cdb-action-btns" v-if="child.userIdx === ${sessionScope.member.userIdx}">

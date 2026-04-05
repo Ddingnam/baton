@@ -11,7 +11,7 @@
                     
                     <div class="cd-profile-card cd-glass-card">
                         <div class="cd-profile-wrapper">
-                            <img :src="'/uploads/crew/' + crew.logoImage" alt="크루 프로필" class="cd-profile-img">
+                            <img :src="'/uploads/crew/' + crew.logoImage" alt="모임 프로필" class="cd-profile-img">
                         </div>
                         
                         <h2 class="cd-crew-title">{{ crew.name }}</h2>
@@ -31,7 +31,7 @@
                         <div class="cd-details-table">
                             <div class="cd-detail-row">
                                 <span class="cd-detail-label">리더</span>
-                                <span class="cd-detail-value">{{ crew.hostNickname || '크루장' }}</span>
+                                <span class="cd-detail-value">{{ crew.hostNickname || '리더' }}</span>
                             </div>
                             <div class="cd-detail-row">
                                 <span class="cd-detail-label">가입방식</span>

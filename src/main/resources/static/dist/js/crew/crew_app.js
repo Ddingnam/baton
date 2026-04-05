@@ -145,7 +145,7 @@ const app = Vue.createApp({
                     return;
                 }
 
-                if (!response.ok) throw new Error("크루 목록 조회 실패");
+                if (!response.ok) throw new Error("모임 목록 조회 실패");
 
                 const data = await response.json();
                 this.myCrewList = data.myCrewListJoined;
