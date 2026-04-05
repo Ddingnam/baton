@@ -22,4 +22,6 @@ public interface AdminMemberService {
 	public void rejectWithdrawal(Map<String, Object> map) throws Exception;
 
 	public Map<String, Object> getWithdrawDetail(Long userIdx);
+
+	public void deactivateMember(Map<String, Object> map) throws Exception;
 }

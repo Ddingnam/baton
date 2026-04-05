@@ -79,22 +79,34 @@
             var b  = document.getElementById('dStatusBadge');
             var bs = document.getElementById('btnSuspend');
             var ba = document.getElementById('btnActivate');
+            var bd = document.getElementById('btnDeactivate');
+
+            var isEmpOrAdmin = (m.authority === 'EMP' || m.authority === 'ADMIN');
 
             if (m.status == 1) {
                 b.textContent = '정상';
                 b.className   = 'detail-status-badge status-ok';
-                bs.style.display = 'inline-flex';
+                bs.style.display = isEmpOrAdmin ? 'none' : 'inline-flex';
                 ba.style.display = 'none';
+                bd.style.display = isEmpOrAdmin ? 'inline-flex' : 'none';
             } else if (m.status == 2) {
                 b.textContent = '제재중';
                 b.className   = 'detail-status-badge status-ban';
                 bs.style.display = 'none';
                 ba.style.display = 'inline-flex';
+                bd.style.display = 'none';
+            } else if (m.status == 0) {
+                b.textContent = '비활성';
+                b.className   = 'detail-status-badge status-out';
+                bs.style.display = 'none';
+                ba.style.display = isEmpOrAdmin ? 'inline-flex' : 'none';
+                bd.style.display = 'none';
             } else {
                 b.textContent = '탈퇴';
                 b.className   = 'detail-status-badge status-out';
                 bs.style.display = 'none';
                 ba.style.display = 'none';
+                bd.style.display = 'none';
             }
 
             swP('paneInfo');
@@ -134,6 +146,32 @@
 
     document.getElementById('btnSuspend').addEventListener('click', function () {
         swP('paneSanction');
+    });
+
+    document.getElementById('btnDeactivate').addEventListener('click', function () {
+        showConfirm({
+            type   : 'warning',
+            title  : '계정 비활성화',
+            desc   : '해당 직원/관리자 계정을 비활성화합니다. 로그인이 불가해지며 언제든 복구할 수 있습니다.',
+            okText : '비활성화',
+            onOk   : function () {
+                fetch(CTX + '/admin/member/deactivate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userIdx: cIdx })
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (d) {
+                    if (d.success) {
+                        showToast('계정이 비활성화되었습니다.', 'success');
+                        setTimeout(function () { location.reload(); }, 1000);
+                    } else {
+                        showToast('오류: ' + d.msg, 'error');
+                    }
+                })
+                .catch(function () { showToast('요청 중 오류가 발생했습니다.', 'error'); });
+            }
+        });
     });
 
     document.getElementById('btnActivate').addEventListener('click', function () {

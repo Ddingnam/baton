@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_main.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_member.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_ui.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_report.css">
 </head>
 <body>
 <div class="agency-layout">

@@ -228,4 +228,18 @@ public class AdminMemberController {
         }
         return ResponseEntity.ok(result);
     }
+
+    @PostMapping("/deactivate")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deactivateMember(@RequestBody Map<String, Object> param) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            adminMemberService.deactivateMember(param);
+            result.put("success", true);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", e.getMessage());
+        }
+        return ResponseEntity.ok(result);
+    }
 }

@@ -138,4 +138,13 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         }
         return result;
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deactivateMember(Map<String, Object> map) throws Exception {
+        Map<String, Object> statusMap = new HashMap<>();
+        statusMap.put("userIdx", map.get("userIdx"));
+        statusMap.put("status", 0);
+        mapper.updateMemberStatus(statusMap);
+    }
 }

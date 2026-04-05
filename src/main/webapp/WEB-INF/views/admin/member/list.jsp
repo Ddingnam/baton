@@ -255,6 +255,10 @@
                         onmouseover="this.style.opacity='0.85';" onmouseout="this.style.opacity='1';">
                         <i class="ri-check-line"></i> 정상화
                     </button>
+                    <button type="button" id="btnDeactivate" style="display:none;align-items:center;gap:5px;padding:7px 14px;border-radius:10px;background:#F59E0B;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;box-shadow:0 3px 10px rgba(245,158,11,0.25);"
+                        onmouseover="this.style.opacity='0.85';" onmouseout="this.style.opacity='1';">
+                        <i class="ri-user-unfollow-line"></i> 비활성화
+                    </button>
                 </div>
             </div>
 
