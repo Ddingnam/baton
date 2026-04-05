@@ -14,6 +14,29 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_member.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_ui.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/admin/admin_report.css">
+    <style>
+        /* 탈퇴 회원 권한 섹션 잠금 */
+        #authoritySection[data-locked="true"] {
+            position: relative;
+            pointer-events: none;
+            user-select: none;
+        }
+        #authoritySection[data-locked="true"]::after {
+            content: "탈퇴 처리된 회원은 권한 변경이 불가합니다";
+            position: absolute;
+            inset: 0;
+            background: rgba(248,250,252,0.82);
+            backdrop-filter: blur(2px);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #94A3B8;
+            letter-spacing: -0.2px;
+        }
+    </style>
 </head>
 <body>
 <div class="agency-layout">
@@ -306,7 +329,7 @@
                     </div>
 
                     
-                    <div style="background:#F8FAFC;border-radius:16px;padding:6px 4px;">
+                    <div id="authoritySection" style="background:#F8FAFC;border-radius:16px;padding:6px 4px;position:relative;">
                         <div style="padding:12px 16px 4px;font-size:10px;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;gap:5px;">
                             <i class="ri-shield-star-line" style="font-size:12px;color:#7C3AED;"></i>권한 설정
                         </div>

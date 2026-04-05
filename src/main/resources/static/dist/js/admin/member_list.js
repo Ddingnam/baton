@@ -25,6 +25,64 @@
     }
     loadStatCounts();
 
+    /* ── 탈퇴 회원 인터랙션 잠금 / 해제 ─────────────────────── */
+    function lockWithdrawnControls() {
+        /* 권한 드롭다운 버튼 */
+        var ddBtn = document.querySelector('#dAuthorityDd .adm-dropdown-btn');
+        if (ddBtn) {
+            ddBtn.disabled          = true;
+            ddBtn.style.opacity     = '0.38';
+            ddBtn.style.cursor      = 'not-allowed';
+            ddBtn.style.pointerEvents = 'none';
+        }
+        /* 저장 버튼 */
+        var saveBtn = document.querySelector('[onclick="saveAuthority()"]');
+        if (saveBtn) {
+            saveBtn.disabled          = true;
+            saveBtn.style.opacity     = '0.38';
+            saveBtn.style.cursor      = 'not-allowed';
+            saveBtn.style.pointerEvents = 'none';
+        }
+        /* 제재 처리 탭 */
+        var sanctionTab = document.querySelector('[data-pane="paneSanction"]');
+        if (sanctionTab) {
+            sanctionTab.disabled          = true;
+            sanctionTab.style.opacity     = '0.38';
+            sanctionTab.style.cursor      = 'not-allowed';
+            sanctionTab.style.pointerEvents = 'none';
+        }
+        /* 권한 설정 영역 전체에 dim 오버레이 표시 */
+        var authSection = document.getElementById('authoritySection');
+        if (authSection) authSection.setAttribute('data-locked', 'true');
+    }
+
+    function unlockControls() {
+        var ddBtn = document.querySelector('#dAuthorityDd .adm-dropdown-btn');
+        if (ddBtn) {
+            ddBtn.disabled          = false;
+            ddBtn.style.opacity     = '';
+            ddBtn.style.cursor      = '';
+            ddBtn.style.pointerEvents = '';
+        }
+        var saveBtn = document.querySelector('[onclick="saveAuthority()"]');
+        if (saveBtn) {
+            saveBtn.disabled          = false;
+            saveBtn.style.opacity     = '';
+            saveBtn.style.cursor      = '';
+            saveBtn.style.pointerEvents = '';
+        }
+        var sanctionTab = document.querySelector('[data-pane="paneSanction"]');
+        if (sanctionTab) {
+            sanctionTab.disabled          = false;
+            sanctionTab.style.opacity     = '';
+            sanctionTab.style.cursor      = '';
+            sanctionTab.style.pointerEvents = '';
+        }
+        var authSection = document.getElementById('authoritySection');
+        if (authSection) authSection.removeAttribute('data-locked');
+    }
+    /* ─────────────────────────────────────────────────────────── */
+
     function oDt(id) {
         cIdx = id;
 
@@ -83,6 +141,9 @@
 
             var isEmpOrAdmin = (m.authority === 'EMP' || m.authority === 'ADMIN');
 
+            /* 매번 컨트롤을 초기화한 뒤 상태별 처리 */
+            unlockControls();
+
             if (m.status == 1) {
                 b.textContent = '정상';
                 b.className   = 'detail-status-badge status-ok';
@@ -102,11 +163,15 @@
                 ba.style.display = isEmpOrAdmin ? 'inline-flex' : 'none';
                 bd.style.display = 'none';
             } else {
+                /* ── 탈퇴 회원 (status == 9) ── */
                 b.textContent = '탈퇴';
                 b.className   = 'detail-status-badge status-out';
                 bs.style.display = 'none';
                 ba.style.display = 'none';
                 bd.style.display = 'none';
+
+                /* 권한 드롭다운 · 저장버튼 · 제재탭 완전 잠금 */
+                lockWithdrawnControls();
             }
 
             swP('paneInfo');
@@ -132,8 +197,8 @@
 
     document.getElementById('detailClose').addEventListener('click', function () {
         var box2 = document.getElementById('memberModalBox');
-    if (box2) { box2.style.opacity='0'; box2.style.transform='translateY(20px) scale(0.97)'; }
-    setTimeout(function(){ document.getElementById('detailOverlay').classList.remove('show'); }, 280);
+        if (box2) { box2.style.opacity='0'; box2.style.transform='translateY(20px) scale(0.97)'; }
+        setTimeout(function(){ document.getElementById('detailOverlay').classList.remove('show'); }, 280);
     });
     document.getElementById('detailOverlay').addEventListener('click', function (e) {
         if (e.target === this) document.getElementById('detailClose').click();
@@ -202,6 +267,8 @@
 
     document.querySelectorAll('.detail-tab-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
+            /* 탈퇴 회원이면 제재 탭 클릭 자체를 무시 */
+            if (this.disabled) return;
             swP(this.dataset.pane);
         });
     });
