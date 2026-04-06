@@ -15,7 +15,7 @@
 :root {
   --primary:        #002C5F;
   --accent:         #1565C0;
-  --bg-color:       #FFFFFF; /* 완전 흰색 배경 */
+  --bg-color:       #FFFFFF; 
   --text-main:      #111827;
   --text-sub:       #4B5563;
   --text-light:     #9CA3AF;
@@ -32,7 +32,6 @@ body {
   min-height: 100vh;
 }
 
-/* ── 헤더 ── */
 .page-header {
   position: sticky; top: 0; z-index: 100;
   background: var(--primary);
@@ -48,7 +47,6 @@ body {
 }
 .header-left { display: flex; align-items: center; gap: 12px; }
 
-/* 뒤로가기 버튼 스타일 추가 */
 .btn-back {
   display: flex; align-items: center; justify-content: center;
   width: 40px; height: 40px;
@@ -117,7 +115,6 @@ body {
   border-color: #D1D5DB;
 }
 
-/* 1. 왼쪽: 아바타 및 기본 정보 */
 .card-left {
   display: flex;
   align-items: center;
@@ -145,7 +142,6 @@ body {
 }
 .info-row i { color: var(--text-light); }
 
-/* 2. 중앙: 남긴 메시지 */
 .card-middle {
   flex: 1; 
   background: #F9FAFB;
@@ -158,7 +154,6 @@ body {
 }
 .card-middle.empty { color: var(--text-light); font-style: italic; }
 
-/* 3. 오른쪽: 시간 및 액션 버튼 (무조건 가로 배치) */
 .card-right {
   flex: 0 0 auto; 
   display: flex;
@@ -203,7 +198,6 @@ body {
 }
 .btn-resume:hover { background: #1E88E5; }
 
-/* ── 빈 상태 ── */
 .empty-state {
   text-align: center; padding: 100px 20px;
   background: #ffffff;
@@ -278,9 +272,10 @@ body {
                 <button class="btn-action btn-call" onclick="location.href='tel:${a.applicantPhone}'">
                   <i class="ri-phone-fill"></i> 전화
                 </button>
-                <button class="btn-action btn-resume" onclick="window.open('${pageContext.request.contextPath}/alba/resume/view?applyIdx=${a.applyIdx}', '_blank')">
-                  <i class="ri-file-text-line"></i> 이력서
-                </button>
+				<button class="btn-action btn-resume"
+				        onclick="window.open('${pageContext.request.contextPath}/alba/resume/view?applyIdx=${a.applyIdx}', '_blank')">
+				  <i class="ri-file-text-line"></i> 이력서
+				</button>
               </div>
             </div>
 

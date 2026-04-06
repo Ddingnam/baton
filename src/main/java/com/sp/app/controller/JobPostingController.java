@@ -423,4 +423,39 @@ public class JobPostingController {
 
 	    return "alba/manage";
 	}
+	@GetMapping("/resume/view")
+	public String viewApplicantResume(@RequestParam("applyIdx") long applyIdx,
+	                                  @AuthenticationPrincipal CustomUserDetails userDetails,
+	                                  Model model) {
+	    try {
+	        if (userDetails == null) {
+	            return "redirect:/member/login";
+	        }
+
+	        JobApplyDto apply = postingService.findApplyById(applyIdx);
+	        if (apply == null) {
+	            return "redirect:/alba/list";
+	        }
+
+	        JobPosting posting = postingService.findById(apply.getPostingIdx());
+	        if (posting == null || posting.getUserIdx() != userDetails.getUserIdx()) {
+	            return "redirect:/alba/list";
+	        }
+
+	        JobProfile profile = jobProfileService.findById(apply.getResumeIdx());
+	        if (profile == null) {
+	            return "redirect:/alba/manage?postingIdx=" + apply.getPostingIdx();
+	        }
+
+	        model.addAttribute("dto", profile);
+	        model.addAttribute("apply", apply);
+
+	        return "alba/resumeView";
+	    } catch (Exception e) {
+	        log.error("viewApplicantResume error", e);
+	        return "redirect:/alba/list";
+	    }
+	}
+
+	
 }

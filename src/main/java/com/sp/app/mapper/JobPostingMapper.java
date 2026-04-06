@@ -26,7 +26,6 @@ public interface JobPostingMapper {
     JobPosting findById(long postingIdx);
 
     void updateHitCount(long postingIdx);   
-    
     List<JobPosting> listPostingByArea(Map<String,Object> map);
     
     List<String> listDong(Map<String, Object> map);
@@ -49,6 +48,11 @@ public interface JobPostingMapper {
 	int getMyApplyCount(long userIdx);
 	int getMyApplyResultCount(long userIdx);
 	int getMyScrapCount(long userIdx);
+	
+	JobApplyDto findApplyById(long applyIdx);
+
+	
+	
 
     
 }

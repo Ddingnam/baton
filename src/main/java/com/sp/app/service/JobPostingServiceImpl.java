@@ -286,5 +286,16 @@ public class JobPostingServiceImpl implements JobPostingService {
 	    }
 	}
 
+	@Override
+	public JobApplyDto findApplyById(long applyIdx) throws Exception {
+	    try {
+	        return mapper.findApplyById(applyIdx);
+	    } catch (Exception e) {
+	        log.error("findApplyById error", e);
+	        throw e;
+	    }
+	}
+
+
 	
 }

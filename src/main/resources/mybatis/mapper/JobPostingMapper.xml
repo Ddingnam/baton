@@ -312,11 +312,23 @@
 		      AND status != '열람대기'
 		</select>
 
-		
 		<select id="getMyScrapCount" parameterType="long" resultType="int">
 		    SELECT COUNT(*)
 		    FROM job_scrap
 		    WHERE member_id = #{userIdx}
+		</select>
+		
+		<select id="findApplyById" parameterType="long" resultType="com.sp.app.domain.dto.JobApplyDto">
+		    SELECT
+		        apply_idx AS applyIdx,
+		        posting_idx AS postingIdx,
+		        user_idx AS userIdx,
+		        resume_idx AS resumeIdx,
+		        status,
+		        apply_date AS applyDate,
+		        message
+		    FROM JOB_APPLY
+		    WHERE apply_idx = #{applyIdx}
 		</select>
 		
 	

@@ -37,6 +37,9 @@ public interface JobPostingService {
     int getMyApplyCount(long userIdx) throws Exception;
     int getMyApplyResultCount(long userIdx) throws Exception;
     int getMyScrapCount(long userIdx) throws Exception;
+    
+    JobApplyDto findApplyById(long applyIdx) throws Exception;
+
 
 
 }
