@@ -4,6 +4,7 @@ import com.sp.app.model.ChatRoom;
 import com.sp.app.admin.mapper.AdminChatMapper;
 import com.sp.app.domain.dto.UserDto;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,6 +134,13 @@ public class AdminChatServiceImpl implements AdminChatService {
 	@Override
 	public void transferOwnership(Long roomIdx, Long newOwnerIdx) {
 		mapper.transferOwnership(roomIdx, newOwnerIdx);
+	}
+
+	@Override
+	@Transactional
+	public void transferAndLeave(Long roomIdx, Long currentOwnerIdx, Long newOwnerIdx) {
+		mapper.transferOwnership(roomIdx, newOwnerIdx);
+		mapper.leaveChannel(roomIdx, currentOwnerIdx);
 	}
 
 	@Override

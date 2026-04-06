@@ -519,19 +519,21 @@ function showToast(msg, type) {
         div.addEventListener('click', function() {
             window.switchRoom(Number(this.dataset.roomidx), this.dataset.roomname, 'channel');
         });
-        if (CHAT_MY_LEVEL >= 99) {
-            var btn = document.createElement('button');
-            btn.className = 'channel-manage-btn';
-            btn.dataset.roomidx  = roomIdx;
-            btn.dataset.roomname = roomName;
-            btn.title = '채널 관리';
-            btn.innerHTML = '<i class="ri-settings-3-line"></i>';
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                if (typeof openManageModal === 'function') openManageModal(Number(this.dataset.roomidx), this.dataset.roomname);
-            });
-            div.appendChild(btn);
-        }
+        var btn = document.createElement('button');
+        btn.className = 'channel-manage-btn';
+        btn.dataset.roomidx  = roomIdx;
+        btn.dataset.roomname = roomName;
+        btn.dataset.type     = 'channel';
+        btn.dataset.muted    = '0';
+        btn.title = '설정';
+        btn.innerHTML = '<i class="ri-settings-3-line"></i>';
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (typeof openManageModal === 'function') {
+                openManageModal(Number(this.dataset.roomidx), this.dataset.roomname, this.dataset.type || 'channel', this.dataset.muted);
+            }
+        });
+        div.appendChild(btn);
         list.appendChild(div);
     }
     function openDmModal() {
@@ -775,17 +777,44 @@ function showToast(msg, type) {
     var manageRoomIdx    = null;
     var manageRoomName   = null;
     var manageCreatorIdx = null;
-    function openManageModal(roomIdx, roomName) {
+    function openManageModal(roomIdx, roomName, roomType, isMuted) {
         manageRoomIdx    = roomIdx;
         manageRoomName   = roomName;
         manageCreatorIdx = null;
-        if (typeof CHAT_MY_LEVEL !== 'undefined' && CHAT_MY_LEVEL >= 99) {
-            document.getElementById('manageChannelName').textContent = '# ' + roomName;
+
+        var isDm = (roomType === 'dm');
+
+        /* ── 헤더 아이콘·제목 ── */
+        var icon = document.getElementById('manageChannelIcon');
+        if (icon) { icon.className = isDm ? 'ri-message-3-line' : 'ri-hashtag'; }
+        document.getElementById('manageChannelName').textContent = (isDm ? '' : '# ') + roomName;
+
+        /* ── 탭 행: DM이면 숨김 ── */
+        var tabsRow = document.getElementById('manageTabsRow');
+        if (tabsRow) tabsRow.style.display = isDm ? 'none' : '';
+
+        /* ── 이름 변경 섹션: 기본 숨김, 방장 확인 후 표시 ── */
+        var renameSection = document.getElementById('renameSection');
+        if (renameSection) renameSection.style.display = 'none';
+        if (!isDm && document.getElementById('renameChannelInput')) {
             document.getElementById('renameChannelInput').value = roomName;
-            switchManageTab('members');
-            document.getElementById('channelManageOverlay').style.display = 'flex';
-            loadChannelMembers(roomIdx);
         }
+
+        /* ── 뮤트 버튼 초기 상태 ── */
+        var muteBtn = document.getElementById('muteToggleBtn');
+        if (muteBtn) {
+            var muted = (isMuted === 1 || isMuted === '1' || isMuted === true);
+            muteBtn.innerHTML = muted
+                ? '<i class="ri-notification-off-line" style="font-size:16px;"></i> 알림 켜기'
+                : '<i class="ri-notification-3-line" style="font-size:16px;"></i> 알림 끄기';
+            muteBtn.style.color       = muted ? 'var(--color-orange)' : '';
+            muteBtn.style.borderColor = muted ? 'var(--color-orange)' : '';
+        }
+
+        /* ── 탭 전환 ── */
+        switchManageTab(isDm ? 'settings' : 'members');
+        document.getElementById('channelManageOverlay').style.display = 'flex';
+        if (!isDm) loadChannelMembers(roomIdx);
     }
     window.openManageModal = openManageModal;
     function closeManageModal() {
@@ -819,13 +848,25 @@ function showToast(msg, type) {
             })
             .then(function(d) {
                 if (!d.success) {
-                    if (currentEl) currentEl.innerHTML = '<p style="font-size:12px;color:var(--color-red);padding:8px 0;">권한이 없거나 오류가 발생했습니다.</p>';
+                    if (currentEl) currentEl.innerHTML = '<p style="font-size:12px;color:var(--color-red);padding:8px 0;">멤버 목록을 불러오지 못했습니다.</p>';
                     if (nonEl)     nonEl.innerHTML     = '';
                     return;
                 }
                 manageCreatorIdx = d.creatorIdx != null ? Number(d.creatorIdx) : null;
                 renderCurrentMembers(d.members, roomIdx);
-                renderNonMembers(d.nonMembers, roomIdx);
+
+                // 멤버 추가 섹션: 관리자(방장)만 표시
+                var addLabelEls = document.querySelectorAll('#manageTabMembers p');
+                var addLabel = addLabelEls.length > 1 ? addLabelEls[addLabelEls.length - 1] : null;
+                var hasNonMembers = Array.isArray(d.nonMembers);
+                if (addLabel) addLabel.style.display = hasNonMembers ? '' : 'none';
+                if (nonEl)    nonEl.style.display    = hasNonMembers ? '' : 'none';
+                if (hasNonMembers) renderNonMembers(d.nonMembers, roomIdx);
+
+                /* 방장이면 채널 이름 변경 섹션 표시 */
+                var amIOwner = (manageCreatorIdx !== null && Number(manageCreatorIdx) === Number(CHAT_MY_IDX));
+                var renameSection = document.getElementById('renameSection');
+                if (renameSection) renameSection.style.display = amIOwner ? '' : 'none';
             })
             .catch(function(err) {
                 console.error('[채널멤버] 로드 실패:', err);
@@ -1020,27 +1061,31 @@ function showToast(msg, type) {
             if (typeof showToast === 'function') showToast('위임할 멤버를 선택해 주세요.', 'error');
             return;
         }
-        fetch(CHAT_CTX + '/admin/chat/channel/' + manageRoomIdx + '/transfer', {
+        var roomIdx = manageRoomIdx;
+        // transfer + leave를 서버에서 하나의 트랜잭션으로 처리
+        fetch(CHAT_CTX + '/admin/chat/channel/' + roomIdx + '/transfer-and-leave', {
             method: 'POST', credentials: 'same-origin',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
             body: 'newOwnerIdx=' + newOwner
-        }).then(function(r) { return r.json(); }).then(function(d) {
-            if (!d.success) {
-                if (typeof showToast === 'function') showToast(d.msg || '위임에 실패했습니다.', 'error');
-                return;
-            }
-            return fetch(CHAT_CTX + '/admin/chat/channel/' + manageRoomIdx + '/leave', {
-                method: 'POST', credentials: 'same-origin',
-                headers: { 'Accept': 'application/json' }
-            });
-        }).then(function(r) { return r && r.json(); }).then(function(d) {
-            if (d && d.success) {
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.success) {
                 document.getElementById('transferOwnerOverlay').style.display = 'none';
-                var item = document.querySelector('.channel-item[data-roomidx="' + manageRoomIdx + '"]');
+                var item = document.querySelector('.channel-item[data-roomidx="' + roomIdx + '"]');
                 if (item) item.remove();
                 closeManageModal();
-                if (manageRoomIdx === CHAT_ROOM_IDX) window.location.href = CHAT_CTX + '/admin/chat';
+                if (roomIdx === CHAT_ROOM_IDX) {
+                    window.location.href = CHAT_CTX + '/admin/chat';
+                } else {
+                    if (typeof showToast === 'function') showToast('방장을 위임하고 채널을 나갔습니다.', 'success');
+                }
+            } else {
+                if (typeof showToast === 'function') showToast(d.msg || '위임에 실패했습니다.', 'error');
             }
+        })
+        .catch(function() {
+            if (typeof showToast === 'function') showToast('서버 오류가 발생했습니다.', 'error');
         });
     };
     // ── 누락된 함수: 브라우저 팝업 알림 권한 요청 ──────────────────
@@ -1101,6 +1146,19 @@ function showToast(msg, type) {
             try { localStorage.setItem('batonAdminChatMuted', _isMutedForNotif ? '1' : '0'); } catch(e) {}
         }
     }
+    // ── 페이지 로드 시 뮤트된 채널 사이드바 시각화 ────────────────
+    (function initMutedChannelIcons() {
+        document.querySelectorAll('.channel-item[data-muted="1"]').forEach(function(roomItem) {
+            roomItem.classList.add('muted');
+            var nameEl = roomItem.querySelector('.chat-room-name');
+            if (nameEl && !nameEl.querySelector('.mute-icon')) {
+                var muteIcon = document.createElement('i');
+                muteIcon.className = 'ri-notification-off-line mute-icon';
+                muteIcon.title = '알림 꺼짐';
+                nameEl.appendChild(muteIcon);
+            }
+        });
+    })();
     // ─────────────────────────────────────────────────────────────
     window.doToggleMute = function() {
         if (!manageRoomIdx) return;
@@ -1119,10 +1177,22 @@ function showToast(msg, type) {
                     btn.style.color      = isMuted ? 'var(--color-orange)' : 'var(--text-sub)';
                     btn.style.borderColor = isMuted ? 'var(--color-orange)' : 'var(--border-color)';
                 }
-                var inlineBtn = document.querySelector('.channel-mute-btn[data-roomidx="' + manageRoomIdx + '"]');
-                if (inlineBtn) {
-                    inlineBtn.innerHTML = isMuted ? '<i class="ri-notification-off-line"></i>' : '<i class="ri-notification-3-line"></i>';
-                    inlineBtn.classList.toggle('muted', isMuted);
+                /* 사이드바 설정 버튼 data-muted 갱신 + 채널 항목 시각적 표시 */
+                var manageBtn = document.querySelector('.channel-manage-btn[data-roomidx="' + manageRoomIdx + '"]');
+                if (manageBtn) manageBtn.dataset.muted = isMuted ? '1' : '0';
+                var roomItem = document.querySelector('.channel-item[data-roomidx="' + manageRoomIdx + '"]');
+                if (roomItem) {
+                    roomItem.classList.toggle('muted', isMuted);
+                    var existingIcon = roomItem.querySelector('.mute-icon');
+                    if (isMuted && !existingIcon) {
+                        var muteIcon = document.createElement('i');
+                        muteIcon.className = 'ri-notification-off-line mute-icon';
+                        muteIcon.title = '알림 꺼짐';
+                        var nameEl = roomItem.querySelector('.chat-room-name');
+                        if (nameEl) nameEl.appendChild(muteIcon);
+                    } else if (!isMuted && existingIcon) {
+                        existingIcon.remove();
+                    }
                 }
                 if (typeof showToast === 'function') showToast(isMuted ? '알림이 꺼졌습니다.' : '알림이 켜졌습니다.', 'info');
             }
@@ -1195,7 +1265,12 @@ function showToast(msg, type) {
     document.querySelectorAll('.channel-manage-btn').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
-            openManageModal(Number(this.dataset.roomidx), this.dataset.roomname);
+            openManageModal(
+                Number(this.dataset.roomidx),
+                this.dataset.roomname,
+                this.dataset.type || 'channel',
+                this.dataset.muted
+            );
         });
     });
     document.querySelectorAll('.channel-manage-tab').forEach(function(btn) {

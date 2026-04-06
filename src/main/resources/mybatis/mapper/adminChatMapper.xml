@@ -27,7 +27,7 @@
             ) AS unreadCount,
             NVL(cm.isMuted, 0) AS isMuted
         FROM chatRoom cr
-        LEFT JOIN chatMember cm ON cr.roomIdx = cm.roomIdx AND cm.userIdx = #{myUserIdx}
+        JOIN chatMember cm ON cr.roomIdx = cm.roomIdx AND cm.userIdx = #{myUserIdx}
         WHERE cr.roomType = 2
         ORDER BY cr.roomIdx ASC
     </select>

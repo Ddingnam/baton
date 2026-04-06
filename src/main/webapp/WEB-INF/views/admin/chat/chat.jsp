@@ -57,15 +57,14 @@
                             <span class="chat-room-hash"><i class="ri-hashtag"></i></span>
                             <span class="chat-room-name">${room.roomName}</span>
                             <div class="channel-item-actions">
-                                <button class="channel-mute-btn ${room.isMuted == 1 ? 'muted' : ''}" data-roomidx="${room.roomIdx}" title="알림 끄기/켜기"
-                                        onclick="event.stopPropagation(); toggleMuteInline(${room.roomIdx}, this)">
-                                    <i class="${room.isMuted == 1 ? 'ri-notification-off-line' : 'ri-notification-3-line'}"></i>
+                                <button class="channel-manage-btn"
+                                        data-roomidx="${room.roomIdx}"
+                                        data-roomname="${room.roomName}"
+                                        data-type="channel"
+                                        data-muted="${room.isMuted}"
+                                        title="설정">
+                                    <i class="ri-settings-3-line"></i>
                                 </button>
-                                <c:if test="${myUserLevel >= 99}">
-                                    <button class="channel-manage-btn" data-roomidx="${room.roomIdx}" data-roomname="${room.roomName}" title="채널 관리">
-                                        <i class="ri-settings-3-line"></i>
-                                    </button>
-                                </c:if>
                             </div>
                         </div>
                     </c:forEach>
@@ -105,9 +104,13 @@
                                 </c:if>
                             </div>
                             <div class="channel-item-actions">
-                                <button class="channel-mute-btn dm-mute-btn" data-roomidx="${dm.roomIdx}" title="알림 끄기/켜기"
-                                        onclick="event.stopPropagation(); toggleMuteInline(${dm.roomIdx}, this)">
-                                    <i class="ri-notification-3-line"></i>
+                                <button class="channel-manage-btn"
+                                        data-roomidx="${dm.roomIdx}"
+                                        data-roomname="${dm.nickname}"
+                                        data-type="dm"
+                                        data-muted="${dm.isMuted}"
+                                        title="설정">
+                                    <i class="ri-settings-3-line"></i>
                                 </button>
                                 <button class="dm-leave-btn" onclick="event.stopPropagation(); leaveDM(${dm.roomIdx})" title="나가기">×</button>
                             </div>
@@ -400,15 +403,14 @@
     <div class="chat-modal" style="width:520px;">
         <div class="chat-modal-head">
             <div style="display:flex;align-items:center;gap:8px;">
-                <i class="ri-hashtag" style="color:var(--color-purple);"></i>
-                <span id="manageChannelName">채널 관리</span>
-                <span style="font-size:11px;font-weight:700;background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;padding:2px 8px;border-radius:20px;">ADMIN</span>
+                <i id="manageChannelIcon" class="ri-hashtag" style="color:var(--color-purple);"></i>
+                <span id="manageChannelName">채널 설정</span>
             </div>
             <button class="chat-modal-close" id="channelManageClose"><i class="ri-close-line"></i></button>
         </div>
         <div class="chat-modal-body" style="padding:0;">
 
-            <div style="display:flex;border-bottom:1px solid var(--border-color);">
+            <div id="manageTabsRow" style="display:flex;border-bottom:1px solid var(--border-color);">
                 <button class="channel-manage-tab active" data-tab="members" style="flex:1;padding:12px;border:none;background:none;font-size:13px;font-weight:700;color:var(--color-purple);border-bottom:2px solid var(--color-purple);cursor:pointer;">멤버 관리</button>
                 <button class="channel-manage-tab" data-tab="settings" style="flex:1;padding:12px;border:none;background:none;font-size:13px;font-weight:600;color:var(--text-sub);cursor:pointer;">채널 설정</button>
             </div>
@@ -422,6 +424,7 @@
 
             <div id="manageTabSettings" style="padding:20px;display:none;">
 
+                <div id="renameSection">
                 <p style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light);margin-bottom:12px;">채널 이름 변경</p>
                 <div style="display:flex;gap:8px;margin-bottom:20px;">
                     <div class="chat-modal-input-wrap" style="flex:1;margin:0;">
@@ -431,6 +434,7 @@
                     <button onclick="doRenameChannel()" style="padding:0 18px;border-radius:10px;border:none;background:var(--grad-primary);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;">
                         변경
                     </button>
+                </div>
                 </div>
 
                 <p style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light);margin-bottom:6px;">알림</p>
@@ -478,12 +482,6 @@
                     </button>
                 </div>
 
-                <p style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light);margin-bottom:12px;">위험 구역</p>
-                <button onclick="doDeleteChannel()" class="settings-action-btn" style="width:100%;"
-                    onmouseover="this.style.background='#FEF2F2';this.style.color='#EF4444';this.style.borderColor='#FCA5A5';"
-                    onmouseout="this.style.background='';this.style.color='';this.style.borderColor='';">
-                    <i class="ri-delete-bin-line"></i> 채널 삭제
-                </button>
             </div>
         </div>
     </div>

@@ -675,6 +675,19 @@
 }
 .channel-mute-btn:hover { color: var(--color-purple); transform: scale(1.15); }
 .channel-mute-btn.muted { color: var(--color-orange, #F97316); }
+
+/* 알림 꺼진 채널 - 사이드바 시각적 표시 */
+.chat-room-item.muted .chat-room-name { color: var(--text-light); }
+.chat-room-item.muted .chat-room-hash { color: var(--text-light); opacity: 0.6; }
+.chat-room-item.muted .mute-icon {
+    display: inline-flex !important;
+    align-items: center;
+    font-size: 11px;
+    color: var(--color-orange, #F97316);
+    margin-left: 4px;
+    opacity: 0.85;
+}
+.mute-icon { display: none; }
 .chat-room-item.active .channel-mute-btn { color: rgba(255,255,255,0.7); }
 .chat-room-item.active .channel-mute-btn:hover { color: #fff; }
 

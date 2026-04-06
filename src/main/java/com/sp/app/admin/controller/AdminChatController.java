@@ -179,15 +179,21 @@ public class AdminChatController {
 	public Map<String, Object> getChannelMembers(@PathVariable("roomIdx") Long roomIdx,
 			@AuthenticationPrincipal CustomUserDetails userDetails) {
 		Map<String, Object> result = new HashMap<>();
-		if (userDetails.getUserLevel() < 99) {
+		if (userDetails == null) {
 			result.put("success", false);
 			return result;
 		}
 		result.put("success", true);
 		result.put("members", adminChatService.listChannelMembers(roomIdx));
-		result.put("nonMembers", adminChatService.listNonMembers(roomIdx));
 		try {
-			result.put("creatorIdx", adminChatService.getChannelCreator(roomIdx));
+			Long creatorIdx = adminChatService.getChannelCreator(roomIdx);
+			result.put("creatorIdx", creatorIdx);
+			// 방장 또는 관리자만 nonMembers(멤버 추가 목록) 제공
+			boolean isOwnerOrAdmin = userDetails.getUserLevel() >= 99
+					|| (creatorIdx != null && creatorIdx.equals(userDetails.getUserIdx()));
+			if (isOwnerOrAdmin) {
+				result.put("nonMembers", adminChatService.listNonMembers(roomIdx));
+			}
 		} catch (Exception e) {
 			result.put("creatorIdx", null);
 		}
@@ -199,11 +205,15 @@ public class AdminChatController {
 	public Map<String, Object> addMember(@PathVariable("roomIdx") Long roomIdx, @RequestParam("userIdx") Long userIdx,
 			@AuthenticationPrincipal CustomUserDetails userDetails) {
 		Map<String, Object> result = new HashMap<>();
-		if (userDetails.getUserLevel() < 99) {
-			result.put("success", false);
-			return result;
-		}
 		try {
+			Long creatorIdx = adminChatService.getChannelCreator(roomIdx);
+			boolean isOwnerOrAdmin = userDetails.getUserLevel() >= 99
+					|| (creatorIdx != null && creatorIdx.equals(userDetails.getUserIdx()));
+			if (!isOwnerOrAdmin) {
+				result.put("success", false);
+				result.put("msg", "방장만 멤버를 추가할 수 있습니다.");
+				return result;
+			}
 			adminChatService.addMemberToChannel(roomIdx, userIdx);
 			result.put("success", true);
 		} catch (Exception e) {
@@ -217,10 +227,6 @@ public class AdminChatController {
 	public Map<String, Object> removeMember(@PathVariable("roomIdx") Long roomIdx,
 			@RequestParam("userIdx") Long userIdx, @AuthenticationPrincipal CustomUserDetails userDetails) {
 		Map<String, Object> result = new HashMap<>();
-		if (userDetails.getUserLevel() < 99) {
-			result.put("success", false);
-			return result;
-		}
 		if (userIdx.equals(userDetails.getUserIdx())) {
 			result.put("success", false);
 			result.put("msg", "본인은 강퇴할 수 없습니다.");
