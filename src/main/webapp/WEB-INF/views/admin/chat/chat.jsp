@@ -236,7 +236,7 @@
                         </c:if>
                         <c:choose>
                             <c:when test="${chat.userIdx.toString() == myUserIdx.toString()}">
-                                <div class="chat-msg-group mine">
+                                <div class="chat-msg-group mine" data-msgidx="${chat.msgIdx}">
                                     <div class="chat-msg-body">
                                         <div class="chat-msg-meta right">
                                             <span class="chat-msg-time">${msgTime}</span>
@@ -275,7 +275,7 @@
                                 </div>
                             </c:when>
                             <c:otherwise>
-                                <div class="chat-msg-group">
+                                <div class="chat-msg-group" data-msgidx="${chat.msgIdx}">
                                     <div class="chat-avt theme-recv-${myTheme}" data-uid="${chat.userIdx}">
                                         <c:choose>
                                             <c:when test="${not empty chat.profilePhoto}">
@@ -333,9 +333,9 @@
                         </div>
                         <input type="file" id="imageInput" style="display:none;" accept="image/*">
                         <input type="file" id="fileInput" style="display:none;">
-                        <input type="text" class="chat-input" id="chatInput"
+                        <textarea class="chat-input" id="chatInput" rows="1"
                                placeholder="<c:choose><c:when test='${currentRoomType == &quot;dm&quot;}'>${currentRoomName}에게 메시지 보내기</c:when><c:otherwise>#${currentRoomName}에 메시지 보내기</c:otherwise></c:choose>"
-                               autocomplete="off" autofocus maxlength="500">
+                               autocomplete="off" autofocus maxlength="500"></textarea>
                         <div class="chat-input-right">
                             <span class="char-counter" id="charCounter" style="display:none;"></span>
                             <button class="chat-emoji-btn" id="emojiBtn" title="이모지">
@@ -479,6 +479,16 @@
                         onmouseover="this.style.background='var(--grad-primary)';this.style.color='#fff';this.style.borderColor='transparent';"
                         onmouseout="this.style.background='';this.style.color='';this.style.borderColor='';">
                         <i class="ri-logout-box-r-line" style="font-size:16px;"></i> 채널 나가기
+                    </button>
+                </div>
+
+                <div id="deleteChannelSection" style="display:none;">
+                    <p style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light);margin-bottom:6px;">위험 구역</p>
+                    <p style="font-size:11px;color:var(--text-light);margin-bottom:10px;">채널을 삭제하면 모든 메시지가 영구적으로 삭제됩니다.</p>
+                    <button onclick="doDeleteChannel()" class="settings-action-btn" style="width:100%;"
+                        onmouseover="this.style.background='#FEF2F2';this.style.color='#EF4444';this.style.borderColor='#FECACA';"
+                        onmouseout="this.style.background='';this.style.color='';this.style.borderColor='';">
+                        <i class="ri-delete-bin-line" style="font-size:16px;"></i> 채널 삭제
                     </button>
                 </div>
 

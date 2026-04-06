@@ -265,6 +265,7 @@ function showToast(msg, type) {
 	    }));
 
 	    chatInput.value = '';
+	    chatInput.style.height = 'auto';
 	    charCounter.style.display = 'none';
 	    chatInput.focus();
 	    stopTypingSignal();
@@ -553,15 +554,16 @@ function showToast(msg, type) {
     document.getElementById('chatSend').addEventListener('click', sendMessage);
     chatInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-        }
-    });
-    chatInput.addEventListener('keyup', function (e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
             if (e.isComposing || e.keyCode === 229) return;
+            e.preventDefault();
             sendMessage();
         }
     });
+    function autoResizeChatInput() {
+        chatInput.style.height = 'auto';
+        chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+    }
+    chatInput.addEventListener('input', autoResizeChatInput);
     chatInput.addEventListener('input', function () {
         const len = this.value.length;
         if (len > 0) {
@@ -796,6 +798,8 @@ function showToast(msg, type) {
         /* ── 이름 변경 섹션: 기본 숨김, 방장 확인 후 표시 ── */
         var renameSection = document.getElementById('renameSection');
         if (renameSection) renameSection.style.display = 'none';
+        var deleteSection = document.getElementById('deleteChannelSection');
+        if (deleteSection) deleteSection.style.display = 'none';
         if (!isDm && document.getElementById('renameChannelInput')) {
             document.getElementById('renameChannelInput').value = roomName;
         }
@@ -867,6 +871,8 @@ function showToast(msg, type) {
                 var amIOwner = (manageCreatorIdx !== null && Number(manageCreatorIdx) === Number(CHAT_MY_IDX));
                 var renameSection = document.getElementById('renameSection');
                 if (renameSection) renameSection.style.display = amIOwner ? '' : 'none';
+                var deleteSection = document.getElementById('deleteChannelSection');
+                if (deleteSection) deleteSection.style.display = amIOwner ? '' : 'none';
             })
             .catch(function(err) {
                 console.error('[채널멤버] 로드 실패:', err);
@@ -1112,28 +1118,60 @@ function showToast(msg, type) {
             }
         });
     };
-    // ── 누락된 함수: 내 화면 채팅 지우기 ──────────────────────────
+    // ── localStorage key helper ────────────────────────────────
+    function getClearKey() {
+        return 'batonChatClear_u' + CHAT_MY_IDX + '_r' + CHAT_ROOM_IDX;
+    }
+    // 페이지 로드 시: 저장된 clearUntil 이하 메시지 숨김
+    (function applyClearOnLoad() {
+        try {
+            var clearUntil = parseInt(localStorage.getItem(getClearKey()) || '0', 10);
+            if (!clearUntil) return;
+            document.querySelectorAll('.chat-msg-group[data-msgidx]').forEach(function(el) {
+                if (parseInt(el.dataset.msgidx, 10) <= clearUntil) el.style.display = 'none';
+            });
+            // 메시지가 없는 날짜 구분선도 숨김
+            document.querySelectorAll('.chat-date-divider').forEach(function(div) {
+                var visibleMsg = false;
+                var sibling = div.nextElementSibling;
+                while (sibling && !sibling.classList.contains('chat-date-divider')) {
+                    if (sibling.style.display !== 'none' && sibling.classList.contains('chat-msg-group')) {
+                        visibleMsg = true; break;
+                    }
+                    sibling = sibling.nextElementSibling;
+                }
+                if (!visibleMsg) div.style.display = 'none';
+            });
+        } catch(e) {}
+    })();
+    // ── 내 화면 채팅 지우기 ──────────────────────────────────────
     window.doClearMyMessages = function() {
+        var doIt = function() {
+            var chatArea = document.getElementById('chatArea');
+            if (!chatArea) return;
+            var maxIdx = 0;
+            chatArea.querySelectorAll('.chat-msg-group[data-msgidx]').forEach(function(el) {
+                var idx = parseInt(el.dataset.msgidx, 10);
+                if (idx > maxIdx) maxIdx = idx;
+                el.style.display = 'none';
+            });
+            chatArea.querySelectorAll('.chat-date-divider').forEach(function(el) { el.style.display = 'none'; });
+            if (maxIdx > 0) {
+                try { localStorage.setItem(getClearKey(), String(maxIdx)); } catch(e) {}
+            }
+            if (typeof showToast === 'function') showToast('내 화면의 채팅을 지웠습니다.', 'success');
+        };
         if (typeof window._batonConfirm === 'function') {
             window._batonConfirm({
                 icon: '<i class="ri-eraser-fill" style="color:#fff;"></i>',
                 iconBg: 'linear-gradient(135deg,#F97316,#FB923C)',
                 title: '내 화면 채팅 지우기',
-                desc: '채팅 내용을 내 화면에서만 지웁니다. 새로고침하면 다시 보입니다.',
+                desc: '채팅 내용을 내 화면에서만 지웁니다. 새로고침해도 유지됩니다.',
                 okLabel: '지우기',
                 okBg: '#F97316'
-            }, function() {
-                var chatArea = document.getElementById('chatArea');
-                if (!chatArea) return;
-                var msgs = chatArea.querySelectorAll('.chat-msg-group, .chat-date-divider');
-                msgs.forEach(function(el) { el.remove(); });
-                if (typeof showToast === 'function') showToast('내 화면의 채팅을 지웠습니다.', 'success');
-            });
+            }, doIt);
         } else {
-            if (confirm('채팅 내용을 내 화면에서만 지우시겠습니까?')) {
-                var chatArea = document.getElementById('chatArea');
-                if (chatArea) chatArea.querySelectorAll('.chat-msg-group, .chat-date-divider').forEach(function(el){ el.remove(); });
-            }
+            if (confirm('채팅 내용을 내 화면에서만 지우시겠습니까?')) doIt();
         }
     };
     // ── 뮤트 초기 상태 로드 ───────────────────────────────────────

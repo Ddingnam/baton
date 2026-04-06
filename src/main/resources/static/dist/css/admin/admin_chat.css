@@ -398,6 +398,8 @@
     flex: 1; background: none; border: none;
     font-family: inherit; font-size: 14px; font-weight: 500;
     color: var(--text-main); outline: none;
+    resize: none; overflow-y: auto; line-height: 1.5;
+    max-height: 120px; min-height: 21px; padding: 0;
 }
 .chat-input::placeholder { color: var(--text-light); }
 

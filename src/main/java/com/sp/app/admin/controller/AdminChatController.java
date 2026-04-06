@@ -343,16 +343,41 @@ public class AdminChatController {
 		return result;
 	}
 
+	@PostMapping(value = "/chat/channel/{roomIdx}/transfer-and-leave", produces = "application/json")
+	@ResponseBody
+	public Map<String, Object> transferAndLeave(@PathVariable("roomIdx") Long roomIdx,
+			@RequestParam("newOwnerIdx") Long newOwnerIdx, @AuthenticationPrincipal CustomUserDetails userDetails) {
+		Map<String, Object> result = new HashMap<>();
+		try {
+			Long creatorIdx = adminChatService.getChannelCreator(roomIdx);
+			if (creatorIdx == null || !creatorIdx.equals(userDetails.getUserIdx())) {
+				result.put("success", false);
+				result.put("msg", "방장만 위임할 수 있습니다.");
+				return result;
+			}
+			adminChatService.transferAndLeave(roomIdx, userDetails.getUserIdx(), newOwnerIdx);
+			result.put("success", true);
+		} catch (Exception e) {
+			result.put("success", false);
+			result.put("msg", "위임에 실패했습니다.");
+		}
+		return result;
+	}
+
 	@PostMapping(value = "/chat/channel/{roomIdx}/delete", produces = "application/json")
 	@ResponseBody
 	public Map<String, Object> deleteChannel(@PathVariable("roomIdx") Long roomIdx,
 			@AuthenticationPrincipal CustomUserDetails userDetails) {
 		Map<String, Object> result = new HashMap<>();
-		if (userDetails.getUserLevel() < 99) {
-			result.put("success", false);
-			return result;
-		}
 		try {
+			Long creatorIdx = adminChatService.getChannelCreator(roomIdx);
+			boolean isOwner = creatorIdx != null && creatorIdx.equals(userDetails.getUserIdx());
+			boolean isAdmin = userDetails.getUserLevel() >= 99;
+			if (!isOwner && !isAdmin) {
+				result.put("success", false);
+				result.put("msg", "방장 또는 관리자만 채널을 삭제할 수 있습니다.");
+				return result;
+			}
 			adminChatService.deleteChannel(roomIdx);
 			result.put("success", true);
 		} catch (Exception e) {

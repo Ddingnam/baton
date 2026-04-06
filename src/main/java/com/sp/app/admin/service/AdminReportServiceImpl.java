@@ -1,15 +1,16 @@
 package com.sp.app.admin.service;
 
-import com.sp.app.admin.domain.dto.ReportDto;
-import com.sp.app.admin.mapper.AdminReportMapper;
-import com.sp.app.service.NotificationService;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.sp.app.admin.domain.dto.ReportDto;
+import com.sp.app.admin.mapper.AdminReportMapper;
+import com.sp.app.service.NotificationService;
 
 @Service
 public class AdminReportServiceImpl implements AdminReportService {
@@ -19,9 +20,6 @@ public class AdminReportServiceImpl implements AdminReportService {
 
     @Autowired
     private AdminMemberService adminMemberService;
-
-    @Autowired
-    private AdminNotificationService adminNotificationService;
 
     @Autowired
     private NotificationService notificationService;
