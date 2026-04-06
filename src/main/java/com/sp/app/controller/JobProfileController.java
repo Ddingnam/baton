@@ -9,6 +9,7 @@ import com.sp.app.mail.Mail;
 import com.sp.app.mail.MailSender;
 import com.sp.app.model.JobProfile;
 import com.sp.app.service.JobProfileService;
+import com.sp.app.service.JobPostingService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,9 @@ public class JobProfileController {
 
     private final JobProfileService jobProfileService;
     private final MailSender mailSender;
+    private final JobPostingService jobPostingService;
 
+    
     @GetMapping("/write")
     public String writeForm(HttpSession session, Model model) {
         SessionInfo info = (SessionInfo) session.getAttribute("member");
@@ -48,14 +51,30 @@ public class JobProfileController {
     public String myList(HttpSession session, Model model) {
         SessionInfo info = (SessionInfo) session.getAttribute("member");
         if (info == null) return "redirect:/member/login";
+
         try {
             List<JobProfile> list = jobProfileService.listJobProfile(info.getUserIdx());
             model.addAttribute("list", list);
+
+            int applyCount = jobPostingService.getMyApplyCount(info.getUserIdx());
+            int resultCount = jobPostingService.getMyApplyResultCount(info.getUserIdx());
+            int scrapCount = jobPostingService.getMyScrapCount(info.getUserIdx());
+
+            model.addAttribute("applyCount", applyCount);
+            model.addAttribute("resultCount", resultCount);
+            model.addAttribute("scrapCount", scrapCount);
+
         } catch (Exception e) {
             log.error("myList error", e);
+            model.addAttribute("applyCount", 0);
+            model.addAttribute("resultCount", 0);
+            model.addAttribute("scrapCount", 0);
         }
+
         return "resume/myList";
     }
+
+
 
     @GetMapping("/article/{profileIdx}")
     public String article(@PathVariable("profileIdx") long profileIdx,

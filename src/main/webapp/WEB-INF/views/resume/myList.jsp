@@ -112,23 +112,23 @@ body { background: var(--bg); font-family: 'Pretendard', sans-serif; }
     <div class="profile-stats">
 
 	  <div class="stat-item"
-	       onclick="location.href='${pageContext.request.contextPath}/mypage/main?tab=alba&inner=apply'">
-	    <div class="stat-title">지원 완료</div>
-	    <div class="stat-num highlight">3<span>건</span></div>
-	  </div>
+	     onclick="location.href='${pageContext.request.contextPath}/mypage/main?tab=alba&inner=apply'">
+	  <div class="stat-title">지원 완료</div>
+	  <div class="stat-num highlight">${applyCount}<span>건</span></div>
+	</div>
 	
-	  <div class="stat-item"
-       	   onclick="location.href='${pageContext.request.contextPath}/mypage/main?tab=alba&inner=apply'">
-	    <div class="stat-title">지원 결과</div>
-	    <div class="stat-num">1<span>건</span></div>
-	  </div>
+	<div class="stat-item"
+	     onclick="location.href='${pageContext.request.contextPath}/mypage/main?tab=alba&inner=apply'">
+	  <div class="stat-title">지원 결과</div>
+	  <div class="stat-num">${resultCount}<span>건</span></div>
+	</div>
 	
-	  <div class="stat-item"
-	       onclick="location.href='${pageContext.request.contextPath}/mypage/main?tab=alba&inner=wish'">
-	    <div class="stat-title">스크랩한 알바</div>
-	    <div class="stat-num">5<span>건</span></div>
-	  </div>
-	
+	<div class="stat-item"
+	     onclick="location.href='${pageContext.request.contextPath}/mypage/main?tab=alba&inner=wish'">
+	  <div class="stat-title">스크랩한 알바</div>
+	  <div class="stat-num">${scrapCount}<span>건</span></div>
+	</div>
+
 	</div>
   </div>
 

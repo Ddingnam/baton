@@ -10,4 +10,5 @@ public interface JobProfileService {
     JobProfile findById(long profileIdx) throws Exception;
     void updateJobProfile(JobProfile dto) throws Exception;
     void deleteJobProfile(long profileIdx) throws Exception;
+
 }

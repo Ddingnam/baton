@@ -18,7 +18,6 @@ public interface JobPostingMapper {
     void deletePosting(long postingIdx);
     
     void insertPostingImage(JobPostingImage dto);
-   // List<String> findImages(long postingIdx);
     List<JobPostingImage> listPostingImage(long postingIdx);
     void deleteImages(long postingIdx);
      
@@ -46,5 +45,10 @@ public interface JobPostingMapper {
 	List<JobApplyDto> listApplicantsByPosting(long postingIdx);
 	int updateStatusByOwner(Map<String,Object> map);
 	List<String> findImagesByPostingIdx(long postingIdx);
+	
+	int getMyApplyCount(long userIdx);
+	int getMyApplyResultCount(long userIdx);
+	int getMyScrapCount(long userIdx);
+
     
 }

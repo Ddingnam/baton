@@ -297,6 +297,28 @@
 	    FROM JOB_APPLY
 	    WHERE posting_idx = #{postingIdx}
 		</select>
+		
+		<select id="getMyApplyCount" parameterType="long" resultType="int">
+		    SELECT COUNT(*)
+		    FROM JOB_APPLY
+		    WHERE user_idx = #{userIdx}
+		</select>
+		
+		<select id="getMyApplyResultCount" parameterType="long" resultType="int">
+		    SELECT COUNT(*)
+		    FROM JOB_APPLY
+		    WHERE user_idx = #{userIdx}
+		      AND status IS NOT NULL
+		      AND status != '열람대기'
+		</select>
+
+		
+		<select id="getMyScrapCount" parameterType="long" resultType="int">
+		    SELECT COUNT(*)
+		    FROM job_scrap
+		    WHERE member_id = #{userIdx}
+		</select>
+		
 	
 
 </mapper>

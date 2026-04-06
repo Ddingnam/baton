@@ -33,4 +33,10 @@ public interface JobPostingService {
 
     List<JobApplyDto> listApplicantsByPosting(long postingIdx);
     List<JobPostingImage> listPostingImage(long postingIdx);
+    
+    int getMyApplyCount(long userIdx) throws Exception;
+    int getMyApplyResultCount(long userIdx) throws Exception;
+    int getMyScrapCount(long userIdx) throws Exception;
+
+
 }

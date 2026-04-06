@@ -255,5 +255,36 @@ public class JobPostingServiceImpl implements JobPostingService {
 	    }
 	    return list;
 	}
+
+	@Override
+	public int getMyApplyCount(long userIdx) throws Exception {
+	    try {
+	        return mapper.getMyApplyCount(userIdx);
+	    } catch (Exception e) {
+	        log.error("getMyApplyCount error", e);
+	        return 0;
+	    }
+	}
+
+	@Override
+	public int getMyApplyResultCount(long userIdx) throws Exception {
+	    try {
+	        return mapper.getMyApplyResultCount(userIdx);
+	    } catch (Exception e) {
+	        log.error("getMyApplyResultCount error", e);
+	        return 0;
+	    }
+	}
+
+	@Override
+	public int getMyScrapCount(long userIdx) throws Exception {
+	    try {
+	        return mapper.getMyScrapCount(userIdx);
+	    } catch (Exception e) {
+	        log.error("getMyScrapCount error", e);
+	        return 0;
+	    }
+	}
+
 	
 }
