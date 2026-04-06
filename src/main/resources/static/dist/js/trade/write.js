@@ -180,6 +180,27 @@ function useTradeWrite(shared) {
         if (data.imageList) data.imageList.forEach(img => existingFiles.value.push({ url: img.imgUrl, imgOrder: img.imgOrder }));
         if (data.tagList) tags.value = [...data.tagList];
     }
+	
+	const confirmModal = reactive({
+	    show: false,
+	    title: '',
+	    message: '',
+	    type: 'info',
+	    isConfirm: false,
+	    onConfirm: () => {}
+	});
+
+	const openModal = (title, message, type = 'info', isConfirm = false, onConfirm = null) => {
+	    confirmModal.title = title;
+	    confirmModal.message = message;
+	    confirmModal.type = type;
+	    confirmModal.isConfirm = isConfirm;
+	    confirmModal.onConfirm = () => {
+	        if (onConfirm) onConfirm();
+	        confirmModal.show = false;
+	    };
+	    confirmModal.show = true;
+	};
 
 	
 	async function initWrite(productIdx = null) {
@@ -196,16 +217,19 @@ function useTradeWrite(shared) {
 	    tempProductIdx.value = data.tempProductIdx || '';
 
 	    if (!productIdx && tempProductIdx.value) {
-	        nextTick(() => {
-	            if (confirm('작성 중인 임시저장 글이 있습니다. 불러오시겠습니까?')) {
-	                writeMode.value = 'write';
-	                currentProductIdx.value = tempProductIdx.value;
-
-	                fetch('/api/trade/updateData?productIdx=' + tempProductIdx.value)
-	                    .then(r => r.json())
-	                    .then(data => fillWForm(data));
-	            }
-	        });
+			openModal(
+				'임시저장 불러오기', 
+				'작성 중이던 게시글이 있습니다.<br>불러오시겠습니까?', 
+				'info', 
+				true, 
+			    () => {
+					writeMode.value = 'write';
+			        currentProductIdx.value = tempProductIdx.value;
+			        fetch('/api/trade/updateData?productIdx=' + tempProductIdx.value)
+						.then(r => r.json())
+			            .then(data => fillWForm(data));
+			    }
+			);
 	    } else if (productIdx) {
 	        const res = await fetch('/api/trade/updateData?productIdx=' + productIdx);
 	        fillWForm(await res.json());
@@ -381,7 +405,7 @@ function useTradeWrite(shared) {
     return {
         writeMode, currentProductIdx, tempProductIdx,
         catOpen, aiLoading, existingFiles, newFiles, newFilePreviews, deletedImgOrders,
-        tags, tagInput, wForm, totalImgCount, selectedCatName, initWrite, 
+        tags, tagInput, wForm, totalImgCount, selectedCatName, confirmModal, initWrite, 
 		isFree, priceDisplay, isShippingFree, shippingDisplay, onlyNumberKey, validateNumber, validatePrice, selectCat, onFileChange, removeExisting, removeNew, 
         addTag, removeTag, onTagBackspace, aiGenerate, submitForm
     };

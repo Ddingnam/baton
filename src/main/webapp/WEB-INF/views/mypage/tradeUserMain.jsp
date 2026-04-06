@@ -32,10 +32,10 @@
 					<div class="pb-avatar"><i class="ri-user-smile-fill"></i></div>
 					<div class="pb-info">
 						<h2 class="pb-name">${dto.nickname} 님</h2>
-						<span class="pb-desc">${region.dong} · 매너온도 <strong class="theme-text">${dto.score}℃</strong></span>
+						<span class="pb-desc">${region.dong} · 매너온도 <strong class="theme-text">${dto.batonDistance}℃</strong></span>
 						<div class="manner-bar-wrap">
 							<div class="manner-bar-bg">
-								<div class="manner-bar-fill theme-bg" style="width: ${dto.score}%"></div>
+								<div class="manner-bar-fill theme-bg" style="width: ${dto.batonDistance}%"></div>
 							</div>
 						</div>
 					</div>
@@ -59,12 +59,12 @@
 					<div class="stat-grid">
 						<div class="stat-box">
 							<div class="stat-icon theme-icon-bg"><i class="ri-chat-3-line"></i></div>
-							<strong>${dto.score} 점</strong>
+							<strong>${dto.batonDistance} 점</strong>
 							<span>평점</span>
 						</div>
 						<div class="stat-box">
 							<div class="stat-icon theme-icon-bg"><i class="ri-bookmark-line"></i></div>
-							<strong>0 개</strong>
+							<strong>${fn:length(tradeList)} 개</strong>
 							<span>거래내역</span>
 						</div>
 						<div class="stat-box">

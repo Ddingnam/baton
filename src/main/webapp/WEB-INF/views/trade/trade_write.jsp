@@ -182,5 +182,25 @@
                 </div>
             </div>
         </form>
+        
+        <div v-if="confirmModal.show" class="custom-modal-overlay" @click.self="confirmModal.show = false">
+		    <div class="custom-modal-content">
+		        <div class="modal-body">
+		            <div class="modal-icon-circle" :class="confirmModal.type">
+		                <i v-if="confirmModal.type === 'danger'" class="ri-error-warning-line"></i>
+		                <i v-else-if="confirmModal.type === 'success'" class="ri-check-line"></i>
+		                <i v-else class="ri-information-line"></i>
+		            </div>
+		            <h3 class="modal-title">{{ confirmModal.title }}</h3>
+		            <p class="modal-message" v-html="confirmModal.message"></p>
+		        </div>
+		        <div class="modal-footer">
+		            <button v-if="confirmModal.isConfirm" class="btn-modal-secondary" @click="confirmModal.show = false">취소</button>
+		            <button class="btn-modal-primary" :class="confirmModal.type" @click="confirmModal.onConfirm">확인</button>
+		        </div>
+		    </div>
+		</div>
+        
+        
     </div>
 </template>
