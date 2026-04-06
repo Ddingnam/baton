@@ -15,4 +15,6 @@ public interface AdminReportMapper {
     public void updateProcessStatus(Map<String, Object> map);
     public Long getReportedUserIdx(@Param("reportIdx") Long reportIdx);
     public Long getReporterIdx(@Param("reportIdx") Long reportIdx);
+    public void hideCommunityPost(@Param("targetIdx") Long targetIdx);
+    public void hideCommunityReply(@Param("targetIdx") Long targetIdx);
 }

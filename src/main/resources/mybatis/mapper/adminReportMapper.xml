@@ -99,4 +99,12 @@
         SELECT reporterIdx FROM adminReport WHERE reportIdx = #{reportIdx}
     </select>
 
+    <update id="hideCommunityPost" parameterType="long">
+        UPDATE community SET is_hidden = 1 WHERE community_id = #{targetIdx}
+    </update>
+
+    <update id="hideCommunityReply" parameterType="long">
+        UPDATE community_reply SET is_hidden = 1 WHERE reply_id = #{targetIdx}
+    </update>
+
 </mapper>

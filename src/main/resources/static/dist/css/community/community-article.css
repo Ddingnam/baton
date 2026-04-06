@@ -676,10 +676,29 @@ body {
 }
 
 .reply-item.deleted {
-    padding: 12px 0;
+    padding: 10px 0;
     display: flex;
     align-items: center;
     gap: 6px;
+}
+
+.reply-hidden-notice {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: #fff8f0;
+    border: 1px solid #fde8c8;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #b36b00;
+    font-style: normal;
+}
+
+.reply-hidden-notice i {
+    font-size: 15px;
+    color: #e07b00;
+    flex-shrink: 0;
 }
 
 .reply-deleted-text {

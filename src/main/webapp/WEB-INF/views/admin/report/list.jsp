@@ -298,6 +298,21 @@
                     </p>
                 </div>
             </div>
+
+            <!-- 콘텐츠 숨기기 옵션 (처리 완료 시에만 사용) -->
+            <div class="rpt-field rpt-sanction-toggle-row" id="hideContentToggleRow">
+                <label class="rpt-sanction-chk-label">
+                    <span class="rpt-sanction-chk-text">
+                        <i class="ri-eye-off-line"></i> 처리 완료 시 게시글/댓글 숨기기
+                    </span>
+                    <input type="checkbox" id="chkHideContent" class="rpt-sanction-chk">
+                    <span class="rpt-toggle-track" id="hideContentToggleTrack"></span>
+                </label>
+            </div>
+            <div class="rpt-hide-warn" id="hideContentWarn" style="display:none;">
+                <i class="ri-information-line"></i>
+                신고된 게시글 또는 댓글이 다른 사용자에게 보이지 않게 숨깜 처리됩니다.
+            </div>
         </div>
 
         

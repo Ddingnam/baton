@@ -96,6 +96,27 @@ public class AdminReportServiceImpl implements AdminReportService {
                     adminMemberService.insertSanction(sanctionMap);
                 }
             }
+
+            // 콘텐츠 숨김 처리
+            Object hideContentObj = map.get("hideContent");
+            boolean hideContent = hideContentObj != null
+                    && Boolean.parseBoolean(hideContentObj.toString());
+
+            if (hideContent) {
+                Object targetIdxObj = map.get("targetIdx");
+                String domainType   = map.get("domainType") != null ? map.get("domainType").toString() : "";
+
+                if (targetIdxObj != null && !domainType.isEmpty()) {
+                    Long targetIdx = Long.valueOf(targetIdxObj.toString());
+
+                    if ("COMMUNITY".equals(domainType)) {
+                        mapper.hideCommunityPost(targetIdx);
+                    } else if ("COMMUNITY_REPLY".equals(domainType)) {
+                        mapper.hideCommunityReply(targetIdx);
+                    }
+                    // TRADE, CREW, ALBA 등 도메인은 각 mapper 구축 후 여기에 추가
+                }
+            }
         }
 
         // 3. 신고자에게 처리 결과 알림 발송

@@ -160,16 +160,16 @@ public class CommunityServiceImpl implements CommunityService {
 	public Page<CommunityDto> getCommunityList(Pageable pageable, String schType, String kwd) {
 	    Page<Community> entities;
 	    if (kwd == null || kwd.isBlank()) {
-	        entities = communityRepository.findByTemporaryFalse(pageable);
+	        entities = communityRepository.findByTemporaryFalseAndIsHiddenFalse(pageable);
 	    } else {
 	        if ("subject".equals(schType)) {
-	            entities = communityRepository.findByTemporaryFalseAndSubjectContaining(kwd, pageable);
+	            entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndSubjectContaining(kwd, pageable);
 	        } else if ("content".equals(schType)) {
-	            entities = communityRepository.findByTemporaryFalseAndContentContaining(kwd, pageable);
+	            entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndContentContaining(kwd, pageable);
 	        } else if ("tag".equals(schType)) {
-	            entities = communityRepository.findByTemporaryFalseAndHashTags_TagNameContaining(kwd, pageable);
+	            entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndHashTags_TagNameContaining(kwd, pageable);
 	        } else {
-	            entities = communityRepository.findByTemporaryFalseAndSubjectContainingOrTemporaryFalseAndContentContaining(kwd, kwd, pageable);
+	            entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndSubjectOrContent(kwd, pageable);
 	        }
 	    }
 	    return entities.map(this::toDto);
@@ -185,30 +185,30 @@ public class CommunityServiceImpl implements CommunityService {
 	    if (hasCat) {
 	        if (hasKwd) {
 	            if ("subject".equals(schType)) {
-	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndCategoryAndSubjectContaining(regionCode, category, kwd, pageable);
+	                entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndRegionCodeAndCategoryAndSubjectContaining(regionCode, category, kwd, pageable);
 	            } else if ("content".equals(schType)) {
-	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndCategoryAndContentContaining(regionCode, category, kwd, pageable);
+	                entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndRegionCodeAndCategoryAndContentContaining(regionCode, category, kwd, pageable);
 	            } else if ("tag".equals(schType)) {
-	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndCategoryAndHashTags_TagNameContaining(regionCode, category, kwd, pageable);
+	                entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndRegionCodeAndCategoryAndHashTags_TagNameContaining(regionCode, category, kwd, pageable);
 	            } else {
-	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndCategoryAndSubjectContaining(regionCode, category, kwd, pageable);
+	                entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndRegionCodeAndCategoryAndSubjectContaining(regionCode, category, kwd, pageable);
 	            }
 	        } else {
-	            entities = communityRepository.findByTemporaryFalseAndRegionCodeAndCategory(regionCode, category, pageable);
+	            entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndRegionCodeAndCategory(regionCode, category, pageable);
 	        }
 	    } else {
 	        if (hasKwd) {
 	            if ("subject".equals(schType)) {
-	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndSubjectContaining(regionCode, kwd, pageable);
+	                entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndRegionCodeAndSubjectContaining(regionCode, kwd, pageable);
 	            } else if ("content".equals(schType)) {
-	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndContentContaining(regionCode, kwd, pageable);
+	                entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndRegionCodeAndContentContaining(regionCode, kwd, pageable);
 	            } else if ("tag".equals(schType)) {
-	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndHashTags_TagNameContaining(regionCode, kwd, pageable);
+	                entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndRegionCodeAndHashTags_TagNameContaining(regionCode, kwd, pageable);
 	            } else {
-	                entities = communityRepository.findByTemporaryFalseAndRegionCodeAndSubjectContainingOrTemporaryFalseAndRegionCodeAndContentContaining(regionCode, kwd, regionCode, kwd, pageable);
+	                entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndRegionCodeAndSubjectOrContent(regionCode, kwd, pageable);
 	            }
 	        } else {
-	            entities = communityRepository.findByTemporaryFalseAndRegionCode(regionCode, pageable);
+	            entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndRegionCode(regionCode, pageable);
 	        }
 	    }
 	    return entities.map(this::toDto);
@@ -219,15 +219,15 @@ public class CommunityServiceImpl implements CommunityService {
 	public Page<CommunityDto> getCommunityListByCategory(Pageable pageable, String category, String schType, String kwd) {
 	    Page<Community> entities;
 	    if (kwd == null || kwd.isBlank()) {
-	        entities = communityRepository.findByTemporaryFalseAndCategory(category, pageable);
+	        entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndCategory(category, pageable);
 	    } else if ("subject".equals(schType)) {
-	        entities = communityRepository.findByTemporaryFalseAndCategoryAndSubjectContaining(category, kwd, pageable);
+	        entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndCategoryAndSubjectContaining(category, kwd, pageable);
 	    } else if ("content".equals(schType)) {
-	        entities = communityRepository.findByTemporaryFalseAndCategoryAndContentContaining(category, kwd, pageable);
+	        entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndCategoryAndContentContaining(category, kwd, pageable);
 	    } else if ("tag".equals(schType)) {
-	        entities = communityRepository.findByTemporaryFalseAndCategoryAndHashTags_TagNameContaining(category, kwd, pageable);
+	        entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndCategoryAndHashTags_TagNameContaining(category, kwd, pageable);
 	    } else {
-	        entities = communityRepository.findByTemporaryFalseAndCategoryAndSubjectContaining(category, kwd, pageable);
+	        entities = communityRepository.findByTemporaryFalseAndIsHiddenFalseAndCategoryAndSubjectContaining(category, kwd, pageable);
 	    }
 	    return entities.map(this::toDto);
 	}
@@ -615,7 +615,7 @@ public class CommunityServiceImpl implements CommunityService {
 	@Override
 	@Transactional(readOnly = true)
 	public long getUserReplyCount(Long memberIdx) {
-		return communityReplyRepository.countByMemberIdxAndIsDeletedFalse(memberIdx);
+		return communityReplyRepository.countByMemberIdxAndDeletedFalse(memberIdx);
 	}
 
 	@Override
@@ -645,7 +645,7 @@ public class CommunityServiceImpl implements CommunityService {
 	@Transactional(readOnly = true)
 	public List<Map<String, Object>> getUserRepliesWithPostTitle(Long memberIdx) {
 		return communityReplyRepository
-				.findByMemberIdxAndIsDeletedFalseOrderByRegDateDesc(memberIdx)
+				.findByMemberIdxAndDeletedFalseOrderByRegDateDesc(memberIdx)
 				.stream()
 				.map(r -> {
 					Map<String, Object> m = new HashMap<>();

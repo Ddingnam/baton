@@ -62,6 +62,10 @@ public class Community {
     @ColumnDefault("false")
     private boolean temporary;
 
+    @ColumnDefault("false")
+    @Column(name = "is_hidden")
+    private boolean isHidden;
+
     @Column
     private LocalDateTime regDate;
 

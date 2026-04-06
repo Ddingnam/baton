@@ -1057,3 +1057,24 @@
     flex-shrink: 0;
     margin-top: 1px;
 }
+/* ── 콘텐츠 숨기기 경고 안내 ── */
+.rpt-hide-warn {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 4px 0 10px 0;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(245, 158, 11, 0.10);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    font-size: 12px;
+    color: #FCD34D;
+    line-height: 1.5;
+}
+
+.rpt-hide-warn i {
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: #F59E0B;
+}

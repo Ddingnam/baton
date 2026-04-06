@@ -49,11 +49,12 @@ public class CommunityReplyServiceImpl implements CommunityReplyService {
                 .communityId(parent.getCommunity().getId())
                 .memberIdx(parent.getMemberIdx())
                 .writerNickname(parent.getWriterNickname())
-                .content(parent.isDeleted() ? "삭제된 댓글입니다." : parent.getContent())
+                .content(parent.isDeleted() ? "삭제된 댓글입니다." : parent.isHidden() ? "" : parent.getContent())
                 .regDate(parent.getRegDate())
                 .parentId(parent.getParentId())
                 .depth(depth)
-                .isDeleted(parent.isDeleted())
+                .deleted(parent.isDeleted())
+                .hidden(parent.isHidden())
                 .build();
         
         result.add(dto);
@@ -78,7 +79,7 @@ public class CommunityReplyServiceImpl implements CommunityReplyService {
                 .writerNickname(dto.getWriterNickname())
                 .content(dto.getContent())
                 .parentId(dto.getParentId())
-                .isDeleted(false)
+                .deleted(false)
                 .build();
 
         replyRepository.save(reply);
@@ -100,6 +101,9 @@ public class CommunityReplyServiceImpl implements CommunityReplyService {
     @Override
     @Transactional(readOnly = true)
     public int replyCount(Long communityId) {
-        return replyRepository.findByCommunityIdOrderByRegDateAsc(communityId).size();
+        return (int) replyRepository.findByCommunityIdOrderByRegDateAsc(communityId)
+                .stream()
+                .filter(r -> !r.isDeleted())
+                .count();
     }
 }

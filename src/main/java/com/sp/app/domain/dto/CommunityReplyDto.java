@@ -2,6 +2,7 @@ package com.sp.app.domain.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,6 +27,10 @@ public class CommunityReplyDto {
 	private Long parentId;
 	private String parentNickname;
 	private int depth;
-	private boolean isDeleted;
-}
 
+	@JsonProperty("isDeleted")
+	private boolean deleted;
+
+	@JsonProperty("isHidden")
+	private boolean hidden;
+}

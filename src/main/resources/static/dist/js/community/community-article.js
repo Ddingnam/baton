@@ -395,11 +395,13 @@ function renderReplies(list) {
         const indentStyle = reply.depth > 0 ? `style="margin-left:${reply.depth * 24}px;"` : '';
         const depthIcon   = reply.depth > 0 ? '<i class="ri-corner-down-right-line" style="color:var(--text-3);margin-right:4px;"></i>' : '';
 
-        if (reply.isDeleted) {
+        if (reply.isDeleted) return '';
+
+        if (reply.isHidden) {
             return `
             <div class="reply-item deleted" ${indentStyle}>
                 ${depthIcon}
-                <span class="reply-deleted-text">삭제된 댓글입니다.</span>
+                <div class="reply-hidden-notice"><i class="ri-alarm-warning-line"></i><span>신고 처리된 댓글입니다.</span></div>
             </div>`;
         }
 

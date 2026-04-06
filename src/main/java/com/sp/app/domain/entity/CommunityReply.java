@@ -52,8 +52,12 @@ public class CommunityReply {
     private LocalDateTime regDate;
 
     @Column(name = "is_deleted")
-    @ColumnDefault("false") 
-    private boolean isDeleted;
+    @ColumnDefault("false")
+    private boolean deleted;
+
+    @Column(name = "is_hidden")
+    @ColumnDefault("false")
+    private boolean hidden;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id")

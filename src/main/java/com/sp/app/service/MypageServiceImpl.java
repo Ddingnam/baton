@@ -45,7 +45,7 @@ public class MypageServiceImpl implements MypageService {
     @Transactional(readOnly = true)
     public List<MypageCommunityDto.ReplyDto> getMyReplies(long memberIdx) {
         return communityReplyRepository
-                .findByMemberIdxAndIsDeletedFalseOrderByRegDateDesc(memberIdx)
+                .findByMemberIdxAndDeletedFalseOrderByRegDateDesc(memberIdx)
                 .stream()
                 .map(reply -> {
                     Community community = reply.getCommunity();
@@ -144,4 +144,4 @@ public class MypageServiceImpl implements MypageService {
     public List<Map<String, Object>> getMyTradeHistory(long memberIdx) {
         return tradeMapper.getMyTradeHistory(memberIdx);
     }
-} 
+}

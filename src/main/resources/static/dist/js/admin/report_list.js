@@ -3,6 +3,8 @@
 
     var currentReportIdx     = null;
     var currentReportedUser  = '';
+    var currentTargetIdx     = null;
+    var currentDomainType    = '';
 
     var overlay      = document.getElementById('detailOverlay');
     var detailClose  = document.getElementById('detailClose');
@@ -33,6 +35,8 @@
                 var statusClass = STATUS_CLASS[d.processStatus] || 'tag-gray';
 
                 currentReportedUser = (d.reportedUserName || '') + ' (' + (d.reportedUserId || '') + ')';
+                currentTargetIdx    = d.targetIdx || null;
+                currentDomainType   = d.domainType || '';
 
                 dDomainType.innerHTML    = '<span class="tag ' + domainTagClass(d.domainType) + '">' + domainLabel + '</span>';
                 var titleEl = document.getElementById('dModalTitle');
@@ -49,12 +53,18 @@
                 resetSanctionUI();
 
                 var toggleRow = document.getElementById('sanctionToggleRow');
+                var hideToggleRow = document.getElementById('hideContentToggleRow');
+                var HIDEABLE_DOMAINS = ['COMMUNITY', 'COMMUNITY_REPLY'];
+                var canHide = HIDEABLE_DOMAINS.indexOf(d.domainType) !== -1;
+
                 if (d.processStatus == 0) {
                     detailFooter.style.display = '';
                     if (toggleRow) toggleRow.style.display = '';
+                    if (hideToggleRow) hideToggleRow.style.display = canHide ? '' : 'none';
                 } else {
                     detailFooter.style.display = 'none';
                     if (toggleRow) toggleRow.style.display = 'none';
+                    if (hideToggleRow) hideToggleRow.style.display = 'none';
                 }
 
                 overlay.classList.add('show');
@@ -94,6 +104,14 @@
 
         var daysInput = document.getElementById('sanctionDays');
         if (daysInput) daysInput.value = '7';
+
+        // hideContent 초기화
+        var chkHide = document.getElementById('chkHideContent');
+        if (chkHide) chkHide.checked = false;
+        var hideTrack = document.getElementById('hideContentToggleTrack');
+        if (hideTrack) hideTrack.classList.remove('on');
+        var hideWarn = document.getElementById('hideContentWarn');
+        if (hideWarn) hideWarn.style.display = 'none';
     }
 
     // ── 제재 추가 체크박스 토글 ──────────────────────────────────────
@@ -108,6 +126,17 @@
             if (track) {
                 this.checked ? track.classList.add('on') : track.classList.remove('on');
             }
+        });
+    }
+
+    // ── 콘텐츠 숨기기 체크박스 토글 ─────────────────────────────────
+    var chkHideContent = document.getElementById('chkHideContent');
+    if (chkHideContent) {
+        chkHideContent.addEventListener('change', function () {
+            var hideWarn  = document.getElementById('hideContentWarn');
+            var hideTrack = document.getElementById('hideContentToggleTrack');
+            if (hideWarn)  hideWarn.style.display = this.checked ? 'block' : 'none';
+            if (hideTrack) this.checked ? hideTrack.classList.add('on') : hideTrack.classList.remove('on');
         });
     }
 
@@ -148,6 +177,10 @@
                 : sanctionDays + '일 기간정지';
             confirmDesc += '<br><span style="color:#EF4444;font-size:13px;margin-top:6px;display:block;">⚠️ ' + currentReportedUser + ' 에게 <strong>' + sanctionLabel + '</strong> 제재가 추가됩니다.</span>';
         }
+        var chkHide = document.getElementById('chkHideContent');
+        if (status === 1 && chkHide && chkHide.checked) {
+            confirmDesc += '<br><span style="color:#F59E0B;font-size:13px;margin-top:4px;display:block;">🚫 신고된 게시글/댓글이 숨김 처리됩니다.</span>';
+        }
 
         showConfirm({
             type  : status === 1 ? 'info' : 'warning',
@@ -155,15 +188,22 @@
             desc  : confirmDesc,
             okText: '확인',
             onOk  : function () {
-                var targetIdx = currentReportIdx;
-                closeModal();
+                // closeModal() 호출 전에 필요한 값을 모두 저장
+                var savedReportIdx   = currentReportIdx;
+                var savedTargetIdx   = currentTargetIdx;
+                var savedDomainType  = currentDomainType;
+                var isHideChecked    = (status === 1 && document.getElementById('chkHideContent') && document.getElementById('chkHideContent').checked);
+                closeModal(); // 여기서 currentTargetIdx, currentDomainType이 null로 초기화됨
 
                 var payload = {
-                    reportIdx     : targetIdx,
+                    reportIdx     : savedReportIdx,
                     processStatus : status,
                     adminMemo     : memo,
                     sanctionType  : sanctionType,
-                    sanctionDays  : sanctionDays
+                    sanctionDays  : sanctionDays,
+                    hideContent   : isHideChecked,
+                    targetIdx     : savedTargetIdx,
+                    domainType    : savedDomainType
                 };
 
                 fetch(CTX + '/admin/report/process', {
@@ -177,6 +217,10 @@
                         var toastMsg = '신고가 ' + statusText + ' 처리되었습니다.';
                         if (sanctionType !== 'NONE' && status === 1) {
                             toastMsg += ' 제재가 적용되었습니다.';
+                        }
+                        var chkHide = document.getElementById('chkHideContent');
+                        if (status === 1 && chkHide && chkHide.checked) {
+                            toastMsg += ' 콘텐츠가 숨김 처리되었습니다.';
                         }
                         showToast(toastMsg, 'success');
                         setTimeout(function () { location.reload(); }, 1000);
@@ -194,6 +238,8 @@
         overlay.classList.remove('show');
         currentReportIdx    = null;
         currentReportedUser = '';
+        currentTargetIdx    = null;
+        currentDomainType   = '';
         resetSanctionUI();
         if (detailFooter) detailFooter.style.display = '';
         var toggleRow = document.getElementById('sanctionToggleRow');
