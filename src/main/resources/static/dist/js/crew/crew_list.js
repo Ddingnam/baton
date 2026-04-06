@@ -22,7 +22,7 @@ const CrewList = {
 
             params: {
                 categoryIdx: 0,
-                distance: '',
+                distance: 'local',
                 joinType: 'all',
                 isRecruiting: true,
                 sortType: 'latest', 
@@ -149,7 +149,7 @@ const CrewList = {
 
         removeFilter(filterId) {
             if (filterId === 'category') this.params.categoryIdx = 0;
-            if (filterId === 'distance') this.params.distance = '';
+            if (filterId === 'distance') this.params.distance = 'local';
             if (filterId === 'joinType') this.params.joinType = 'all';
             if (filterId === 'keyword') this.params.keyword = '';
             
@@ -159,7 +159,7 @@ const CrewList = {
 		resetFilters() {
 	        this.params = {
 	            categoryIdx: 0,
-	            distance: '',
+	            distance: 'local',
 	            joinType: 'all',
 	            isRecruiting: true,
 	            keyword: '',
@@ -167,9 +167,11 @@ const CrewList = {
 	            page: 1,
 	            size: 9
 	        };
+			/*
 	        if (this.activeFilters) {
 	            this.activeFilters = [];
 	        }
+			*/
 	        this.resetAndFetch();
 	    },
 

@@ -44,11 +44,13 @@ public class CrewRestController {
 	@Value("${file.upload-root}/crew")
     private String uploadPath;
 	
+	/*
 	@Value("${weather.api.key}")
 	private String weatherApiKey;
 
 	@Value("${weather.api.url}")
 	private String weatherApiUrl;
+	*/
 	
 	@PostMapping("register")
     public ResponseEntity<?> register(
@@ -85,7 +87,7 @@ public class CrewRestController {
 	@GetMapping("list")
 	public ResponseEntity<?> crewList(
 	        @RequestParam(value = "categoryIdx", defaultValue = "0") int categoryIdx,
-	        @RequestParam(value = "distance", required = false, defaultValue = "") String distance,
+	        @RequestParam(value = "distance", required = false, defaultValue = "local") String distance,
 	        @RequestParam(value = "joinType", defaultValue = "all") String joinType,
 	        @RequestParam(value = "isRecruiting", defaultValue = "true") boolean isRecruiting,
 	        @RequestParam(value = "sortType", defaultValue = "latest") String sortType,
@@ -252,6 +254,7 @@ public class CrewRestController {
         }
     }
     
+    /*
     @SuppressWarnings("unchecked")
     @GetMapping("dashboard/weather")
     public ResponseEntity<?> getCrewWeather(@RequestParam(name = "city", defaultValue = "Seoul") String city) {
@@ -268,6 +271,7 @@ public class CrewRestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("날씨 정보를 가져올 수 없습니다.");
         }
     }
+    */
     
     @GetMapping("manage/{crewIdx}/members")
 	public ResponseEntity<?> getActiveMembers(

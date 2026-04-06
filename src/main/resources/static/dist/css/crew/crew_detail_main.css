@@ -95,20 +95,27 @@
 }
 
 .cd-region-list-container {
-	display: flex;
-	justify-content: center;
-	margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;          
+    width: 100%;
+    margin-bottom: 16px;
 }
 
-.cd-region-tag span {
-	font-size: 12px;
-	font-weight: 700;
-	color: var(--text-sub);
-	background: rgba(255, 255, 255, 0.7);
-	padding: 6px 14px;
-	border-radius: 12px;
-	border: 1px solid rgba(255, 255, 255, 0.9);
-	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+.cd-region-tag {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-sub);
+    background: rgba(255, 255, 255, 0.7);
+    padding: 6px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
 }
 
 .cd-details-table {

@@ -25,7 +25,7 @@
         </header>
 
         <div id="id-find-form-area">
-            <form name="idFindForm" class="auth-form-body">
+            <form name="idFindForm" class="auth-form-body" autocomplete="off">
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 <div class="input-sequence item-1">
                     <label class="input-label">이름</label>

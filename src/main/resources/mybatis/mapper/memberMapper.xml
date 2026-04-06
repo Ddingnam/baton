@@ -63,7 +63,7 @@
 
 	<insert id="insertSnsUser" parameterType="com.sp.app.domain.dto.SnsUserDto">
 		INSERT INTO sns_users (authIdx, userIdx, provider, oauthId, linkedDate)
-		VALUES (sns_users_seq.NEXTVAL, #{userIdx}, #{provider}, #{oauthId}, SYSDATE)
+		VALUES (sns_user_seq.NEXTVAL, #{userIdx}, #{provider}, #{oauthId}, SYSDATE)
 	</insert>
 
 	<insert id="insertMember12" parameterType="com.sp.app.domain.dto.MemberDto">

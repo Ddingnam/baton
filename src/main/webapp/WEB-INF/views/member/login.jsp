@@ -58,7 +58,7 @@
             <p class="auth-subtitle">당신의 일상을 잇는 <br>가장 가까운 바톤 터치</p>
         </header>
 
-        <form name="loginForm" action="${pageContext.request.contextPath}/member/login" method="post" class="auth-form-body">
+        <form name="loginForm" action="${pageContext.request.contextPath}/member/login" method="post" class="auth-form-body" autocomplete="off">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
             <div class="input-sequence item-1">

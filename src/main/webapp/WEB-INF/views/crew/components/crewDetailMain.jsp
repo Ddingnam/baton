@@ -23,10 +23,10 @@
                         </div>
 
                         <div class="cd-region-list-container" v-if="crew.regions && crew.regions.length > 0">
-                            <div v-for="(reg, index) in crew.regions" :key="index" class="cd-region-tag">
-                                <span>{{ reg.fullAddress }}</span>
-                            </div>
-                        </div>
+						    <div v-for="(reg, index) in crew.regions" :key="index" class="cd-region-tag">
+						        {{ reg.fullAddress }}
+						    </div>
+						</div>
                         
                         <div class="cd-details-table">
                             <div class="cd-detail-row">
