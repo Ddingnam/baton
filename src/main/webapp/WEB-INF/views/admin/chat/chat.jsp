@@ -57,9 +57,9 @@
                             <span class="chat-room-hash"><i class="ri-hashtag"></i></span>
                             <span class="chat-room-name">${room.roomName}</span>
                             <div class="channel-item-actions">
-                                <button class="channel-mute-btn" data-roomidx="${room.roomIdx}" title="알림 끄기/켜기"
+                                <button class="channel-mute-btn ${room.isMuted == 1 ? 'muted' : ''}" data-roomidx="${room.roomIdx}" title="알림 끄기/켜기"
                                         onclick="event.stopPropagation(); toggleMuteInline(${room.roomIdx}, this)">
-                                    <i class="ri-notification-3-line"></i>
+                                    <i class="${room.isMuted == 1 ? 'ri-notification-off-line' : 'ri-notification-3-line'}"></i>
                                 </button>
                                 <c:if test="${myUserLevel >= 99}">
                                     <button class="channel-manage-btn" data-roomidx="${room.roomIdx}" data-roomname="${room.roomName}" title="채널 관리">
@@ -104,7 +104,13 @@
                                     <span class="chat-room-preview" id="preview-${dm.roomIdx}">${fn:substring(dm.recentMessage,0,20)}</span>
                                 </c:if>
                             </div>
-                            <button class="dm-leave-btn" onclick="event.stopPropagation(); leaveDM(${dm.roomIdx})" title="나가기">×</button>
+                            <div class="channel-item-actions">
+                                <button class="channel-mute-btn dm-mute-btn" data-roomidx="${dm.roomIdx}" title="알림 끄기/켜기"
+                                        onclick="event.stopPropagation(); toggleMuteInline(${dm.roomIdx}, this)">
+                                    <i class="ri-notification-3-line"></i>
+                                </button>
+                                <button class="dm-leave-btn" onclick="event.stopPropagation(); leaveDM(${dm.roomIdx})" title="나가기">×</button>
+                            </div>
                         </div>
                     </c:forEach>
                     <c:if test="${empty dmList}">
@@ -427,19 +433,48 @@
                     </button>
                 </div>
 
-                <p style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light);margin-bottom:12px;">내 설정</p>
-                <div style="display:flex;gap:8px;margin-bottom:20px;">
-                    <button id="muteToggleBtn" onclick="doToggleMute()"
-                        class="settings-action-btn"
+                <p style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light);margin-bottom:6px;">알림</p>
+                <p style="font-size:11px;color:var(--text-light);margin-bottom:10px;">새 메시지가 오면 팝업으로 알려줍니다. 기본적으로 켜져 있습니다.</p>
+                <div style="margin-bottom:20px;">
+                    <button id="muteToggleBtn" onclick="doToggleMute()" class="settings-action-btn" style="width:100%;"
                         onmouseover="this.style.background='var(--grad-primary)';this.style.color='#fff';this.style.borderColor='transparent';"
                         onmouseout="this.style.background='';this.style.color='';this.style.borderColor='';">
-                        <i class="ri-notification-3-line" style="font-size:16px;"></i> 알림 끄기
+                        <c:choose>
+                            <c:when test="${currentRoomType == 'channel'}">
+                                <c:set var="initMuted" value="0"/>
+                                <c:forEach var="room" items="${roomList}">
+                                    <c:if test="${room.roomIdx == currentRoomIdx}">
+                                        <c:set var="initMuted" value="${room.isMuted}"/>
+                                    </c:if>
+                                </c:forEach>
+                                <c:choose>
+                                    <c:when test="${initMuted == 1}">
+                                        <i class="ri-notification-off-line" style="font-size:16px;"></i> 알림 켜기
+                                    </c:when>
+                                    <c:otherwise>
+                                        <i class="ri-notification-3-line" style="font-size:16px;"></i> 알림 끄기
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:when>
+                            <c:otherwise>
+                                <i class="ri-notification-3-line" style="font-size:16px;"></i> 알림 끄기
+                            </c:otherwise>
+                        </c:choose>
                     </button>
-                    <button onclick="doLeaveChannel()"
-                        class="settings-action-btn"
+                </div>
+
+                <p style="font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light);margin-bottom:6px;">내 화면</p>
+                <p style="font-size:11px;color:var(--text-light);margin-bottom:10px;">채팅 내용을 내 화면에서만 지웁니다. 다른 사람에게는 영향 없고 새로고침하면 다시 보입니다.</p>
+                <div style="display:flex;gap:8px;margin-bottom:20px;">
+                    <button onclick="doClearMyMessages()" class="settings-action-btn" style="flex:1;"
+                        onmouseover="this.style.background='#FFF7ED';this.style.color='#F97316';this.style.borderColor='#FED7AA';"
+                        onmouseout="this.style.background='';this.style.color='';this.style.borderColor='';">
+                        <i class="ri-eraser-line" style="font-size:16px;"></i> 내 화면 채팅 지우기
+                    </button>
+                    <button onclick="doLeaveChannel()" class="settings-action-btn" style="flex:1;"
                         onmouseover="this.style.background='var(--grad-primary)';this.style.color='#fff';this.style.borderColor='transparent';"
                         onmouseout="this.style.background='';this.style.color='';this.style.borderColor='';">
-                        <i class="ri-logout-box-r-line" style="font-size:16px;"></i> 나가기
+                        <i class="ri-logout-box-r-line" style="font-size:16px;"></i> 채널 나가기
                     </button>
                 </div>
 
@@ -593,6 +628,10 @@ var CHAT_ROOM_IDX = Number('${currentRoomIdx}');
 var CHAT_ROOM_TYPE  = '${currentRoomType}';
 var CHAT_MY_LEVEL  = Number('${myUserLevel}');
 var CHAT_MY_THEME = '${myTheme}';
+var CHAT_ROOM_MUTED = <c:choose>
+    <c:when test="${currentRoomType == 'channel'}"><c:set var="currentMuted" value="0"/><c:forEach var="room" items="${roomList}"><c:if test="${room.roomIdx == currentRoomIdx}"><c:set var="currentMuted" value="${room.isMuted}"/></c:if></c:forEach>${currentMuted}</c:when>
+    <c:otherwise>0</c:otherwise>
+</c:choose>;
 
 window.CTX = CHAT_CTX;
 window.ADMIN_USER_IDX = CHAT_MY_IDX;

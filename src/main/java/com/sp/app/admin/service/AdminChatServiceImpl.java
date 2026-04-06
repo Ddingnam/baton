@@ -126,6 +126,11 @@ public class AdminChatServiceImpl implements AdminChatService {
 	}
 
 	@Override
+	public int getMuteState(Long roomIdx, Long userIdx) {
+		return mapper.getMuted(roomIdx, userIdx);
+	}
+
+	@Override
 	public void transferOwnership(Long roomIdx, Long newOwnerIdx) {
 		mapper.transferOwnership(roomIdx, newOwnerIdx);
 	}

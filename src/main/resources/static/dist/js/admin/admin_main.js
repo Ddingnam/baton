@@ -1191,6 +1191,10 @@ function fcSelectDate(key) {
                         if (!raw || raw === 'read_chat' || raw.startsWith('room_deleted:')) return;
                         const n = JSON.parse(raw);
                         if (n && n.notifIdx) injectRealtimeNoti(n);
+                        /* ── 채팅 인앱 팝업: 채팅 페이지가 아닐 때 카톡처럼 표시 ── */
+                        if (n && n.type === 'CHAT') {
+                            showAdminChatPopup(n.sender || '새 메시지', n.content || '', n.roomIdx);
+                        }
                     } catch(e) {}
                 });
                 /* ── 실시간 Presence 구독 (채팅 모듈과 동일한 토픽 재사용) ── */
@@ -1540,3 +1544,89 @@ function fcSelectDate(key) {
         });
     }
 });
+/* ══════════════════════════════════════════════════════════════
+   관리자 채팅 인앱 팝업 (카톡 스타일)
+   - 채팅 페이지가 아닌 모든 관리자 화면에서 동작
+   - localStorage 'batonAdminChatMuted' = '1' 이면 무음
+   ══════════════════════════════════════════════════════════════ */
+(function () {
+    var POPUP_ID   = 'batonAdminChatPopup';
+    var MUTE_KEY   = 'batonAdminChatMuted';
+    var _hideTimer = null;
+
+    function escHtml(s) {
+        return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function isMuted() { return localStorage.getItem(MUTE_KEY) === '1'; }
+    function setMuted(v) { localStorage.setItem(MUTE_KEY, v ? '1' : '0'); }
+
+    function getOrCreatePopup() {
+        var el = document.getElementById(POPUP_ID);
+        if (el) return el;
+        el = document.createElement('div');
+        el.id = POPUP_ID;
+        el.style.cssText = [
+            'position:fixed;bottom:24px;right:24px;z-index:999999',
+            'background:var(--card-bg,#fff)',
+            'border:1.5px solid var(--border-color,#e5e7eb)',
+            'border-radius:18px;padding:14px 16px 14px 14px',
+            'box-shadow:0 12px 40px rgba(0,0,0,0.18)',
+            'min-width:270px;max-width:330px',
+            'display:none;align-items:flex-start;gap:12px',
+            'cursor:pointer;transition:opacity .25s,transform .25s',
+            'opacity:0;transform:translateY(16px)'
+        ].join(';');
+        document.body.appendChild(el);
+        return el;
+    }
+
+    function hidePopup(el) {
+        el.style.opacity = '0'; el.style.transform = 'translateY(16px)';
+        setTimeout(function () { el.style.display = 'none'; }, 250);
+    }
+
+    window.showAdminChatPopup = function (sender, body, roomIdx) {
+        if (window.location.pathname.indexOf('/admin/chat') !== -1) return;
+        if (isMuted()) return;
+        var el  = getOrCreatePopup();
+        var ctx = window.CTX || '';
+        var safeBody = escHtml(String(body || '').replace(/^__IMG__|^__FILE__/, '[파일]'));
+
+        el.innerHTML =
+            '<div style="width:38px;height:38px;border-radius:50%;background:var(--grad-primary,linear-gradient(135deg,#7C3AED,#EC4899));display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+            '<i class="ri-message-3-fill" style="color:#fff;font-size:17px;"></i></div>' +
+            '<div style="flex:1;min-width:0;">' +
+            '<div style="font-size:11px;font-weight:800;color:var(--color-purple,#7C3AED);margin-bottom:3px;">💬 새 채팅</div>' +
+            '<div style="font-size:13px;font-weight:800;color:var(--text-main,#1e293b);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;">' + escHtml(sender) + '</div>' +
+            '<div style="font-size:12px;font-weight:500;color:var(--text-sub,#64748b);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safeBody + '</div>' +
+            '</div>' +
+            '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;">' +
+            '<button id="batonPopupClose" title="닫기" style="width:24px;height:24px;border:none;background:var(--base-bg,#f8fafc);border-radius:8px;cursor:pointer;color:var(--text-light,#94a3b8);font-size:14px;display:flex;align-items:center;justify-content:center;">' +
+            '<i class="ri-close-line"></i></button>' +
+            '<button id="batonPopupMute" title="알림 끄기" style="width:24px;height:24px;border:none;background:var(--base-bg,#f8fafc);border-radius:8px;cursor:pointer;color:var(--text-light,#94a3b8);font-size:14px;display:flex;align-items:center;justify-content:center;">' +
+            '<i class="ri-notification-off-line"></i></button>' +
+            '</div>';
+
+        el.onclick = function (e) {
+            if (e.target.closest('#batonPopupClose') || e.target.closest('#batonPopupMute')) return;
+            location.href = ctx + '/admin/chat' + (roomIdx ? '?room=' + roomIdx : '');
+        };
+        el.querySelector('#batonPopupClose').onclick = function (e) {
+            e.stopPropagation(); hidePopup(el);
+        };
+        el.querySelector('#batonPopupMute').onclick = function (e) {
+            e.stopPropagation(); setMuted(true); hidePopup(el);
+            if (typeof showToast === 'function') showToast('채팅 팝업 알림이 꺼졌습니다. 채팅 설정에서 다시 켤 수 있습니다.', 'info');
+        };
+
+        el.style.display = 'flex';
+        requestAnimationFrame(function () { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; });
+        clearTimeout(_hideTimer);
+        _hideTimer = setTimeout(function () { hidePopup(el); }, 5000);
+        el.onmouseenter = function () { clearTimeout(_hideTimer); };
+        el.onmouseleave = function () { _hideTimer = setTimeout(function () { hidePopup(el); }, 2000); };
+    };
+
+    /* 채팅 설정에서 알림 켜기/끄기를 외부에서 호출할 수 있도록 */
+    window.batonChatMuteStatus = { isMuted: isMuted, setMuted: setMuted };
+}());

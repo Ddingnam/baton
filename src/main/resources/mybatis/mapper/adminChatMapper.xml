@@ -9,7 +9,8 @@
              AND m.userIdx != #{myUserIdx}
              AND m.msgType != 4
              AND m.sendDate > NVL((SELECT lastReadDate FROM chatMember WHERE roomIdx = cr.roomIdx AND userIdx = #{myUserIdx}), TO_DATE('1900-01-01','YYYY-MM-DD'))
-            ) AS unreadCount
+            ) AS unreadCount,
+            NVL(cm.isMuted, 0) AS isMuted
         FROM chatRoom cr
         JOIN chatMember cm ON cr.roomIdx = cm.roomIdx AND cm.userIdx = #{myUserIdx}
         WHERE cr.roomType = 2
@@ -23,8 +24,10 @@
              AND m.userIdx != #{myUserIdx}
              AND m.msgType != 4
              AND m.sendDate > NVL((SELECT lastReadDate FROM chatMember WHERE roomIdx = cr.roomIdx AND userIdx = #{myUserIdx}), TO_DATE('1900-01-01','YYYY-MM-DD'))
-            ) AS unreadCount
+            ) AS unreadCount,
+            NVL(cm.isMuted, 0) AS isMuted
         FROM chatRoom cr
+        LEFT JOIN chatMember cm ON cr.roomIdx = cm.roomIdx AND cm.userIdx = #{myUserIdx}
         WHERE cr.roomType = 2
         ORDER BY cr.roomIdx ASC
     </select>

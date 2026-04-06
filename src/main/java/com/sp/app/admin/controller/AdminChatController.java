@@ -41,7 +41,6 @@ public class AdminChatController {
 		Long myUserIdx = member != null ? member.getUserIdx() : userDetails.getUserIdx();
 		String myNickname = member != null ? member.getNickname() : userDetails.getNickname();
 		int myUserLevel = member != null ? member.getUserLevel() : userDetails.getUserLevel();
-		// ✅ [수정] SessionInfo의 프로필 필드는 avatar → getAvatar() 사용 (CustomUserDetails.getProfilePhoto()도 내부적으로 member.getAvatar() 호출)
 		String myProfilePhoto = member != null ? member.getAvatar() : userDetails.getProfilePhoto();
 
 		if (roomIdx != null)
@@ -77,7 +76,6 @@ public class AdminChatController {
 			}
 		}
 
-		// ✅ [추가] DM 채팅방일 때 상대방 프로필/userIdx를 헤더에 표시하기 위해 model에 추가
 		String counterpartPhoto = null;
 		Long counterpartUserIdx = null;
 		if ("dm".equals(currentRoomType) && roomIdx != null) {
@@ -279,6 +277,21 @@ public class AdminChatController {
 			int newState = adminChatService.toggleMute(roomIdx, userDetails.getUserIdx());
 			result.put("success", true);
 			result.put("isMuted", newState);
+		} catch (Exception e) {
+			result.put("success", false);
+		}
+		return result;
+	}
+
+	@GetMapping(value = "/chat/channel/{roomIdx}/mute/state", produces = "application/json")
+	@ResponseBody
+	public Map<String, Object> getMuteState(@PathVariable("roomIdx") Long roomIdx,
+			@AuthenticationPrincipal CustomUserDetails userDetails) {
+		Map<String, Object> result = new HashMap<>();
+		try {
+			int state = adminChatService.getMuteState(roomIdx, userDetails.getUserIdx());
+			result.put("success", true);
+			result.put("isMuted", state);
 		} catch (Exception e) {
 			result.put("success", false);
 		}

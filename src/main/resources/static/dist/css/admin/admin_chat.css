@@ -322,12 +322,11 @@
 
 /* DM 나가기 버튼 */
 .dm-leave-btn {
-    display: none; width: 20px; height: 20px; border: none;
+    width: 20px; height: 20px; border: none;
     background: none; color: var(--text-light); cursor: pointer;
     border-radius: 4px; flex-shrink: 0; font-size: 13px;
-    align-items: center; justify-content: center; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; transition: all 0.15s;
 }
-.chat-room-item:hover .dm-leave-btn { display: flex; }
 .dm-leave-btn:hover { background: #FEF2F2; color: #EF4444; }
 
 /* 받는 메시지 아바타 테마별 색상 */
@@ -658,6 +657,26 @@
 .chat-room-item:not(.active) .channel-manage-btn:hover { transform: scale(1.15) rotate(20deg); color: var(--color-purple); }
 .chat-room-item.active .channel-manage-btn { color: rgba(255,255,255,0.7); }
 .chat-room-item.active .channel-manage-btn:hover { transform: scale(1.15) rotate(20deg); color: #fff; }
+
+/* 채널/DM 아이템 우측 액션 버튼 묶음 */
+.channel-item-actions {
+    display: none; align-items: center; gap: 2px;
+    margin-left: auto; flex-shrink: 0;
+}
+.chat-room-item:hover .channel-item-actions { display: flex; }
+.chat-room-item.active .channel-item-actions { display: flex; }
+
+/* 알림 뮤트 버튼 */
+.channel-mute-btn {
+    width: 22px; height: 22px; border-radius: 50%; border: none;
+    background: none; color: var(--text-light); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0; transition: all 0.2s var(--spring);
+}
+.channel-mute-btn:hover { color: var(--color-purple); transform: scale(1.15); }
+.channel-mute-btn.muted { color: var(--color-orange, #F97316); }
+.chat-room-item.active .channel-mute-btn { color: rgba(255,255,255,0.7); }
+.chat-room-item.active .channel-mute-btn:hover { color: #fff; }
 
 .dm-delete-btn {
     width: 22px; height: 22px; border-radius: 50%; border: none;

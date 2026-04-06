@@ -1,3 +1,23 @@
+// 전역 뮤트 상태 - 두 IIFE 모두 접근 가능
+var _isMutedForNotif = false;
+
+// 전역 토스트 알림
+function showToast(msg, type) {
+    var colors = { success: '#22c55e', error: '#ef4444', info: '#7c3aed', warning: '#f97316' };
+    var el = document.createElement('div');
+    el.textContent = msg;
+    el.style.cssText = [
+        'position:fixed;bottom:80px;right:24px;z-index:999999',
+        'background:' + (colors[type] || colors.info),
+        'color:#fff;padding:12px 20px;border-radius:12px',
+        'font-size:13px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,0.2)',
+        'transition:opacity .3s;pointer-events:none'
+    ].join(';');
+    document.body.appendChild(el);
+    setTimeout(function() { el.style.opacity = '0'; }, 2500);
+    setTimeout(function() { el.remove(); }, 2800);
+}
+
 (function () {
     'use strict';
     let stompClient        = null;
@@ -74,7 +94,10 @@
                         badge.className = 'chat-room-badge';
                         badge.id = 'badge-' + roomIdx;
                         badge.textContent = formatBadgeCount(1);
-                        item.appendChild(badge);
+                        // channel-item-actions 앞에 삽입, 없으면 그냥 append
+                        var actions = item.querySelector('.channel-item-actions');
+                        if (actions) item.insertBefore(badge, actions);
+                        else item.appendChild(badge);
                     } else {
                         var nextCount = Math.min((parseInt(badge.textContent) || 0) + 1, 9999);
                         badge.textContent = formatBadgeCount(nextCount);
@@ -96,6 +119,10 @@
                             }
                         }
                     }
+                    // 다른 방 메시지도 인앱 팝업 표시
+                    var notifSender = data.sender || '새 메시지';
+                    var notifBody   = data.content || '';
+                    showInAppNotif(notifSender, notifBody);
                     updateStudioUnreadBadge();
                 } catch(e) {}
             });
@@ -140,6 +167,53 @@
         const delay = Math.min(3000 * Math.pow(1.5, reconnectCount++), 30000);
         setTimeout(connect, delay);
     }
+    // ── 인앱 알림 팝업 (카톡 스타일) ──────────────────────
+    // _isMutedForNotif는 전역으로 선언 (두 IIFE 모두 접근)
+    function escN(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function showInAppNotif(sender, body) {
+        if (_isMutedForNotif) return;
+        var el = document.getElementById('batonChatNotif');
+        if (!el) {
+            el = document.createElement('div');
+            el.id = 'batonChatNotif';
+            el.style.cssText = [
+                'position:fixed;bottom:24px;right:24px;z-index:99999',
+                'background:var(--card-bg,#fff)',
+                'border:1.5px solid var(--border-color,#e5e7eb)',
+                'border-radius:16px;padding:14px 18px 14px 14px',
+                'box-shadow:0 8px 32px rgba(0,0,0,0.15)',
+                'min-width:260px;max-width:320px',
+                'display:flex;align-items:flex-start;gap:12px',
+                'cursor:pointer;transition:opacity .25s,transform .25s',
+                'transform:translateY(0)'
+            ].join(';');
+            el.addEventListener('click', function() {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(12px)';
+                setTimeout(function(){ el.style.display='none'; el.style.transform=''; }, 250);
+            });
+            document.body.appendChild(el);
+        }
+        el.innerHTML = '<div style="width:36px;height:36px;border-radius:50%;background:var(--grad-primary,#7C3AED);display:flex;align-items:center;justify-content:center;flex-shrink:0;">'
+            + '<i class="ri-message-3-fill" style="color:#fff;font-size:16px;"></i></div>'
+            + '<div style="flex:1;min-width:0;">'
+            + '<div style="font-size:12px;font-weight:800;color:var(--color-purple,#7C3AED);margin-bottom:2px;">💬 새 메시지</div>'
+            + '<div style="font-size:13px;font-weight:700;color:var(--text-main,#111);margin-bottom:2px;">' + escN(sender) + '</div>'
+            + '<div style="font-size:12px;color:var(--text-sub,#666);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'
+            + escN(body.length > 40 ? body.substring(0,40)+'…' : body) + '</div>'
+            + '</div>';
+        el.style.display = 'flex';
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+        clearTimeout(el._t);
+        el._t = setTimeout(function(){
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(12px)';
+            setTimeout(function(){ el.style.display='none'; el.style.transform=''; }, 250);
+        }, 4500);
+    }
+    // ─────────────────────────────────────────────────────
+
     function handleIncoming(msg) {
         if (msg.msgType === 4) {
             if (Number(msg.userIdx) !== CHAT_MY_IDX) clearUnreadBadges();
@@ -148,6 +222,14 @@
         appendMessage(msg);
         clearUnreadBadges();
         sendReadEvent();
+        // 내가 보낸 메시지가 아니면 인앱 팝업 알림
+        if (Number(msg.userIdx) !== CHAT_MY_IDX) {
+            var sender = msg.nickname || '새 메시지';
+            var body   = msg.content  || '';
+            if (body.indexOf('__IMG__') === 0) body = '📷 사진';
+            else if (body.indexOf('__FILE__') === 0) body = '📎 파일';
+            showInAppNotif(sender, body);
+        }
     }
     function sendMessage() {
         const text = chatInput.value.trim();
@@ -690,7 +772,6 @@
     });
 })();
 (function() {
-    if (typeof CHAT_MY_LEVEL === 'undefined' || CHAT_MY_LEVEL < 99) return;
     var manageRoomIdx    = null;
     var manageRoomName   = null;
     var manageCreatorIdx = null;
@@ -698,11 +779,13 @@
         manageRoomIdx    = roomIdx;
         manageRoomName   = roomName;
         manageCreatorIdx = null;
-        document.getElementById('manageChannelName').textContent = '# ' + roomName;
-        document.getElementById('renameChannelInput').value = roomName;
-        switchManageTab('members');
-        document.getElementById('channelManageOverlay').style.display = 'flex';
-        loadChannelMembers(roomIdx);
+        if (typeof CHAT_MY_LEVEL !== 'undefined' && CHAT_MY_LEVEL >= 99) {
+            document.getElementById('manageChannelName').textContent = '# ' + roomName;
+            document.getElementById('renameChannelInput').value = roomName;
+            switchManageTab('members');
+            document.getElementById('channelManageOverlay').style.display = 'flex';
+            loadChannelMembers(roomIdx);
+        }
     }
     window.openManageModal = openManageModal;
     function closeManageModal() {
@@ -740,7 +823,7 @@
                     if (nonEl)     nonEl.innerHTML     = '';
                     return;
                 }
-                manageCreatorIdx = d.creatorIdx || null;
+                manageCreatorIdx = d.creatorIdx != null ? Number(d.creatorIdx) : null;
                 renderCurrentMembers(d.members, roomIdx);
                 renderNonMembers(d.nonMembers, roomIdx);
             })
@@ -759,7 +842,7 @@
             el.innerHTML = '<p style="font-size:12px;color:var(--text-light);padding:8px 0;">멤버가 없습니다</p>';
             return;
         }
-        var amICreator = (manageCreatorIdx !== null && manageCreatorIdx === CHAT_MY_IDX);
+        var amICreator = (manageCreatorIdx !== null && Number(manageCreatorIdx) === Number(CHAT_MY_IDX));
         el.innerHTML = members.map(function(m) {
             var isCreator = (manageCreatorIdx !== null && m.userIdx === manageCreatorIdx);
             var isMe      = (m.userIdx === CHAT_MY_IDX);
@@ -848,51 +931,66 @@
     };
     window.doLeaveChannel = function() {
         if (!manageRoomIdx) return;
-        var isCreator = (manageCreatorIdx !== null && manageCreatorIdx === CHAT_MY_IDX);
-        if (isCreator) {
-            openTransferModal();
-            return;
-        }
-        customConfirm({
-            icon: '<i class="ri-logout-box-r-line" style="color:#fff;"></i>',
-            iconBg: 'linear-gradient(135deg,#64748B,#334155)',
-            title: '채널 나가기',
-            desc: '채널에서 나가면 다시 초대받아야 합니다.',
-            okLabel: '나가기',
-            okBg: '#475569'
-        }, function() {
-            fetch(CHAT_CTX + '/admin/chat/channel/' + manageRoomIdx + '/leave', {
-                method: 'POST', credentials: 'same-origin',
-                headers: { 'Accept': 'application/json' }
-            }).then(function(r) { return r.json(); }).then(function(d) {
-                if (d.success) {
-                    var item = document.querySelector('.channel-item[data-roomidx="' + manageRoomIdx + '"]');
-                    if (item) item.remove();
-                    closeManageModal();
-                    if (manageRoomIdx === CHAT_ROOM_IDX) window.location.href = CHAT_CTX + '/admin/chat';
-                } else {
-                    if (typeof showToast === 'function') showToast(d.msg || '나가기에 실패했습니다.', 'error');
-                }
+        var roomIdx = manageRoomIdx;
+        // 항상 서버에서 최신 방장 정보를 확인 (캐시 타이밍 문제 방지)
+        fetch(CHAT_CTX + '/admin/chat/channel/' + roomIdx + '/members', {
+            credentials: 'same-origin', headers: { 'Accept': 'application/json' }
+        }).then(function(r) { return r.json(); }).then(function(d) {
+            if (!d.success) {
+                if (typeof showToast === 'function') showToast('채널 정보를 불러오지 못했습니다.', 'error');
+                return;
+            }
+            manageCreatorIdx = d.creatorIdx != null ? Number(d.creatorIdx) : null;
+            if (d.members)    renderCurrentMembers(d.members, roomIdx);
+            if (d.nonMembers) renderNonMembers(d.nonMembers, roomIdx);
+
+            var isCreator = (manageCreatorIdx !== null && manageCreatorIdx === Number(CHAT_MY_IDX));
+            if (isCreator) {
+                openTransferModal(d.members || []);
+                return;
+            }
+            customConfirm({
+                icon: '<i class="ri-logout-box-r-line" style="color:#fff;"></i>',
+                iconBg: 'linear-gradient(135deg,#64748B,#334155)',
+                title: '채널 나가기',
+                desc: '채널에서 나가면 다시 초대받아야 합니다.',
+                okLabel: '나가기',
+                okBg: '#475569'
+            }, function() {
+                fetch(CHAT_CTX + '/admin/chat/channel/' + roomIdx + '/leave', {
+                    method: 'POST', credentials: 'same-origin',
+                    headers: { 'Accept': 'application/json' }
+                }).then(function(r) { return r.json(); }).then(function(d) {
+                    if (d.success) {
+                        var item = document.querySelector('.channel-item[data-roomidx="' + roomIdx + '"]');
+                        if (item) item.remove();
+                        closeManageModal();
+                        if (roomIdx === CHAT_ROOM_IDX) window.location.href = CHAT_CTX + '/admin/chat';
+                    } else {
+                        if (typeof showToast === 'function') showToast(d.msg || '나가기에 실패했습니다.', 'error');
+                    }
+                }).catch(function() {
+                    if (typeof showToast === 'function') showToast('서버 오류가 발생했습니다.', 'error');
+                });
             });
+        }).catch(function() {
+            if (typeof showToast === 'function') showToast('서버 오류가 발생했습니다.', 'error');
         });
     };
-    function openTransferModal() {
+    // members 배열을 직접 받아서 DOM 파싱 의존 완전 제거
+    function openTransferModal(members) {
         var overlay = document.getElementById('transferOwnerOverlay');
         var list    = document.getElementById('transferMemberList');
         if (!overlay || !list) return;
-        var rows = document.querySelectorAll('#currentMemberList .manage-member-row');
         var html = '';
-        rows.forEach(function(row) {
-            var nameEl = row.querySelector('.manage-member-name');
-            var name   = nameEl ? nameEl.textContent.replace('(나)', '').trim() : '';
-            var btn    = row.querySelector('.manage-member-action.remove');
-            if (!btn) return;
-            var userIdx = btn.getAttribute('onclick').match(/removeMember\(\d+,(\d+)\)/);
-            if (!userIdx) return;
-            var uid = userIdx[1];
-            html += '<div class="transfer-member-row" onclick="selectTransferMember(' + uid + ', this)">'
+        (members || []).forEach(function(m) {
+            // 방장 본인, 현재 방장 제외
+            if (m.userIdx === CHAT_MY_IDX) return;
+            if (manageCreatorIdx !== null && m.userIdx === manageCreatorIdx) return;
+            var name = m.nickname || '?';
+            html += '<div class="transfer-member-row" onclick="selectTransferMember(' + m.userIdx + ', this)">'
                   + '<div class="manage-member-avt">' + name.substring(0,2) + '</div>'
-                  + '<span style="font-size:13px;font-weight:600;color:var(--text-main);">' + name + '</span>'
+                  + '<span style="font-size:13px;font-weight:600;color:var(--text-main);">' + esc(name) + '</span>'
                   + '<i class="ri-checkbox-blank-circle-line" style="margin-left:auto;font-size:18px;color:var(--text-light);"></i>'
                   + '</div>';
         });
@@ -945,6 +1043,65 @@
             }
         });
     };
+    // ── 누락된 함수: 브라우저 팝업 알림 권한 요청 ──────────────────
+    window.requestNotifPermission = function() {
+        if (!('Notification' in window)) {
+            if (typeof showToast === 'function') showToast('이 브라우저는 알림을 지원하지 않습니다.', 'error');
+            return;
+        }
+        if (Notification.permission === 'granted') {
+            if (typeof showToast === 'function') showToast('이미 팝업 알림이 허용되어 있습니다.', 'info');
+            var btn = document.getElementById('notifPermBtn');
+            if (btn) btn.innerHTML = '<i class="ri-notification-badge-line" style="font-size:16px;"></i> 팝업 알림 켜짐 ✓';
+            return;
+        }
+        Notification.requestPermission().then(function(permission) {
+            var btn = document.getElementById('notifPermBtn');
+            if (permission === 'granted') {
+                if (typeof showToast === 'function') showToast('팝업 알림이 허용되었습니다.', 'success');
+                if (btn) btn.innerHTML = '<i class="ri-notification-badge-line" style="font-size:16px;"></i> 팝업 알림 켜짐 ✓';
+                // 테스트 알림
+                new Notification('BATON Studio', { body: '알림이 활성화되었습니다! 🎉', icon: '/favicon.ico' });
+            } else {
+                if (typeof showToast === 'function') showToast('알림 권한이 거부되었습니다. 브라우저 설정에서 허용해 주세요.', 'error');
+            }
+        });
+    };
+    // ── 누락된 함수: 내 화면 채팅 지우기 ──────────────────────────
+    window.doClearMyMessages = function() {
+        if (typeof window._batonConfirm === 'function') {
+            window._batonConfirm({
+                icon: '<i class="ri-eraser-fill" style="color:#fff;"></i>',
+                iconBg: 'linear-gradient(135deg,#F97316,#FB923C)',
+                title: '내 화면 채팅 지우기',
+                desc: '채팅 내용을 내 화면에서만 지웁니다. 새로고침하면 다시 보입니다.',
+                okLabel: '지우기',
+                okBg: '#F97316'
+            }, function() {
+                var chatArea = document.getElementById('chatArea');
+                if (!chatArea) return;
+                var msgs = chatArea.querySelectorAll('.chat-msg-group, .chat-date-divider');
+                msgs.forEach(function(el) { el.remove(); });
+                if (typeof showToast === 'function') showToast('내 화면의 채팅을 지웠습니다.', 'success');
+            });
+        } else {
+            if (confirm('채팅 내용을 내 화면에서만 지우시겠습니까?')) {
+                var chatArea = document.getElementById('chatArea');
+                if (chatArea) chatArea.querySelectorAll('.chat-msg-group, .chat-date-divider').forEach(function(el){ el.remove(); });
+            }
+        }
+    };
+    // ── 뮤트 초기 상태 로드 ───────────────────────────────────────
+    if (typeof CHAT_ROOM_MUTED !== 'undefined') {
+        _isMutedForNotif = CHAT_ROOM_MUTED === 1;
+        /* 다른 페이지 팝업과 localStorage 동기화 */
+        if (window.batonChatMuteStatus) {
+            window.batonChatMuteStatus.setMuted(_isMutedForNotif);
+        } else {
+            try { localStorage.setItem('batonAdminChatMuted', _isMutedForNotif ? '1' : '0'); } catch(e) {}
+        }
+    }
+    // ─────────────────────────────────────────────────────────────
     window.doToggleMute = function() {
         if (!manageRoomIdx) return;
         fetch(CHAT_CTX + '/admin/chat/channel/' + manageRoomIdx + '/mute', {
@@ -953,6 +1110,9 @@
         }).then(function(r) { return r.json(); }).then(function(d) {
             if (d.success) {
                 var isMuted = d.isMuted === 1;
+                _isMutedForNotif = isMuted; // 알림 팝업 연동
+                /* 다른 페이지 팝업 알림도 동기화 */
+                if (window.batonChatMuteStatus) window.batonChatMuteStatus.setMuted(isMuted);
                 var btn = document.getElementById('muteToggleBtn');
                 if (btn) {
                     btn.innerHTML = (isMuted ? '<i class="ri-notification-off-line" style="font-size:16px;"></i> 알림 켜기' : '<i class="ri-notification-3-line" style="font-size:16px;"></i> 알림 끄기');
@@ -977,7 +1137,12 @@
                 var isMuted = d.isMuted === 1;
                 btnEl.innerHTML = isMuted ? '<i class="ri-notification-off-line"></i>' : '<i class="ri-notification-3-line"></i>';
                 btnEl.classList.toggle('muted', isMuted);
-                if (typeof showToast === 'function') showToast(isMuted ? '알림이 꺼졌습니다.' : '알림이 켜졌습니다.', 'info');
+                // 현재 방이면 인앱 알림 상태도 동기화
+                if (Number(roomIdx) === Number(CHAT_ROOM_IDX)) {
+                    _isMutedForNotif = isMuted;
+                    if (window.batonChatMuteStatus) window.batonChatMuteStatus.setMuted(isMuted);
+                }
+                showToast(isMuted ? '알림이 꺼졌습니다.' : '알림이 켜졌습니다.', 'info');
             }
         });
     };

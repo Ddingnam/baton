@@ -16,4 +16,5 @@ public class ChatRoom {
     private String roomName;
     private int roomType;
     private int isOnline;
+    private int isMuted;
 }
