@@ -15,7 +15,6 @@
 body{background:var(--bg);}
 .wrap{max-width:760px;margin:0 auto;padding:100px 20px 60px;}
 
-/* 상단 헤더 */
 .resume-header{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:30px 28px;margin-bottom:16px;display:flex;align-items:center;gap:20px;}
 .avatar-circle{width:72px;height:72px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--primary);flex-shrink:0;overflow:hidden;}
 .avatar-circle img{width:100%;height:100%;object-fit:cover;}
@@ -25,22 +24,23 @@ body{background:var(--bg);}
 .resume-meta{display:flex;gap:14px;flex-wrap:wrap;}
 .meta-item{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--sub);}
 
-/* 섹션 카드 */
 .info-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:26px 28px;margin-bottom:14px;}
 .card-label{font-size:12px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px;}
 .card-content{font-size:15px;color:var(--text);line-height:1.75;white-space:pre-wrap;word-break:break-word;}
 .card-content.empty-text{color:#9CA3AF;font-style:italic;}
 
-/* 하단 버튼 바 */
 .bottom-bar{position:fixed;bottom:0;left:0;width:100%;background:var(--surface);border-top:1px solid var(--border);padding:14px 20px;z-index:100;box-shadow:0 -4px 16px rgba(0,0,0,0.05);}
 .bar-inner{max-width:760px;margin:0 auto;display:flex;gap:10px;}
 .btn-back{flex:1;padding:14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:15px;font-weight:600;color:var(--sub);cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;}
-.btn-edit{flex:2;padding:14px;background:var(--primary);border:none;border-radius:10px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn-edit{flex:2;padding:14px;background:var(--primary);border:none;border-radius:10px;font-size:15px;font-weight:700;color:#fff !important;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn-edit i{color:#fff !important;}
 .btn-del{flex:1;padding:14px;background:#FEF2F2;border:none;border-radius:10px;font-size:15px;font-weight:700;color:#DC2626;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;}
 .btn-back:hover{background:#E2E8F0;}
-.btn-edit:hover{background:#1a4a8a;}
+.btn-edit:hover{background:#1a4a8a;color:#fff !important;}
+.btn-edit:hover i{color:#fff !important;}
 .btn-del:hover{background:#fee2e2;}
 </style>
+
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/layout/header.jsp"/>
