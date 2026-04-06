@@ -44,7 +44,6 @@ public class JobProfileController {
         return "redirect:/resume/myList";
     }
 
-    /* ───────────── 나의 이력서 목록 ───────────── */
     @GetMapping("/myList")
     public String myList(HttpSession session, Model model) {
         SessionInfo info = (SessionInfo) session.getAttribute("member");
@@ -58,7 +57,6 @@ public class JobProfileController {
         return "resume/myList";
     }
 
-    /* ───────────── 상세보기 ───────────── */
     @GetMapping("/article/{profileIdx}")
     public String article(@PathVariable("profileIdx") long profileIdx,
                           HttpSession session, Model model) {
@@ -76,7 +74,6 @@ public class JobProfileController {
         return "resume/article";
     }
 
-    /* ───────────── 수정 폼 ───────────── */
     @GetMapping("/update")
     public String updateForm(@RequestParam("profileIdx") long profileIdx,
                              HttpSession session, Model model) {
@@ -111,7 +108,6 @@ public class JobProfileController {
         return "redirect:/resume/article/" + dto.getProfileIdx();
     }
 
-    /* ───────────── 삭제 ───────────── */
     @GetMapping("/delete")
     public String delete(@RequestParam("profileIdx") long profileIdx, HttpSession session) {
         SessionInfo info = (SessionInfo) session.getAttribute("member");
@@ -126,7 +122,6 @@ public class JobProfileController {
         return "redirect:/resume/myList";
     }
 
-    /* ───────────── 인쇄 전용 팝업 ───────────── */
     @GetMapping("/print")
     public String printResume(@RequestParam("profileIdx") long profileIdx, 
                               HttpSession session, Model model) {
@@ -144,7 +139,6 @@ public class JobProfileController {
         return "resume/print";
     }
 
-    /* ───────────── ★ 이메일 발송 팝업 (추가됨) ───────────── */
     @GetMapping("/email")
     public String emailPopup(@RequestParam("profileIdx") long profileIdx, 
                              HttpSession session, Model model) {
@@ -164,7 +158,6 @@ public class JobProfileController {
         return "resume/emailPopup";
     }
 
-    /* ───────────── ★ 이메일 발송 처리 (수정본) ───────────── */
     @PostMapping("/email")
     public String sendEmailSubmit(@RequestParam("profileIdx") long profileIdx,
                                   @RequestParam("receiverName") String receiverName,
@@ -185,7 +178,6 @@ public class JobProfileController {
             mail.setReceiverEmail(emailId + "@" + emailDomain);
             mail.setSubject("[BATON] " + info.getName() + "님의 이력서입니다.");
             
-            // ★ 핵심 수정: getContent() 대신 getIntroduce() 사용!
             String intro = dto.getIntroduce() != null ? dto.getIntroduce() : "내용이 없습니다.";
             
             StringBuilder sb = new StringBuilder();
@@ -196,7 +188,6 @@ public class JobProfileController {
             sb.append("<p><strong>지원자:</strong> ").append(dto.getUserName()).append("</p>");
             sb.append("<div style='background:#f9f9f9; padding:15px; margin-top:10px;'>");
             
-            // 엔터(\n)를 HTML 줄바꿈(<br>)으로 변환
             sb.append(intro.replace("\n", "<br>")); 
             
             sb.append("</div>");
@@ -214,5 +205,30 @@ public class JobProfileController {
         
         return "resume/emailResult"; 
     }
+    
+    @PostMapping("/deleteMulti")
+    public String deleteMulti(@RequestParam("profileIdxs") List<Long> profileIdxs,
+                              HttpSession session) {
+        SessionInfo info = (SessionInfo) session.getAttribute("member");
+        if (info == null) return "redirect:/member/login";
+
+        if (profileIdxs == null || profileIdxs.isEmpty()) {
+            return "redirect:/resume/myList";
+        }
+
+        try {
+            for (Long profileIdx : profileIdxs) {
+                JobProfile origin = jobProfileService.findById(profileIdx);
+                if (origin != null && origin.getUserIdx() == info.getUserIdx()) {
+                    jobProfileService.deleteJobProfile(profileIdx);
+                }
+            }
+        } catch (Exception e) {
+            log.error("deleteMulti error", e);
+        }
+
+        return "redirect:/resume/myList";
+    }
+
     
 }

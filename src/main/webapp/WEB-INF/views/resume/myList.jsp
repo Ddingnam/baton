@@ -215,31 +215,31 @@ body { background: var(--bg); font-family: 'Pretendard', sans-serif; }
 <jsp:include page="/WEB-INF/views/layout/footer.jsp"/>
 
 <script>
-// 1. 체크박스 전체선택
 function toggleAll(source) {
     const checkboxes = document.querySelectorAll('input[name="profileIdxs"]');
     checkboxes.forEach(cb => cb.checked = source.checked);
 }
 
-// 2. 다중 삭제
 function submitDelChk() {
+    const form = document.getElementById('manageForm');
     const checked = document.querySelectorAll('input[name="profileIdxs"]:checked');
+
     if (checked.length === 0) {
         alert("삭제할 이력서를 선택해주세요.");
         return;
     }
+
     if (confirm("선택한 이력서 " + checked.length + "개를 정말 삭제하시겠습니까?")) {
-        alert('백엔드 다중 삭제 로직 연결이 필요합니다 (form submit 발생)');
+        form.submit();
     }
 }
 
-// 3. 인쇄 팝업 띄우기
+
 function printResume(profileIdx) {
-	const url = '${pageContext.request.contextPath}/resume/print?profileIdx=' + profileIdx;
+    const url = '${pageContext.request.contextPath}/resume/print?profileIdx=' + profileIdx;
     window.open(url, 'resumePrint', 'width=850,height=900,scrollbars=yes');
 }
 
-// 4. 이메일 팝업 띄우기 (BATON 전용)
 function emailResume(profileIdx) {
     const url = '${pageContext.request.contextPath}/resume/email?profileIdx=' + profileIdx;
     window.open(url, 'resumeEmail', 'width=550,height=650,scrollbars=no');
