@@ -75,7 +75,7 @@
     <div class="alba-write-content">
 
       <div class="content-header">
-        <a href="${pageContext.request.contextPath}/alba" class="back-btn">
+        <a href="${pageContext.request.contextPath}/alba/list" class="back-btn">
           <i class="ri-arrow-left-s-line"></i>
         </a>
         <div class="header-text">
