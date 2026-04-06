@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sp.app.mapper.JobProfileMapper">
 
-<!-- 공통 resultMap -->
 <resultMap id="jobProfileMap" type="com.sp.app.model.JobProfile">
     <id     property="profileIdx"    column="PROFILEIDX"/>
     <result property="userIdx"       column="USERIDX"/>
@@ -23,7 +22,6 @@
     <result property="updatedDate"   column="UPDATEDDATE"/>
 </resultMap>
 
-<!-- 등록 -->
 <insert id="insertJobProfile" parameterType="com.sp.app.model.JobProfile">
     <selectKey keyProperty="profileIdx" resultType="long" order="BEFORE">
         SELECT seq_job_profile.NEXTVAL FROM dual
@@ -50,14 +48,12 @@
     )
 </insert>
 
-<!-- 이력서 개수 -->
 <select id="getResumeCount" parameterType="long" resultType="int">
     SELECT NVL(COUNT(*), 0)
     FROM JOBPROFILE
     WHERE USERIDX = #{userIdx}
 </select>
 
-<!-- 나의 이력서 목록 -->
 <select id="listJobProfile" parameterType="long" resultMap="jobProfileMap">
     SELECT PROFILEIDX, USERIDX,
            PHOTOURL, NAME, TEL, EMAIL, GENDER,
@@ -72,7 +68,6 @@
     ORDER BY CREATEDDATE DESC
 </select>
 
-<!-- 단건 조회 -->
 <select id="findById" parameterType="long" resultMap="jobProfileMap">
     SELECT PROFILEIDX, USERIDX,
            PHOTOURL, NAME, TEL, EMAIL, GENDER,
@@ -86,7 +81,6 @@
     WHERE PROFILEIDX = #{profileIdx}
 </select>
 
-<!-- 수정 -->
 <update id="updateJobProfile" parameterType="com.sp.app.model.JobProfile">
     UPDATE JOBPROFILE SET
         PROFILETITLE  = #{title},
@@ -102,9 +96,16 @@
     WHERE PROFILEIDX = #{profileIdx}
 </update>
 
-<!-- 삭제 -->
 <delete id="deleteJobProfile" parameterType="long">
     DELETE FROM JOBPROFILE WHERE PROFILEIDX = #{profileIdx}
 </delete>
+
+<update id="updatePublicStatus" parameterType="map">
+    UPDATE job_profile
+    SET is_public = #{isPublic}
+    WHERE profile_idx = #{profileIdx}
+      AND user_idx = #{userIdx}
+</update>
+
 
 </mapper>

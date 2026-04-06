@@ -183,7 +183,15 @@ body { background: var(--bg); font-family: 'Pretendard', sans-serif; }
                     </a>
                   </td>
                   <td><a href="${pageContext.request.contextPath}/resume/update?profileIdx=${r.profileIdx}" class="btn-edit">수정</a></td>
-                  <td><button type="button" class="btn-outline" onclick="alert('공개 설정 기능 준비중입니다.');">공개하기</button></td>
+                  <td>
+					  <form method="post" action="${pageContext.request.contextPath}/resume/togglePublic" style="display:inline;">
+					    <input type="hidden" name="profileIdx" value="${r.profileIdx}">
+					    <button type="submit" class="btn-outline">
+					      ${r.isPublic eq 'Y' ? '비공개하기' : '공개하기'}
+					    </button>
+					  </form>
+					</td>
+
                 </tr>
               </c:forEach>
             </tbody>

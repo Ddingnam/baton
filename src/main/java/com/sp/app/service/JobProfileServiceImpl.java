@@ -75,6 +75,21 @@ public class JobProfileServiceImpl implements JobProfileService {
             throw e;
         }
     }
+
+    @Override
+    public void updatePublicStatus(long profileIdx, long userIdx, String isPublic) throws Exception {
+        try {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("profileIdx", profileIdx);
+            map.put("userIdx", userIdx);
+            map.put("isPublic", isPublic);
+            mapper.updatePublicStatus(map);
+        } catch (Exception e) {
+            log.error("updatePublicStatus error", e);
+            throw e;
+        }
+    }
+
     
 
 }

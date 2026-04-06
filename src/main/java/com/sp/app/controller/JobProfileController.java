@@ -248,6 +248,28 @@ public class JobProfileController {
 
         return "redirect:/resume/myList";
     }
+    
+    @PostMapping("/togglePublic")
+    public String togglePublic(@RequestParam("profileIdx") long profileIdx,
+                               HttpSession session) {
+        SessionInfo info = (SessionInfo) session.getAttribute("member");
+        if (info == null) return "redirect:/member/login";
+
+        try {
+            JobProfile dto = jobProfileService.findById(profileIdx);
+            if (dto == null || dto.getUserIdx() != info.getUserIdx()) {
+                return "redirect:/resume/myList";
+            }
+
+            String nextValue = "Y".equals(dto.getIsPublic()) ? "N" : "Y";
+            jobProfileService.updatePublicStatus(profileIdx, info.getUserIdx(), nextValue);
+        } catch (Exception e) {
+            log.error("togglePublic error", e);
+        }
+
+        return "redirect:/resume/myList";
+    }
+
 
     
 }

@@ -12,4 +12,6 @@ public interface JobProfileMapper {
     JobProfile findById(long profileIdx);
     void updateJobProfile(JobProfile dto);
     void deleteJobProfile(long profileIdx);
+    void updatePublicStatus(java.util.Map<String, Object> map);
+
 }
