@@ -25,7 +25,7 @@
             <p class="auth-subtitle">안전한 중고거래의 시작, <br>바톤 터치를 준비해볼까요?</p>
         </header>
 
-        <form name="registerForm" action="${pageContext.request.contextPath}/member/register" method="post" class="auth-form-body">
+        <form name="registerForm" action="${pageContext.request.contextPath}/member/register" method="post" class="auth-form-body" autocomplete="off">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
             <div class="input-sequence item-2">

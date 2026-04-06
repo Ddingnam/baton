@@ -24,7 +24,7 @@
             <p class="auth-subtitle">등록한 아이디와 이메일을 <br>정확히 입력해 주세요.</p>
         </header>
 
-		<form name="findPwdForm" class="auth-form-body">
+		<form name="findPwdForm" class="auth-form-body" autocomplete="off">
 		    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 		    
 		    <div class="input-sequence item-1">

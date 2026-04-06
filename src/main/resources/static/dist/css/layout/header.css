@@ -868,3 +868,18 @@ html {
     font-family: 'Pretendard', sans-serif !important;
     font-weight: 500 !important;
 }
+
+/* 💡 1. 기본 상태: 부드러운 이동(transition) 속성 부여 */
+/* 내려갈 때와 올라올 때 모두 이 0.4초짜리 애니메이션이 적용됩니다. */
+#crew-chat-trigger,
+#baton-chatbot-trigger {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+}
+
+/* 💡 2. 채팅창 열림 상태: 화면 아래로 밀어내고 투명하게 만듦 */
+body.chat-panel-open #crew-chat-trigger,
+body.chat-panel-open #baton-chatbot-trigger {
+    transform: translateY(150px); /* 아래로 150px 이동 (아이콘 크기에 맞춰 조절) */
+    opacity: 0;                   /* 투명도 0 (숨김) */
+    pointer-events: none;         /* 보이지 않을 때 클릭 방지 */
+}

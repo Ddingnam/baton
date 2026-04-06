@@ -125,6 +125,15 @@ const app = Vue.createApp({
 			myCrewList: []
         }
     },
+	watch: {
+        isChatOpen(newVal) {
+            if (newVal) {
+                document.body.classList.add('chat-panel-open');
+            } else {
+                document.body.classList.remove('chat-panel-open');
+            }
+        }
+    },
     async mounted() {
         window.toggleCrewChat = () => {
             this.isChatOpen = !this.isChatOpen;

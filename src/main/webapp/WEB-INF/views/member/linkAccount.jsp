@@ -158,7 +158,7 @@ body {
             </div>
         </div>
 
-        <form action="${pageContext.request.contextPath}/member/linkAccount" method="post">
+        <form action="${pageContext.request.contextPath}/member/linkAccount" method="post" autocomplete="off">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
             <div class="input-sequence reveal-item delay-3">
