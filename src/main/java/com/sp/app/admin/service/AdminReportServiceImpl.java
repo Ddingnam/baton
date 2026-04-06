@@ -2,6 +2,7 @@ package com.sp.app.admin.service;
 
 import com.sp.app.admin.domain.dto.ReportDto;
 import com.sp.app.admin.mapper.AdminReportMapper;
+import com.sp.app.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,9 @@ public class AdminReportServiceImpl implements AdminReportService {
 
     @Autowired
     private AdminNotificationService adminNotificationService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public int dataCount(Map<String, Object> map) {
@@ -114,19 +118,17 @@ public class AdminReportServiceImpl implements AdminReportService {
                     } else if ("COMMUNITY_REPLY".equals(domainType)) {
                         mapper.hideCommunityReply(targetIdx);
                     }
-                    // TRADE, CREW, ALBA 등 도메인은 각 mapper 구축 후 여기에 추가
                 }
             }
         }
 
-        // 3. 신고자에게 처리 결과 알림 발송
         try {
             Long reportIdx = Long.valueOf(map.get("reportIdx").toString());
             Long reporterIdx = mapper.getReporterIdx(reportIdx);
             if (reporterIdx != null) {
                 String statusLabel = status == 1 ? "처리 완료" : "반려";
                 String content = "접수하신 신고(#" + reportIdx + ")가 [" + statusLabel + "] 처리되었습니다.";
-                adminNotificationService.sendToAdmin(reporterIdx, "REPORT", content, "/admin/report/list");
+                notificationService.sendNotification(reporterIdx, "REPORT", content, "/mypage/report");
             }
         } catch (Exception ignored) {}
     }

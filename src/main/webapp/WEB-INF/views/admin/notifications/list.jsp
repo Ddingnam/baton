@@ -205,10 +205,8 @@
                         <button class="nfi-chip" data-type="INQUIRY"><i class="ri-question-answer-line"></i> 문의 <span class="chip-count" id="cnt-INQUIRY">0</span></button>
                         <button class="nfi-chip" data-type="PAYMENT"><i class="ri-coin-line"></i> 결제 <span class="chip-count" id="cnt-PAYMENT">0</span></button>
                         <button class="nfi-chip" data-type="REFUND"><i class="ri-refund-2-line"></i> 환불 <span class="chip-count" id="cnt-REFUND">0</span></button>
-                        <button class="nfi-chip" data-type="CHAT"><i class="ri-chat-3-line"></i> 채팅 <span class="chip-count" id="cnt-CHAT">0</span></button>
-                        <button class="nfi-chip" data-type="MEMBER"><i class="ri-user-add-line"></i> 회원 <span class="chip-count" id="cnt-MEMBER">0</span></button>
+                        <button class="nfi-chip" data-type="MEMBER"><i class="ri-user-add-line"></i> 회원가입 <span class="chip-count" id="cnt-MEMBER">0</span></button>
                         <button class="nfi-chip" data-type="CALENDAR"><i class="ri-calendar-check-line"></i> 캘린더 <span class="chip-count" id="cnt-CALENDAR">0</span></button>
-                        <button class="nfi-chip" data-type="TODO"><i class="ri-task-line"></i> 할 일 <span class="chip-count" id="cnt-TODO">0</span></button>
                         <button class="nfi-chip" data-type="SYSTEM"><i class="ri-shield-flash-line"></i> 시스템 <span class="chip-count" id="cnt-SYSTEM">0</span></button>
                         <button class="nfi-chip" data-type="unread"><span class="chip-dot"></span> 미읽음만 <span class="chip-count" id="cnt-unread">0</span></button>
                     </div>
@@ -278,7 +276,7 @@
         var el;
         el = document.getElementById('cnt-all');    if (el) el.textContent = total;
         el = document.getElementById('cnt-unread'); if (el) el.textContent = unread;
-        ['REPORT','INQUIRY','PAYMENT','REFUND','CHAT','MEMBER','CALENDAR','TODO','SYSTEM'].forEach(function(t) {
+        ['REPORT','INQUIRY','PAYMENT','REFUND','MEMBER','CALENDAR','SYSTEM'].forEach(function(t) {
             el = document.getElementById('cnt-' + t);
             if (el) el.textContent = allNotis.filter(function(n) { return n.notifType === t; }).length;
         });

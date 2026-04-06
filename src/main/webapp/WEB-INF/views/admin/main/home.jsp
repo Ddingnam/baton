@@ -58,13 +58,6 @@
             window.mock30Labels = mock30Labels;
             window.mock30Data   = mock30Data;
 
-            /* 메트릭 가데이터 */
-            window.mockMetrics = {
-                totalMembers : 1247,
-                todayRevenue : 460000,
-                todayTrades  : 38,
-                pendingReports: 5
-            };
         })();
     </script>
     <script src="${pageContext.request.contextPath}/dist/js/admin/admin_main.js"></script>

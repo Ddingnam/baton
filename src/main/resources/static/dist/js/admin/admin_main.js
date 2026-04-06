@@ -1222,36 +1222,6 @@ function fcSelectDate(key) {
         fill.addColorStop(1, 'rgba(0,0,0,0)');
         return { stroke, fill, c1 };
     }
-    /* ── 메트릭 가데이터 주입 ── */
-    (function() {
-        const m = window.mockMetrics;
-        if (!m) return;
-        function fmt(n) { return n.toLocaleString('ko-KR'); }
-        /* 각 metric-val 요소를 label로 찾아 교체 */
-        document.querySelectorAll('.metric-card').forEach(card => {
-            const label = card.querySelector('.metric-label');
-            const val   = card.querySelector('.metric-val');
-            if (!label || !val) return;
-            const t = label.textContent.trim();
-            if (t === '전체 회원수'   && val.textContent.trim() === '0') val.textContent = fmt(m.totalMembers);
-            if (t === '오늘 충전 매출' && (val.textContent.includes('0원') || val.textContent.trim() === '0원')) val.textContent = fmt(m.todayRevenue) + '원';
-            if (t === '오늘 거래건수'  && val.textContent.trim() === '0') val.textContent = fmt(m.todayTrades);
-        });
-        /* 트렌드 텍스트 */
-        document.querySelectorAll('.metric-trend').forEach(el => {
-            if (el.textContent.includes('전일 대비 0%') || el.textContent.includes('오늘 가입 0%')) {
-                const card = el.closest('.metric-card');
-                if (!card) return;
-                const label = card.querySelector('.metric-label');
-                if (!label) return;
-                const t = label.textContent.trim();
-                if (t === '전체 회원수')    { el.innerHTML = '<i class="ri-arrow-up-line"></i> 오늘 가입 +3명'; el.className = 'metric-trend text-purple'; }
-                if (t === '오늘 충전 매출') { el.innerHTML = '<i class="ri-arrow-up-line"></i> 전일 대비 +12.4%'; el.className = 'metric-trend text-blue'; }
-                if (t === '오늘 거래건수')  { el.innerHTML = '<i class="ri-arrow-up-line"></i> 전일 대비 +5건'; el.className = 'metric-trend text-green'; }
-            }
-        });
-    })();
-
     /* ── 차트 ── */
     const ctx = document.getElementById('gradientChart');
     if (ctx) {
@@ -1627,6 +1597,5 @@ function fcSelectDate(key) {
         el.onmouseleave = function () { _hideTimer = setTimeout(function () { hidePopup(el); }, 2000); };
     };
 
-    /* 채팅 설정에서 알림 켜기/끄기를 외부에서 호출할 수 있도록 */
     window.batonChatMuteStatus = { isMuted: isMuted, setMuted: setMuted };
 }());
