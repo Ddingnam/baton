@@ -27,7 +27,7 @@ public class SpringMvcConfiguration implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(tradeHitCountInterceptor)
-			.addPathPatterns("/trade/article");
+			.addPathPatterns("/api/trade/article/*");
 	}
 
 }

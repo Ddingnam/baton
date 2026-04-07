@@ -1,6 +1,7 @@
 package com.sp.app.interceptor;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.HandlerMapping;
 
 import com.sp.app.model.Trade;
 import com.sp.app.security.CustomUserDetails;
@@ -32,6 +34,18 @@ public class TradeHitCountInterceptor implements HandlerInterceptor{
             HttpSession session = req.getSession();
             
             String productIdxStr = req.getParameter("productIdx");
+
+            if (productIdxStr == null) {
+                Object pathVarObj = req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+
+                if (pathVarObj instanceof Map<?, ?> pathVariables) {
+                    Object value = pathVariables.get("productIdx");
+                    if (value != null) {
+                        productIdxStr = value.toString();
+                    }
+                }
+            }
+
             if (productIdxStr == null) return true;
 
             long productIdx = Long.parseLong(productIdxStr);
