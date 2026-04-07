@@ -104,6 +104,7 @@ public class CommunityServiceImpl implements CommunityService {
 			}
 
 			Community savedCommunity = communityRepository.save(community);
+			dto.setId(savedCommunity.getId()); // 호출자에서 생성된 id 참조 가능하도록
 
 			try {
 				List<MultipartFile> attachFiles = dto.getAttachFiles();
@@ -335,6 +336,38 @@ public class CommunityServiceImpl implements CommunityService {
 				}
 			} catch(Exception e) { 
 				log.info("커뮤니티 수정 알림 전송 실패: ", e); 
+			}
+
+			// Poll 업데이트: 기존 poll 삭제 후 새로 저장
+			CommunityPoll existingPoll = communityPollRepository.findByCommunityId(community.getId());
+			if (existingPoll != null) {
+				communityPollRepository.delete(existingPoll);
+				communityPollRepository.flush();
+			}
+			if (dto.getPollTitle() != null && !dto.getPollTitle().isEmpty() && dto.getPollOptions() != null) {
+				LocalDateTime endDate = null;
+				if (dto.getPollEndDate() != null && !dto.getPollEndDate().isEmpty()) {
+					try {
+						endDate = LocalDateTime.of(LocalDate.parse(dto.getPollEndDate(), DateTimeFormatter.ISO_DATE), LocalTime.MAX);
+					} catch (Exception ignored) {}
+				}
+				CommunityPoll newPoll = CommunityPoll.builder()
+						.community(community)
+						.title(dto.getPollTitle())
+						.multipleChoice(dto.getPollMultiple() != null && dto.getPollMultiple())
+						.endDate(endDate)
+						.build();
+				CommunityPoll savedPoll = communityPollRepository.save(newPoll);
+				List<PollOption> options = new ArrayList<>();
+				for (String optionContent : dto.getPollOptions()) {
+					if (optionContent != null && !optionContent.trim().isEmpty()) {
+						options.add(PollOption.builder()
+								.poll(savedPoll)
+								.content(optionContent)
+								.build());
+					}
+				}
+				pollOptionRepository.saveAll(options);
 			}
 		
 		} catch (Exception e) {

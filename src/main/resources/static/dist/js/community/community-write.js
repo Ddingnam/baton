@@ -413,7 +413,9 @@ function saveTemp() {
 	const activeIds = Array.from(activeImages).map(img => img.getAttribute('data-temp-id'));
 
 	const formData = new FormData();
+	const currentId = document.communityForm.id ? document.communityForm.id.value : null;
 	const dto = {
+		id: currentId && parseInt(currentId) > 0 ? parseInt(currentId) : null,
 		subject: subject,
 		content: content,
 		category: document.querySelector('input[name="category"]:checked')?.value || '1',
@@ -441,6 +443,10 @@ function saveTemp() {
 		if (data.status === 'true') {
 			showBatonToast('임시저장되었습니다 ✓');
 			loadTempCount();
+			// 새로 생성된 경우 id를 form에 반영해 다음 임시저장 시 update 처리
+			if (data.id && document.communityForm.id) {
+				document.communityForm.id.value = data.id;
+			}
 		} else {
 			showBatonToast(data.message || '임시저장에 실패했습니다.');
 		}

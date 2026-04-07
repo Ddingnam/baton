@@ -87,7 +87,8 @@ public class AdminReportServiceImpl implements AdminReportService {
                     Map<String, Object> sanctionMap = new HashMap<>();
                     sanctionMap.put("userIdx",      reportedUserIdx);
                     sanctionMap.put("sanctionType", sanctionType);
-                    sanctionMap.put("reason",       map.getOrDefault("adminMemo", "신고 처리에 의한 제재"));
+                    String adminMemo = map.get("adminMemo") != null ? map.get("adminMemo").toString().trim() : "";
+                    sanctionMap.put("reason", adminMemo.isEmpty() ? "신고 처리에 의한 제재" : adminMemo);
 
                     if ("TEMPORARY".equals(sanctionType)) {
                         Object daysObj = map.get("sanctionDays");

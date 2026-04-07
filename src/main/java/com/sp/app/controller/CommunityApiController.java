@@ -34,6 +34,7 @@ import com.sp.app.service.MemberService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RestController
@@ -196,6 +197,7 @@ public class CommunityApiController {
         }
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/poll")
     public ResponseEntity<Map<String, Object>> getPoll(
             @RequestParam("id") Long communityId,
@@ -325,6 +327,7 @@ public class CommunityApiController {
 
             result.put("status", "true");
             result.put("message", "임시저장되었습니다.");
+            result.put("id", dto.getId()); // 신규 저장 시 생성된 id 반환
         } catch (Exception e) {
             log.error("임시저장 실패", e);
             result.put("status", "false");
